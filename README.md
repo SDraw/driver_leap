@@ -41,7 +41,8 @@ use "vrcmd" to verify things are loading:
 Driver hydra : 2 displays
         Hydra (Serial number hydra0_controller0)
         Hydra (Serial number hydra0_controller1)
-...```
+...
+```
 
 You can also use "vrcmd --pollposes" (followed by an index number to limit the output) to see things are working.
 
