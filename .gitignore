@@ -6,3 +6,4 @@ ipch
 .vs
 *.opensdf
 *.opendb
+*.VC.db
