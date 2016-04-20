@@ -487,6 +487,11 @@ void CHydraHmdLatest::Deactivate()
 	m_unSteamVRTrackedDeviceId = vr::k_unTrackedDeviceIndexInvalid;
 }
 
+void CHydraHmdLatest::PowerOff()
+{
+	// TODO
+}
+
 void CHydraHmdLatest::DebugRequest( const char * pchRequest, char * pchResponseBuffer, uint32_t unResponseBufferSize )
 {
 	std::istringstream ss( pchRequest );

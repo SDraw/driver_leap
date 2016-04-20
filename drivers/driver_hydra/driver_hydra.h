@@ -82,6 +82,7 @@ public:
 	// Implementation of vr::ITrackedDeviceServerDriver
 	virtual vr::EVRInitError Activate( uint32_t unObjectId ) override;
 	virtual void Deactivate() override;
+	virtual void PowerOff() override;
 	void *GetComponent( const char *pchComponentNameAndVersion ) override;
 	virtual void DebugRequest( const char * pchRequest, char * pchResponseBuffer, uint32_t unResponseBufferSize ) override;
 	virtual vr::DriverPose_t GetPose() override;

@@ -6,7 +6,7 @@
 
 1. Install SteamVR.  It is under "Tools" in everyone's Steam Library.  steam://install/250820
 2. Install "Sixense SDK for the Razer Hydra".  It is also under "Tools".  steam://install/42300
-3. Fetch the OpenVR SDK 0.9.15 from https://github.com/ValveSoftware/openvr .  That version SHA is c95571027b79644643bca044538144c96194c4f2.  Newer version should also work with minor changes.
+3. Fetch the OpenVR SDK 0.9.19 from https://github.com/ValveSoftware/openvr .  That version SHA is f1ffbf4e92f383bdb453d58f9583c51a5ec350d9.  Newer version should also work with minor changes.
 
 The solution and project files are for Visual Studio 2015.
 
