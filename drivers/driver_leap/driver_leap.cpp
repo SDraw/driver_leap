@@ -21,19 +21,19 @@ CClientDriver_Leap g_ClientTrackedDeviceProvider;
 HMD_DLL_EXPORT
 void *HmdDriverFactory( const char *pInterfaceName, int *pReturnCode )
 {
-	if ( 0 == strcmp( vr::IServerTrackedDeviceProvider_Version, pInterfaceName ) )
-	{
-		return &g_ServerTrackedDeviceProvider;
-	}
-	if ( 0 == strcmp( vr::IClientTrackedDeviceProvider_Version, pInterfaceName ) )
-	{
-		return &g_ClientTrackedDeviceProvider;
-	}
+    if ( 0 == strcmp( vr::IServerTrackedDeviceProvider_Version, pInterfaceName ) )
+    {
+        return &g_ServerTrackedDeviceProvider;
+    }
+    if ( 0 == strcmp( vr::IClientTrackedDeviceProvider_Version, pInterfaceName ) )
+    {
+        return &g_ClientTrackedDeviceProvider;
+    }
 
-	if ( pReturnCode )
-		*pReturnCode = vr::VRInitError_Init_InterfaceNotFound;
+    if ( pReturnCode )
+    *pReturnCode = vr::VRInitError_Init_InterfaceNotFound;
 
-	return NULL;
+    return NULL;
 }
 
 //==================================================================================================
@@ -44,28 +44,28 @@ static vr::IDriverLog * s_pLogFile = NULL;
 
 static bool InitDriverLog( vr::IDriverLog *pDriverLog )
 {
-	if ( s_pLogFile )
-		return false;
-	s_pLogFile = pDriverLog;
-	return s_pLogFile != NULL;
+    if ( s_pLogFile )
+        return false;
+    s_pLogFile = pDriverLog;
+    return s_pLogFile != NULL;
 }
 
 static void CleanupDriverLog()
 {
-	s_pLogFile = NULL;
+    s_pLogFile = NULL;
 }
 
 static void DriverLogVarArgs( const char *pMsgFormat, va_list args )
 {
-	char buf[1024];
+    char buf[1024];
 #if defined( WIN32 )
-	vsprintf_s( buf, pMsgFormat, args );
+    vsprintf_s( buf, pMsgFormat, args );
 #else
-	vsnprintf( buf, sizeof( buf ), pMsgFormat, args );
+    vsnprintf( buf, sizeof( buf ), pMsgFormat, args );
 #endif
 
-	if ( s_pLogFile )
-		s_pLogFile->Log( buf );
+    if ( s_pLogFile )
+        s_pLogFile->Log( buf );
 }
 
 /** Provides printf-style debug logging via the vr::IDriverLog interface provided by SteamVR
@@ -74,12 +74,12 @@ static void DriverLogVarArgs( const char *pMsgFormat, va_list args )
 */
 static void DriverLog( const char *pMsgFormat, ... )
 {
-	va_list args;
-	va_start( args, pMsgFormat );
+    va_list args;
+    va_start( args, pMsgFormat );
 
-	DriverLogVarArgs( pMsgFormat, args );
+    DriverLogVarArgs( pMsgFormat, args );
 
-	va_end( args );
+    va_end( args );
 }
 
 //==================================================================================================
@@ -114,7 +114,7 @@ void CServerDriver_Leap::onInit(const Controller&controller)
  */
 void CServerDriver_Leap::onConnect(const Controller&controller)
 {
-	DriverLog(" CServerDriver_Leap::onConnect()\n");
+    DriverLog(" CServerDriver_Leap::onConnect()\n");
 }
 
 /**
@@ -135,7 +135,7 @@ void CServerDriver_Leap::onConnect(const Controller&controller)
  */
 void CServerDriver_Leap::onDisconnect(const Controller&controller)
 {
-	DriverLog(" CServerDriver_Leap::onDisconnect()\n");
+    DriverLog(" CServerDriver_Leap::onDisconnect()\n");
 }
 
 /**
@@ -149,7 +149,7 @@ void CServerDriver_Leap::onDisconnect(const Controller&controller)
  */
 void CServerDriver_Leap::onExit(const Controller&controller)
 {
-	DriverLog(" CServerDriver_Leap::onExit()\n");
+    DriverLog(" CServerDriver_Leap::onExit()\n");
 }
 
 /**
@@ -187,7 +187,7 @@ void CServerDriver_Leap::onFrame(const Controller&controller)
  */
 void CServerDriver_Leap::onFocusGained(const Controller&controller)
 {
-//	DriverLog(" CServerDriver_Leap::onFocusGained()\n");
+//    DriverLog(" CServerDriver_Leap::onFocusGained()\n");
 }
 
 /**
@@ -204,7 +204,7 @@ void CServerDriver_Leap::onFocusGained(const Controller&controller)
  */
 void CServerDriver_Leap::onFocusLost(const Controller&controller)
 {
-//	DriverLog(" CServerDriver_Leap::onFocusLost()\n");
+//    DriverLog(" CServerDriver_Leap::onFocusLost()\n");
 }
 
 // onServiceConnect/onServiceDisconnect are for connection established/lost.
@@ -221,7 +221,7 @@ void CServerDriver_Leap::onFocusLost(const Controller&controller)
  */
 void CServerDriver_Leap::onServiceConnect(const Controller&controller)
 {
-	DriverLog(" CServerDriver_Leap::onServiceConnect()\n");
+    DriverLog(" CServerDriver_Leap::onServiceConnect()\n");
 }
 
 /**
@@ -237,7 +237,7 @@ void CServerDriver_Leap::onServiceConnect(const Controller&controller)
  */
 void CServerDriver_Leap::onServiceDisconnect(const Controller&controller)
 {
-	DriverLog(" CServerDriver_Leap::onServiceDisconnect()\n");
+    DriverLog(" CServerDriver_Leap::onServiceDisconnect()\n");
 }
 
 /**
@@ -255,20 +255,20 @@ void CServerDriver_Leap::onServiceDisconnect(const Controller&controller)
  */
 void CServerDriver_Leap::onDeviceChange(const Controller&controller)
 {
-	DriverLog(" CServerDriver_Leap::onDeviceChange()\n");
+    DriverLog(" CServerDriver_Leap::onDeviceChange()\n");
 
-	if (controller.isConnected())
-	{
-		ScanForNewControllers(true);
-	}
-	else
-	{
-		scope_lock lock(m_Mutex);
+    if (controller.isConnected())
+    {
+        ScanForNewControllers(true);
+    }
+    else
+    {
+        scope_lock lock(m_Mutex);
 
-		for (auto it = m_vecControllers.begin(); it != m_vecControllers.end(); ++it)
-			delete (*it);
-		m_vecControllers.clear();
-	}
+        for (auto it = m_vecControllers.begin(); it != m_vecControllers.end(); ++it)
+            delete (*it);
+        m_vecControllers.clear();
+    }
 }
 
 /**
@@ -305,7 +305,7 @@ void CServerDriver_Leap::onImages(const Controller&controller)
  */
 void CServerDriver_Leap::onServiceChange(const Controller&controller)
 {
-	DriverLog(" CServerDriver_Leap::onServiceChange()\n");
+    DriverLog(" CServerDriver_Leap::onServiceChange()\n");
 }
 
 /**
@@ -322,7 +322,7 @@ void CServerDriver_Leap::onServiceChange(const Controller&controller)
  */
 void CServerDriver_Leap::onDeviceFailure(const Controller&controller)
 {
-	DriverLog(" CServerDriver_Leap::onDeviceFailure()\n");
+    DriverLog(" CServerDriver_Leap::onDeviceFailure()\n");
 }
 
 /**
@@ -340,7 +340,7 @@ void CServerDriver_Leap::onDeviceFailure(const Controller&controller)
  */
 void CServerDriver_Leap::onLogMessage(const Controller&controller, MessageSeverity severity, int64_t timestamp, const char* msg)
 {
-	DriverLog(" CServerDriver_Leap::onLogMessage(%d): %s\n", (int)severity, msg);
+    DriverLog(" CServerDriver_Leap::onLogMessage(%d): %s\n", (int)severity, msg);
 }
 
 
@@ -349,140 +349,140 @@ void CServerDriver_Leap::onLogMessage(const Controller&controller, MessageSeveri
 //==================================================================================================
 
 CServerDriver_Leap::CServerDriver_Leap()
-	: m_bLaunchedLeapMonitor( false )
+    : m_bLaunchedLeapMonitor( false )
 {
 }
 
 CServerDriver_Leap::~CServerDriver_Leap()
 {
-	Cleanup();
+    Cleanup();
 }
 
 vr::EVRInitError CServerDriver_Leap::Init( vr::IDriverLog * pDriverLog, vr::IServerDriverHost * pDriverHost, const char * pchUserDriverConfigDir, const char * pchDriverInstallDir )
 {
-	InitDriverLog( pDriverLog );
-	m_pDriverHost = pDriverHost;
-	m_strDriverInstallDir = pchDriverInstallDir;
+    InitDriverLog( pDriverLog );
+    m_pDriverHost = pDriverHost;
+    m_strDriverInstallDir = pchDriverInstallDir;
 
-	m_Controller = new Controller;
+    m_Controller = new Controller;
 
-	Controller &controller = *m_Controller;
+    Controller &controller = *m_Controller;
 
-	bool backgroundModeAllowed = controller.config().getInt32("background_app_mode") == 2;
-	if (!backgroundModeAllowed) {
-		// TODO: Show dialog to request permission to allow background mode apps
-		bool userPermission = true;
-		if (userPermission) {
-			controller.config().setInt32("background_app_mode", 2);
-			controller.config().save();
-		}
-	}
+    bool backgroundModeAllowed = controller.config().getInt32("background_app_mode") == 2;
+    if (!backgroundModeAllowed) {
+        // TODO: Show dialog to request permission to allow background mode apps
+        bool userPermission = true;
+        if (userPermission) {
+            controller.config().setInt32("background_app_mode", 2);
+            controller.config().save();
+        }
+    }
 
-	controller.setPolicy(Leap::Controller::POLICY_OPTIMIZE_HMD);
-	controller.setPolicy(Leap::Controller::POLICY_BACKGROUND_FRAMES);
+    controller.setPolicy(Leap::Controller::POLICY_OPTIMIZE_HMD);
+    controller.setPolicy(Leap::Controller::POLICY_BACKGROUND_FRAMES);
 
-	// make sure we always get background frames even when we lose the focus to another
-	// Leap-enabled application
-	controller.setPolicy((Leap::Controller::PolicyFlag)(15));
+    // make sure we always get background frames even when we lose the focus to another
+    // Leap-enabled application
+    controller.setPolicy((Leap::Controller::PolicyFlag)(15));
 
-	// allow other background applications to receive frames even when SteamVR has the focus.
-//	controller.setPolicy((Leap::Controller::PolicyFlag)(23));
+    // allow other background applications to receive frames even when SteamVR has the focus.
+//    controller.setPolicy((Leap::Controller::PolicyFlag)(23));
 
-	m_Controller->addListener(*this);
+    m_Controller->addListener(*this);
 
-	return vr::VRInitError_None;
+    return vr::VRInitError_None;
 }
 
 void CServerDriver_Leap::Cleanup()
 {
-	if (m_Controller)
-	{
-		m_Controller->removeListener(*this);
-		delete m_Controller;
-		m_Controller = NULL;
-	}
+    if (m_Controller)
+    {
+        m_Controller->removeListener(*this);
+        delete m_Controller;
+        m_Controller = NULL;
+    }
 }
 
 uint32_t CServerDriver_Leap::GetTrackedDeviceCount()
 {
-	scope_lock lock( m_Mutex );
+    scope_lock lock( m_Mutex );
 
-	return m_vecControllers.size();
+    return m_vecControllers.size();
 }
 
 vr::ITrackedDeviceServerDriver * CServerDriver_Leap::GetTrackedDeviceDriver( uint32_t unWhich, const char *pchInterfaceVersion )
 {
-	// don't return anything if that's not the interface version we have
-	if ( 0 != stricmp( pchInterfaceVersion, vr::ITrackedDeviceServerDriver_Version ) )
-	{
-		DriverLog( "FindTrackedDeviceDriver for version %s, which we don't support.\n",
-			pchInterfaceVersion );
-		return NULL;
-	}
+    // don't return anything if that's not the interface version we have
+    if ( 0 != stricmp( pchInterfaceVersion, vr::ITrackedDeviceServerDriver_Version ) )
+    {
+        DriverLog( "FindTrackedDeviceDriver for version %s, which we don't support.\n",
+            pchInterfaceVersion );
+        return NULL;
+    }
 
-	scope_lock lock( m_Mutex );
+    scope_lock lock( m_Mutex );
 
-	if ( unWhich < m_vecControllers.size() )
-		return m_vecControllers[unWhich];
+    if ( unWhich < m_vecControllers.size() )
+        return m_vecControllers[unWhich];
 
-	return nullptr;
+    return nullptr;
 }
 
 vr::ITrackedDeviceServerDriver * CServerDriver_Leap::FindTrackedDeviceDriver( const char * pchId, const char *pchInterfaceVersion )
 {
-	// don't return anything if that's not the interface version we have
-	if ( 0 != stricmp( pchInterfaceVersion, vr::ITrackedDeviceServerDriver_Version ) )
-	{
-		DriverLog( "FindTrackedDeviceDriver for version %s, which we don't support.\n",
-			pchInterfaceVersion );
-		return NULL;
-	}
+    // don't return anything if that's not the interface version we have
+    if ( 0 != stricmp( pchInterfaceVersion, vr::ITrackedDeviceServerDriver_Version ) )
+    {
+        DriverLog( "FindTrackedDeviceDriver for version %s, which we don't support.\n",
+            pchInterfaceVersion );
+        return NULL;
+    }
 
-	scope_lock lock( m_Mutex );
+    scope_lock lock( m_Mutex );
 
-	for ( auto it = m_vecControllers.begin(); it != m_vecControllers.end(); ++it )
-	{
-		if ( 0 == strcmp( ( *it )->GetSerialNumber(), pchId ) )
-		{
-			return *it;
-		}
-	}
-	return nullptr;
+    for ( auto it = m_vecControllers.begin(); it != m_vecControllers.end(); ++it )
+    {
+        if ( 0 == strcmp( ( *it )->GetSerialNumber(), pchId ) )
+        {
+            return *it;
+        }
+    }
+    return nullptr;
 }
 
 void CServerDriver_Leap::RunFrame()
 {
-	if (m_vecControllers.size() == 2)
-	{
-		m_vecControllers[0]->RealignCoordinates(m_vecControllers[0], m_vecControllers[1]);
-	}
+    if (m_vecControllers.size() == 2)
+    {
+        m_vecControllers[0]->RealignCoordinates(m_vecControllers[0], m_vecControllers[1]);
+    }
 
-	if (m_Controller)
-	{
-		if (m_Controller->isConnected())
-		{
-			Frame frame = m_Controller->frame();
+    if (m_Controller)
+    {
+        if (m_Controller->isConnected())
+        {
+            Frame frame = m_Controller->frame();
 
-			// update the controllers
-			for (auto it = m_vecControllers.begin(); it != m_vecControllers.end(); ++it)
-			{
-				CLeapHmdLatest *pLeap = *it;
-				if (pLeap->IsActivated())
-				{
-					// Returns true if this is new data (so we can sleep for long interval)
-					if (!pLeap->Update(frame))
-					{
-						// not updated?
-					}
-				}
-			}
-		}
-	}
+            // update the controllers
+            for (auto it = m_vecControllers.begin(); it != m_vecControllers.end(); ++it)
+            {
+                CLeapHmdLatest *pLeap = *it;
+                if (pLeap->IsActivated())
+                {
+                    // Returns true if this is new data (so we can sleep for long interval)
+                    if (!pLeap->Update(frame))
+                    {
+                        // not updated?
+                    }
+                }
+            }
+        }
+    }
 }
 
 bool CServerDriver_Leap::ShouldBlockStandbyMode()
 {
-	return false;
+    return false;
 }
 
 void CServerDriver_Leap::EnterStandby()
@@ -495,58 +495,58 @@ void CServerDriver_Leap::LeaveStandby()
 
 static void GenerateSerialNumber( char *p, int psize, int base, int controller )
 {
-	_snprintf( p, psize, "leap%d_controller%d", base, controller );
+    _snprintf( p, psize, "leap%d_controller%d", base, controller );
 }
 
 void CServerDriver_Leap::ScanForNewControllers( bool bNotifyServer )
 {
-	while (m_vecControllers.size() < 2)
-	{
-		char buf[256];
-		int base = 0;
-		int i = m_vecControllers.size();
-		GenerateSerialNumber( buf, sizeof( buf ), base, i );
-		scope_lock lock( m_Mutex );
-		if ( !FindTrackedDeviceDriver( buf, vr::ITrackedDeviceServerDriver_Version ) )
-		{
-			DriverLog( "added new device %s\n", buf );
-			m_vecControllers.push_back( new CLeapHmdLatest( m_pDriverHost, base, i ) );
-			if ( bNotifyServer && m_pDriverHost )
-			{
-				m_pDriverHost->TrackedDeviceAdded( m_vecControllers.back()->GetSerialNumber() );
-			}
-		}
-	}
+    while (m_vecControllers.size() < 2)
+    {
+        char buf[256];
+        int base = 0;
+        int i = m_vecControllers.size();
+        GenerateSerialNumber( buf, sizeof( buf ), base, i );
+        scope_lock lock( m_Mutex );
+        if ( !FindTrackedDeviceDriver( buf, vr::ITrackedDeviceServerDriver_Version ) )
+        {
+            DriverLog( "added new device %s\n", buf );
+            m_vecControllers.push_back( new CLeapHmdLatest( m_pDriverHost, base, i ) );
+            if ( bNotifyServer && m_pDriverHost )
+            {
+                m_pDriverHost->TrackedDeviceAdded( m_vecControllers.back()->GetSerialNumber() );
+            }
+        }
+    }
 }
 
 // The leap_monitor is a companion program which will tell us the pose of the HMD.
 void CServerDriver_Leap::LaunchLeapMonitor( const char * pchDriverInstallDir )
 {
-	if ( m_bLaunchedLeapMonitor )
-		return;
+    if ( m_bLaunchedLeapMonitor )
+        return;
 
-	m_bLaunchedLeapMonitor = true;
+    m_bLaunchedLeapMonitor = true;
 
-	std::ostringstream ss;
+    std::ostringstream ss;
 
-	ss << pchDriverInstallDir << "\\bin\\";
+    ss << pchDriverInstallDir << "\\bin\\";
 #if defined( _WIN64 )
-	ss << "win64";
+    ss << "win64";
 #elif defined( _WIN32 )
-	ss << "win32";
+    ss << "win32";
 #else
 #error Do not know how to launch leap_monitor
 #endif
-	DriverLog( "leap_monitor path: %s\n", ss.str().c_str() );
+    DriverLog( "leap_monitor path: %s\n", ss.str().c_str() );
 
 #if defined( _WIN32 )
-	STARTUPINFOA sInfoProcess = { 0 };
-	sInfoProcess.cb = sizeof(STARTUPINFOW);
-	sInfoProcess.dwFlags = STARTF_USESHOWWINDOW;
-	sInfoProcess.wShowWindow = SW_SHOWDEFAULT;
-	PROCESS_INFORMATION pInfoStartedProcess;
-	BOOL okay = CreateProcessA( (ss.str() + "\\leap_monitor.exe").c_str(), NULL, NULL, NULL, FALSE, 0, NULL, ss.str().c_str(), &sInfoProcess, &pInfoStartedProcess );
-	DriverLog( "start leap_monitor okay: %d %08x\n", okay, GetLastError() );
+    STARTUPINFOA sInfoProcess = { 0 };
+    sInfoProcess.cb = sizeof(STARTUPINFOW);
+    sInfoProcess.dwFlags = STARTF_USESHOWWINDOW;
+    sInfoProcess.wShowWindow = SW_SHOWDEFAULT;
+    PROCESS_INFORMATION pInfoStartedProcess;
+    BOOL okay = CreateProcessA( (ss.str() + "\\leap_monitor.exe").c_str(), NULL, NULL, NULL, FALSE, 0, NULL, ss.str().c_str(), &sInfoProcess, &pInfoStartedProcess );
+    DriverLog( "start leap_monitor okay: %d %08x\n", okay, GetLastError() );
 #else
 #error Do not know how to launch leap_monitor
 #endif
@@ -555,7 +555,7 @@ void CServerDriver_Leap::LaunchLeapMonitor( const char * pchDriverInstallDir )
 /** Launch leap_monitor if needed (requested by devices as they activate) */
 void CServerDriver_Leap::LaunchLeapMonitor()
 {
-	LaunchLeapMonitor( m_strDriverInstallDir.c_str() );
+    LaunchLeapMonitor( m_strDriverInstallDir.c_str() );
 }
 
 //==================================================================================================
@@ -572,9 +572,9 @@ CClientDriver_Leap::~CClientDriver_Leap()
 
 vr::EVRInitError CClientDriver_Leap::Init( vr::IDriverLog * pDriverLog, vr::IClientDriverHost * pDriverHost, const char * pchUserDriverConfigDir, const char * pchDriverInstallDir )
 {
-	InitDriverLog( pDriverLog );
-	m_pDriverHost = pDriverHost;
-	return vr::VRInitError_None;
+    InitDriverLog( pDriverLog );
+    m_pDriverHost = pDriverHost;
+    return vr::VRInitError_None;
 }
 
 void CClientDriver_Leap::Cleanup()
@@ -583,23 +583,23 @@ void CClientDriver_Leap::Cleanup()
 
 bool CClientDriver_Leap::BIsHmdPresent( const char * pchUserConfigDir )
 {
-	return false;
+    return false;
 }
 
 vr::EVRInitError CClientDriver_Leap::SetDisplayId( const char * pchDisplayId )
 {
-	return vr::VRInitError_None;
-	//return vr::VRInitError_Driver_HmdUnknown;
+    return vr::VRInitError_None;
+    //return vr::VRInitError_Driver_HmdUnknown;
 }
 
 vr::HiddenAreaMesh_t CClientDriver_Leap::GetHiddenAreaMesh( vr::EVREye eEye )
 {
-	return vr::HiddenAreaMesh_t();
+    return vr::HiddenAreaMesh_t();
 }
 
 uint32_t CClientDriver_Leap::GetMCImage( uint32_t * pImgWidth, uint32_t * pImgHeight, uint32_t * pChannels, void * pDataBuffer, uint32_t unBufferLen )
 {
-	return uint32_t();
+    return uint32_t();
 }
 
 //==================================================================================================
@@ -609,27 +609,27 @@ uint32_t CClientDriver_Leap::GetMCImage( uint32_t * pImgWidth, uint32_t * pImgHe
 const std::chrono::milliseconds CLeapHmdLatest::k_TrackingLatency( -30 );
 
 CLeapHmdLatest::CLeapHmdLatest( vr::IServerDriverHost * pDriverHost, int base, int n )
-	: m_pDriverHost( pDriverHost )
-	, m_nBase( base )
-	, m_nId( n )
-	, m_eHemisphereTrackingState( k_eHemisphereTrackingEnabled )
-	, m_bCalibrated( true )
-	, m_pAlignmentPartner( NULL )
-	, m_eSystemButtonState( k_eIdle )
-	, m_unSteamVRTrackedDeviceId( vr::k_unTrackedDeviceIndexInvalid )
+    : m_pDriverHost( pDriverHost )
+    , m_nBase( base )
+    , m_nId( n )
+    , m_eHemisphereTrackingState( k_eHemisphereTrackingEnabled )
+    , m_bCalibrated( true )
+    , m_pAlignmentPartner( NULL )
+    , m_eSystemButtonState( k_eIdle )
+    , m_unSteamVRTrackedDeviceId( vr::k_unTrackedDeviceIndexInvalid )
 {
-	memset(m_hmdPos, 0, sizeof(m_hmdPos));
+    memset(m_hmdPos, 0, sizeof(m_hmdPos));
 
-	char buf[256];
-	GenerateSerialNumber( buf, sizeof( buf ), base, n );
-	m_strSerialNumber = buf;
+    char buf[256];
+    GenerateSerialNumber( buf, sizeof( buf ), base, n );
+    m_strSerialNumber = buf;
 
-	memset( &m_ControllerState, 0, sizeof( m_ControllerState ) );
-	memset( &m_Pose, 0, sizeof( m_Pose ) );
-	m_Pose.result = vr::TrackingResult_Running_OK;
+    memset( &m_ControllerState, 0, sizeof( m_ControllerState ) );
+    memset( &m_Pose, 0, sizeof( m_Pose ) );
+    m_Pose.result = vr::TrackingResult_Running_OK;
 
-	m_firmware_revision = 0x0001;
-	m_hardware_revision = 0x0001;
+    m_firmware_revision = 0x0001;
+    m_hardware_revision = 0x0001;
 }
 
 CLeapHmdLatest::~CLeapHmdLatest()
@@ -638,444 +638,522 @@ CLeapHmdLatest::~CLeapHmdLatest()
 
 void *CLeapHmdLatest::GetComponent( const char *pchComponentNameAndVersion )
 {
-	if ( !stricmp( pchComponentNameAndVersion, vr::IVRControllerComponent_Version ) )
-	{
-		return ( vr::IVRControllerComponent* )this;
-	}
-	
-	return NULL;
+    if ( !stricmp( pchComponentNameAndVersion, vr::IVRControllerComponent_Version ) )
+    {
+        return ( vr::IVRControllerComponent* )this;
+    }
+    
+    return NULL;
 }
 
 vr::EVRInitError CLeapHmdLatest::Activate( uint32_t unObjectId )
 {
-	DriverLog( "CLeapHmdLatest::Activate: %s is object id %d\n", GetSerialNumber(), unObjectId );
-	m_unSteamVRTrackedDeviceId = unObjectId;
+    DriverLog( "CLeapHmdLatest::Activate: %s is object id %d\n", GetSerialNumber(), unObjectId );
+    m_unSteamVRTrackedDeviceId = unObjectId;
 
-	g_ServerTrackedDeviceProvider.LaunchLeapMonitor();
+    g_ServerTrackedDeviceProvider.LaunchLeapMonitor();
 
-	return vr::VRInitError_None;
+    return vr::VRInitError_None;
 }
 
 void CLeapHmdLatest::Deactivate()
 {
-	DriverLog( "CLeapHmdLatest::Deactivate: %s was object id %d\n", GetSerialNumber(), m_unSteamVRTrackedDeviceId );
-	m_unSteamVRTrackedDeviceId = vr::k_unTrackedDeviceIndexInvalid;
+    DriverLog( "CLeapHmdLatest::Deactivate: %s was object id %d\n", GetSerialNumber(), m_unSteamVRTrackedDeviceId );
+    m_unSteamVRTrackedDeviceId = vr::k_unTrackedDeviceIndexInvalid;
 }
 
 void CLeapHmdLatest::PowerOff()
 {
-//	DriverLog("CLeapHmdLatest::PowerOff: %s is object id %d\n", GetSerialNumber(), m_unSteamVRTrackedDeviceId);
-	// FIXME Implement
+//    DriverLog("CLeapHmdLatest::PowerOff: %s is object id %d\n", GetSerialNumber(), m_unSteamVRTrackedDeviceId);
+    // FIXME Implement
 }
 
 void CLeapHmdLatest::DebugRequest( const char * pchRequest, char * pchResponseBuffer, uint32_t unResponseBufferSize )
 {
-	std::istringstream ss( pchRequest );
-	std::string strCmd;
+    std::istringstream ss( pchRequest );
+    std::string strCmd;
 
-	ss >> strCmd;
-	if ( strCmd == "leap:realign_coordinates" )
-	{
-		// leap_monitor is calling us back with HMD tracking information so we can
-		// finish realigning our coordinate system to the HMD's
-		float m[3][3], v[3];
-		for ( int i = 0; i < 3; ++i )
-		{
-			for ( int j = 0; j < 3; ++j )
-			{
-				ss >> m[j][i];
-			}
-			ss >> v[i];
-		}
-		FinishRealignCoordinates(m, v);
-	}
+    ss >> strCmd;
+    if ( strCmd == "leap:realign_coordinates" )
+    {
+        // leap_monitor is calling us back with HMD tracking information so we can
+        // finish realigning our coordinate system to the HMD's
+        float m[3][3], v[3];
+        for ( int i = 0; i < 3; ++i )
+        {
+            for ( int j = 0; j < 3; ++j )
+            {
+                ss >> m[j][i];
+            }
+            ss >> v[i];
+        }
+        FinishRealignCoordinates(m, v);
+    }
 }
 
 const char * CLeapHmdLatest::GetSerialNumber()
 {
-	return m_strSerialNumber.c_str();
+    return m_strSerialNumber.c_str();
 }
 
 vr::DriverPose_t CLeapHmdLatest::GetPose()
 {
-	// This is only called at startup to synchronize with the driver.
-	// Future updates are driven by our thread calling TrackedDevicePoseUpdated()
-	return m_Pose;
+    // This is only called at startup to synchronize with the driver.
+    // Future updates are driven by our thread calling TrackedDevicePoseUpdated()
+    return m_Pose;
 }
 
 bool CLeapHmdLatest::GetBoolTrackedDeviceProperty( vr::ETrackedDeviceProperty prop, vr::ETrackedPropertyError * pError )
 {
-	*pError = vr::TrackedProp_ValueNotProvidedByDevice;
-	return false;
+    *pError = vr::TrackedProp_ValueNotProvidedByDevice;
+    return false;
 }
 
 float CLeapHmdLatest::GetFloatTrackedDeviceProperty( vr::ETrackedDeviceProperty prop, vr::ETrackedPropertyError * pError )
 {
-	*pError = vr::TrackedProp_ValueNotProvidedByDevice;
-	return 0.0f;
+    *pError = vr::TrackedProp_ValueNotProvidedByDevice;
+    return 0.0f;
 }
 
 int32_t CLeapHmdLatest::GetInt32TrackedDeviceProperty( vr::ETrackedDeviceProperty prop, vr::ETrackedPropertyError * pError )
 {
-	int32_t nRetVal = 0;
-	vr::ETrackedPropertyError error = vr::TrackedProp_UnknownProperty;
-	switch ( prop )
-	{
-	case vr::Prop_DeviceClass_Int32:
-		nRetVal = vr::TrackedDeviceClass_Controller;
-		error = vr::TrackedProp_Success;
-		break;
+    int32_t nRetVal = 0;
+    vr::ETrackedPropertyError error = vr::TrackedProp_UnknownProperty;
+    switch ( prop )
+    {
+    case vr::Prop_DeviceClass_Int32:
+        nRetVal = vr::TrackedDeviceClass_Controller;
+        error = vr::TrackedProp_Success;
+        break;
 
-	case vr::Prop_Axis0Type_Int32:
-		nRetVal = vr::k_eControllerAxis_Joystick;
-		error = vr::TrackedProp_Success;
-		break;
+    case vr::Prop_Axis0Type_Int32:
+        nRetVal = vr::k_eControllerAxis_Joystick;
+        error = vr::TrackedProp_Success;
+        break;
 
-	case vr::Prop_Axis1Type_Int32:
-		nRetVal = vr::k_eControllerAxis_Trigger;
-		error = vr::TrackedProp_Success;
-		break;
+    case vr::Prop_Axis1Type_Int32:
+        nRetVal = vr::k_eControllerAxis_Trigger;
+        error = vr::TrackedProp_Success;
+        break;
 
-	case vr::Prop_Axis2Type_Int32:
-	case vr::Prop_Axis3Type_Int32:
-	case vr::Prop_Axis4Type_Int32:
-		error = vr::TrackedProp_ValueNotProvidedByDevice;
-		break;
-	}
+    case vr::Prop_Axis2Type_Int32:
+    case vr::Prop_Axis3Type_Int32:
+    case vr::Prop_Axis4Type_Int32:
+        error = vr::TrackedProp_ValueNotProvidedByDevice;
+        break;
+    }
 
-	*pError = error;
-	return nRetVal;
+    *pError = error;
+    return nRetVal;
 }
 
 uint64_t CLeapHmdLatest::GetUint64TrackedDeviceProperty( vr::ETrackedDeviceProperty prop, vr::ETrackedPropertyError * pError )
 {
-	uint64_t ulRetVal = 0;
-	vr::ETrackedPropertyError error = vr::TrackedProp_ValueNotProvidedByDevice;
+    uint64_t ulRetVal = 0;
+    vr::ETrackedPropertyError error = vr::TrackedProp_ValueNotProvidedByDevice;
 
-	switch ( prop )
-	{
-	case vr::Prop_CurrentUniverseId_Uint64:
-	case vr::Prop_PreviousUniverseId_Uint64:
-		error = vr::TrackedProp_ValueNotProvidedByDevice;
-		break;
+    switch ( prop )
+    {
+    case vr::Prop_CurrentUniverseId_Uint64:
+    case vr::Prop_PreviousUniverseId_Uint64:
+        error = vr::TrackedProp_ValueNotProvidedByDevice;
+        break;
 
-	case vr::Prop_SupportedButtons_Uint64:
-		ulRetVal = 
-			vr::ButtonMaskFromId( vr::k_EButton_System ) |
-			vr::ButtonMaskFromId( vr::k_EButton_Axis0 ) |
-			vr::ButtonMaskFromId( vr::k_EButton_Axis1 ) |
-			vr::ButtonMaskFromId( k_EButton_Button1 ) |
-			vr::ButtonMaskFromId( k_EButton_Button2 ) |
-			vr::ButtonMaskFromId( k_EButton_Button3 ) |
-			vr::ButtonMaskFromId( k_EButton_Button4 ) |
-			vr::ButtonMaskFromId( k_EButton_Bumper );
-		error = vr::TrackedProp_Success;
-		break;
+    case vr::Prop_SupportedButtons_Uint64:
+        ulRetVal = 
+            vr::ButtonMaskFromId( vr::k_EButton_System ) |
+            vr::ButtonMaskFromId( vr::k_EButton_Axis0 ) |
+            vr::ButtonMaskFromId( vr::k_EButton_Axis1 ) |
+            vr::ButtonMaskFromId( k_EButton_Button1 ) |
+            vr::ButtonMaskFromId( k_EButton_Button2 ) |
+            vr::ButtonMaskFromId( k_EButton_Button3 ) |
+            vr::ButtonMaskFromId( k_EButton_Button4 ) |
+            vr::ButtonMaskFromId( k_EButton_Bumper );
+        error = vr::TrackedProp_Success;
+        break;
 
-	case vr::Prop_HardwareRevision_Uint64:
-		ulRetVal = m_hardware_revision;
-		error = vr::TrackedProp_Success;
-		break;
+    case vr::Prop_HardwareRevision_Uint64:
+        ulRetVal = m_hardware_revision;
+        error = vr::TrackedProp_Success;
+        break;
 
-	case vr::Prop_FirmwareVersion_Uint64:
-		ulRetVal = m_firmware_revision;
-		error = vr::TrackedProp_Success;
-		break;
+    case vr::Prop_FirmwareVersion_Uint64:
+        ulRetVal = m_firmware_revision;
+        error = vr::TrackedProp_Success;
+        break;
 
-	}
+    }
 
-	*pError = error;
-	return ulRetVal;
+    *pError = error;
+    return ulRetVal;
 }
 
 vr::HmdMatrix34_t CLeapHmdLatest::GetMatrix34TrackedDeviceProperty( vr::ETrackedDeviceProperty prop, vr::ETrackedPropertyError * pError )
 {
-	return vr::HmdMatrix34_t();
+    return vr::HmdMatrix34_t();
 }
 
 uint32_t CLeapHmdLatest::GetStringTrackedDeviceProperty( vr::ETrackedDeviceProperty prop, char * pchValue, uint32_t unBufferSize, vr::ETrackedPropertyError * pError )
 {
-	std::ostringstream ssRetVal;
+    std::ostringstream ssRetVal;
 
-	switch ( prop )
-	{
-	case vr::Prop_SerialNumber_String:
-		ssRetVal << m_strSerialNumber;
-		break;
+    switch ( prop )
+    {
+    case vr::Prop_SerialNumber_String:
+        ssRetVal << m_strSerialNumber;
+        break;
 
-	case vr::Prop_RenderModelName_String:
-		// The {leap} syntax lets us refer to rendermodels that are installed
-		// in the driver's own resources/rendermodels directory.  The driver can
-		// still refer to SteamVR models like "generic_hmd".
-		ssRetVal << "{leap}leap_controller";
-		break;
+    case vr::Prop_RenderModelName_String:
+        // The {leap} syntax lets us refer to rendermodels that are installed
+        // in the driver's own resources/rendermodels directory.  The driver can
+        // still refer to SteamVR models like "generic_hmd".
+        ssRetVal << "{leap}leap_controller";
+        break;
 
-	case vr::Prop_ManufacturerName_String:
-		ssRetVal << "LeapMotion";
-		break;
+    case vr::Prop_ManufacturerName_String:
+        ssRetVal << "LeapMotion";
+        break;
 
-	case vr::Prop_ModelNumber_String:
-		ssRetVal << "Controller";
-		break;
+    case vr::Prop_ModelNumber_String:
+        ssRetVal << "Controller";
+        break;
 
-	case vr::Prop_TrackingFirmwareVersion_String:
-		ssRetVal << "cd.firmware_revision=" << m_firmware_revision;
-		break;
+    case vr::Prop_TrackingFirmwareVersion_String:
+        ssRetVal << "cd.firmware_revision=" << m_firmware_revision;
+        break;
 
-	case vr::Prop_HardwareRevision_String:
-		ssRetVal << "cd.hardware_revision=" << m_hardware_revision;
-		break;
-	}
+    case vr::Prop_HardwareRevision_String:
+        ssRetVal << "cd.hardware_revision=" << m_hardware_revision;
+        break;
+    }
 
-	std::string sRetVal = ssRetVal.str();
-	if ( sRetVal.empty() )
-	{
-		*pError = vr::TrackedProp_ValueNotProvidedByDevice;
-		return 0;
-	}
-	else if ( sRetVal.size() + 1 > unBufferSize )
-	{
-		*pError = vr::TrackedProp_BufferTooSmall;
-		return sRetVal.size() + 1;  // caller needs to know how to size buffer
-	}
-	else
-	{
-		_snprintf( pchValue, unBufferSize, sRetVal.c_str() );
-		*pError = vr::TrackedProp_Success;
-		return sRetVal.size() + 1;
-	}
+    std::string sRetVal = ssRetVal.str();
+    if ( sRetVal.empty() )
+    {
+        *pError = vr::TrackedProp_ValueNotProvidedByDevice;
+        return 0;
+    }
+    else if ( sRetVal.size() + 1 > unBufferSize )
+    {
+        *pError = vr::TrackedProp_BufferTooSmall;
+        return sRetVal.size() + 1;  // caller needs to know how to size buffer
+    }
+    else
+    {
+        _snprintf( pchValue, unBufferSize, sRetVal.c_str() );
+        *pError = vr::TrackedProp_Success;
+        return sRetVal.size() + 1;
+    }
 }
 
 vr::VRControllerState_t CLeapHmdLatest::GetControllerState()
 {
-	// This is only called at startup to synchronize with the driver.
-	// Future updates are driven by our thread calling TrackedDeviceButton*() and TrackedDeviceAxis*()
-	return vr::VRControllerState_t();
+    // This is only called at startup to synchronize with the driver.
+    // Future updates are driven by our thread calling TrackedDeviceButton*() and TrackedDeviceAxis*()
+    return vr::VRControllerState_t();
 }
 
 bool CLeapHmdLatest::TriggerHapticPulse( uint32_t unAxisId, uint16_t usPulseDurationMicroseconds )
 {
-	return true;  // handled -- returning false will cause errors to come out of vrserver
+    return true;  // handled -- returning false will cause errors to come out of vrserver
 }
 
 void CLeapHmdLatest::SendButtonUpdates( ButtonUpdate ButtonEvent, uint64_t ulMask )
 {
-	if ( !ulMask )
-		return;
+    if ( !ulMask )
+        return;
 
-	for ( int i = 0; i< vr::k_EButton_Max; i++ )
-	{
-		vr::EVRButtonId button = ( vr::EVRButtonId )i;
+    for ( int i = 0; i< vr::k_EButton_Max; i++ )
+    {
+        vr::EVRButtonId button = ( vr::EVRButtonId )i;
 
-		uint64_t bit = ButtonMaskFromId( button );
+        uint64_t bit = ButtonMaskFromId( button );
 
-		if ( bit & ulMask )
-		{
-			( m_pDriverHost->*ButtonEvent )( m_unSteamVRTrackedDeviceId, button, 0.0 );
-		}
-	}
+        if ( bit & ulMask )
+        {
+            ( m_pDriverHost->*ButtonEvent )( m_unSteamVRTrackedDeviceId, button, 0.0 );
+        }
+    }
 }
 
 void CLeapHmdLatest::UpdateControllerState(Frame &frame)
 {
-	vr::VRControllerState_t NewState = { 0 };
+    vr::VRControllerState_t NewState = { 0 };
 
-	// Changing unPacketNum tells anyone polling state that something might have
-	// changed.  We don't try to be precise about that here.
-	NewState.unPacketNum = m_ControllerState.unPacketNum + 1;
+    // Changing unPacketNum tells anyone polling state that something might have
+    // changed.  We don't try to be precise about that here.
+    NewState.unPacketNum = m_ControllerState.unPacketNum + 1;
 
 #if 0
-	if ( cd.buttons & SIXENSE_BUTTON_1 )
-		NewState.ulButtonPressed |= vr::ButtonMaskFromId( k_EButton_Button1 );
-	if ( cd.buttons & SIXENSE_BUTTON_2 )
-		NewState.ulButtonPressed |= vr::ButtonMaskFromId( k_EButton_Button2 );
-	if ( cd.buttons & SIXENSE_BUTTON_3 )
-		NewState.ulButtonPressed |= vr::ButtonMaskFromId( k_EButton_Button3 );
-	if ( cd.buttons & SIXENSE_BUTTON_4 )
-		NewState.ulButtonPressed |= vr::ButtonMaskFromId( k_EButton_Button4 );
-	if ( cd.buttons & SIXENSE_BUTTON_BUMPER )
-		NewState.ulButtonPressed |= vr::ButtonMaskFromId( k_EButton_Bumper );
-	if ( cd.buttons & SIXENSE_BUTTON_START )
-		NewState.ulButtonPressed |= vr::ButtonMaskFromId( vr::k_EButton_System );
-	if ( cd.buttons & SIXENSE_BUTTON_JOYSTICK)
-		NewState.ulButtonPressed |= vr::ButtonMaskFromId( vr::k_EButton_Axis0 );
-	if ( cd.trigger > 0.1f )
-		NewState.ulButtonTouched |= vr::ButtonMaskFromId( vr::k_EButton_Axis1 );
-	if ( cd.trigger > 0.8f )
-		NewState.ulButtonPressed |= vr::ButtonMaskFromId( vr::k_EButton_Axis1 );
-	// sixense driver seems to have good deadzone, but add a small one here
-	if ( fabsf( cd.joystick_x ) > 0.03f || fabsf( cd.joystick_y ) > 0.03f )
-		NewState.ulButtonTouched |= vr::ButtonMaskFromId( vr::k_EButton_Axis0 );
+    if ( cd.buttons & SIXENSE_BUTTON_1 )
+        NewState.ulButtonPressed |= vr::ButtonMaskFromId( k_EButton_Button1 );
+    if ( cd.buttons & SIXENSE_BUTTON_2 )
+        NewState.ulButtonPressed |= vr::ButtonMaskFromId( k_EButton_Button2 );
+    if ( cd.buttons & SIXENSE_BUTTON_3 )
+        NewState.ulButtonPressed |= vr::ButtonMaskFromId( k_EButton_Button3 );
+    if ( cd.buttons & SIXENSE_BUTTON_4 )
+        NewState.ulButtonPressed |= vr::ButtonMaskFromId( k_EButton_Button4 );
+    if ( cd.buttons & SIXENSE_BUTTON_BUMPER )
+        NewState.ulButtonPressed |= vr::ButtonMaskFromId( k_EButton_Bumper );
+    if ( cd.buttons & SIXENSE_BUTTON_START )
+        NewState.ulButtonPressed |= vr::ButtonMaskFromId( vr::k_EButton_System );
+    if ( cd.buttons & SIXENSE_BUTTON_JOYSTICK)
+        NewState.ulButtonPressed |= vr::ButtonMaskFromId( vr::k_EButton_Axis0 );
+    if ( cd.trigger > 0.1f )
+        NewState.ulButtonTouched |= vr::ButtonMaskFromId( vr::k_EButton_Axis1 );
+    if ( cd.trigger > 0.8f )
+        NewState.ulButtonPressed |= vr::ButtonMaskFromId( vr::k_EButton_Axis1 );
+    // sixense driver seems to have good deadzone, but add a small one here
+    if ( fabsf( cd.joystick_x ) > 0.03f || fabsf( cd.joystick_y ) > 0.03f )
+        NewState.ulButtonTouched |= vr::ButtonMaskFromId( vr::k_EButton_Axis0 );
 
-	// All pressed buttons are touched
-	NewState.ulButtonTouched |= NewState.ulButtonPressed;
+    // All pressed buttons are touched
+    NewState.ulButtonTouched |= NewState.ulButtonPressed;
 
-	uint64_t ulChangedTouched = NewState.ulButtonTouched ^ m_ControllerState.ulButtonTouched;
-	uint64_t ulChangedPressed = NewState.ulButtonPressed ^ m_ControllerState.ulButtonPressed;
+    uint64_t ulChangedTouched = NewState.ulButtonTouched ^ m_ControllerState.ulButtonTouched;
+    uint64_t ulChangedPressed = NewState.ulButtonPressed ^ m_ControllerState.ulButtonPressed;
 
-	SendButtonUpdates( &vr::IServerDriverHost::TrackedDeviceButtonTouched, ulChangedTouched & NewState.ulButtonTouched );
-	SendButtonUpdates( &vr::IServerDriverHost::TrackedDeviceButtonPressed, ulChangedPressed & NewState.ulButtonPressed );
-	SendButtonUpdates( &vr::IServerDriverHost::TrackedDeviceButtonUnpressed, ulChangedPressed & ~NewState.ulButtonPressed );
-	SendButtonUpdates( &vr::IServerDriverHost::TrackedDeviceButtonUntouched, ulChangedTouched & ~NewState.ulButtonTouched );
+    SendButtonUpdates( &vr::IServerDriverHost::TrackedDeviceButtonTouched, ulChangedTouched & NewState.ulButtonTouched );
+    SendButtonUpdates( &vr::IServerDriverHost::TrackedDeviceButtonPressed, ulChangedPressed & NewState.ulButtonPressed );
+    SendButtonUpdates( &vr::IServerDriverHost::TrackedDeviceButtonUnpressed, ulChangedPressed & ~NewState.ulButtonPressed );
+    SendButtonUpdates( &vr::IServerDriverHost::TrackedDeviceButtonUntouched, ulChangedTouched & ~NewState.ulButtonTouched );
 
-	NewState.rAxis[0].x = cd.joystick_x;
-	NewState.rAxis[0].y = cd.joystick_y;
-	NewState.rAxis[1].x = cd.trigger;
-	NewState.rAxis[1].y = 0.0f;
+    NewState.rAxis[0].x = cd.joystick_x;
+    NewState.rAxis[0].y = cd.joystick_y;
+    NewState.rAxis[1].x = cd.trigger;
+    NewState.rAxis[1].y = 0.0f;
 
-	if ( NewState.rAxis[0].x != m_ControllerState.rAxis[0].x || NewState.rAxis[0].y != m_ControllerState.rAxis[0].y )
-		m_pDriverHost->TrackedDeviceAxisUpdated( m_unSteamVRTrackedDeviceId, 0, NewState.rAxis[0] );
-	if ( NewState.rAxis[1].x != m_ControllerState.rAxis[1].x )
-		m_pDriverHost->TrackedDeviceAxisUpdated( m_unSteamVRTrackedDeviceId, 1, NewState.rAxis[1] );
+    if ( NewState.rAxis[0].x != m_ControllerState.rAxis[0].x || NewState.rAxis[0].y != m_ControllerState.rAxis[0].y )
+        m_pDriverHost->TrackedDeviceAxisUpdated( m_unSteamVRTrackedDeviceId, 0, NewState.rAxis[0] );
+    if ( NewState.rAxis[1].x != m_ControllerState.rAxis[1].x )
+        m_pDriverHost->TrackedDeviceAxisUpdated( m_unSteamVRTrackedDeviceId, 1, NewState.rAxis[1] );
 #endif
 
-	m_ControllerState = NewState;
+    m_ControllerState = NewState;
+}
+
+void invert_3x3(const float (*A)[3], float (*R)[3]) {
+    float det;
+
+    det = A[0][0] * (A[2][2] * A[1][1] - A[2][1] * A[1][2])
+        - A[1][0] * (A[2][2] * A[0][1] - A[2][1] * A[0][2])
+        + A[2][0] * (A[1][2] * A[0][1] - A[1][1] * A[0][2]);
+
+    R[0][0] =  (A[2][2] * A[1][1] - A[2][1] * A[1][2]) / det;
+    R[0][1] = -(A[2][2] * A[0][1] - A[2][1] * A[0][2]) / det;
+    R[0][2] =  (A[1][2] * A[0][1] - A[1][1] * A[0][2]) / det;
+
+    R[1][0] = -(A[2][2] * A[1][0] - A[2][0] * A[1][2]) / det;
+    R[1][1] =  (A[2][2] * A[0][0] - A[2][0] * A[0][2]) / det;
+    R[1][2] = -(A[1][2] * A[0][0] - A[1][0] * A[0][2]) / det;
+
+    R[2][0] =  (A[2][1] * A[1][0] - A[2][0] * A[1][1]) / det;
+    R[2][1] = -(A[2][1] * A[0][0] - A[2][0] * A[0][1]) / det;
+    R[2][2] =  (A[1][1] * A[0][0] - A[1][0] * A[0][1]) / det;
+}
+
+static vr::HmdQuaternion_t CalculateRotation(float(*a)[3]) {
+
+    vr::HmdQuaternion_t q;
+
+    float trace = a[0][0] + a[1][1] + a[2][2];
+    if (trace > 0) {
+        float s = 0.5f / sqrtf(trace + 1.0f);
+        q.w = 0.25f / s;
+        q.x = (a[2][1] - a[1][2]) * s;
+        q.y = (a[0][2] - a[2][0]) * s;
+        q.z = (a[1][0] - a[0][1]) * s;
+    }
+    else {
+        if (a[0][0] > a[1][1] && a[0][0] > a[2][2]) {
+            float s = 2.0f * sqrtf(1.0f + a[0][0] - a[1][1] - a[2][2]);
+            q.w = (a[2][1] - a[1][2]) / s;
+            q.x = 0.25f * s;
+            q.y = (a[0][1] + a[1][0]) / s;
+            q.z = (a[0][2] + a[2][0]) / s;
+        }
+        else if (a[1][1] > a[2][2]) {
+            float s = 2.0f * sqrtf(1.0f + a[1][1] - a[0][0] - a[2][2]);
+            q.w = (a[0][2] - a[2][0]) / s;
+            q.x = (a[0][1] + a[1][0]) / s;
+            q.y = 0.25f * s;
+            q.z = (a[1][2] + a[2][1]) / s;
+        }
+        else {
+            float s = 2.0f * sqrtf(1.0f + a[2][2] - a[0][0] - a[1][1]);
+            q.w = (a[1][0] - a[0][1]) / s;
+            q.x = (a[0][2] + a[2][0]) / s;
+            q.y = (a[1][2] + a[2][1]) / s;
+            q.z = 0.25f * s;
+        }
+    }
+    q.x = -q.x;
+    q.y = -q.y;
+    q.z = -q.z;
+    return q;
 }
 
 void CLeapHmdLatest::UpdateTrackingState(Frame &frame)
 {
-	HandList &hands = frame.hands();
+    HandList &hands = frame.hands();
 
-	for (int h = 0; h < hands.count(); h++)
-	{
-		Hand &hand = hands[h];
+    for (int h = 0; h < hands.count(); h++)
+    {
+        Hand &hand = hands[h];
 
-		// controller #0 is supposed to be the left hand, controller #1 the right one.
-		if (m_nId == 0 && hand.isLeft() ||
-			m_nId == 1 && hand.isRight())
-		{
-			// This is very hard to know with this driver, but CServerDriver_Leap::ThreadFunc
-			// tries to reduce latency as much as possible.  There is filtering in the Sixense SDK,
-			// though, which causes additional unknown latency.  This time is used to know how much
-			// extrapolation (via velocity and angular velocity) should be done when predicting poses.
-			m_Pose.poseTimeOffset = -0.016f;
+        // controller #0 is supposed to be the left hand, controller #1 the right one.
+        if (m_nId == 0 && hand.isLeft() ||
+            m_nId == 1 && hand.isRight())
+        {
+            // This is very hard to know with this driver, but CServerDriver_Leap::ThreadFunc
+            // tries to reduce latency as much as possible.  There is filtering in the Sixense SDK,
+            // though, which causes additional unknown latency.  This time is used to know how much
+            // extrapolation (via velocity and angular velocity) should be done when predicting poses.
+            m_Pose.poseTimeOffset = -0.016f;
 
-			// The "driver" coordinate system is the one that vecPosition is in.  This is whatever
-			// coordinates the driver naturally produces for position and orientation.  The "world"
-			// coordinate system is the one that is presented to vrserver.  This should include
-			// fixing any tilt to the world (caused by a tilted camera, for example) and can include
-			// any other useful transformation for the driver (e.g. the driver is tracking from a
-			// secondary camera, but uses this transform to move this object into the primary camera
-			// coordinate system to be consistent with other objects).
-			//
-			// This transform is multiplied on the left of the predicted "driver" pose.  That becomes
-			// the vr::TrackingUniverseRawAndUncalibrated origin, which is then further offset for
-			// floor height and tracking space center by the chaperone system to produce both the
-			// vr::TrackingUniverseSeated and vr::TrackingUniverseStanding spaces.
-			//
-			// In the leap driver, we use it to unify our coordinate system with the HMD.
-			m_Pose.qWorldFromDriverRotation = m_hmdRot;
-			m_Pose.vecWorldFromDriverTranslation[0] = m_hmdPos[0];
-			m_Pose.vecWorldFromDriverTranslation[1] = m_hmdPos[1];
-			m_Pose.vecWorldFromDriverTranslation[2] = m_hmdPos[2];
+            // The "driver" coordinate system is the one that vecPosition is in.  This is whatever
+            // coordinates the driver naturally produces for position and orientation.  The "world"
+            // coordinate system is the one that is presented to vrserver.  This should include
+            // fixing any tilt to the world (caused by a tilted camera, for example) and can include
+            // any other useful transformation for the driver (e.g. the driver is tracking from a
+            // secondary camera, but uses this transform to move this object into the primary camera
+            // coordinate system to be consistent with other objects).
+            //
+            // This transform is multiplied on the left of the predicted "driver" pose.  That becomes
+            // the vr::TrackingUniverseRawAndUncalibrated origin, which is then further offset for
+            // floor height and tracking space center by the chaperone system to produce both the
+            // vr::TrackingUniverseSeated and vr::TrackingUniverseStanding spaces.
+            //
+            // In the leap driver, we use it to unify our coordinate system with the HMD.
+            m_Pose.qWorldFromDriverRotation = m_hmdRot;
+            m_Pose.vecWorldFromDriverTranslation[0] = m_hmdPos[0];
+            m_Pose.vecWorldFromDriverTranslation[1] = m_hmdPos[1];
+            m_Pose.vecWorldFromDriverTranslation[2] = m_hmdPos[2];
 
-			// The "head" coordinate system defines a natural point for the object.  While the "driver"
-			// space may be chosen for mechanical, eletrical, or mathematical convenience (e.g. being
-			// the location of the IMU), the "head" should be a point meaningful to the user.  For HMDs,
-			// it's the point directly between the user's eyes.  The origin of this coordinate system
-			// is the origin used for the rendermodel.
-			//
-			// This transform is multiplied on the right side of the "driver" pose.
-			//
-			// This transform was inadvertently left at identity for the GDC 2015 controllers, creating
-			// a defacto standard "head" position for controllers at the location of the IMU for that
-			// particular controller.  We will remedy that later by adding other, explicitly named and
-			// chosen spaces.  For now, mimicking that point in this driver lets us run content authored
-			// for the HTC Vive Developer Edition controller.  This was done by loading an existing
-			// controller rendermodel along side the Leap model and rotating the Leap model to roughly
-			// align the main features like the handle and trigger.
-			m_Pose.qDriverFromHeadRotation.w = 1;
-			m_Pose.qDriverFromHeadRotation.x = -m_hmdRot.x;
-			m_Pose.qDriverFromHeadRotation.y = -m_hmdRot.y;
-			m_Pose.qDriverFromHeadRotation.z = -m_hmdRot.z;
-			m_Pose.vecDriverFromHeadTranslation[0] = 0;
-			m_Pose.vecDriverFromHeadTranslation[1] = 0;
-			m_Pose.vecDriverFromHeadTranslation[2] = 0;
+            // The "head" coordinate system defines a natural point for the object.  While the "driver"
+            // space may be chosen for mechanical, eletrical, or mathematical convenience (e.g. being
+            // the location of the IMU), the "head" should be a point meaningful to the user.  For HMDs,
+            // it's the point directly between the user's eyes.  The origin of this coordinate system
+            // is the origin used for the rendermodel.
+            //
+            // This transform is multiplied on the right side of the "driver" pose.
+            //
+            // This transform was inadvertently left at identity for the GDC 2015 controllers, creating
+            // a defacto standard "head" position for controllers at the location of the IMU for that
+            // particular controller.  We will remedy that later by adding other, explicitly named and
+            // chosen spaces.  For now, mimicking that point in this driver lets us run content authored
+            // for the HTC Vive Developer Edition controller.  This was done by loading an existing
+            // controller rendermodel along side the Leap model and rotating the Leap model to roughly
+            // align the main features like the handle and trigger.
+            m_Pose.qDriverFromHeadRotation.w = 1;
+            m_Pose.qDriverFromHeadRotation.x = 0; //  -m_hmdRot.x;   this would cancel out the HMD's rotation
+            m_Pose.qDriverFromHeadRotation.y = 0; //  -m_hmdRot.y;
+            m_Pose.qDriverFromHeadRotation.z = 0; //  -m_hmdRot.z;
+            m_Pose.vecDriverFromHeadTranslation[0] = 0;
+            m_Pose.vecDriverFromHeadTranslation[1] = 0;
+            m_Pose.vecDriverFromHeadTranslation[2] = 0;
 
-			Vector position = hand.palmPosition();
+            Vector position = hand.palmPosition();
 
-			m_Pose.vecPosition[0] = -0.001*position.x; //  0.3 * m_nId - 0.15;
-			m_Pose.vecPosition[1] = -0.001*position.z;
-			m_Pose.vecPosition[2] = -0.001*position.y - 0.15; // assume 15 cm offset from center of head
+            m_Pose.vecPosition[0] = -0.001*position.x;
+            m_Pose.vecPosition[1] = -0.001*position.z;
+            m_Pose.vecPosition[2] = -0.001*position.y - 0.15; // assume 15 cm offset from midpoint between eys
 
-			m_Pose.vecVelocity[0] = 0;
-			m_Pose.vecVelocity[1] = 0;
-			m_Pose.vecVelocity[2] = 0;
+            Vector velocity = hand.palmVelocity();
 
-			m_Pose.vecAcceleration[0] = 0.0;
-			m_Pose.vecAcceleration[1] = 0.0;
-			m_Pose.vecAcceleration[2] = 0.0;
+            m_Pose.vecVelocity[0] = -0.001*velocity.x;
+            m_Pose.vecVelocity[1] = -0.001*velocity.z;
+            m_Pose.vecVelocity[2] = -0.001*velocity.y;
 
-			m_Pose.qRotation.w = 1;
-			m_Pose.qRotation.x = 0;
-			m_Pose.qRotation.y = 0;
-			m_Pose.qRotation.z = 0;
+            // Unmeasured.  XXX we currently leave the acceleration at zero
+            m_Pose.vecAcceleration[0] = 0.0;
+            m_Pose.vecAcceleration[1] = 0.0;
+            m_Pose.vecAcceleration[2] = 0.0;
 
-			// Unmeasured.  XXX with no angular velocity, throwing might not work in some games
-			m_Pose.vecAngularVelocity[0] = 0.0;
-			m_Pose.vecAngularVelocity[1] = 0.0;
-			m_Pose.vecAngularVelocity[2] = 0.0;
+            // get two vectors describing the hand's orientation in space. We need to find a rotation
+            // matrix that turns the default coordinate system into the hand's coordinate system
+            Vector direction = hand.direction(); direction /= direction.magnitude();
+            Vector normal = hand.palmNormal(); normal /= normal.magnitude();
+            Vector side = direction.cross(normal);
 
-			// The same argument applies here as to vecAcceleration, and a driver is even
-			// less likely to have a valid value for it (since gyros measure angular velocity)
-			m_Pose.vecAngularAcceleration[0] = 0.0;
-			m_Pose.vecAngularAcceleration[1] = 0.0;
-			m_Pose.vecAngularAcceleration[2] = 0.0;
+            // NOTE: y and z are swapped with respect to the Leap Motion's coordinate system and I list
+            //       the vectors in the order in which I expect them to be in the tracking camera's
+            //       coordinates system: X = sideways,
+            //                           Y = up/down i.e. palm's normal vector
+            //                           Z = front/back i.e. hand's pointing direction
+            float R[3][3] =
+            { { side.x,      side.z,      side.y      },
+              { normal.x,    normal.z,    normal.y    },
+              { direction.x, direction.z, direction.y } };
 
-			// Don't show user any controllers until they have hemisphere tracking and
-			// do the calibration gesture.  leap_monitor should be prompting with an overlay
-			if (m_eHemisphereTrackingState != k_eHemisphereTrackingEnabled)
-				m_Pose.result = vr::TrackingResult_Uninitialized;
-			else if (!m_bCalibrated)
-				m_Pose.result = vr::TrackingResult_Calibrating_InProgress;
-			else
-				m_Pose.result = vr::TrackingResult_Running_OK;
+            // now turn this into a Quaternion and we're done.
+            m_Pose.qRotation = CalculateRotation(R);
 
-			m_Pose.poseIsValid = m_bCalibrated;
-			m_Pose.deviceIsConnected = true;
+            // Unmeasured.  XXX with no angular velocity, throwing might not work in some games
+            m_Pose.vecAngularVelocity[0] = 0.0;
+            m_Pose.vecAngularVelocity[1] = 0.0;
+            m_Pose.vecAngularVelocity[2] = 0.0;
 
-			// These should always be false from any modern driver.  These are for Oculus DK1-like
-			// rotation-only tracking.  Support for that has likely rotted in vrserver.
-			m_Pose.willDriftInYaw = false;
-			m_Pose.shouldApplyHeadModel = false;
+            // The same argument applies here as to vecAcceleration, and a driver is even
+            // less likely to have a valid value for it (since gyros measure angular velocity)
+            m_Pose.vecAngularAcceleration[0] = 0.0;
+            m_Pose.vecAngularAcceleration[1] = 0.0;
+            m_Pose.vecAngularAcceleration[2] = 0.0;
 
-			// This call posts this pose to shared memory, where all clients will have access to it the next
-			// moment they want to predict a pose.
-			m_pDriverHost->TrackedDevicePoseUpdated(m_unSteamVRTrackedDeviceId, m_Pose);
-		}
-	}
+            // Don't show user any controllers until they have hemisphere tracking and
+            // do the calibration gesture.  leap_monitor should be prompting with an overlay
+            if (m_eHemisphereTrackingState != k_eHemisphereTrackingEnabled)
+                m_Pose.result = vr::TrackingResult_Uninitialized;
+            else if (!m_bCalibrated)
+                m_Pose.result = vr::TrackingResult_Calibrating_InProgress;
+            else
+                m_Pose.result = vr::TrackingResult_Running_OK;
+
+            m_Pose.poseIsValid = m_bCalibrated;
+            m_Pose.deviceIsConnected = true;
+
+            // These should always be false from any modern driver.  These are for Oculus DK1-like
+            // rotation-only tracking.  Support for that has likely rotted in vrserver.
+            m_Pose.willDriftInYaw = false;
+            m_Pose.shouldApplyHeadModel = false;
+
+            // This call posts this pose to shared memory, where all clients will have access to it the next
+            // moment they want to predict a pose.
+            m_pDriverHost->TrackedDevicePoseUpdated(m_unSteamVRTrackedDeviceId, m_Pose);
+        }
+    }
 }
 
 bool CLeapHmdLatest::IsHoldingSystemButton() const
 {
-	return m_eSystemButtonState == k_eWaiting;
+    return m_eSystemButtonState == k_eWaiting;
 }
 
 void CLeapHmdLatest::ConsumeSystemButtonPress()
 {
-	if ( m_eSystemButtonState == k_eWaiting )
-	{
-		m_eSystemButtonState = k_eBlocked;
-	}
+    if ( m_eSystemButtonState == k_eWaiting )
+    {
+        m_eSystemButtonState = k_eBlocked;
+    }
 }
 
 bool CLeapHmdLatest::IsActivated() const
 {
-	return m_unSteamVRTrackedDeviceId != vr::k_unTrackedDeviceIndexInvalid;
+    return m_unSteamVRTrackedDeviceId != vr::k_unTrackedDeviceIndexInvalid;
 }
 
 bool CLeapHmdLatest::HasControllerId( int nBase, int nId )
 {
-	return nBase == m_nBase && nId == m_nId;
+    return nBase == m_nBase && nId == m_nId;
 }
 
 /** Process sixenseControllerData.  Return true if it's new to help caller manage sleep durations */
 bool CLeapHmdLatest::Update(Frame &frame)
 {
-	UpdateTrackingState(frame);
-	UpdateControllerState(frame);
+    UpdateTrackingState(frame);
+    UpdateControllerState(frame);
 
-	return true;
+    return true;
 }
 
 // User initiated manual alignment of the coordinate system of driver_leap with the HMD:
@@ -1087,75 +1165,33 @@ bool CLeapHmdLatest::Update(Frame &frame)
 // symmetry).
 void CLeapHmdLatest::RealignCoordinates( CLeapHmdLatest * pLeapA, CLeapHmdLatest * pLeapB )
 {
-	if ( pLeapA->m_unSteamVRTrackedDeviceId == vr::k_unTrackedDeviceIndexInvalid )
-		return;
+    if ( pLeapA->m_unSteamVRTrackedDeviceId == vr::k_unTrackedDeviceIndexInvalid )
+        return;
 
-	pLeapA->m_pAlignmentPartner = pLeapB;
-	pLeapB->m_pAlignmentPartner = pLeapA;
+    pLeapA->m_pAlignmentPartner = pLeapB;
+    pLeapB->m_pAlignmentPartner = pLeapA;
 
-	// Ask leap_monitor to tell us HMD pose
-	static vr::VREvent_Data_t nodata = { 0 };
-	pLeapA->m_pDriverHost->VendorSpecificEvent( pLeapA->m_unSteamVRTrackedDeviceId,
-		(vr::EVREventType) (vr::VREvent_VendorSpecific_Reserved_Start + 0), nodata,
-		-std::chrono::duration_cast<std::chrono::seconds>( k_TrackingLatency ).count() );
-}
-
-static vr::HmdQuaternion_t CalculateRotation(float (*a)[3]) {
-
-	vr::HmdQuaternion_t q;
-
-	float trace = a[0][0] + a[1][1] + a[2][2];
-	if (trace > 0) {
-		float s = 0.5f / sqrtf(trace + 1.0f);
-		q.w = 0.25f / s;
-		q.x = (a[2][1] - a[1][2]) * s;
-		q.y = (a[0][2] - a[2][0]) * s;
-		q.z = (a[1][0] - a[0][1]) * s;
-	}
-	else {
-		if (a[0][0] > a[1][1] && a[0][0] > a[2][2]) {
-			float s = 2.0f * sqrtf(1.0f + a[0][0] - a[1][1] - a[2][2]);
-			q.w = (a[2][1] - a[1][2]) / s;
-			q.x = 0.25f * s;
-			q.y = (a[0][1] + a[1][0]) / s;
-			q.z = (a[0][2] + a[2][0]) / s;
-		}
-		else if (a[1][1] > a[2][2]) {
-			float s = 2.0f * sqrtf(1.0f + a[1][1] - a[0][0] - a[2][2]);
-			q.w = (a[0][2] - a[2][0]) / s;
-			q.x = (a[0][1] + a[1][0]) / s;
-			q.y = 0.25f * s;
-			q.z = (a[1][2] + a[2][1]) / s;
-		}
-		else {
-			float s = 2.0f * sqrtf(1.0f + a[2][2] - a[0][0] - a[1][1]);
-			q.w = (a[1][0] - a[0][1]) / s;
-			q.x = (a[0][2] + a[2][0]) / s;
-			q.y = (a[1][2] + a[2][1]) / s;
-			q.z = 0.25f * s;
-		}
-	}
-	q.x = -q.x;
-	q.y = -q.y;
-	q.z = -q.z;
-	return q;
+    // Ask leap_monitor to tell us HMD pose
+    static vr::VREvent_Data_t nodata = { 0 };
+    pLeapA->m_pDriverHost->VendorSpecificEvent( pLeapA->m_unSteamVRTrackedDeviceId,
+        (vr::EVREventType) (vr::VREvent_VendorSpecific_Reserved_Start + 0), nodata,
+        -std::chrono::duration_cast<std::chrono::seconds>( k_TrackingLatency ).count() );
 }
 
 // leap_monitor called us back with the HMD information
-// (Note we should probably cache pose at the moment of the chording, but we just use current here)
 void CLeapHmdLatest::FinishRealignCoordinates(float(*m)[3], float *v )
 {
-	CLeapHmdLatest * pLeapA = this;
-	CLeapHmdLatest * pLeapB = m_pAlignmentPartner;
+    CLeapHmdLatest * pLeapA = this;
+    CLeapHmdLatest * pLeapB = m_pAlignmentPartner;
 
-	if ( !pLeapA || !pLeapB )
-		return;
+    if ( !pLeapA || !pLeapB )
+        return;
 
-	memcpy(pLeapA->m_hmdPos, &v[0], sizeof(m_hmdPos));
-	memcpy(pLeapB->m_hmdPos, &v[0], sizeof(m_hmdPos));
+    memcpy(pLeapA->m_hmdPos, &v[0], sizeof(m_hmdPos));
+    memcpy(pLeapB->m_hmdPos, &v[0], sizeof(m_hmdPos));
 
-	pLeapA->m_hmdRot = pLeapB->m_hmdRot = CalculateRotation(m);
+    pLeapA->m_hmdRot = pLeapB->m_hmdRot = CalculateRotation(m);
 
-	pLeapA->m_bCalibrated = true;
-	pLeapB->m_bCalibrated = true;
+    pLeapA->m_bCalibrated = true;
+    pLeapB->m_bCalibrated = true;
 }
