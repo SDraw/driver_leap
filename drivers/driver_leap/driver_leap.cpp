@@ -612,7 +612,6 @@ CLeapHmdLatest::CLeapHmdLatest( vr::IServerDriverHost * pDriverHost, int base, i
     : m_pDriverHost( pDriverHost )
     , m_nBase( base )
     , m_nId( n )
-    , m_eHemisphereTrackingState( k_eHemisphereTrackingEnabled )
     , m_bCalibrated( true )
     , m_pAlignmentPartner( NULL )
     , m_eSystemButtonState( k_eIdle )
@@ -997,6 +996,7 @@ void CLeapHmdLatest::UpdateTrackingState(Frame &frame)
 {
     HandList &hands = frame.hands();
 
+    bool handFound = false;
     for (int h = 0; h < hands.count(); h++)
     {
         Hand &hand = hands[h];
@@ -1005,11 +1005,7 @@ void CLeapHmdLatest::UpdateTrackingState(Frame &frame)
         if (m_nId == 0 && hand.isLeft() ||
             m_nId == 1 && hand.isRight())
         {
-            // This is very hard to know with this driver, but CServerDriver_Leap::ThreadFunc
-            // tries to reduce latency as much as possible.  There is filtering in the Sixense SDK,
-            // though, which causes additional unknown latency.  This time is used to know how much
-            // extrapolation (via velocity and angular velocity) should be done when predicting poses.
-            m_Pose.poseTimeOffset = -0.016f;
+            handFound = true;
 
             // The "driver" coordinate system is the one that vecPosition is in.  This is whatever
             // coordinates the driver naturally produces for position and orientation.  The "world"
@@ -1047,8 +1043,8 @@ void CLeapHmdLatest::UpdateTrackingState(Frame &frame)
             // align the main features like the handle and trigger.
             m_Pose.qDriverFromHeadRotation.w = 1;
             m_Pose.qDriverFromHeadRotation.x = 0; //  -m_hmdRot.x;   this would cancel out the HMD's rotation
-            m_Pose.qDriverFromHeadRotation.y = 0; //  -m_hmdRot.y;
-            m_Pose.qDriverFromHeadRotation.z = 0; //  -m_hmdRot.z;
+            m_Pose.qDriverFromHeadRotation.y = 0; //  -m_hmdRot.y;   but instead we rely on the Leap Motion to
+            m_Pose.qDriverFromHeadRotation.z = 0; //  -m_hmdRot.z;   update the hand rotation as the head rotates
             m_Pose.vecDriverFromHeadTranslation[0] = 0;
             m_Pose.vecDriverFromHeadTranslation[1] = 0;
             m_Pose.vecDriverFromHeadTranslation[2] = 0;
@@ -1100,28 +1096,37 @@ void CLeapHmdLatest::UpdateTrackingState(Frame &frame)
             m_Pose.vecAngularAcceleration[1] = 0.0;
             m_Pose.vecAngularAcceleration[2] = 0.0;
 
-            // Don't show user any controllers until they have hemisphere tracking and
-            // do the calibration gesture.  leap_monitor should be prompting with an overlay
-            if (m_eHemisphereTrackingState != k_eHemisphereTrackingEnabled)
-                m_Pose.result = vr::TrackingResult_Uninitialized;
-            else if (!m_bCalibrated)
-                m_Pose.result = vr::TrackingResult_Calibrating_InProgress;
-            else
-                m_Pose.result = vr::TrackingResult_Running_OK;
+            // this results in the controllers being shown on screen
+            m_Pose.result = vr::TrackingResult_Running_OK;
 
+            // the pose validity also depends on HMD tracking data sent to us by the leap_monitor.exe
             m_Pose.poseIsValid = m_bCalibrated;
-            m_Pose.deviceIsConnected = true;
-
-            // These should always be false from any modern driver.  These are for Oculus DK1-like
-            // rotation-only tracking.  Support for that has likely rotted in vrserver.
-            m_Pose.willDriftInYaw = false;
-            m_Pose.shouldApplyHeadModel = false;
-
-            // This call posts this pose to shared memory, where all clients will have access to it the next
-            // moment they want to predict a pose.
-            m_pDriverHost->TrackedDevicePoseUpdated(m_unSteamVRTrackedDeviceId, m_Pose);
         }
     }
+
+    if (!handFound)
+    {
+        m_Pose.result = vr::TrackingResult_Running_OutOfRange;
+        m_Pose.poseIsValid = false;
+    }
+
+    // This is very hard to know with this driver, but CServerDriver_Leap::ThreadFunc
+    // tries to reduce latency as much as possible.  There is processing in the Leap Motion SDK,
+    // though, which causes additional unknown latency.  This time is used to know how much
+    // extrapolation (via velocity and angular velocity) should be done when predicting poses.
+    m_Pose.poseTimeOffset = -0.016f;
+
+    // when we get here, the Leap Motion is connected
+    m_Pose.deviceIsConnected = true;
+
+    // These should always be false from any modern driver.  These are for Oculus DK1-like
+    // rotation-only tracking.  Support for that has likely rotted in vrserver.
+    m_Pose.willDriftInYaw = false;
+    m_Pose.shouldApplyHeadModel = false;
+
+    // This call posts this pose to shared memory, where all clients will have access to it the next
+    // moment they want to predict a pose.
+    m_pDriverHost->TrackedDevicePoseUpdated(m_unSteamVRTrackedDeviceId, m_Pose);
 }
 
 bool CLeapHmdLatest::IsHoldingSystemButton() const

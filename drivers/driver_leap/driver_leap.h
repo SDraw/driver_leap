@@ -153,7 +153,6 @@ private:
     vr::VRControllerState_t m_ControllerState;
 
     // Ancillary tracking state
-    enum { k_eHemisphereTrackingEnabled } m_eHemisphereTrackingState;
     bool m_bCalibrated;
     float m_hmdPos[3];
     vr::HmdQuaternion_t m_hmdRot;
