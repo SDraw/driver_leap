@@ -2,10 +2,10 @@
 
 ## Note about WORK IN PROGRESS
 
-You're seeing an early version of this software. I've got positional tracking established now.
+You're seeing an early version of this software. I've got positional tracking established now
+as well as hand pose tracking (not including fingers).
 
-I stil have to implement the pose (oriention) of the hand as well as emulation of some buttons
-using gestures.
+I stil have to implement emulation of buttons and joypad axes using gestures.
 
 I do not think I will be able to get animated hands into the 3D view, as the render model you
 can give to each controller seems to be a static object. At best, I can swap out objects
