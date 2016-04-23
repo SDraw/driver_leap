@@ -1,12 +1,24 @@
-# Razer Hydra Driver for SteamVR
+# Leap Motion Driver for SteamVR
+
+## Note about WORK IN PROGRESS
+
+You're seeing an early version of this software. I've got positional tracking established now.
+
+I stil have to implement the pose (oriention) of the hand as well as emulation of some buttons
+using gestures.
+
+I do not think I will be able to get animated hands into the 3D view, as the render model you
+can give to each controller seems to be a static object. At best, I can swap out objects
+if a specific gesture is recognized. Adding separate controllers for each finger seems
+infeasible.
 
 ## Building
 
 ### Install Dependencies
 
 1. Install SteamVR.  It is under "Tools" in everyone's Steam Library.  steam://install/250820
-2. Install "Sixense SDK for the Razer Hydra".  It is also under "Tools".  steam://install/42300
-3. Fetch the OpenVR SDK 0.9.19 from https://github.com/ValveSoftware/openvr .  That version SHA is f1ffbf4e92f383bdb453d58f9583c51a5ec350d9.  Newer version should also work with minor changes.
+2. Install "Leap Motion Orion SDK V3.1.1".  https://developer.leapmotion.com/get-started
+3. Fetch the OpenVR SDK 0.9.19 from https://github.com/ValveSoftware/openvr .
 
 The solution and project files are for Visual Studio 2015.
 
@@ -18,7 +30,7 @@ Under "Property Manager" in Visual Studio, expand any of the configurations and 
 
 You will probably want to build Release x86.  You can also build x64.  The post-build step will install the binaries and copy the resources to the configured InstallDir and register that path with SteamVR.
 
-## Using The Hydra Driver 
+## Using The Leap Motion Driver 
 
 After building, the InstallDir should be a complete binary distribution.  To use it:
 
@@ -32,15 +44,15 @@ After building, the InstallDir should be a complete binary distribution.  To use
 }```
 3. If you are trying to use the Hydra driver without an HMD, you might want to enable driver_null (no HMD) or set "requireHmd": false.
 
-After starting SteamVR, you should see controllers blinking in the status window.  Inside the HMD you will see instructions to get the Hydra coordinates aligned with your HMD.  Once you do, the controllers will turn solid green.
+After starting SteamVR, you should see controllers blinking in the status window until you move your hands into the field of view.
 
 You can use "vrcmd" (with no arguments) to see a list of devices to verify things are working.
 use "vrcmd" to verify things are loading:
 
 ```...
-Driver hydra : 2 displays
-        Hydra (Serial number hydra0_controller0)
-        Hydra (Serial number hydra0_controller1)
+Driver leap : 2 displays
+        leap (Serial number leap0_controller0)
+        leap (Serial number leap0_controller1)
 ...
 ```
 
@@ -52,5 +64,5 @@ The code in this distribution is distributed under the terms of the LICENSE file
 
 The render models are based on work by Zoltan Erdokovy <zoltan.erdokovy@gmail.com> with permission.
 
-The compiled driver and the install directory use the Sixense SDK.  That development kit has a license which requires copyright acknowledgement for distribution.  See the EULA that is displayed when installing the Sixense SDK.
-
+The compiled driver and the install directory use the Leap Motion Orion SDK.  Use subject to the terms of the Leap Motion SDK Agreement available at
+https://developer.leapmotion.com/sdk_agreement.
