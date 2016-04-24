@@ -62,14 +62,17 @@ private:
     std::string m_strDriverInstallDir;
 
     bool m_bLaunchedLeapMonitor;
+    PROCESS_INFORMATION m_pInfoStartedProcess;
 
+    // SteamVR's tracked controller objects
     std::vector< CLeapHmdLatest * > m_vecControllers;
 
+    // Leap Motion's Controller object
     Controller *m_Controller;
 
-    // needed for Listeners (callbacks arrive from different threads)
-    std::recursive_mutex m_Mutex;
-    typedef std::lock_guard<std::recursive_mutex> scope_lock;
+    // a mutex for thread safety (Leap::Listener callbacks arrive from different threads)
+//    std::recursive_mutex m_Mutex;
+//    typedef std::lock_guard<std::recursive_mutex> scope_lock;
 };
 
 class CClientDriver_Leap : public vr::IClientTrackedDeviceProvider
@@ -118,8 +121,6 @@ public:
     bool IsActivated() const;
     bool HasControllerId( int nBase, int nId );
     bool Update(Frame &frame);
-    bool IsHoldingSystemButton() const;
-    void ConsumeSystemButtonPress();
     const char *GetSerialNumber();
 
     static void RealignCoordinates( CLeapHmdLatest * pLeapA, CLeapHmdLatest * pLeapB );
@@ -155,10 +156,6 @@ private:
 
     // Other controller with from the last realignment
     CLeapHmdLatest *m_pAlignmentPartner;
-
-    // Timeout for system button chording
-    std::chrono::steady_clock::time_point m_SystemButtonDelay;
-    enum { k_eIdle, k_eWaiting, k_eSent, k_ePulsed, k_eBlocked } m_eSystemButtonState;
 
     // Cached for answering version queries from vrserver
     unsigned short m_firmware_revision;

@@ -528,7 +528,7 @@
         {
             "{3C67513D-01DD-4637-8A68-80971EB9504F}:_B572C0F62C374CA0A6C66D010BE1A374"
             {
-            "DefaultLocation" = "8:c:\\Program Files (x86)\\SteamVR leap driver"
+            "DefaultLocation" = "8:c:\\Program Files (x86)\\SteamVR Leap Motion driver"
             "Name" = "8:#1925"
             "AlwaysCreate" = "11:FALSE"
             "Condition" = "8:"
@@ -611,7 +611,7 @@
                                     }
                                     "{9EF0B969-E518-4E46-987F-47570745A589}:_6E55793820964E8FAF968D498761B3E3"
                                     {
-                                    "Name" = "8:x64"
+                                    "Name" = "8:Win64"
                                     "AlwaysCreate" = "11:FALSE"
                                     "Condition" = "8:"
                                     "Transitive" = "11:FALSE"
@@ -676,11 +676,11 @@
         "Manufacturer" = "8:cbuchner1"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:https://github.com/cbuchner1/driver_leap/wiki"
-        "Title" = "8:SteamVR leap driver"
+        "Title" = "8:SteamVR Leap Motion driver"
         "Subject" = "8:"
         "ARPCONTACT" = "8:Valve"
         "Keywords" = "8:"
-        "ARPCOMMENTS" = "8:SteamVR leap driver"
+        "ARPCOMMENTS" = "8:SteamVR Leap Motion driver"
         "ARPURLINFOABOUT" = "8:https://github.com/cbuchner1/driver_leap/"
         "ARPPRODUCTICON" = "8:"
         "ARPIconIndex" = "3:0"

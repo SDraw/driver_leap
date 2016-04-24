@@ -25,7 +25,8 @@ CClientDriver_Leap g_ClientTrackedDeviceProvider;
 #define RIGHT_CONTROLLER 1
 
 // values > 0 will tilt up the controller in VR space relative to the direction of the hand
-#define GRIP_ANGLE_OFFSET 0
+#define L_GRIP_ANGLE_OFFSET 0
+#define R_GRIP_ANGLE_OFFSET 0
 
 HMD_DLL_EXPORT
 void *HmdDriverFactory( const char *pInterfaceName, int *pReturnCode )
@@ -105,6 +106,7 @@ static void DriverLog( const char *pMsgFormat, ... )
  */
 void CServerDriver_Leap::onInit(const Controller&controller)
 {
+    DriverLog("CServerDriver_Leap::onInit()\n");
 }
 
 /**
@@ -123,7 +125,7 @@ void CServerDriver_Leap::onInit(const Controller&controller)
  */
 void CServerDriver_Leap::onConnect(const Controller&controller)
 {
-    DriverLog(" CServerDriver_Leap::onConnect()\n");
+    DriverLog("CServerDriver_Leap::onConnect()\n");
 }
 
 /**
@@ -144,7 +146,7 @@ void CServerDriver_Leap::onConnect(const Controller&controller)
  */
 void CServerDriver_Leap::onDisconnect(const Controller&controller)
 {
-    DriverLog(" CServerDriver_Leap::onDisconnect()\n");
+    DriverLog("CServerDriver_Leap::onDisconnect()\n");
 }
 
 /**
@@ -158,7 +160,7 @@ void CServerDriver_Leap::onDisconnect(const Controller&controller)
  */
 void CServerDriver_Leap::onExit(const Controller&controller)
 {
-    DriverLog(" CServerDriver_Leap::onExit()\n");
+    DriverLog("CServerDriver_Leap::onExit()\n");
 }
 
 /**
@@ -196,7 +198,7 @@ void CServerDriver_Leap::onFrame(const Controller&controller)
  */
 void CServerDriver_Leap::onFocusGained(const Controller&controller)
 {
-//    DriverLog(" CServerDriver_Leap::onFocusGained()\n");
+//    DriverLog("CServerDriver_Leap::onFocusGained()\n");
 }
 
 /**
@@ -213,7 +215,7 @@ void CServerDriver_Leap::onFocusGained(const Controller&controller)
  */
 void CServerDriver_Leap::onFocusLost(const Controller&controller)
 {
-//    DriverLog(" CServerDriver_Leap::onFocusLost()\n");
+//    DriverLog("CServerDriver_Leap::onFocusLost()\n");
 }
 
 // onServiceConnect/onServiceDisconnect are for connection established/lost.
@@ -230,7 +232,7 @@ void CServerDriver_Leap::onFocusLost(const Controller&controller)
  */
 void CServerDriver_Leap::onServiceConnect(const Controller&controller)
 {
-    DriverLog(" CServerDriver_Leap::onServiceConnect()\n");
+    DriverLog("CServerDriver_Leap::onServiceConnect()\n");
 }
 
 /**
@@ -246,7 +248,7 @@ void CServerDriver_Leap::onServiceConnect(const Controller&controller)
  */
 void CServerDriver_Leap::onServiceDisconnect(const Controller&controller)
 {
-    DriverLog(" CServerDriver_Leap::onServiceDisconnect()\n");
+    DriverLog("CServerDriver_Leap::onServiceDisconnect()\n");
 }
 
 /**
@@ -264,16 +266,34 @@ void CServerDriver_Leap::onServiceDisconnect(const Controller&controller)
  */
 void CServerDriver_Leap::onDeviceChange(const Controller&controller)
 {
-    DriverLog(" CServerDriver_Leap::onDeviceChange()\n");
+    DriverLog("CServerDriver_Leap::onDeviceChange()\n");
 
     if (controller.isConnected())
     {
+        bool backgroundModeAllowed = controller.config().getInt32("background_app_mode") == 2;
+        if (!backgroundModeAllowed) {
+            // TODO: Show dialog to request permission to allow background mode apps
+            bool userPermission = true;
+            if (userPermission) {
+                controller.config().setInt32("background_app_mode", 2);
+                controller.config().save();
+            }
+        }
+
+        controller.setPolicy(Leap::Controller::POLICY_OPTIMIZE_HMD);
+        controller.setPolicy(Leap::Controller::POLICY_BACKGROUND_FRAMES);
+
+        // make sure we always get background frames even when we lose the focus to another
+        // Leap-enabled application
+        controller.setPolicy((Leap::Controller::PolicyFlag)(15));
+
+        // allow other background applications to receive frames even when SteamVR has the focus.
+        controller.setPolicy((Leap::Controller::PolicyFlag)(23));
+
         ScanForNewControllers(true);
     }
     else
     {
-        scope_lock lock(m_Mutex);
-
         for (auto it = m_vecControllers.begin(); it != m_vecControllers.end(); ++it)
             delete (*it);
         m_vecControllers.clear();
@@ -314,7 +334,7 @@ void CServerDriver_Leap::onImages(const Controller&controller)
  */
 void CServerDriver_Leap::onServiceChange(const Controller&controller)
 {
-    DriverLog(" CServerDriver_Leap::onServiceChange()\n");
+    DriverLog("CServerDriver_Leap::onServiceChange()\n");
 }
 
 /**
@@ -331,7 +351,7 @@ void CServerDriver_Leap::onServiceChange(const Controller&controller)
  */
 void CServerDriver_Leap::onDeviceFailure(const Controller&controller)
 {
-    DriverLog(" CServerDriver_Leap::onDeviceFailure()\n");
+    DriverLog("CServerDriver_Leap::onDeviceFailure()\n");
 }
 
 /**
@@ -349,7 +369,7 @@ void CServerDriver_Leap::onDeviceFailure(const Controller&controller)
  */
 void CServerDriver_Leap::onLogMessage(const Controller&controller, MessageSeverity severity, int64_t timestamp, const char* msg)
 {
-    DriverLog(" CServerDriver_Leap::onLogMessage(%d): %s\n", (int)severity, msg);
+    DriverLog("CServerDriver_Leap::onLogMessage(%d): %s\n", (int)severity, msg);
 }
 
 
@@ -360,42 +380,27 @@ void CServerDriver_Leap::onLogMessage(const Controller&controller, MessageSeveri
 CServerDriver_Leap::CServerDriver_Leap()
     : m_bLaunchedLeapMonitor( false )
 {
+//    DriverLog not yet initialized at this point.
+//    DriverLog("CServerDriver_Leap::CServerDriver_Leap()\n");
 }
 
 CServerDriver_Leap::~CServerDriver_Leap()
 {
+    DriverLog("CServerDriver_Leap::~CServerDriver_Leap()\n");
     Cleanup();
 }
 
 vr::EVRInitError CServerDriver_Leap::Init( vr::IDriverLog * pDriverLog, vr::IServerDriverHost * pDriverHost, const char * pchUserDriverConfigDir, const char * pchDriverInstallDir )
 {
     InitDriverLog( pDriverLog );
+    DriverLog("CServerDriver_Leap::Init()\n");
+
     m_pDriverHost = pDriverHost;
     m_strDriverInstallDir = pchDriverInstallDir;
 
     m_Controller = new Controller;
 
     Controller &controller = *m_Controller;
-
-    bool backgroundModeAllowed = controller.config().getInt32("background_app_mode") == 2;
-    if (!backgroundModeAllowed) {
-        // TODO: Show dialog to request permission to allow background mode apps
-        bool userPermission = true;
-        if (userPermission) {
-            controller.config().setInt32("background_app_mode", 2);
-            controller.config().save();
-        }
-    }
-
-    controller.setPolicy(Leap::Controller::POLICY_OPTIMIZE_HMD);
-    controller.setPolicy(Leap::Controller::POLICY_BACKGROUND_FRAMES);
-
-    // make sure we always get background frames even when we lose the focus to another
-    // Leap-enabled application
-    controller.setPolicy((Leap::Controller::PolicyFlag)(15));
-
-    // allow other background applications to receive frames even when SteamVR has the focus.
-    controller.setPolicy((Leap::Controller::PolicyFlag)(23));
 
     m_Controller->addListener(*this);
 
@@ -404,33 +409,32 @@ vr::EVRInitError CServerDriver_Leap::Init( vr::IDriverLog * pDriverLog, vr::ISer
 
 void CServerDriver_Leap::Cleanup()
 {
+    DriverLog("CServerDriver_Leap::Cleanup()\n");
+
+    // send a termination message to the leap monitor companion application
     if (m_bLaunchedLeapMonitor)
     {
-        // Ask leap_monitor to shut down. It may also receive a VREvent_Quit, but this
-        // vendor specific event may be seen earlier.
-        static vr::VREvent_Data_t nodata = { 0 };
-        if (m_vecControllers.size() > 0)
-        {
-            m_pDriverHost->VendorSpecificEvent(m_vecControllers[0]->GetDeviceId(),
-                (vr::EVREventType) (vr::VREvent_VendorSpecific_Reserved_Start + 1), nodata,
-                0.0);
-
-            m_bLaunchedLeapMonitor = false;
-        }
+        // Ask leap_monitor to shut down.
+        PostThreadMessage(m_pInfoStartedProcess.dwThreadId, WM_QUIT, 0, 0);
+        m_bLaunchedLeapMonitor = false;
     }
 
+    // clean up our Leap::Controller object
     if (m_Controller)
     {
         m_Controller->removeListener(*this);
         delete m_Controller;
         m_Controller = NULL;
     }
+
+    // clean up any controller objects we've created
+    for (auto it = m_vecControllers.begin(); it != m_vecControllers.end(); ++it)
+        delete (*it);
+    m_vecControllers.clear();
 }
 
 uint32_t CServerDriver_Leap::GetTrackedDeviceCount()
 {
-    scope_lock lock( m_Mutex );
-
     return m_vecControllers.size();
 }
 
@@ -443,8 +447,6 @@ vr::ITrackedDeviceServerDriver * CServerDriver_Leap::GetTrackedDeviceDriver( uin
             pchInterfaceVersion );
         return NULL;
     }
-
-    scope_lock lock( m_Mutex );
 
     if ( unWhich < m_vecControllers.size() )
         return m_vecControllers[unWhich];
@@ -461,8 +463,6 @@ vr::ITrackedDeviceServerDriver * CServerDriver_Leap::FindTrackedDeviceDriver( co
             pchInterfaceVersion );
         return NULL;
     }
-
-    scope_lock lock( m_Mutex );
 
     for ( auto it = m_vecControllers.begin(); it != m_vecControllers.end(); ++it )
     {
@@ -511,10 +511,12 @@ bool CServerDriver_Leap::ShouldBlockStandbyMode()
 
 void CServerDriver_Leap::EnterStandby()
 {
+    DriverLog("CServerDriver_Leap::EnterStandby()\n");
 }
 
 void CServerDriver_Leap::LeaveStandby()
 {
+    DriverLog("CServerDriver_Leap::LeaveStandby()\n");
 }
 
 static void GenerateSerialNumber( char *p, int psize, int base, int controller )
@@ -532,7 +534,6 @@ void CServerDriver_Leap::ScanForNewControllers( bool bNotifyServer )
         int base = 0;
         int i = m_vecControllers.size();
         GenerateSerialNumber( buf, sizeof( buf ), base, i );
-        scope_lock lock( m_Mutex );
         if ( !FindTrackedDeviceDriver( buf, vr::ITrackedDeviceServerDriver_Version ) )
         {
             DriverLog( "added new device %s\n", buf );
@@ -550,6 +551,8 @@ void CServerDriver_Leap::LaunchLeapMonitor( const char * pchDriverInstallDir )
 {
     if ( m_bLaunchedLeapMonitor )
         return;
+
+    DriverLog("CServerDriver_Leap::LaunchLeapMonitor()\n");
 
     m_bLaunchedLeapMonitor = true;
 
@@ -570,8 +573,7 @@ void CServerDriver_Leap::LaunchLeapMonitor( const char * pchDriverInstallDir )
     sInfoProcess.cb = sizeof(STARTUPINFOW);
 //    sInfoProcess.dwFlags = STARTF_USESHOWWINDOW;
 //    sInfoProcess.wShowWindow = SW_SHOWDEFAULT;
-    PROCESS_INFORMATION pInfoStartedProcess;
-    BOOL okay = CreateProcessA( (ss.str() + "\\leap_monitor.exe").c_str(), NULL, NULL, NULL, FALSE, 0, NULL, ss.str().c_str(), &sInfoProcess, &pInfoStartedProcess );
+    BOOL okay = CreateProcessA( (ss.str() + "\\leap_monitor.exe").c_str(), NULL, NULL, NULL, FALSE, 0, NULL, ss.str().c_str(), &sInfoProcess, &m_pInfoStartedProcess );
     DriverLog( "start leap_monitor okay: %d %08x\n", okay, GetLastError() );
 #else
 #error Do not know how to launch leap_monitor
@@ -599,12 +601,14 @@ CClientDriver_Leap::~CClientDriver_Leap()
 vr::EVRInitError CClientDriver_Leap::Init( vr::IDriverLog * pDriverLog, vr::IClientDriverHost * pDriverHost, const char * pchUserDriverConfigDir, const char * pchDriverInstallDir )
 {
     InitDriverLog( pDriverLog );
+    DriverLog("CClientDriver_Leap::Init()\n");
     m_pDriverHost = pDriverHost;
     return vr::VRInitError_None;
 }
 
 void CClientDriver_Leap::Cleanup()
 {
+    DriverLog("CClientDriver_Leap::Cleanup()\n");
 }
 
 bool CClientDriver_Leap::BIsHmdPresent( const char * pchUserConfigDir )
@@ -640,9 +644,10 @@ CLeapHmdLatest::CLeapHmdLatest( vr::IServerDriverHost * pDriverHost, int base, i
     , m_nId( n )
     , m_bCalibrated( true )
     , m_pAlignmentPartner( NULL )
-    , m_eSystemButtonState( k_eIdle )
     , m_unSteamVRTrackedDeviceId( vr::k_unTrackedDeviceIndexInvalid )
 {
+    DriverLog("CLeapHmdLatest::CLeapHmdLatest(base=%d, n=%d)\n", base, n);
+    
     memset(m_hmdPos, 0, sizeof(m_hmdPos));
 
     char buf[256];
@@ -659,6 +664,7 @@ CLeapHmdLatest::CLeapHmdLatest( vr::IServerDriverHost * pDriverHost, int base, i
 
 CLeapHmdLatest::~CLeapHmdLatest()
 {
+    DriverLog("CLeapHmdLatest::~CLeapHmdLatest(base=%d, n=%d)\n", m_nBase, m_nId);
 }
 
 void *CLeapHmdLatest::GetComponent( const char *pchComponentNameAndVersion )
@@ -689,7 +695,7 @@ void CLeapHmdLatest::Deactivate()
 
 void CLeapHmdLatest::PowerOff()
 {
-//    DriverLog("CLeapHmdLatest::PowerOff: %s is object id %d\n", GetSerialNumber(), m_unSteamVRTrackedDeviceId);
+    DriverLog("CLeapHmdLatest::PowerOff()\n");
     // FIXME Implement
 }
 
@@ -1222,8 +1228,13 @@ void CLeapHmdLatest::UpdateTrackingState(Frame &frame)
 #endif
 
             // consider the controller's grip angle
-#if GRIP_ANGLE_OFFSET
-            m_Pose.qRotation = rotate_around_axis(Vector(1.0, 0.0, 0.0), GRIP_ANGLE_OFFSET) * m_Pose.qRotation;
+#if L_GRIP_ANGLE_OFFSET
+            if (m_nId == LEFT_CONTROLLER)
+                m_Pose.qRotation = rotate_around_axis(Vector(1.0, 0.0, 0.0), L_GRIP_ANGLE_OFFSET) * m_Pose.qRotation;
+#endif
+#if R_GRIP_ANGLE_OFFSET
+            if (m_nId == RIGHT_CONTROLLER)
+                m_Pose.qRotation = rotate_around_axis(Vector(1.0, 0.0, 0.0), R_GRIP_ANGLE_OFFSET) * m_Pose.qRotation;
 #endif
 
             // Unmeasured.  XXX with no angular velocity, throwing might not work in some games
@@ -1270,19 +1281,6 @@ void CLeapHmdLatest::UpdateTrackingState(Frame &frame)
     m_pDriverHost->TrackedDevicePoseUpdated(m_unSteamVRTrackedDeviceId, m_Pose);
 }
 
-bool CLeapHmdLatest::IsHoldingSystemButton() const
-{
-    return m_eSystemButtonState == k_eWaiting;
-}
-
-void CLeapHmdLatest::ConsumeSystemButtonPress()
-{
-    if ( m_eSystemButtonState == k_eWaiting )
-    {
-        m_eSystemButtonState = k_eBlocked;
-    }
-}
-
 bool CLeapHmdLatest::IsActivated() const
 {
     return m_unSteamVRTrackedDeviceId != vr::k_unTrackedDeviceIndexInvalid;
@@ -1302,13 +1300,7 @@ bool CLeapHmdLatest::Update(Frame &frame)
     return true;
 }
 
-// User initiated manual alignment of the coordinate system of driver_leap with the HMD:
-//
-// The user has put two controllers on either side of her head, near the shoulders.  We
-// assume that the HMD is roughly in between them (so the exact distance apart doesn't
-// matter as long as the pose is symmetrical) and we align the HMD's coordinate system
-// using the line between the controllers (again, exact position is not important, only
-// symmetry).
+// Alignment of the coordinate system of driver_leap with the HMD:
 void CLeapHmdLatest::RealignCoordinates( CLeapHmdLatest * pLeapA, CLeapHmdLatest * pLeapB )
 {
     if ( pLeapA->m_unSteamVRTrackedDeviceId == vr::k_unTrackedDeviceIndexInvalid )
