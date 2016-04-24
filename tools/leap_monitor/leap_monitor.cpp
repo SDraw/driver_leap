@@ -103,6 +103,13 @@ protected:
                         TriggerRealignCoordinates( Event );
                     }
                     break;
+
+                case vr::VREvent_VendorSpecific_Reserved_Start + 1:
+                    if (IsLeapDevice(Event.trackedDeviceIndex))
+                    {
+                        exit(0);
+                    }
+                    break;
                 }
             }
         }

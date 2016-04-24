@@ -131,6 +131,8 @@ public:
     static void RealignCoordinates( CLeapHmdLatest * pLeapA, CLeapHmdLatest * pLeapB );
     void FinishRealignCoordinates( float (*m)[3], float *v );
 
+    uint32_t GetDeviceId() { return m_unSteamVRTrackedDeviceId; }
+
 private:
     static const std::chrono::milliseconds k_TrackingLatency;
 

@@ -395,6 +395,21 @@ vr::EVRInitError CServerDriver_Leap::Init( vr::IDriverLog * pDriverLog, vr::ISer
 
 void CServerDriver_Leap::Cleanup()
 {
+    if (m_bLaunchedLeapMonitor)
+    {
+        // Ask leap_monitor to shut down. It may also receive a VREvent_Quit, but this
+        // vendor specific event may be seen earlier.
+        static vr::VREvent_Data_t nodata = { 0 };
+        if (m_vecControllers.size() > 0)
+        {
+            m_pDriverHost->VendorSpecificEvent(m_vecControllers[0]->GetDeviceId(),
+                (vr::EVREventType) (vr::VREvent_VendorSpecific_Reserved_Start + 1), nodata,
+                0.0);
+
+            m_bLaunchedLeapMonitor = false;
+        }
+    }
+
     if (m_Controller)
     {
         m_Controller->removeListener(*this);
@@ -542,8 +557,8 @@ void CServerDriver_Leap::LaunchLeapMonitor( const char * pchDriverInstallDir )
 #if defined( _WIN32 )
     STARTUPINFOA sInfoProcess = { 0 };
     sInfoProcess.cb = sizeof(STARTUPINFOW);
-    sInfoProcess.dwFlags = STARTF_USESHOWWINDOW;
-    sInfoProcess.wShowWindow = SW_SHOWDEFAULT;
+//    sInfoProcess.dwFlags = STARTF_USESHOWWINDOW;
+//    sInfoProcess.wShowWindow = SW_SHOWDEFAULT;
     PROCESS_INFORMATION pInfoStartedProcess;
     BOOL okay = CreateProcessA( (ss.str() + "\\leap_monitor.exe").c_str(), NULL, NULL, NULL, FALSE, 0, NULL, ss.str().c_str(), &sInfoProcess, &pInfoStartedProcess );
     DriverLog( "start leap_monitor okay: %d %08x\n", okay, GetLastError() );
@@ -806,7 +821,7 @@ uint32_t CLeapHmdLatest::GetStringTrackedDeviceProperty( vr::ETrackedDevicePrope
         // The {leap} syntax lets us refer to rendermodels that are installed
         // in the driver's own resources/rendermodels directory.  The driver can
         // still refer to SteamVR models like "generic_hmd".
-        ssRetVal << "{leap}leap_controller";
+        ssRetVal << "vr_controller_vive_1_5";
         break;
 
     case vr::Prop_ManufacturerName_String:
@@ -883,28 +898,39 @@ void CLeapHmdLatest::UpdateControllerState(Frame &frame)
     // changed.  We don't try to be precise about that here.
     NewState.unPacketNum = m_ControllerState.unPacketNum + 1;
 
+    HandList &hands = frame.hands();
+
+    bool handFound = false;
+    for (int h = 0; h < hands.count(); h++)
+    {
+        Hand &hand = hands[h];
+
+        // controller #0 is supposed to be the left hand, controller #1 the right one.
+        if (m_nId == 0 && hand.isLeft() ||
+            m_nId == 1 && hand.isRight())
+        {
+            handFound = true;
+        }
+    }
+
 #if 0
-    if ( cd.buttons & SIXENSE_BUTTON_1 )
         NewState.ulButtonPressed |= vr::ButtonMaskFromId( k_EButton_Button1 );
-    if ( cd.buttons & SIXENSE_BUTTON_2 )
         NewState.ulButtonPressed |= vr::ButtonMaskFromId( k_EButton_Button2 );
-    if ( cd.buttons & SIXENSE_BUTTON_3 )
         NewState.ulButtonPressed |= vr::ButtonMaskFromId( k_EButton_Button3 );
-    if ( cd.buttons & SIXENSE_BUTTON_4 )
         NewState.ulButtonPressed |= vr::ButtonMaskFromId( k_EButton_Button4 );
-    if ( cd.buttons & SIXENSE_BUTTON_BUMPER )
         NewState.ulButtonPressed |= vr::ButtonMaskFromId( k_EButton_Bumper );
-    if ( cd.buttons & SIXENSE_BUTTON_START )
         NewState.ulButtonPressed |= vr::ButtonMaskFromId( vr::k_EButton_System );
-    if ( cd.buttons & SIXENSE_BUTTON_JOYSTICK)
         NewState.ulButtonPressed |= vr::ButtonMaskFromId( vr::k_EButton_Axis0 );
+
     if ( cd.trigger > 0.1f )
         NewState.ulButtonTouched |= vr::ButtonMaskFromId( vr::k_EButton_Axis1 );
     if ( cd.trigger > 0.8f )
         NewState.ulButtonPressed |= vr::ButtonMaskFromId( vr::k_EButton_Axis1 );
+
     // sixense driver seems to have good deadzone, but add a small one here
     if ( fabsf( cd.joystick_x ) > 0.03f || fabsf( cd.joystick_y ) > 0.03f )
         NewState.ulButtonTouched |= vr::ButtonMaskFromId( vr::k_EButton_Axis0 );
+#endif
 
     // All pressed buttons are touched
     NewState.ulButtonTouched |= NewState.ulButtonPressed;
@@ -917,16 +943,17 @@ void CLeapHmdLatest::UpdateControllerState(Frame &frame)
     SendButtonUpdates( &vr::IServerDriverHost::TrackedDeviceButtonUnpressed, ulChangedPressed & ~NewState.ulButtonPressed );
     SendButtonUpdates( &vr::IServerDriverHost::TrackedDeviceButtonUntouched, ulChangedTouched & ~NewState.ulButtonTouched );
 
-    NewState.rAxis[0].x = cd.joystick_x;
-    NewState.rAxis[0].y = cd.joystick_y;
-    NewState.rAxis[1].x = cd.trigger;
+    NewState.rAxis[0].x = 0.0f; //  cd.joystick_x;
+    NewState.rAxis[0].y = 0.0f; //  cd.joystick_y;
+
+    NewState.rAxis[1].x = 0.0f; //  cd.trigger;
     NewState.rAxis[1].y = 0.0f;
 
     if ( NewState.rAxis[0].x != m_ControllerState.rAxis[0].x || NewState.rAxis[0].y != m_ControllerState.rAxis[0].y )
         m_pDriverHost->TrackedDeviceAxisUpdated( m_unSteamVRTrackedDeviceId, 0, NewState.rAxis[0] );
+
     if ( NewState.rAxis[1].x != m_ControllerState.rAxis[1].x )
         m_pDriverHost->TrackedDeviceAxisUpdated( m_unSteamVRTrackedDeviceId, 1, NewState.rAxis[1] );
-#endif
 
     m_ControllerState = NewState;
 }
@@ -1072,18 +1099,43 @@ void CLeapHmdLatest::UpdateTrackingState(Frame &frame)
             Vector normal = hand.palmNormal(); normal /= normal.magnitude();
             Vector side = direction.cross(normal);
 
+#if 0
+            // This code assumes palms are facing downwards.
+
             // NOTE: y and z are swapped with respect to the Leap Motion's coordinate system and I list
             //       the vectors in the order in which I expect them to be in the tracking camera's
             //       coordinates system: X = sideways,
             //                           Y = up/down i.e. palm's normal vector
             //                           Z = front/back i.e. hand's pointing direction
+            m_Pose.qRotation = CalculateRotation(R);
+
             float R[3][3] =
-            { { side.x,      side.z,      side.y      },
-              { normal.x,    normal.z,    normal.y    },
+            { { side.x,      side.z,      side.y },
+            { normal.x,    normal.z,    normal.y },
+            { direction.x, direction.z, direction.y } };
+
+#else
+            // This code assumes palms are facing inwards as if you were holding controllers.
+            // This is why the left hand and the
+            // right hands have to use different matrices to compute their rotations.
+
+            float L[3][3] =
+            { {-normal.x,  -normal.z,   -normal.y },
+            {   side.x,      side.z,      side.y },
+            {   direction.x, direction.z, direction.y } };
+
+            float R[3][3] =
+            { { normal.x,    normal.z,    normal.y },
+              {-side.x,     -side.z,     -side.y      },
               { direction.x, direction.z, direction.y } };
 
             // now turn this into a Quaternion and we're done.
-            m_Pose.qRotation = CalculateRotation(R);
+            if (m_nId == 0)
+                m_Pose.qRotation = CalculateRotation(L);
+            else if (m_nId == 1)
+                m_Pose.qRotation = CalculateRotation(R);
+
+#endif
 
             // Unmeasured.  XXX with no angular velocity, throwing might not work in some games
             m_Pose.vecAngularVelocity[0] = 0.0;
