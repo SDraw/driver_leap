@@ -8,19 +8,19 @@ You're seeing an early version of this software. I've got positional tracking es
 - clenching the middle, ring, pinky finger to a fist maps to the grabbing buttons
 - a pinch gesture between thumb and index finger maps to main controller button ("A")
 
-## Games/Experiences that work well
+### Games/Experiences that work well
 
 - the Blu (all three stages)
 - Irrational Exuberance: Prologue
 - the Rose and I
  
-## Games/Experiences that are starting but not quite playable yet.
+### Games/Experiences that are starting but not quite playable yet.
 
 - Audioshield: somehow the controllers are swapped? Control is tricky and not very precise. Semi-playable though.
 - Tilt Brush & Final Approach: these start and you can start doing things, but there is lack of trackpad support in my driver.
 - Brookhaven Experiment: tracking only works while SteamVR window is in focus. Why? Gun in right hand needs a 60 degree uptilt angle (define this in steamvr.vrsettings config file in Steam config folder). Trigger gesture detection is way to imprecise, you won't even survive the first wave of Zombies.
 
-# Demos that won't work at all
+### Demos that won't work at all
 - The Lab: My DK2 shows only a black screen. Why?
 - Realities: You can't currently press the trackpad with my driver to start the experience.
 
