@@ -8,13 +8,27 @@ You're seeing an early version of this software. I've got positional tracking es
 - clenching the middle, ring, pinky finger to a fist maps to the grabbing buttons
 - a pinch gesture between thumb and index finger maps to main controller button ("A")
 
+## Games/Experiences that work well
+
+- the Blu (all three stages)
+- Irrational Exuberance: Prologue
+- the Rose and I
+ 
+## Games/Experiences that are starting but not quite playable yet.
+
+- Audioshield: somehow the controllers are swapped? Control is tricky and not very precise. Semi-playable though.
+- Tilt Brush & Final Approach: these start and you can start doing things, but there is lack of trackpad support in my driver.
+- Brookhaven Experiment: tracking only works while SteamVR window is in focus. Why? Gun in right hand needs a 60 degree uptilt angle (define this in steamvr.vrsettings config file in Steam config folder). Trigger gesture detection is way to imprecise, you won't even survive the first wave of Zombies.
+
+# Demos that won't work at all
+- The Lab: My DK2 shows only a black screen. Why?
+- Realities: You can't currently press the trackpad with my driver to start the experience.
+
 ## Known Issues
 
 I am seeing SteamVR Server crash on shutdown a lot. This could be related to my driver, but I have not yet found the root cause for the crash.
 
 The Brookhaven experiment seems to steal focus from StreamVR, so that Steam does not get any position tracking. Clicking on the SteamVR window restores tracking, but mutes the audio on Brookhaven. Meh.
-
-In AudioShield the shields appear to be swapped around (left/right hand). I have tried to swap the order of left and right hand controllers in my driver, but that did not help.
 
 Some games work better when no grip angle is added to the controller pose, other games actually require a steep angle to be playable (Brookhaven, Audioshield). We may have to add a feature to chose the preferred default pose at runtime.
 
