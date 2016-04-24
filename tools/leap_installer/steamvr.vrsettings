@@ -4,7 +4,7 @@
       "CollisionBoundsStyle" : 0
    },
    "leap" : {
-      "renderModel_lefthand" : "vr_controller_vive_1_5"
+      "renderModel_lefthand" : "vr_controller_vive_1_5",
       "renderModel_righthand" : "vr_controller_vive_1_5"
    },
    "jsonid" : "vrsettings",
