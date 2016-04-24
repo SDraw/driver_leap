@@ -115,12 +115,6 @@ public:
     virtual vr::VRControllerState_t GetControllerState() override;
     virtual bool TriggerHapticPulse( uint32_t unAxisId, uint16_t usPulseDurationMicroseconds ) override;
 
-    static const vr::EVRButtonId k_EButton_Button1 = ( vr::EVRButtonId ) 7;
-    static const vr::EVRButtonId k_EButton_Button2 = ( vr::EVRButtonId ) 8;
-    static const vr::EVRButtonId k_EButton_Button3 = ( vr::EVRButtonId ) 9;
-    static const vr::EVRButtonId k_EButton_Button4 = vr::k_EButton_ApplicationMenu;
-    static const vr::EVRButtonId k_EButton_Bumper  = vr::k_EButton_Grip; // Just for demo compatibility
-
     bool IsActivated() const;
     bool HasControllerId( int nBase, int nId );
     bool Update(Frame &frame);
