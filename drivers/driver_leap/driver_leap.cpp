@@ -24,10 +24,6 @@ CClientDriver_Leap g_ClientTrackedDeviceProvider;
 #define LEFT_CONTROLLER 0
 #define RIGHT_CONTROLLER 1
 
-// values > 0 will tilt up the controller in VR space relative to the direction of the hand
-#define L_GRIP_ANGLE_OFFSET 0
-#define R_GRIP_ANGLE_OFFSET 0
-
 HMD_DLL_EXPORT
 void *HmdDriverFactory( const char *pInterfaceName, int *pReturnCode )
 {
@@ -660,6 +656,18 @@ CLeapHmdLatest::CLeapHmdLatest( vr::IServerDriverHost * pDriverHost, int base, i
 
     m_firmware_revision = 0x0001;
     m_hardware_revision = 0x0001;
+
+    // Load config from steamvr.vrsettings
+    vr::IVRSettings *settings_;
+    settings_ = m_pDriverHost->GetSettings(vr::IVRSettings_Version);
+
+    // Load rendermodel
+    char tmp_[256];
+    settings_->GetString("leap", (m_nId ==  LEFT_CONTROLLER) ? "renderModel_lefthand" : (m_nId == RIGHT_CONTROLLER) ? "renderModel_righthand" : "renderModel", tmp_, sizeof(tmp_), "vr_controller_vive_1_5");
+    m_strRenderModel = tmp_;
+
+    // set the 
+    m_gripAngleOffset = settings_->GetFloat("leap", (m_nId == LEFT_CONTROLLER) ? "gripAngleOffset_lefthand" : (m_nId == RIGHT_CONTROLLER) ? "gripAngleOffset_righthand" : "gripAngleOffset", 0.0);
 }
 
 CLeapHmdLatest::~CLeapHmdLatest()
@@ -833,10 +841,8 @@ uint32_t CLeapHmdLatest::GetStringTrackedDeviceProperty( vr::ETrackedDevicePrope
         break;
 
     case vr::Prop_RenderModelName_String:
-        // The {leap} syntax lets us refer to rendermodels that are installed
-        // in the driver's own resources/rendermodels directory.  The driver can
-        // still refer to SteamVR models like "generic_hmd".
-        ssRetVal << "vr_controller_vive_1_5";
+        // We return the user configured rendermodel here. Defaults to "vr_controller_vive_1_5".
+        ssRetVal << m_strRenderModel.c_str();
         break;
 
     case vr::Prop_ManufacturerName_String:
@@ -1226,16 +1232,9 @@ void CLeapHmdLatest::UpdateTrackingState(Frame &frame)
                 m_Pose.qRotation = CalculateRotation(R);
 
 #endif
-
-            // consider the controller's grip angle
-#if L_GRIP_ANGLE_OFFSET
-            if (m_nId == LEFT_CONTROLLER)
-                m_Pose.qRotation = rotate_around_axis(Vector(1.0, 0.0, 0.0), L_GRIP_ANGLE_OFFSET) * m_Pose.qRotation;
-#endif
-#if R_GRIP_ANGLE_OFFSET
-            if (m_nId == RIGHT_CONTROLLER)
-                m_Pose.qRotation = rotate_around_axis(Vector(1.0, 0.0, 0.0), R_GRIP_ANGLE_OFFSET) * m_Pose.qRotation;
-#endif
+            // rotate by the specified grip angle (may be useful when using the Vive as a gun grip)
+            if (m_gripAngleOffset != 0)
+                m_Pose.qRotation = rotate_around_axis(Vector(1.0, 0.0, 0.0), m_gripAngleOffset) * m_Pose.qRotation;
 
             // Unmeasured.  XXX with no angular velocity, throwing might not work in some games
             m_Pose.vecAngularVelocity[0] = 0.0;
