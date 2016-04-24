@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "driver_leap", "drivers\driv
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "leap_monitor", "tools\leap_monitor\leap_monitor.vcxproj", "{BC06AF9C-36D6-455A-B421-00A9635684AD}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "leap_installer", "tools\leap_installer\leap_installer.vdproj", "{60517323-2772-4341-9161-56C776DC1840}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -31,6 +33,12 @@ Global
 		{BC06AF9C-36D6-455A-B421-00A9635684AD}.Release|x64.Build.0 = Release|x64
 		{BC06AF9C-36D6-455A-B421-00A9635684AD}.Release|x86.ActiveCfg = Release|Win32
 		{BC06AF9C-36D6-455A-B421-00A9635684AD}.Release|x86.Build.0 = Release|Win32
+		{60517323-2772-4341-9161-56C776DC1840}.Debug|x64.ActiveCfg = Debug
+		{60517323-2772-4341-9161-56C776DC1840}.Debug|x64.Build.0 = Debug
+		{60517323-2772-4341-9161-56C776DC1840}.Debug|x86.ActiveCfg = Debug
+		{60517323-2772-4341-9161-56C776DC1840}.Debug|x86.Build.0 = Debug
+		{60517323-2772-4341-9161-56C776DC1840}.Release|x64.ActiveCfg = Release
+		{60517323-2772-4341-9161-56C776DC1840}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

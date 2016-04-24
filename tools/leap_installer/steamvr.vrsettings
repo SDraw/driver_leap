@@ -1,0 +1,24 @@
+{
+   "collisionBounds" : {
+      "CollisionBoundsGroundPerimeterOn" : false,
+      "CollisionBoundsStyle" : 0
+   },
+   "leap" : {
+      "renderModel_lefthand" : "vr_controller_vive_1_5"
+      "renderModel_righthand" : "vr_controller_vive_1_5"
+   },
+   "jsonid" : "vrsettings",
+   "keyboard" : {
+      "TutorialCompletions" : 1
+   },
+   "perfcheck" : {
+      "heuristicActive" : true
+   },
+   "steamvr" : {
+      "activateMultipleDrivers" : true,
+      "allowReprojection" : true,
+      "background" : "#0A0A0A",
+      "loglevel" : 3
+   },
+   "version" : "1"
+}
