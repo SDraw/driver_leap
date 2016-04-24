@@ -2,9 +2,9 @@
 
 ## Note about WORK IN PROGRESS
 
-You're seeing an early version of this software. I've got positional tracking established now as well as hand pose tracking. Some experimental mapping of hand gestures to triggers and buttons were added:
+You're seeing an early version of this software. I've got positional tracking established now as well as hand pose tracking. Some experimental mappings of hand gestures to triggers and buttons were added:
 
-- Bending of the index finger maps to trigger, like you would fire a gun.
+- Bending of the index finger maps to the trigger button, like you would fire a gun.
 - clenching the middle, ring, pinky finger to a fist maps to the grabbing buttons
 - a pinch gesture between thumb and index finger maps to main controller button ("A")
 
@@ -18,7 +18,7 @@ In AudioShield the shields appear to be swapped around (left/right hand). I have
 
 Some games work better when no grip angle is added to the controller pose, other games actually require a steep angle to be playable (Brookhaven, Audioshield). We may have to add a feature to chose the preferred default pose at runtime.
 
-Tracking is not quite reliable to always detect my trigger gestures. I think we will have to integrate for small handheld controllers like the Wiimote or the Playstation Move Navigation controller in the future.
+Tracking is not quite reliable to always detect my trigger gestures. I think we will have to integrate small handheld controllers like the Wiimote or the Playstation Move Navigation controller in the future.
 
 I do not think I will be able to get animated hands into the 3D view, as the render model you can assign to each controller is mostly a static object. There are some JSON files to map joystick axes and triggers to animated parts of the displayed controller. But the fingers do not directly map to joystick axes directly and hence cannot be shown. Also not all games make use of SteamVR's internal controller visualization.
 
