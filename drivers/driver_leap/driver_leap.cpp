@@ -800,7 +800,6 @@ uint64_t CLeapHmdLatest::GetUint64TrackedDeviceProperty( vr::ETrackedDevicePrope
 
     case vr::Prop_SupportedButtons_Uint64:
         ulRetVal = 
-            vr::ButtonMaskFromId( vr::k_EButton_A ) |
             vr::ButtonMaskFromId( vr::k_EButton_ApplicationMenu) |
             vr::ButtonMaskFromId( vr::k_EButton_System ) |
             vr::ButtonMaskFromId( vr::k_EButton_SteamVR_Touchpad ) |
@@ -911,133 +910,79 @@ void CLeapHmdLatest::SendButtonUpdates( ButtonUpdate ButtonEvent, uint64_t ulMas
     }
 }
 
-static float maprange(float input, float minimum, float maximum)
-{
-    float mapped = (input - minimum) / (maximum - minimum);
-    return std::max(std::min(mapped, 1.0f), 0.0f);
-}
-
 void CLeapHmdLatest::UpdateControllerState(Frame &frame)
 {
     vr::VRControllerState_t NewState = { 0 };
 
-    HandList &hands = frame.hands();
-
     bool handFound = false;
-    for (int h = 0; h < hands.count(); h++)
+    GestureMatcher::WhichHand which = (m_nId == LEFT_CONTROLLER ) ? GestureMatcher::LeftHand :
+                                      (m_nId == RIGHT_CONTROLLER) ? GestureMatcher::RightHand :
+                                      GestureMatcher::AnyHand;
+
+    float scores[GestureMatcher::NUM_GESTURES];
+    handFound = matcher.MatchGestures(frame, which, scores);
+
+    if (handFound)
     {
-        Hand &hand = hands[h];
-
-        // controller #0 is supposed to be the left hand, controller #1 the right one.
-        if (hand.isValid() && (m_nId == LEFT_CONTROLLER && hand.isLeft() ||
-                               m_nId == RIGHT_CONTROLLER && hand.isRight() ))
-        {
-            handFound = true;
-
-            float bending[5] = { 0 };
-
-            // Evaluate bending of all fingers
-            const FingerList &fingers = hand.fingers();
-            for (auto fl = fingers.begin(); fl != fingers.end(); ++fl) {
-                const Finger &finger = *fl;
-
-                int f = finger.type(); // thumb, index, middle, ring, pinky
-                bending[f] = 0.0f;
-
-                if (finger.isFinger() && finger.isValid())
-                {
-                    // go through the finger's bones:
-                    // metacarpal, proximal, intermediate, distal
-                    Vector prev_direction;
-                    for (int b = 0; b < 4; b++)
-                    {
-                        Leap::Bone &bone = finger.bone(Leap::Bone::Type(b));
-                        Vector direction = bone.direction();
-                        if (b > 0)
-                        {
-                            // sum up the total bend angles in radians.
-
-                            // for the index finger we do not include the metacarpal to proximal angle
-                            // otherwise pinch gestures would be misinterpreted as pulling a trigger
-                            if (! (finger.type() == Leap::Finger::TYPE_INDEX && bone.type() == Leap::Bone::TYPE_PROXIMAL))
-                                bending[f] += 57.2957795 * direction.angleTo(prev_direction); // in degrees
-                        }
-                        prev_direction = direction;
-                    }
-                }
-            }
-
-            // trigger is derived from bending the index finger like a gun trigger beyond 70 degrees
-            // (not including the metacarpal to proximal bone angle)
-            float trigger = maprange(bending[Leap::Finger::TYPE_INDEX], 70.0, 100.0);
-
-            // gripping strength is derived from clenching middle, ring, pinky fingers beyond 90 degrees
-            float grip = maprange((bending[Leap::Finger::TYPE_MIDDLE] + bending[Leap::Finger::TYPE_RING] + bending[Leap::Finger::TYPE_PINKY]) / 3, 90.0, 180.0);
-
-            // button press is derived from a pinch gesture (index and thumb), moving the index and thumb closer than 25mm
-            float button = maprange(hand.pinchDistance(), 40, 30);
-
-            // Changing unPacketNum tells anyone polling state that something might have
-            // changed.  We don't try to be precise about that here.
-            NewState.unPacketNum = m_ControllerState.unPacketNum + 1;
+        // Changing unPacketNum tells anyone polling state that something might have
+        // changed.  We don't try to be precise about that here.
+        NewState.unPacketNum = m_ControllerState.unPacketNum + 1;
 
 //            NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_System);
 //            NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu);
 //            NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Touchpad);  // touchpad click
 
-            // digital trigger mapping (fist clenching gesture)
-            if (trigger > 0.2f)
-                NewState.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Trigger);
-            if (trigger > 0.5f)
-                NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Trigger);
+        // digital trigger mapping (fist clenching gesture)
+        if (scores[GestureMatcher::TriggerFinger] > 0.5f)
+            NewState.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Trigger);
+        if (scores[GestureMatcher::TriggerFinger] > 0.5f)
+            NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Trigger);
 
-            // grip mapping (clench fist with middle, index, pinky fingers)
-            if (grip >= 0.2f) 
-                NewState.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_Grip);
-            if (grip >= 0.5f)
-                NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_Grip);
+        // grip mapping (clench fist with middle, index, pinky fingers)
+        if (scores[GestureMatcher::LowerFist] >= 0.5f)
+            NewState.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_Grip);
+        if (scores[GestureMatcher::LowerFist] >= 0.5f)
+            NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_Grip);
 
-            // button press mapping (pinch gesture)
-            if (button >= 0.2f)
-                NewState.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_A);
-            if (button >= 0.5f)
-                NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_A);
+        // button press mapping (ThumbInwards gesture)
+        if (scores[GestureMatcher::ThumbInwards] >= 0.5f)
+            NewState.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Touchpad);
+        if (scores[GestureMatcher::ThumbInwards] >= 1.0f)
+            NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Touchpad);
 
 #if 0
-            // sixense driver seems to have good deadzone, but add a small one here
-            if (fabsf(cd.joystick_x) > 0.03f || fabsf(cd.joystick_y) > 0.03f)
-                NewState.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_StreamVR_Touchpad);
+        // sixense driver seems to have good deadzone, but add a small one here
+        if (fabsf(cd.joystick_x) > 0.03f || fabsf(cd.joystick_y) > 0.03f)
+            NewState.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_StreamVR_Touchpad);
 #endif
 
-            // All pressed buttons are touched
-            NewState.ulButtonTouched |= NewState.ulButtonPressed;
+        // All pressed buttons are touched
+        NewState.ulButtonTouched |= NewState.ulButtonPressed;
 
-            uint64_t ulChangedTouched = NewState.ulButtonTouched ^ m_ControllerState.ulButtonTouched;
-            uint64_t ulChangedPressed = NewState.ulButtonPressed ^ m_ControllerState.ulButtonPressed;
+        uint64_t ulChangedTouched = NewState.ulButtonTouched ^ m_ControllerState.ulButtonTouched;
+        uint64_t ulChangedPressed = NewState.ulButtonPressed ^ m_ControllerState.ulButtonPressed;
 
-            SendButtonUpdates(&vr::IServerDriverHost::TrackedDeviceButtonTouched, ulChangedTouched & NewState.ulButtonTouched);
-            SendButtonUpdates(&vr::IServerDriverHost::TrackedDeviceButtonPressed, ulChangedPressed & NewState.ulButtonPressed);
-            SendButtonUpdates(&vr::IServerDriverHost::TrackedDeviceButtonUnpressed, ulChangedPressed & ~NewState.ulButtonPressed);
-            SendButtonUpdates(&vr::IServerDriverHost::TrackedDeviceButtonUntouched, ulChangedTouched & ~NewState.ulButtonTouched);
+        SendButtonUpdates(&vr::IServerDriverHost::TrackedDeviceButtonTouched, ulChangedTouched & NewState.ulButtonTouched);
+        SendButtonUpdates(&vr::IServerDriverHost::TrackedDeviceButtonPressed, ulChangedPressed & NewState.ulButtonPressed);
+        SendButtonUpdates(&vr::IServerDriverHost::TrackedDeviceButtonUnpressed, ulChangedPressed & ~NewState.ulButtonPressed);
+        SendButtonUpdates(&vr::IServerDriverHost::TrackedDeviceButtonUntouched, ulChangedTouched & ~NewState.ulButtonTouched);
 
-            NewState.rAxis[0].x = 0.0f; //  cd.joystick_x;
-            NewState.rAxis[0].y = 0.0f; //  cd.joystick_y;
+        NewState.rAxis[0].x = 0.0f; //  cd.joystick_x;
+        NewState.rAxis[0].y = 0.0f; //  cd.joystick_y;
 
-            NewState.rAxis[1].x = trigger;
-            NewState.rAxis[1].y = 0.0f;
+        NewState.rAxis[1].x = scores[GestureMatcher::TriggerFinger];
+        NewState.rAxis[1].y = 0.0f;
 
-            // the touchpad maps to Axis 0 X/Y
-            if (NewState.rAxis[0].x != m_ControllerState.rAxis[0].x || NewState.rAxis[0].y != m_ControllerState.rAxis[0].y)
-                m_pDriverHost->TrackedDeviceAxisUpdated(m_unSteamVRTrackedDeviceId, 0, NewState.rAxis[0]);
+        // the touchpad maps to Axis 0 X/Y
+        if (NewState.rAxis[0].x != m_ControllerState.rAxis[0].x || NewState.rAxis[0].y != m_ControllerState.rAxis[0].y)
+            m_pDriverHost->TrackedDeviceAxisUpdated(m_unSteamVRTrackedDeviceId, 0, NewState.rAxis[0]);
 
-            // trigger maps to Axis 1 X
-            if (NewState.rAxis[1].x != m_ControllerState.rAxis[1].x)
-                m_pDriverHost->TrackedDeviceAxisUpdated(m_unSteamVRTrackedDeviceId, 1, NewState.rAxis[1]);
+        // trigger maps to Axis 1 X
+        if (NewState.rAxis[1].x != m_ControllerState.rAxis[1].x)
+            m_pDriverHost->TrackedDeviceAxisUpdated(m_unSteamVRTrackedDeviceId, 1, NewState.rAxis[1]);
 
-            m_ControllerState = NewState;
-        }
+        m_ControllerState = NewState;
     }
-
 }
 
 // multiplication of quaternions

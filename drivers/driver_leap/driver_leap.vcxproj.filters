@@ -10,11 +10,13 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="driver_leap.cpp" />
     <ClCompile Include="pch.cpp" />
+    <ClCompile Include="GestureMatcher.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="driver_leap.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="GestureMatcher.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\README.md">

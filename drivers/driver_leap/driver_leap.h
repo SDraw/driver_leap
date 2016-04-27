@@ -11,6 +11,7 @@
 #include <chrono>
 
 #include "Leap.h"
+#include "GestureMatcher.h"
 
 using namespace Leap;
 
@@ -169,4 +170,7 @@ private:
 
     // with this angle offset you can emulate the angle of a gun grip. Positive values tilt the controller up by N degrees.
     float m_gripAngleOffset;
+
+    // a helper object to identify hand poses
+    GestureMatcher matcher;
 };

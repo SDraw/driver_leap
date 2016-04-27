@@ -664,9 +664,9 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:SteamVR Leap Motion driver"
-        "ProductCode" = "8:{1001FC44-A16C-4F4B-86E3-CD824B17D920}"
-        "PackageCode" = "8:{4141F2B2-515B-48F2-9CA3-4D0C7B6DDACC}"
-        "UpgradeCode" = "8:{76F38173-D6FE-4221-B110-E68665ACD1AC}"
+        "ProductCode" = "8:{1001FC44-A16C-4F4B-86E3-CD824B17D921}"
+        "PackageCode" = "8:{4141F2B2-515B-48F2-9CA3-4D0C7B6DDACD}"
+        "UpgradeCode" = "8:{76F38173-D6FE-4221-B110-E68665ACD1AD}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"

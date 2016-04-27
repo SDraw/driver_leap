@@ -1,25 +1,41 @@
 {
    "collisionBounds" : {
+      "CollisionBoundsColorGammaA" : 112,
+      "CollisionBoundsColorGammaB" : 28,
+      "CollisionBoundsColorGammaG" : 0,
+      "CollisionBoundsColorGammaR" : 255,
       "CollisionBoundsGroundPerimeterOn" : false,
-      "CollisionBoundsStyle" : 0
-   },
-   "leap" : {
-      "renderModel_lefthand" : "vr_controller_vive_1_5",
-      "renderModel_righthand" : "vr_controller_vive_1_5",
-      "gripAngleOffset_lefthand" : 0,
-      "gripAngleOffset_righthand" : 0
+      "CollisionBoundsStyle" : 1
    },
    "jsonid" : "vrsettings",
    "keyboard" : {
       "TutorialCompletions" : 1
+   },
+   "leap" : {
+      "gripAngleOffset_lefthand" : 0,
+      "gripAngleOffset_righthand" : 0,
+      "renderModel_lefthand" : "vr_controller_vive_1_5",
+      "renderModel_righthand" : "vr_controller_vive_1_5"
+   },
+   "leap_gestures" : {
+      "MenuPressed"     : "GestureWithin:ILY[0.5,1.0]",
+      "SystemPressed"   : "GestureWithin:Timeout[0.5,1.0]",
+      "GrabPressed"     : "GestureWithin:LowerFirst[0.5,1.0]",
+      "TouchpadTouched" : "GestureWithin:ThumbInwards[0.0,0.5]",
+      "TouchpadPressed" : "GestureWithin:ThumbInwards[0.5,1.0]",
+      "TriggerPressed"  : "GestureWithin:TriggerFinger[0.5,1.0]",
+      "TriggerAxis[0]"  : "GestureAxis:TriggerFinger[0.0,1.0]",
+      "TriggerAxis[1]"  : 0,
+      "TouchpadAxis[0]" : "GestureAxis:ThumbPositionX[-1.0,-1.0]",
+      "TouchpadAxis[1]" : "GestureAxis:ThumbPositionY[-1.0,-1.0]"
    },
    "perfcheck" : {
       "heuristicActive" : true
    },
    "steamvr" : {
       "activateMultipleDrivers" : true,
-      "allowReprojection" : true,
-      "background" : "#0A0A0A",
+      "allowReprojection" : false,
+      "background" : "D:\\Steam\\steamapps\\common\\SteamVR\\\\resources\\backgrounds\\viveNight.png",
       "loglevel" : 3
    },
    "version" : "1"
