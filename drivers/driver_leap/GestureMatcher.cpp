@@ -52,10 +52,10 @@ bool GestureMatcher::MatchGestures(const Frame &frame, WhichHand which, float(&r
                 Vector prev_direction;
                 for (int b = 0; b < 4; b++)
                 {
-                    Leap::Bone &bone = finger.bone(Leap::Bone::Type(b));
+                    Bone &bone = finger.bone(Bone::Type(b));
                     Vector direction = bone.direction();
                     
-                    if (b == Leap::Bone::TYPE_DISTAL)
+                    if (b == Bone::TYPE_DISTAL)
                         fingerdir[f] = direction;
     
                     if (b > 0)
@@ -88,15 +88,31 @@ bool GestureMatcher::MatchGestures(const Frame &frame, WhichHand which, float(&r
         merge(result[TriggerFinger], trigger);
 
         // lower first gesture means clenching middle, ring, pinky fingers beyond 90 degrees
-        float grip = maprange((sumbend[Leap::Finger::TYPE_MIDDLE] + sumbend[Leap::Finger::TYPE_RING] + sumbend[Leap::Finger::TYPE_PINKY]) / 3, 90.0, 180.0);
+        float grip = maprange((sumbend[Finger::TYPE_MIDDLE] + sumbend[Finger::TYPE_RING] + sumbend[Finger::TYPE_PINKY]) / 3, 90.0, 180.0);
         merge(result[LowerFist], grip);
 
-        // pinch gesture means pinching the index and thumb (distance closer than 25mm)
+        // pinch gesture means pinching the index and thumb (distance closer than 30mm)
         float pinch = maprange(hand.pinchDistance(), 40, 30);
         merge(result[Pinch], pinch);
 
         // ThumbInwards gesture means that the thumb points inwards (direction of palm, opposite of thumbs up)
         result[ThumbInwards] = maprange(cosalpha, 0.0, 0.6);
+
+
+        // *UNRELIABLE* ILY gesture means pinky and index finger extended, middle and ring finger curled up
+        // Thumb doesn't matter. It's easier to point it inwards for many people.
+        result[ILY] = std::min(maprange((sumbend[Finger::TYPE_PINKY] + sumbend[Finger::TYPE_INDEX]) / 2, 50.0, 40.0),
+                               maprange((sumbend[Finger::TYPE_MIDDLE] + sumbend[Finger::TYPE_RING]) / 2, 120.0, 150.0));
+
+        // *UNRELIABLE* Flipping the Bird: You know how to flip a bird.
+        result[FlippingTheBird] = std::min(maprange(sumbend[Finger::TYPE_MIDDLE], 50.0, 40.0),
+                                           maprange((sumbend[Finger::TYPE_INDEX] + sumbend[Finger::TYPE_RING] + sumbend[Finger::TYPE_PINKY]) / 3, 120.0, 150.0));
+
+        // Victory gesture: make a nice V sign with your index and middle finger
+        float angle = fingerdir[Finger::TYPE_INDEX].angleTo(fingerdir[Finger::TYPE_MIDDLE]);
+        result[Victory] = std::min(std::min(maprange((sumbend[Finger::TYPE_INDEX] + sumbend[Finger::TYPE_MIDDLE]) / 2, 50.0, 40.0),
+                                   maprange((sumbend[Finger::TYPE_PINKY] + sumbend[Finger::TYPE_RING]) / 2, 120.0, 150.0)),
+                                   maprange(57.2957795f * fingerdir[Finger::TYPE_INDEX].angleTo(fingerdir[Finger::TYPE_MIDDLE]), 10.0, 20.0) );
     }
 
     return success;

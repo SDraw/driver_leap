@@ -7,6 +7,7 @@ You're seeing an early version of this software. I've got positional tracking es
 - Bending of the index finger maps to the trigger button, like you would fire a gun.
 - clenching the middle, ring, pinky finger to a fist maps to the grabbing buttons
 - the thumb inwards gesture (just point the thumb in the direction of your palm) clicks the trackpad
+- Victory pose (index and middle fingers stretched out in V shape) is used for application menu button
 
 - a pinch gesture between index finger and thumb is detected, but currently not mapped to any button
   as there is too much crosstalk with the trigger finger.

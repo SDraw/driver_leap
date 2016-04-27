@@ -932,6 +932,12 @@ void CLeapHmdLatest::UpdateControllerState(Frame &frame)
 //            NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu);
 //            NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Touchpad);  // touchpad click
 
+        // application menu mapping (Victory gesture)
+        if (scores[GestureMatcher::ThumbInwards] >= 0.8f)
+            NewState.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu);
+        if (scores[GestureMatcher::ThumbInwards] >= 0.8f)
+            NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu);
+
         // digital trigger mapping (fist clenching gesture)
         if (scores[GestureMatcher::TriggerFinger] > 0.5f)
             NewState.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Trigger);
