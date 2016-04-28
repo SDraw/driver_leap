@@ -63,6 +63,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_46D86E1EF46C45B291C7DFF0D05FEC5C"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_49761FE2D46C46CCABACAE1F484155E0"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -136,6 +142,12 @@
         "Entry"
         {
         "MsmKey" = "8:_CFBCE41F6CBB497AAC174637F0027B36"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_D1A7B7704A7949AE959BEEECB56D10D8"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -340,6 +352,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_46D86E1EF46C45B291C7DFF0D05FEC5C"
+            {
+            "SourcePath" = "8:D:\\Steam\\steamapps\\common\\SteamVR\\drivers\\leap\\bin\\Win64\\gesture_checker.exe"
+            "TargetName" = "8:gesture_checker.exe"
+            "Tag" = "8:"
+            "Folder" = "8:_6E55793820964E8FAF968D498761B3E3"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_49761FE2D46C46CCABACAE1F484155E0"
             {
             "SourcePath" = "8:D:\\Steam\\steamapps\\common\\SteamVR\\drivers\\leap\\bin\\Win32\\driver_leap.dll"
@@ -486,6 +518,26 @@
             "TargetName" = "8:unregister_driver.cmd"
             "Tag" = "8:"
             "Folder" = "8:_B572C0F62C374CA0A6C66D010BE1A374"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D1A7B7704A7949AE959BEEECB56D10D8"
+            {
+            "SourcePath" = "8:D:\\Steam\\steamapps\\common\\SteamVR\\drivers\\leap\\bin\\Win32\\gesture_checker.exe"
+            "TargetName" = "8:gesture_checker.exe"
+            "Tag" = "8:"
+            "Folder" = "8:_63ACE570CFFD4D6A9853F4B6B90E0B8C"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -665,7 +717,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:SteamVR Leap Motion driver"
         "ProductCode" = "8:{1001FC44-A16C-4F4B-86E3-CD824B17D921}"
-        "PackageCode" = "8:{4141F2B2-515B-48F2-9CA3-4D0C7B6DDACD}"
+        "PackageCode" = "8:{74EF0F2A-7FF9-48C2-B856-E8D8B7F128CE}"
         "UpgradeCode" = "8:{76F38173-D6FE-4221-B110-E68665ACD1AD}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"

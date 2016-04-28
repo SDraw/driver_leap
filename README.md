@@ -15,7 +15,7 @@ I am working on allowing to freely map gestures to buttons in the steamvr.vrsett
 
 ## Supported gestures
 
-There are other gestures detected currently, but not mapped to buttons. If you want to try these out, click on the application "gesture_checker.exe" in your steam directory Steam\steamapps\common\SteamVR\drivers\leap\bin
+There are other gestures detected currently, but not mapped to buttons. If you want to try these out, click on the application "gesture_checker.exe" in the directory C:\Program Files (x86)\SteamVR Leap Motion driver\leap\bin\Win32
 
 Then I also recommend that you simultaneously bring up your Leap Motion's settings and from there start the diagnostic visualizer (the windowed one). Press "v" once to switch it to headmount optimized mode.
 
