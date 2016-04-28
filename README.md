@@ -7,26 +7,41 @@ You're seeing an early version of this software. I've got positional tracking es
 - Bending of the index finger maps to the trigger button, like you would fire a gun.
 - clenching the middle, ring, pinky finger to a fist maps to the grabbing buttons
 - the thumb inwards gesture (just point the thumb in the direction of your palm) clicks the trackpad
-- Victory pose (index and middle fingers stretched out in V shape) is used for application menu button
+- Flat hand held in front of you, palm towards face is used for application menu button
+- Flat hand held in front of you, palm away from you is used for system menu button
 
-- a pinch gesture between index finger and thumb is detected, but currently not mapped to any button
-  as there is too much crosstalk with the trigger finger.
+I am working on allowing to freely map gestures to buttons in the steamvr.vrsettings config file in your Steam\config folder. However note that the "leap_gestures" section is currently not parsed yet. It's merely a sign of things to come.
 
-### Games/Experiences that work well
+
+## Supported gestures
+
+There are other gestures detected currently, but not mapped to buttons. If you want to try these out, click on the application "gesture_checker.exe" in your steam directory Steam\steamapps\common\SteamVR\drivers\leap\bin
+
+Then I also recommend that you simultaneously bring up your Leap Motion's settings and from there start the diagnostic visualizer (the windowed one). Press "v" once to switch it to headmount optimized mode.
+
+Now pull both windows side by side and bring a hand into view. The command prompt running the gesture_checker program should output a series of numbers next to the names of the gestures. A "1.0" means confidential detection, a "0.0" means no detection.
+
+You can practise some gestures this way and also check your pose in the Leap Motion diagnostic visualizer.
+
+
+### Games/Experiences that work mostly
 
 - the Blu (all three stages)
 - Irrational Exuberance: Prologue
 - the Rose and I
- 
+- The Lab (some experiences work, others are tricky)
+- Final Approach
+- Audioshield: somehow the controllers are swapped? Control is tricky and not very precise. Semi-playable though.
+  
 ### Games/Experiences that are starting but not quite playable yet.
 
-- Audioshield: somehow the controllers are swapped? Control is tricky and not very precise. Semi-playable though.
-- Tilt Brush & Final Approach: these start and you can start doing things, but there is lack of trackpad support in my driver.
+- Tilt Brush: starts and you can start doing things, but there is lack of complete trackpad support in my driver.
 - Brookhaven Experiment: tracking only works while SteamVR window is in focus. Why? Gun in right hand needs a 60 degree uptilt angle (define this in steamvr.vrsettings config file in Steam config folder). Trigger gesture detection is way to imprecise, you won't even survive the first wave of Zombies.
-- The Lab: Lack of the Menu button prevents leaving any stages
+
 
 ### Demos that won't work at all
 - n/a
+
 
 ## Known Issues
 
