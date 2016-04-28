@@ -12,6 +12,16 @@ You're seeing an early version of this software. I've got positional tracking es
 
 I am working on allowing to freely map gestures to buttons in the steamvr.vrsettings config file in your Steam\config folder. However note that the "leap_gestures" section is currently not parsed yet. It's merely a sign of things to come.
 
+## Supported gestures
+
+There are other gestures detected currently, but not mapped to buttons. If you want to try these out, click on the application "gesture_checker.exe" in the directory C:\Program Files (x86)\SteamVR Leap Motion driver\leap\bin\Win32
+
+Then I also recommend that you simultaneously bring up your Leap Motion's settings and from there start the diagnostic visualizer (the windowed version, not the VR one). Press "v" once to switch it to headmount optimized mode.
+
+Now pull both windows side by side and bring a hand into view. The command prompt running the gesture_checker program should output a series of numbers next to the names of the gestures. A "1.0" means confidential detection, a "0.0" means no detection.
+
+You can practise some gestures this way and also cross-check your pose in the Leap Motion diagnostic visualizer against the detection confidence.
+
         // Finger gestures (these would not throw your hand's orientation off much)
         TriggerFinger,           // bend your index finger as if pulling a trigger
         LowerFist,               // grab with your middle, ring, pinky fingers
@@ -28,17 +38,6 @@ I am working on allowing to freely map gestures to buttons in the steamvr.vrsett
         FlatHandPalmTowards,     // flat hand, palm points towards self (relative to alignment of Leap!)
         ThumbUp,                 // thumb points up, remaining fingers form a fist
         ThumbInward,             // thumb points towards the left for the right hand and vice versa
-
-
-## Supported gestures
-
-There are other gestures detected currently, but not mapped to buttons. If you want to try these out, click on the application "gesture_checker.exe" in the directory C:\Program Files (x86)\SteamVR Leap Motion driver\leap\bin\Win32
-
-Then I also recommend that you simultaneously bring up your Leap Motion's settings and from there start the diagnostic visualizer (the windowed version, not the VR one). Press "v" once to switch it to headmount optimized mode.
-
-Now pull both windows side by side and bring a hand into view. The command prompt running the gesture_checker program should output a series of numbers next to the names of the gestures. A "1.0" means confidential detection, a "0.0" means no detection.
-
-You can practise some gestures this way and also cross-check your pose in the Leap Motion diagnostic visualizer against the detection confidence.
 
 
 ### Games/Experiences that work mostly
