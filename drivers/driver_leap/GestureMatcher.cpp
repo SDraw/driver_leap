@@ -99,38 +99,38 @@ bool GestureMatcher::MatchGestures(const Frame &frame, WhichHand which, float(&r
             pinkyside = normal.cross(direction);
         else
             pinkyside = direction.cross(normal);
-        result[Thumbpress] = maprange(pinkyside.dot(fingerdir[Finger::TYPE_THUMB]), 0.0f, 0.6f);
+        merge(result[Thumbpress], maprange(pinkyside.dot(fingerdir[Finger::TYPE_THUMB]), 0.0f, 0.6f));
 
 
         // *UNRELIABLE* ILY gesture means pinky and index finger extended, middle and ring finger curled up
         // Thumb doesn't matter. It's easier to point it inwards for many people.
-        result[ILY] = std::min(maprange((sumbend[Finger::TYPE_PINKY] + sumbend[Finger::TYPE_INDEX]) / 2, 50.0, 40.0),
-                               maprange((sumbend[Finger::TYPE_MIDDLE] + sumbend[Finger::TYPE_RING]) / 2, 120.0, 150.0));
+        merge(result[ILY], std::min(maprange((sumbend[Finger::TYPE_PINKY] + sumbend[Finger::TYPE_INDEX]) / 2, 50.0, 40.0),
+                               maprange((sumbend[Finger::TYPE_MIDDLE] + sumbend[Finger::TYPE_RING]) / 2, 120.0, 150.0)));
 
         // *UNRELIABLE* Flipping the Bird: You know how to flip a bird.
-        result[FlippingTheBird] = std::min(maprange(sumbend[Finger::TYPE_MIDDLE], 50.0, 40.0),
-                                           maprange((sumbend[Finger::TYPE_INDEX] + sumbend[Finger::TYPE_RING] + sumbend[Finger::TYPE_PINKY]) / 3, 120.0, 150.0));
+        merge(result[FlippingTheBird], std::min(maprange(sumbend[Finger::TYPE_MIDDLE], 50.0, 40.0),
+                                        maprange((sumbend[Finger::TYPE_INDEX] + sumbend[Finger::TYPE_RING] + sumbend[Finger::TYPE_PINKY]) / 3, 120.0, 150.0)));
 
         // Victory gesture: make a nice V sign with your index and middle finger
         float angle = fingerdir[Finger::TYPE_INDEX].angleTo(fingerdir[Finger::TYPE_MIDDLE]);
-        result[Victory] = std::min(std::min(maprange((sumbend[Finger::TYPE_INDEX] + sumbend[Finger::TYPE_MIDDLE]) / 2, 50.0, 40.0),
+        merge(result[Victory], std::min(std::min(maprange((sumbend[Finger::TYPE_INDEX] + sumbend[Finger::TYPE_MIDDLE]) / 2, 50.0, 40.0),
                                    maprange((sumbend[Finger::TYPE_PINKY] + sumbend[Finger::TYPE_RING]) / 2, 120.0, 150.0)),
-                                   maprange(57.2957795f * fingerdir[Finger::TYPE_INDEX].angleTo(fingerdir[Finger::TYPE_MIDDLE]), 10.0, 20.0) );
+                                   maprange(57.2957795f * fingerdir[Finger::TYPE_INDEX].angleTo(fingerdir[Finger::TYPE_MIDDLE]), 10.0, 20.0) ));
 
         // FlatHand gestures
         float flatHand = maprange((sumbend[Finger::TYPE_THUMB] + sumbend[Finger::TYPE_INDEX] + sumbend[Finger::TYPE_MIDDLE] + sumbend[Finger::TYPE_RING] + sumbend[Finger::TYPE_PINKY]) / 5, 50.0, 40.0);
         Vector palmnormal = hand.palmNormal();
-        result[FlatHandPalmUp]      = std::min(flatHand, maprange(( up).dot(palmnormal), 0.8f, 0.95f));
-        result[FlatHandPalmDown]    = std::min(flatHand, maprange((-up).dot(palmnormal), 0.8f, 0.95f));
-        result[FlatHandPalmAway]    = std::min(flatHand, maprange(( in).dot(palmnormal), 0.8f, 0.95f));
-        result[FlatHandPalmTowards] = std::min(flatHand, maprange((-in).dot(palmnormal), 0.8f, 0.95f));
+        merge(result[FlatHandPalmUp]     , std::min(flatHand, maprange(( up).dot(palmnormal), 0.8f, 0.95f)));
+        merge(result[FlatHandPalmDown]   , std::min(flatHand, maprange((-up).dot(palmnormal), 0.8f, 0.95f)));
+        merge(result[FlatHandPalmAway]   , std::min(flatHand, maprange(( in).dot(palmnormal), 0.8f, 0.95f)));
+        merge(result[FlatHandPalmTowards], std::min(flatHand, maprange((-in).dot(palmnormal), 0.8f, 0.95f)));
 
         // ThumbsUp/Inward gestures
         Vector inward = hand.isLeft() ? right : -right;
         float fistHand = maprange((sumbend[Finger::TYPE_INDEX] + sumbend[Finger::TYPE_MIDDLE] + sumbend[Finger::TYPE_RING] + sumbend[Finger::TYPE_PINKY]) / 5, 120.0, 150.0);
         float straightThumb = maprange(sumbend[Finger::TYPE_THUMB], 50.0, 40.0);
-        result[ThumbUp]     = std::min(fistHand, std::min(straightThumb, maprange((    up).dot(fingerdir[Finger::TYPE_THUMB]), 0.8f, 0.95f)));
-        result[ThumbInward] = std::min(fistHand, std::min(straightThumb, maprange((inward).dot(fingerdir[Finger::TYPE_THUMB]), 0.8f, 0.95f)));
+        merge(result[ThumbUp]     , std::min(fistHand, std::min(straightThumb, maprange((    up).dot(fingerdir[Finger::TYPE_THUMB]), 0.8f, 0.95f))));
+        merge(result[ThumbInward] , std::min(fistHand, std::min(straightThumb, maprange((inward).dot(fingerdir[Finger::TYPE_THUMB]), 0.8f, 0.95f))));
 
 #if 0
         fprintf(stderr, "handdir %f %f %f\n", hand.direction().x, hand.direction().y, hand.direction().z);

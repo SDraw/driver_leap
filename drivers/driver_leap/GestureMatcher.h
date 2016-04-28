@@ -25,13 +25,13 @@ public:
 
     enum GestureType
     {
-        // Finger gestures
-        TriggerFinger,           // bend your trigger finger
+        // Finger gestures (these would not throw your hand's orientation off much)
+        TriggerFinger,           // bend your index finger as if pulling a trigger
         LowerFist,               // grab with your middle, ring, pinky fingers
         Pinch,                   // pinch with your thumb and index fingers
         Thumbpress,              // point the thumb towards the direction of your pinky
 
-        // Hand gestures
+        // Hand gestures (these would significantly change the orientation of your hand)
         FlippingTheBird,         // flip someone off with your middle finger
         ILY,                     // pinky and index finger extended, middle and ring bent
         Victory,                 // V shape with your index, middle fingers, other fingers curled
@@ -42,7 +42,7 @@ public:
         ThumbUp,                 // thumb points up, remaining fingers form a fist
         ThumbInward,             // thumb points towards the left for the right hand and vice versa
 
-        TODO_LiveLongAndProsper, // Spock's trademark
+        TODO_LiveLongAndProsper, // Spock's trademark greeting
         TODO_DiverOkay,          // Diver's "I'm Okay" sign.
         TODO_FistBump,           // a Fist Bump gesture
 

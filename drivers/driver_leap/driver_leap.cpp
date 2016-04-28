@@ -928,14 +928,16 @@ void CLeapHmdLatest::UpdateControllerState(Frame &frame)
         // changed.  We don't try to be precise about that here.
         NewState.unPacketNum = m_ControllerState.unPacketNum + 1;
 
-//            NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_System);
-//            NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu);
-//            NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Touchpad);  // touchpad click
+        // system menu mapping (Flat hand away from you gesture)
+        if (scores[GestureMatcher::FlatHandPalmAway] >= 0.8f)
+            NewState.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_System);
+        if (scores[GestureMatcher::FlatHandPalmAway] >= 0.8f)
+            NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_System);
 
-        // application menu mapping (Victory gesture)
-        if (scores[GestureMatcher::ThumbInwards] >= 0.8f)
+        // application menu mapping (Flat hand towards your face gesture)
+        if (scores[GestureMatcher::FlatHandPalmTowards] >= 0.8f)
             NewState.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu);
-        if (scores[GestureMatcher::ThumbInwards] >= 0.8f)
+        if (scores[GestureMatcher::FlatHandPalmTowards] >= 0.8f)
             NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu);
 
         // digital trigger mapping (fist clenching gesture)
@@ -950,10 +952,10 @@ void CLeapHmdLatest::UpdateControllerState(Frame &frame)
         if (scores[GestureMatcher::LowerFist] >= 0.5f)
             NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_Grip);
 
-        // button press mapping (ThumbInwards gesture)
-        if (scores[GestureMatcher::ThumbInwards] >= 0.5f)
+        // button press mapping (Thumbpress gesture)
+        if (scores[GestureMatcher::Thumbpress] >= 0.5f)
             NewState.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Touchpad);
-        if (scores[GestureMatcher::ThumbInwards] >= 1.0f)
+        if (scores[GestureMatcher::Thumbpress] >= 1.0f)
             NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Touchpad);
 
 #if 0
