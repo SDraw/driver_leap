@@ -21,7 +21,7 @@ Then I also recommend that you simultaneously bring up your Leap Motion's settin
 
 Now pull both windows side by side and bring a hand into view. The command prompt running the gesture_checker program should output a series of numbers next to the names of the gestures. A "1.0" means confidential detection, a "0.0" means no detection.
 
-You can practise some gestures this way and also check your pose in the Leap Motion diagnostic visualizer.
+You can practise some gestures this way and also cross-check your pose in the Leap Motion diagnostic visualizer against the detection confidence.
 
 
 ### Games/Experiences that work mostly
