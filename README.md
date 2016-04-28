@@ -6,7 +6,7 @@ You're seeing an early version of this software. I've got positional tracking es
 
 - Bending of the index finger maps to the trigger button, like you would fire a gun.
 - clenching the middle, ring, pinky finger to a fist maps to the grabbing buttons
-- the thumbpress gesture (just point the thumb in the direction of your palm) clicks the trackpad
+- the thumbpress gesture (just point the thumb in the direction of your palm) touches and clicks the trackpad
 - Flat hand held in front of you, palm towards face is used for application menu button
 - Flat hand held in front of you, palm away from you is used for system menu button
 
