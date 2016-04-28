@@ -17,7 +17,7 @@ I am working on allowing to freely map gestures to buttons in the steamvr.vrsett
 
 There are other gestures detected currently, but not mapped to buttons. If you want to try these out, click on the application "gesture_checker.exe" in the directory C:\Program Files (x86)\SteamVR Leap Motion driver\leap\bin\Win32
 
-Then I also recommend that you simultaneously bring up your Leap Motion's settings and from there start the diagnostic visualizer (the windowed one). Press "v" once to switch it to headmount optimized mode.
+Then I also recommend that you simultaneously bring up your Leap Motion's settings and from there start the diagnostic visualizer (the windowed version, not the VR one). Press "v" once to switch it to headmount optimized mode.
 
 Now pull both windows side by side and bring a hand into view. The command prompt running the gesture_checker program should output a series of numbers next to the names of the gestures. A "1.0" means confidential detection, a "0.0" means no detection.
 
