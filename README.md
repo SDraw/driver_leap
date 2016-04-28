@@ -12,6 +12,23 @@ You're seeing an early version of this software. I've got positional tracking es
 
 I am working on allowing to freely map gestures to buttons in the steamvr.vrsettings config file in your Steam\config folder. However note that the "leap_gestures" section is currently not parsed yet. It's merely a sign of things to come.
 
+        // Finger gestures (these would not throw your hand's orientation off much)
+        TriggerFinger,           // bend your index finger as if pulling a trigger
+        LowerFist,               // grab with your middle, ring, pinky fingers
+        Pinch,                   // pinch with your thumb and index fingers
+        Thumbpress,              // point the thumb towards the direction of your pinky
+
+        // Hand gestures (these would significantly change the orientation of your hand)
+        FlippingTheBird,         // flip someone off with your middle finger
+        ILY,                     // pinky and index finger extended, middle and ring bent
+        Victory,                 // V shape with your index, middle fingers, other fingers curled
+        FlatHandPalmUp,          // flat hand, palm points upwards (relative to alignment of Leap!)
+        FlatHandPalmDown,        // flat hand, palm points downwards (relative to alignment of Leap!)
+        FlatHandPalmAway,        // flat hand, palm points away from self (relative to alignment of Leap!)
+        FlatHandPalmTowards,     // flat hand, palm points towards self (relative to alignment of Leap!)
+        ThumbUp,                 // thumb points up, remaining fingers form a fist
+        ThumbInward,             // thumb points towards the left for the right hand and vice versa
+
 
 ## Supported gestures
 
