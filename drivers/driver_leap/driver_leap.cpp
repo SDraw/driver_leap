@@ -928,10 +928,10 @@ void CLeapHmdLatest::UpdateControllerState(Frame &frame)
         // changed.  We don't try to be precise about that here.
         NewState.unPacketNum = m_ControllerState.unPacketNum + 1;
 
-        // system menu mapping (Flat hand away from you gesture)
-        if (scores[GestureMatcher::FlatHandPalmAway] >= 0.8f)
+        // system menu mapping (timeout gesture)
+        if (scores[GestureMatcher::Timeout] >= 0.8f)
             NewState.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_System);
-        if (scores[GestureMatcher::FlatHandPalmAway] >= 0.8f)
+        if (scores[GestureMatcher::Timeout] >= 0.8f)
             NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_System);
 
         // application menu mapping (Flat hand towards your face gesture)
@@ -953,7 +953,7 @@ void CLeapHmdLatest::UpdateControllerState(Frame &frame)
             NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_Grip);
 
         // button press mapping (Thumbpress gesture)
-        if (scores[GestureMatcher::Thumbpress] >= 0.5f)
+        if (scores[GestureMatcher::Thumbpress] >= 0.2f)
             NewState.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Touchpad);
         if (scores[GestureMatcher::Thumbpress] >= 1.0f)
             NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Touchpad);
@@ -975,8 +975,8 @@ void CLeapHmdLatest::UpdateControllerState(Frame &frame)
         SendButtonUpdates(&vr::IServerDriverHost::TrackedDeviceButtonUnpressed, ulChangedPressed & ~NewState.ulButtonPressed);
         SendButtonUpdates(&vr::IServerDriverHost::TrackedDeviceButtonUntouched, ulChangedTouched & ~NewState.ulButtonTouched);
 
-        NewState.rAxis[0].x = 0.0f; //  cd.joystick_x;
-        NewState.rAxis[0].y = 0.0f; //  cd.joystick_y;
+        NewState.rAxis[0].x = scores[GestureMatcher::TouchpadAxisX];
+        NewState.rAxis[0].y = scores[GestureMatcher::TouchpadAxisY];
 
         NewState.rAxis[1].x = scores[GestureMatcher::TriggerFinger];
         NewState.rAxis[1].y = 0.0f;

@@ -47,7 +47,9 @@ public:
         TODO_FistBump,           // a Fist Bump gesture
 
         // Two handed gestures
-        TODO_Timeout,            // both Hands form a T shape, signals a Timeout in sports
+        Timeout,                 // both Hands form a T shape, signals a Timeout in sports
+        TouchpadAxisX,           // Touchpad emulation: index finger of other hand points towards palm 
+        TouchpadAxisY,           // Touchpad emulation: index finger of other hand points towards palm 
 
         NUM_GESTURES,
 
@@ -87,6 +89,9 @@ public:
         case FlatHandPalmTowards: return "FlatHandPalmTowards"; break;
         case ThumbUp: return "ThumbUp"; break;
         case ThumbInward: return "ThumbInward"; break;
+        case Timeout: return "Timeout"; break;
+        case TouchpadAxisX: return "TouchpadAxisX"; break;
+        case TouchpadAxisY: return "TouchpadAxisY"; break;
         default: return ""; break;
         }
     }
@@ -110,6 +115,9 @@ public:
         else if (name.compare("FlatHandPalmTowards") == 0) return FlatHandPalmTowards;
         else if (name.compare("ThumbUp") == 0) return ThumbUp;
         else if (name.compare("ThumbInward") == 0) return ThumbInward;
+        else if (name.compare("Timeout") == 0) return Timeout;
+        else if (name.compare("TouchpadAxisX") == 0) return TouchpadAxisX;
+        else if (name.compare("TouchpadAxisY") == 0) return TouchpadAxisY;
         else return INVALID_GESTURE;
     }
 

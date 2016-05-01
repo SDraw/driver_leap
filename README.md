@@ -4,11 +4,20 @@
 
 You're seeing an early version of this software. I've got positional tracking established now as well as hand pose tracking. Some experimental mappings of hand gestures to triggers and buttons were added:
 
-- Bending of the index finger maps to the trigger button, like you would fire a gun.
+Trigger:
+- bending of the index finger maps to the trigger button, like you would fire a gun.
+
+Grip:
 - clenching the middle, ring, pinky finger to a fist maps to the grabbing buttons
-- the thumbpress gesture (just point the thumb in the direction of your palm) touches and clicks the trackpad
+
+Trackpad:
+- the thumbpress gesture (just point the thumb in the direction of your palm) touches and clicks the trackpad, depending on the intensity of your gesture.
+- pointing the index finger towards the are of the other hand's palm will emulate the touchpad. To press the touchpad in the desired position use the tumbpress gesture simultaneously while pointing.
+
+Menu buttons:
 - Flat hand held in front of you, palm towards face is used for application menu button
-- Flat hand held in front of you, palm away from you is used for system menu button
+- the Timeout pose (as used in sports), registers as the system menu button
+
 
 I am working on allowing to freely map gestures to buttons in the steamvr.vrsettings config file in your Steam\config folder. However note that the "leap_gestures" section is currently not parsed yet. It's merely a sign of things to come.
 
@@ -38,6 +47,11 @@ You can practise some gestures this way and also cross-check your pose in the Le
         FlatHandPalmTowards,     // flat hand, palm points towards self (relative to alignment of Leap!)
         ThumbUp,                 // thumb points up, remaining fingers form a fist
         ThumbInward,             // thumb points towards the left for the right hand and vice versa
+
+        // Two handed gestures
+        Timeout,                 // both Hands form a T shape, signals a Timeout in sports
+        TouchpadAxisX,           // Touchpad emulation: index finger of other hand points towards palm 
+        TouchpadAxisY,           // Touchpad emulation: index finger of other hand points towards palm 
 
 
 ### Games/Experiences that work mostly

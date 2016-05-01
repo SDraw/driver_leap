@@ -5,6 +5,38 @@ const Vector GestureMatcher::RightVector = Vector(-1,  0,  0);
 const Vector GestureMatcher::InVector    = Vector( 0,  1,  0);
 const Vector GestureMatcher::UpVector    = Vector( 0,  0, -1);
 
+// invert a 3x3 matrix
+static void invert_3x3(const float(*A)[3], float(*R)[3]) {
+    float det;
+
+    det = A[0][0] * (A[2][2] * A[1][1] - A[2][1] * A[1][2])
+        - A[1][0] * (A[2][2] * A[0][1] - A[2][1] * A[0][2])
+        + A[2][0] * (A[1][2] * A[0][1] - A[1][1] * A[0][2]);
+
+    R[0][0] = (A[2][2] * A[1][1] - A[2][1] * A[1][2]) / det;
+    R[0][1] = -(A[2][2] * A[0][1] - A[2][1] * A[0][2]) / det;
+    R[0][2] = (A[1][2] * A[0][1] - A[1][1] * A[0][2]) / det;
+
+    R[1][0] = -(A[2][2] * A[1][0] - A[2][0] * A[1][2]) / det;
+    R[1][1] = (A[2][2] * A[0][0] - A[2][0] * A[0][2]) / det;
+    R[1][2] = -(A[1][2] * A[0][0] - A[1][0] * A[0][2]) / det;
+
+    R[2][0] = (A[2][1] * A[1][0] - A[2][0] * A[1][1]) / det;
+    R[2][1] = -(A[2][1] * A[0][0] - A[2][0] * A[0][1]) / det;
+    R[2][2] = (A[1][1] * A[0][0] - A[1][0] * A[0][1]) / det;
+}
+
+// compute matrix * column vector product
+static Vector matrix_vector(const float(*A)[3], Vector &v)
+{
+    Vector result;
+    result.x = A[0][0] * v.x + A[0][1] * v.y + A[0][2] * v.z;
+    result.y = A[1][0] * v.x + A[1][1] * v.y + A[1][2] * v.z;
+    result.z = A[2][0] * v.x + A[2][1] * v.y + A[2][2] * v.z;
+    return result;
+}
+
+
 
 GestureMatcher::GestureMatcher()
 {
@@ -23,15 +55,19 @@ bool GestureMatcher::MatchGestures(const Frame &frame, WhichHand which, float(&r
 
     // Go through the hands in the dataset
     HandList &hands = frame.hands();
+
     for (int h = 0; h < hands.count(); h++)
     {
-        Hand &hand = hands[h];
+        Hand hand = hands[h];
 
         // these are the conditions under which we do not want
         // to evaluate a hand from the Frame dataset.
         if (!hand.isValid()) continue;
         if (which == RightHand && hand.isLeft()) continue;
         if (which == LeftHand && hand.isRight()) continue;
+
+        Hand otherhand;
+        if (hands.count() == 2) otherhand = hands[(h + 1) % 2];
 
         // okay, found a hand we want to look at.
         success = true;
@@ -43,7 +79,11 @@ bool GestureMatcher::MatchGestures(const Frame &frame, WhichHand which, float(&r
         float sumbend[5] = { 0 };
 
         Vector fingerdir[5];
+        Vector fingertip[5];
+        bool extended[5];
         memset(fingerdir, 0, sizeof(fingerdir));
+        memset(fingertip, 0, sizeof(fingertip));
+        memset(extended, 0, sizeof(extended));
 
         // Evaluate bending of all fingers
         const FingerList &fingers = hand.fingers();
@@ -53,6 +93,9 @@ bool GestureMatcher::MatchGestures(const Frame &frame, WhichHand which, float(&r
             int f = finger.type(); // thumb, index, middle, ring, pinky
             if (finger.isFinger() && finger.isValid())
             {
+                fingertip[f] = finger.tipPosition();
+                extended[f] = finger.isExtended();
+
                 // go through the finger's bones:
                 // metacarpal, proximal, intermediate, distal
                 Vector prev_direction;
@@ -92,13 +135,13 @@ bool GestureMatcher::MatchGestures(const Frame &frame, WhichHand which, float(&r
         merge(result[Pinch], pinch);
 
         // Thumbpress gesture means that the thumb points the direction of the pinky
-        Vector normal = hand.palmNormal();
+        Vector palmNormal = hand.palmNormal();
         Vector direction = hand.direction();
         Vector pinkyside;
         if (hand.isRight())
-            pinkyside = normal.cross(direction);
+            pinkyside = palmNormal.cross(direction);
         else
-            pinkyside = direction.cross(normal);
+            pinkyside = direction.cross(palmNormal);
         merge(result[Thumbpress], maprange(pinkyside.dot(fingerdir[Finger::TYPE_THUMB]), 0.0f, 0.6f));
 
 
@@ -119,11 +162,10 @@ bool GestureMatcher::MatchGestures(const Frame &frame, WhichHand which, float(&r
 
         // FlatHand gestures
         float flatHand = maprange((sumbend[Finger::TYPE_THUMB] + sumbend[Finger::TYPE_INDEX] + sumbend[Finger::TYPE_MIDDLE] + sumbend[Finger::TYPE_RING] + sumbend[Finger::TYPE_PINKY]) / 5, 50.0, 40.0);
-        Vector palmnormal = hand.palmNormal();
-        merge(result[FlatHandPalmUp]     , std::min(flatHand, maprange(( up).dot(palmnormal), 0.8f, 0.95f)));
-        merge(result[FlatHandPalmDown]   , std::min(flatHand, maprange((-up).dot(palmnormal), 0.8f, 0.95f)));
-        merge(result[FlatHandPalmAway]   , std::min(flatHand, maprange(( in).dot(palmnormal), 0.8f, 0.95f)));
-        merge(result[FlatHandPalmTowards], std::min(flatHand, maprange((-in).dot(palmnormal), 0.8f, 0.95f)));
+        merge(result[FlatHandPalmUp]     , std::min(flatHand, maprange(( up).dot(palmNormal), 0.8f, 0.95f)));
+        merge(result[FlatHandPalmDown]   , std::min(flatHand, maprange((-up).dot(palmNormal), 0.8f, 0.95f)));
+        merge(result[FlatHandPalmAway]   , std::min(flatHand, maprange(( in).dot(palmNormal), 0.8f, 0.95f)));
+        merge(result[FlatHandPalmTowards], std::min(flatHand, maprange((-in).dot(palmNormal), 0.8f, 0.95f)));
 
         // ThumbsUp/Inward gestures
         Vector inward = hand.isLeft() ? right : -right;
@@ -131,6 +173,77 @@ bool GestureMatcher::MatchGestures(const Frame &frame, WhichHand which, float(&r
         float straightThumb = maprange(sumbend[Finger::TYPE_THUMB], 50.0, 40.0);
         merge(result[ThumbUp]     , std::min(fistHand, std::min(straightThumb, maprange((    up).dot(fingerdir[Finger::TYPE_THUMB]), 0.8f, 0.95f))));
         merge(result[ThumbInward] , std::min(fistHand, std::min(straightThumb, maprange((inward).dot(fingerdir[Finger::TYPE_THUMB]), 0.8f, 0.95f))));
+
+        if (otherhand.isValid()) // two handed gestures really need two hands
+        {
+            // Timeout gesture. Note that only the lower hand forming the T shape will register the gesture.
+            // TODO: might also validate that the lower hand points upward
+            // TODO: might as well check that the other hand is also flat
+            merge(result[Timeout], std::min( flatHand,  // I reuse the flatHand metric from above
+                                   std::min( maprange(hand.direction().dot(-otherhand.palmNormal()), 0.8f, 0.95f),
+                                             maprange(fingertip[Leap::Finger::TYPE_INDEX].distanceTo(otherhand.palmPosition()), 80.0f, 60.0f) )
+                                   ));
+
+            // Touchpad emulation
+            Finger otherIndex = otherhand.fingers().fingerType(Leap::Finger::TYPE_INDEX)[0];
+            if (otherIndex.isFinger() && otherIndex.isValid())
+            {
+                // we need the index finger direction and the other hand's palm to face opposing directions
+                if (otherIndex.direction().dot(hand.palmNormal()) < 0)
+                {
+                    // Origin o of the plane is the hand's palm position
+                    Vector o = hand.palmPosition();
+
+                    // sideways vector on the hand
+                    Vector uvec = direction.cross(palmNormal) * hand.palmWidth() / 2;
+
+                    // vvec going from palm towards the hand's pointing direction
+                    Vector vvec = hand.direction() * hand.palmWidth() / 2;
+
+                    // p and d form a line originating at the index finger's tip
+                    Vector p = otherIndex.tipPosition();
+                    Vector d = otherIndex.direction();
+
+                    //  solve this linear equation system
+                    //  p0       d0     o0       uvec0       vvec0
+                    //  p1 + n * d1  =  o1 + u * uvec1 + v * vvec1
+                    //  p2       d2     o2       uvec1       vvec2
+
+                    //  u         u0 v0 d0       p0   o0
+                    //  v =  inv( u1 v1 d1 ) * ( p1 - o1 )
+                    //  n         u2 v2 d2       p2   o2
+
+                    float A[3][3] = { {uvec.x, vvec.x, d.x},
+                                      {uvec.y, vvec.y, d.y},
+                                      {uvec.z, vvec.z, d.z} };
+
+                    float invA[3][3];
+                    invert_3x3(A, invA);
+                    Vector R = matrix_vector(invA, Vector(p.x - o.x, p.y - o.y, p.z - o.z));
+
+                    // u and v are in R.x and R.y respectively and are expected to be within -1...+1
+                    // when the index finger points into the palm area
+                    // n is contained in R.z and represents the distance in mm between the index finger tip and the palm
+
+                    // compute length of u,v vector in plane
+                    float u = R.x;
+                    float v = R.y;
+                    float length = sqrtf(u*u + v*v);
+
+                    // ignore if are we pointing way out of bounds
+                    if (length < 5.0)
+                    {
+                        // limit vector to remain inside unit circle
+                        if (length > 1.0) {
+                            u /= length;
+                            v /= length;
+                        }
+                        result[TouchpadAxisX] = u;
+                        result[TouchpadAxisY] = v;
+                    }
+                }
+            }
+        }
 
 #if 0
         fprintf(stderr, "handdir %f %f %f\n", hand.direction().x, hand.direction().y, hand.direction().z);
