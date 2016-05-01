@@ -19,6 +19,13 @@ Menu buttons:
 - the Timeout pose (as used in sports), registers as the system menu button
 
 
+Swapped hands?
+
+when SteamVR confuses the left and right controller hands (which will be indicated by little hand icons shown near the bottom of the displayed Wand controllers), simply cross your hands the first time you bring them into view after starting SteamVR. This reverses the hand assignment and can improve the gaming experience for example in Audioshield.
+
+
+
+
 I am working on allowing to freely map gestures to buttons in the steamvr.vrsettings config file in your Steam\config folder. However note that the "leap_gestures" section is currently not parsed yet. It's merely a sign of things to come.
 
 ## Supported gestures

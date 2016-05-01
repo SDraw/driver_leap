@@ -652,7 +652,7 @@ CLeapHmdLatest::CLeapHmdLatest( vr::IServerDriverHost * pDriverHost, int base, i
 
     memset( &m_ControllerState, 0, sizeof( m_ControllerState ) );
     memset( &m_Pose, 0, sizeof( m_Pose ) );
-    m_Pose.result = vr::TrackingResult_Running_OK;
+    m_Pose.result = vr::TrackingResult_Uninitialized;
 
     m_firmware_revision = 0x0001;
     m_hardware_revision = 0x0001;
@@ -929,9 +929,9 @@ void CLeapHmdLatest::UpdateControllerState(Frame &frame)
         NewState.unPacketNum = m_ControllerState.unPacketNum + 1;
 
         // system menu mapping (timeout gesture)
-        if (scores[GestureMatcher::Timeout] >= 0.8f)
+        if (scores[GestureMatcher::Timeout] >= 0.5f)
             NewState.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_System);
-        if (scores[GestureMatcher::Timeout] >= 0.8f)
+        if (scores[GestureMatcher::Timeout] >= 0.5f)
             NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_System);
 
         // application menu mapping (Flat hand towards your face gesture)
@@ -1277,11 +1277,14 @@ void CLeapHmdLatest::FinishRealignCoordinates(float(*m)[3], float *v )
     if ( !pLeapA || !pLeapB )
         return;
 
-    memcpy(pLeapA->m_hmdPos, &v[0], sizeof(m_hmdPos));
-    memcpy(pLeapB->m_hmdPos, &v[0], sizeof(m_hmdPos));
+    vr::HmdQuaternion_t q = CalculateRotation(m);
+    pLeapA->UpdateHmdPose(v, q);
+    pLeapB->UpdateHmdPose(v, q);
+}
 
-    pLeapA->m_hmdRot = pLeapB->m_hmdRot = CalculateRotation(m);
-
-    pLeapA->m_bCalibrated = true;
-    pLeapB->m_bCalibrated = true;
+void CLeapHmdLatest::UpdateHmdPose(float *v, vr::HmdQuaternion_t q)
+{
+    memcpy(m_hmdPos, &v[0], sizeof(m_hmdPos));
+    m_hmdRot = q;
+    m_bCalibrated = true;
 }

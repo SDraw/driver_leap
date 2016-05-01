@@ -126,6 +126,7 @@ public:
 
     static void RealignCoordinates( CLeapHmdLatest * pLeapA, CLeapHmdLatest * pLeapB );
     void FinishRealignCoordinates( float (*m)[3], float *v );
+    void UpdateHmdPose(float *v, vr::HmdQuaternion_t q);
 
     uint32_t GetDeviceId() { return m_unSteamVRTrackedDeviceId; }
 
