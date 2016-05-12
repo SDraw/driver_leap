@@ -2,12 +2,9 @@
 
 ## Installation of this driver.
 
-1) Get the Leap Motion Orion Beta runtimes https://developer.leapmotion.com/get-started
-2) Install the Visual C++ 2015 redistributables (32 and 64 bits)
-   https://download.microsoft.com/download/9/3/F/93FCF1E7-E6A4-478B-96E7-D4B285925B00/vc_redist.x86.exe
-   https://download.microsoft.com/download/9/3/F/93FCF1E7-E6A4-478B-96E7-D4B285925B00/vc_redist.x64.exe
-3) Download the most recent setup file from the Releases section of this project and run the .exe setup
-   https://github.com/cbuchner1/driver_leap/releases
+- Get the Leap Motion Orion Beta runtimes https://developer.leapmotion.com/get-started
+- Install the Visual C++ 2015 redistributables (32 and 64 bits) https://download.microsoft.com/download/9/3/F/93FCF1E7-E6A4-478B-96E7-D4B285925B00/vc_redist.x86.exe https://download.microsoft.com/download/9/3/F/93FCF1E7-E6A4-478B-96E7-D4B285925B00/vc_redist.x64.exe
+- Download the most recent setup file from the Releases section of this project and run the .exe setup https://github.com/cbuchner1/driver_leap/releases
 
 Start SteamVR to see if two additional controllers show up (they should be blinking if your hands are
 not in the field of view of the Leap Motion, solid otherwise).
