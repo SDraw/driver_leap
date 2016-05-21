@@ -317,8 +317,20 @@ int wmain(int argc, wchar_t* argv[])
 {
     if (argc == 4)
     {
+        // default to current working directory as the driver path
         wchar_t wcwd[512];
         wchar_t *cwd = _wgetcwd(wcwd, sizeof(wcwd) / sizeof(wchar_t));
+
+        // if the path to the source JSON file contains a backslash,
+        // prefer this path over the current working directory for
+        // registering the driver path.
+        wchar_t *tmp;
+        if ((tmp = wcsrchr(argv[2], L'\\')) != NULL)
+        {
+            cwd = wcsncpy(wcwd, argv[2], tmp - argv[2]);
+            wcwd[tmp - argv[2]] = L'\0';
+        }
+
         if (cwd != NULL)
         {
             wstring configfile;
