@@ -1,5 +1,22 @@
 # Leap Motion Driver for SteamVR
 
+## Installation of this driver.
+
+- Get the Leap Motion Orion Beta runtimes https://developer.leapmotion.com/get-started
+- Install the Visual C++ 2015 Update 2 redistributables (32 and 64 bits) https://www.microsoft.com/en-us/download/details.aspx?id=51682
+- Download the most recent zip file from the Releases section of this project and run the contained exe setup program https://github.com/cbuchner1/driver_leap/releases
+
+Start SteamVR to see if two additional controllers show up (they should be blinking if your hands are
+not in the field of view of the Leap Motion, solid otherwise).
+
+### Troubleshooting
+
+Try manually running this batch file in case the driver still does not appear to work
+C:\Program Files (x86)\SteamVR Leap Motion driver\register_driver.cmd
+
+If you experience frequent crashes of SteamVR on exit and this bothers you, uninstall my driver. I will try to fix this ASAP, but at the moment I have no clue why SteamVR is crashing.
+
+
 ## Note about WORK IN PROGRESS
 
 You're seeing an early version of this software. I've got positional tracking established now as well as hand pose tracking. Some experimental mappings of hand gestures to triggers and buttons were added:
@@ -93,7 +110,7 @@ Tracking is not quite reliable to always detect my trigger gestures. I think we 
 I do not think I will be able to get animated hands into the 3D view, as the render model you can assign to each controller is mostly a static object. There are some JSON files to map joystick axes and triggers to animated parts of the displayed controller. But the fingers do not directly map to joystick axes directly and hence cannot be shown. Also not all games make use of SteamVR's internal controller visualization.
 
 
-## Building
+## Building from Sourcecode (Developers only)
 
 ### Install Dependencies
 
@@ -111,7 +128,7 @@ Under "Property Manager" in Visual Studio, expand any of the configurations and 
 
 You will probably want to build Release x86.  You can also build x64.  The post-build step will install the binaries and copy the resources to the configured InstallDir and register that path with SteamVR.
 
-## Using The Leap Motion Driver 
+## Preapring The Leap Motion Driver for use (Developers only)
 
 After building, the InstallDir should be a complete binary distribution.  To use it:
 
