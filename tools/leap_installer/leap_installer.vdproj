@@ -45,6 +45,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_3132EE2D101044AC95074C6A67780183"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_3CA0FAC059694A78AC308168A9264E6B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -81,12 +87,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_4DECB4F2300140F986D5E26E2F46D8EB"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_5D2E8844BFC146EE8A48925D279754C7"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -106,12 +106,6 @@
         "Entry"
         {
         "MsmKey" = "8:_73089C7E2B7C4F008B43C8C898345CB2"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_7A20EAA6D9B6451DBCC504D68414EAE4"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -141,12 +135,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_C80F010063C1420A86BB3AE44F9A69E5"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_CFBCE41F6CBB497AAC174637F0027B36"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -160,12 +148,6 @@
         "Entry"
         {
         "MsmKey" = "8:_F8AEF392AE0B43289FFBB2E89EDF8E3C"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_FDE78D0ED2544B28AAC39C38C0DDF9CC"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -241,47 +223,33 @@
     {
         "CustomAction"
         {
-            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_4AC771438D18463DB9A71D8388291621"
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_253F674ABF3249DC9576155B0199A3D7"
             {
-            "Name" = "8:start_script.vbs"
+            "Name" = "8:config_tool.exe install"
             "Condition" = "8:"
-            "Object" = "8:_FDE78D0ED2544B28AAC39C38C0DDF9CC"
-            "FileType" = "3:4"
-            "InstallAction" = "3:2"
-            "Arguments" = "8:"
+            "Object" = "8:_3132EE2D101044AC95074C6A67780183"
+            "FileType" = "3:2"
+            "InstallAction" = "3:1"
+            "Arguments" = "8:install \"[TARGETDIR]leap.vrsettings\" \"[TARGETDIR]leap_backup.vrsettings\""
             "EntryPoint" = "8:"
             "Sequence" = "3:1"
-            "Identifier" = "8:_11160E3A_617D_4686_92A0_D056AC227D1C"
+            "Identifier" = "8:_B86DB632_9571_4BDF_A4E3_A281907D22C3"
             "InstallerClass" = "11:FALSE"
-            "CustomActionData" = "8:[TARGETDIR]register_driver.cmd"
+            "CustomActionData" = "8:"
             }
-            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_5F280F75BC01487393AE04DCEB493A2B"
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_3934F57E01254B1CADD0A47252A9279B"
             {
-            "Name" = "8:start_script.vbs"
+            "Name" = "8:config_tool.exe uninstall"
             "Condition" = "8:"
-            "Object" = "8:_FDE78D0ED2544B28AAC39C38C0DDF9CC"
-            "FileType" = "3:4"
-            "InstallAction" = "3:3"
-            "Arguments" = "8:"
-            "EntryPoint" = "8:"
-            "Sequence" = "3:1"
-            "Identifier" = "8:_AE12457B_A1DC_449B_BDB7_80349BC87525"
-            "InstallerClass" = "11:FALSE"
-            "CustomActionData" = "8:[TARGETDIR]unregister_driver.cmd"
-            }
-            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_BFEE16DED5024CCD884987F9E94E5930"
-            {
-            "Name" = "8:start_script.vbs"
-            "Condition" = "8:"
-            "Object" = "8:_FDE78D0ED2544B28AAC39C38C0DDF9CC"
-            "FileType" = "3:4"
+            "Object" = "8:_3132EE2D101044AC95074C6A67780183"
+            "FileType" = "3:2"
             "InstallAction" = "3:4"
-            "Arguments" = "8:"
+            "Arguments" = "8:uninstall \"[TARGETDIR]leap.vrsettings\" \"[TARGETDIR]leap_backup.vrsettings\""
             "EntryPoint" = "8:"
             "Sequence" = "3:1"
-            "Identifier" = "8:_C3C5DA58_A3AA_4AA4_A5D7_F2793E9F6473"
+            "Identifier" = "8:_5D6D59E0_F6EF_4391_9594_415554BC7308"
             "InstallerClass" = "11:FALSE"
-            "CustomActionData" = "8:[TARGETDIR]unregister_driver.cmd"
+            "CustomActionData" = "8:"
             }
         }
         "DefaultFeature"
@@ -358,6 +326,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3132EE2D101044AC95074C6A67780183"
+            {
+            "SourcePath" = "8:D:\\Steam\\steamapps\\common\\SteamVR\\drivers\\leap\\bin\\Win64\\config_tool.exe"
+            "TargetName" = "8:config_tool.exe"
+            "Tag" = "8:"
+            "Folder" = "8:_B572C0F62C374CA0A6C66D010BE1A374"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_46D86E1EF46C45B291C7DFF0D05FEC5C"
             {
             "SourcePath" = "8:D:\\Steam\\steamapps\\common\\SteamVR\\drivers\\leap\\bin\\Win64\\gesture_checker.exe"
@@ -384,26 +372,6 @@
             "TargetName" = "8:driver_leap.dll"
             "Tag" = "8:"
             "Folder" = "8:_63ACE570CFFD4D6A9853F4B6B90E0B8C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4DECB4F2300140F986D5E26E2F46D8EB"
-            {
-            "SourcePath" = "8:register_driver.cmd"
-            "TargetName" = "8:register_driver.cmd"
-            "Tag" = "8:"
-            "Folder" = "8:_B572C0F62C374CA0A6C66D010BE1A374"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -478,26 +446,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7A20EAA6D9B6451DBCC504D68414EAE4"
-            {
-            "SourcePath" = "8:D:\\Steam\\steamapps\\common\\SteamVR\\drivers\\leap\\bin\\Win32\\config_tool.exe"
-            "TargetName" = "8:config_tool.exe"
-            "Tag" = "8:"
-            "Folder" = "8:_B572C0F62C374CA0A6C66D010BE1A374"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_983A7D1646F9483AA2D164DCF999E52A"
             {
             "SourcePath" = "8:leap.vrsettings"
@@ -538,52 +486,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_C80F010063C1420A86BB3AE44F9A69E5"
-            {
-            "SourcePath" = "8:unregister_driver.cmd"
-            "TargetName" = "8:unregister_driver.cmd"
-            "Tag" = "8:"
-            "Folder" = "8:_B572C0F62C374CA0A6C66D010BE1A374"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D1A7B7704A7949AE959BEEECB56D10D8"
             {
             "SourcePath" = "8:D:\\Steam\\steamapps\\common\\SteamVR\\drivers\\leap\\bin\\Win32\\gesture_checker.exe"
             "TargetName" = "8:gesture_checker.exe"
             "Tag" = "8:"
             "Folder" = "8:_63ACE570CFFD4D6A9853F4B6B90E0B8C"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_FDE78D0ED2544B28AAC39C38C0DDF9CC"
-            {
-            "SourcePath" = "8:start_script.vbs"
-            "TargetName" = "8:start_script.vbs"
-            "Tag" = "8:"
-            "Folder" = "8:_B572C0F62C374CA0A6C66D010BE1A374"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -606,7 +514,7 @@
         {
             "{3C67513D-01DD-4637-8A68-80971EB9504F}:_B572C0F62C374CA0A6C66D010BE1A374"
             {
-            "DefaultLocation" = "8:c:\\Program Files (x86)\\SteamVR Leap Motion driver"
+            "DefaultLocation" = "8:c:\\Program Files\\SteamVR Leap Motion driver"
             "Name" = "8:#1925"
             "AlwaysCreate" = "11:FALSE"
             "Condition" = "8:"
@@ -743,7 +651,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:SteamVR Leap Motion driver"
         "ProductCode" = "8:{1001FC44-A16C-4F4B-86E3-CD824B17D921}"
-        "PackageCode" = "8:{74EF0F2A-7FF9-48C2-B856-E8D8B7F128CE}"
+        "PackageCode" = "8:{75AAA640-5D9E-4AC7-916B-27ADF9B35C25}"
         "UpgradeCode" = "8:{76F38173-D6FE-4221-B110-E68665ACD1AD}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -764,7 +672,7 @@
         "ARPIconIndex" = "3:0"
         "SearchPath" = "8:"
         "UseSystemSearchPath" = "11:TRUE"
-        "TargetPlatform" = "3:0"
+        "TargetPlatform" = "3:1"
         "PreBuildEvent" = "8:"
         "PostBuildEvent" = "8:"
         "RunPostBuildEvent" = "3:0"

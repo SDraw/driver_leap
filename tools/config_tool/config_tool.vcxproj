@@ -109,6 +109,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
     </Link>
     <PostBuildEvent>
       <Command>mkdir "$(InstallDir)\bin\Win32"
@@ -127,6 +128,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" "$(InstallDir)\bin\Win32"</Command>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
     </Link>
     <PostBuildEvent>
       <Command>mkdir "$(InstallDir)\bin\Win64"
@@ -149,6 +151,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" "$(InstallDir)\bin\Win64"</Command>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
     </Link>
     <PostBuildEvent>
       <Command>mkdir "$(InstallDir)\bin\Win32"
@@ -171,6 +174,7 @@ copy "$(OutDir)$(TargetName)$(TargetExt)" "$(InstallDir)\bin\Win32"</Command>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
     </Link>
     <PostBuildEvent>
       <Command>mkdir "$(InstallDir)\bin\Win64"
