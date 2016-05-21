@@ -952,7 +952,7 @@ void CLeapHmdLatest::UpdateControllerState(Frame &frame)
         if (scores[GestureMatcher::LowerFist] >= 0.5f)
             NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_Grip);
 
-        // button press mapping (Thumbpress gesture)
+        // touchpad button press mapping (Thumbpress gesture)
         if (scores[GestureMatcher::Thumbpress] >= 0.2f)
             NewState.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Touchpad);
         if (scores[GestureMatcher::Thumbpress] >= 1.0f)

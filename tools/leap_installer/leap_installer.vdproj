@@ -111,6 +111,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_7A20EAA6D9B6451DBCC504D68414EAE4"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_880EDDBD2BDA486D8F835BEDCC35A3F1"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -472,10 +478,30 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7A20EAA6D9B6451DBCC504D68414EAE4"
+            {
+            "SourcePath" = "8:D:\\Steam\\steamapps\\common\\SteamVR\\drivers\\leap\\bin\\Win32\\config_tool.exe"
+            "TargetName" = "8:config_tool.exe"
+            "Tag" = "8:"
+            "Folder" = "8:_B572C0F62C374CA0A6C66D010BE1A374"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_983A7D1646F9483AA2D164DCF999E52A"
             {
-            "SourcePath" = "8:steamvr.vrsettings"
-            "TargetName" = "8:steamvr.vrsettings"
+            "SourcePath" = "8:leap.vrsettings"
+            "TargetName" = "8:leap.vrsettings"
             "Tag" = "8:"
             "Folder" = "8:_B572C0F62C374CA0A6C66D010BE1A374"
             "Condition" = "8:"
