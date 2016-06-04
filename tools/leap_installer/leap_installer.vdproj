@@ -178,10 +178,15 @@
             "ComponentsUrl" = "8:"
                 "Items"
                 {
-                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.5"
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.Visual.C++.14.0.x64"
                     {
-                    "Name" = "8:Microsoft .NET Framework 4.5 (x86 and x64)"
-                    "ProductCode" = "8:.NETFramework,Version=v4.5"
+                    "Name" = "8:Visual C++ \"14\" Runtime Libraries (x64)"
+                    "ProductCode" = "8:Microsoft.Visual.C++.14.0.x64"
+                    }
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.Visual.C++.14.0.x86"
+                    {
+                    "Name" = "8:Visual C++ \"14\" Runtime Libraries (x86)"
+                    "ProductCode" = "8:Microsoft.Visual.C++.14.0.x86"
                     }
                 }
             }
@@ -651,7 +656,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:SteamVR Leap Motion driver"
         "ProductCode" = "8:{1001FC44-A16C-4F4B-86E3-CD824B17D921}"
-        "PackageCode" = "8:{75AAA640-5D9E-4AC7-916B-27ADF9B35C25}"
+        "PackageCode" = "8:{09D59766-8A0E-48CC-B8DD-A5DE3F154029}"
         "UpgradeCode" = "8:{76F38173-D6FE-4221-B110-E68665ACD1AD}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
