@@ -64,7 +64,21 @@ bool ReadRegValue(HKEY root, wstring key, wstring name, wstring &value)
     return true;
 }
 
+// check if a directory exists
+bool dirExists(const std::wstring& dirName_in)
+{
+    DWORD ftyp = GetFileAttributes(dirName_in.c_str());
+    if (ftyp == INVALID_FILE_ATTRIBUTES)
+        return false;  //something is wrong with your path!
+
+    if (ftyp & FILE_ATTRIBUTE_DIRECTORY)
+        return true;   // this is a directory!
+
+    return false;    // this is not a directory!
+}
+
 // get the SteamVR installation path
+// TODO: I just learnt about %LOCALAPPDATA%\OpenVR\openvrpaths.vrpath. Let's make use of it.
 bool SteamVRInstallLocation(wstring &location)
 {
     // guess where streamVR is located from its uninstall entry. Is there a better way?
@@ -74,8 +88,18 @@ bool SteamVRInstallLocation(wstring &location)
         if (ReadRegValue(HKEY_CURRENT_USER, L"SOFTWARE\\Valve\\Steam", L"SteamPath", location))
         {
             replace(location.begin(), location.end(), L'/', L'\\');
-            location.append(L"\\steamapps\\common\\SteamVR");
-            return true;
+
+            if (dirExists(location + L"\\steamapps\\common\\SteamVR"))
+            {
+                location.append(L"\\steamapps\\common\\SteamVR");
+                return true;
+            }
+            else if (dirExists(location + L"\\steamapps\\common\\OpenVR"))
+            {
+                location.append(L"\\steamapps\\common\\OpenVR");
+                return true;
+            }
+            return false;
         }
     }
     else
@@ -86,11 +110,16 @@ bool SteamVRInstallLocation(wstring &location)
 }
 
 // get the path to the vrpathreg utility (32bit)
+// (this will be enclosed in double quotes if path contains a space character)
 bool SteamVRPathReg(wstring &location)
 {
     if (SteamVRInstallLocation(location))
     {
         location.append(L"\\bin\\win32\\vrpathreg.exe");
+
+        if (location.find(L' ') != wstring::npos)
+            location = L"\"" + location + L"\"";
+
         return true;
     }
     return false;
