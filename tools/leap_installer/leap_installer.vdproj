@@ -527,16 +527,16 @@
             "Property" = "8:TARGETDIR"
                 "Folders"
                 {
-                    "{9EF0B969-E518-4E46-987F-47570745A589}:_612B6353C7A34055B1F60607C3F3C0EA"
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_64392182BFF245C6B99829B01C7525F8"
                     {
-                    "Name" = "8:leap"
+                    "Name" = "8:bin"
                     "AlwaysCreate" = "11:FALSE"
                     "Condition" = "8:"
                     "Transitive" = "11:FALSE"
-                    "Property" = "8:_B76C8E7B76134394BA854D344FACCAC0"
+                    "Property" = "8:_AC65A2107E4B4BA8805F889F0F049AC8"
                         "Folders"
                         {
-                            "{9EF0B969-E518-4E46-987F-47570745A589}:_443D9E912CDA437A99AA51722DDC713A"
+                            "{9EF0B969-E518-4E46-987F-47570745A589}:_30941B0D95A54F17B92ED7E87C8C4395"
                             {
                             "Name" = "8:resources"
                             "AlwaysCreate" = "11:FALSE"
@@ -580,37 +580,26 @@
                                     }
                                 }
                             }
-                            "{9EF0B969-E518-4E46-987F-47570745A589}:_9449B2F9163A4584830E19AACAD71EFC"
+                            "{9EF0B969-E518-4E46-987F-47570745A589}:_63ACE570CFFD4D6A9853F4B6B90E0B8C"
                             {
-                            "Name" = "8:bin"
+                            "Name" = "8:Win32"
                             "AlwaysCreate" = "11:FALSE"
                             "Condition" = "8:"
                             "Transitive" = "11:FALSE"
-                            "Property" = "8:_AC65A2107E4B4BA8805F889F0F049AC8"
+                            "Property" = "8:_DB679BDED51148F2A32F8E582D9D4E61"
                                 "Folders"
                                 {
-                                    "{9EF0B969-E518-4E46-987F-47570745A589}:_63ACE570CFFD4D6A9853F4B6B90E0B8C"
-                                    {
-                                    "Name" = "8:Win32"
-                                    "AlwaysCreate" = "11:FALSE"
-                                    "Condition" = "8:"
-                                    "Transitive" = "11:FALSE"
-                                    "Property" = "8:_DB679BDED51148F2A32F8E582D9D4E61"
-                                        "Folders"
-                                        {
-                                        }
-                                    }
-                                    "{9EF0B969-E518-4E46-987F-47570745A589}:_6E55793820964E8FAF968D498761B3E3"
-                                    {
-                                    "Name" = "8:Win64"
-                                    "AlwaysCreate" = "11:FALSE"
-                                    "Condition" = "8:"
-                                    "Transitive" = "11:FALSE"
-                                    "Property" = "8:_0868F43C1375413D815C73AA49BBA0D4"
-                                        "Folders"
-                                        {
-                                        }
-                                    }
+                                }
+                            }
+                            "{9EF0B969-E518-4E46-987F-47570745A589}:_6E55793820964E8FAF968D498761B3E3"
+                            {
+                            "Name" = "8:Win64"
+                            "AlwaysCreate" = "11:FALSE"
+                            "Condition" = "8:"
+                            "Transitive" = "11:FALSE"
+                            "Property" = "8:_0868F43C1375413D815C73AA49BBA0D4"
+                                "Folders"
+                                {
                                 }
                             }
                         }
