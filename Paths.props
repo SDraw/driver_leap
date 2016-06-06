@@ -3,7 +3,7 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
     <SteamVRRuntimeDir>D:\Steam\steamapps\common\SteamVR</SteamVRRuntimeDir>
-    <OpenVRDir>C:\Users\Christian Buchner\Documents\Visual Studio 2015\Projects\Leap\openvr-0.9.19</OpenVRDir>
+    <OpenVRDir>C:\Users\Christian Buchner\Documents\Visual Studio 2015\Projects\Leap\openvr-1.0.0</OpenVRDir>
     <LeapSDKDir>C:\Users\Christian Buchner\Documents\Visual Studio 2015\Projects\Leap\LeapSDK</LeapSDKDir>
     <InstallDir>D:\Steam\steamapps\common\SteamVR\drivers\leap</InstallDir>
   </PropertyGroup>

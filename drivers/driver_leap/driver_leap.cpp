@@ -434,32 +434,16 @@ uint32_t CServerDriver_Leap::GetTrackedDeviceCount()
     return m_vecControllers.size();
 }
 
-vr::ITrackedDeviceServerDriver * CServerDriver_Leap::GetTrackedDeviceDriver( uint32_t unWhich, const char *pchInterfaceVersion )
+vr::ITrackedDeviceServerDriver * CServerDriver_Leap::GetTrackedDeviceDriver( uint32_t unWhich )
 {
-    // don't return anything if that's not the interface version we have
-    if ( 0 != stricmp( pchInterfaceVersion, vr::ITrackedDeviceServerDriver_Version ) )
-    {
-        DriverLog( "FindTrackedDeviceDriver for version %s, which we don't support.\n",
-            pchInterfaceVersion );
-        return NULL;
-    }
-
     if ( unWhich < m_vecControllers.size() )
         return m_vecControllers[unWhich];
 
     return nullptr;
 }
 
-vr::ITrackedDeviceServerDriver * CServerDriver_Leap::FindTrackedDeviceDriver( const char * pchId, const char *pchInterfaceVersion )
+vr::ITrackedDeviceServerDriver * CServerDriver_Leap::FindTrackedDeviceDriver( const char * pchId )
 {
-    // don't return anything if that's not the interface version we have
-    if ( 0 != stricmp( pchInterfaceVersion, vr::ITrackedDeviceServerDriver_Version ) )
-    {
-        DriverLog( "FindTrackedDeviceDriver for version %s, which we don't support.\n",
-            pchInterfaceVersion );
-        return NULL;
-    }
-
     for ( auto it = m_vecControllers.begin(); it != m_vecControllers.end(); ++it )
     {
         if ( 0 == strcmp( ( *it )->GetSerialNumber(), pchId ) )
@@ -530,7 +514,7 @@ void CServerDriver_Leap::ScanForNewControllers( bool bNotifyServer )
         int base = 0;
         int i = m_vecControllers.size();
         GenerateSerialNumber( buf, sizeof( buf ), base, i );
-        if ( !FindTrackedDeviceDriver( buf, vr::ITrackedDeviceServerDriver_Version ) )
+        if ( !FindTrackedDeviceDriver( buf ) )
         {
             DriverLog( "added new device %s\n", buf );
             m_vecControllers.push_back( new CLeapHmdLatest( m_pDriverHost, base, i ) );

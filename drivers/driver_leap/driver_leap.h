@@ -27,8 +27,9 @@ public:
     virtual vr::EVRInitError Init( vr::IDriverLog * pDriverLog, vr::IServerDriverHost * pDriverHost, const char * pchUserDriverConfigDir, const char * pchDriverInstallDir ) override;
     virtual void Cleanup() override;
     virtual uint32_t GetTrackedDeviceCount() override;
-    virtual vr::ITrackedDeviceServerDriver * GetTrackedDeviceDriver( uint32_t unWhich, const char *pchInterfaceVersion ) override;
-    virtual vr::ITrackedDeviceServerDriver * FindTrackedDeviceDriver( const char * pchId, const char *pchInterfaceVersion ) override;
+    virtual vr::ITrackedDeviceServerDriver * GetTrackedDeviceDriver( uint32_t unWhich ) override;
+    virtual vr::ITrackedDeviceServerDriver * FindTrackedDeviceDriver( const char * pchId ) override;
+    virtual const char * const *GetInterfaceVersions() { return vr::k_InterfaceVersions; }
     virtual void RunFrame() override;
 
     virtual bool ShouldBlockStandbyMode() override;
