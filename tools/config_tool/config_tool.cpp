@@ -258,6 +258,18 @@ bool MergeJSON(const wstring &targetfile, const wstring &tobemergedin, const wst
     char buffer[65536];
 
     FILE * pFile = _wfopen(targetfile.c_str(), L"rt");
+    if (pFile == NULL)
+    {
+        // create an empty JSON config file if we did not find an existing file.
+        pFile = _wfopen(targetfile.c_str(), L"wt");
+        if (pFile != NULL)
+        {
+            fprintf(pFile, "{\n}\n");
+            fclose(pFile);
+        }
+
+        pFile = _wfopen(targetfile.c_str(), L"rt");
+    }
     rapidjson::Document document;
     {
         rapidjson::FileReadStream is(pFile, buffer, sizeof(buffer));
@@ -374,6 +386,7 @@ int wmain(int argc, wchar_t* argv[])
                     {
                         location.append(L" adddriver \"");
                         location.append(cwd);
+                        location.append(L"\\leap");
                         location.append(L"\"");
                         wstring result = exec(location);
                         wcout << result << endl;
@@ -388,6 +401,7 @@ int wmain(int argc, wchar_t* argv[])
                     {
                         location.append(L" removedriver \"");
                         location.append(cwd);
+                        location.append(L"\\leap");
                         location.append(L"\"");
                         wstring result = exec(location);
                         wcout << result << endl;

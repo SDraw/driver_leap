@@ -93,6 +93,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_5FA3B681B7C647769FCA9766EC8C7D5C"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_695E8F66CB1C459BB36C5CCBD37BDB71"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -123,7 +129,25 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_A29A6B60034147968A5DA4F1C159D78C"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_A86A20EAE6A54E1182E623BEF1B0149D"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_AB090313E193434C85A8FA759CB6BE2C"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_BF8304C89F504814B6D214CBB097DD02"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -173,21 +197,11 @@
             {
             "Enabled" = "11:TRUE"
             "PromptEnabled" = "11:TRUE"
-            "PrerequisitesLocation" = "2:1"
+            "PrerequisitesLocation" = "2:2"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
                 "Items"
                 {
-                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.Visual.C++.14.0.x64"
-                    {
-                    "Name" = "8:Visual C++ \"14\" Runtime Libraries (x64)"
-                    "ProductCode" = "8:Microsoft.Visual.C++.14.0.x64"
-                    }
-                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.Visual.C++.14.0.x86"
-                    {
-                    "Name" = "8:Visual C++ \"14\" Runtime Libraries (x86)"
-                    "ProductCode" = "8:Microsoft.Visual.C++.14.0.x86"
-                    }
                 }
             }
         }
@@ -215,11 +229,6 @@
             "ComponentsUrl" = "8:"
                 "Items"
                 {
-                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.5"
-                    {
-                    "Name" = "8:Microsoft .NET Framework 4.5 (x86 and x64)"
-                    "ProductCode" = "8:.NETFramework,Version=v4.5"
-                    }
                 }
             }
         }
@@ -527,16 +536,16 @@
             "Property" = "8:TARGETDIR"
                 "Folders"
                 {
-                    "{9EF0B969-E518-4E46-987F-47570745A589}:_64392182BFF245C6B99829B01C7525F8"
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_612B6353C7A34055B1F60607C3F3C0EA"
                     {
-                    "Name" = "8:bin"
+                    "Name" = "8:leap"
                     "AlwaysCreate" = "11:FALSE"
                     "Condition" = "8:"
                     "Transitive" = "11:FALSE"
-                    "Property" = "8:_AC65A2107E4B4BA8805F889F0F049AC8"
+                    "Property" = "8:_B76C8E7B76134394BA854D344FACCAC0"
                         "Folders"
                         {
-                            "{9EF0B969-E518-4E46-987F-47570745A589}:_30941B0D95A54F17B92ED7E87C8C4395"
+                            "{9EF0B969-E518-4E46-987F-47570745A589}:_443D9E912CDA437A99AA51722DDC713A"
                             {
                             "Name" = "8:resources"
                             "AlwaysCreate" = "11:FALSE"
@@ -580,26 +589,37 @@
                                     }
                                 }
                             }
-                            "{9EF0B969-E518-4E46-987F-47570745A589}:_63ACE570CFFD4D6A9853F4B6B90E0B8C"
+                            "{9EF0B969-E518-4E46-987F-47570745A589}:_9449B2F9163A4584830E19AACAD71EFC"
                             {
-                            "Name" = "8:Win32"
+                            "Name" = "8:bin"
                             "AlwaysCreate" = "11:FALSE"
                             "Condition" = "8:"
                             "Transitive" = "11:FALSE"
-                            "Property" = "8:_DB679BDED51148F2A32F8E582D9D4E61"
+                            "Property" = "8:_AC65A2107E4B4BA8805F889F0F049AC8"
                                 "Folders"
                                 {
-                                }
-                            }
-                            "{9EF0B969-E518-4E46-987F-47570745A589}:_6E55793820964E8FAF968D498761B3E3"
-                            {
-                            "Name" = "8:Win64"
-                            "AlwaysCreate" = "11:FALSE"
-                            "Condition" = "8:"
-                            "Transitive" = "11:FALSE"
-                            "Property" = "8:_0868F43C1375413D815C73AA49BBA0D4"
-                                "Folders"
-                                {
+                                    "{9EF0B969-E518-4E46-987F-47570745A589}:_63ACE570CFFD4D6A9853F4B6B90E0B8C"
+                                    {
+                                    "Name" = "8:Win32"
+                                    "AlwaysCreate" = "11:FALSE"
+                                    "Condition" = "8:"
+                                    "Transitive" = "11:FALSE"
+                                    "Property" = "8:_DB679BDED51148F2A32F8E582D9D4E61"
+                                        "Folders"
+                                        {
+                                        }
+                                    }
+                                    "{9EF0B969-E518-4E46-987F-47570745A589}:_6E55793820964E8FAF968D498761B3E3"
+                                    {
+                                    "Name" = "8:Win64"
+                                    "AlwaysCreate" = "11:FALSE"
+                                    "Condition" = "8:"
+                                    "Transitive" = "11:FALSE"
+                                    "Property" = "8:_0868F43C1375413D815C73AA49BBA0D4"
+                                        "Folders"
+                                        {
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -645,7 +665,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:SteamVR Leap Motion driver"
         "ProductCode" = "8:{1001FC44-A16C-4F4B-86E3-CD824B17D921}"
-        "PackageCode" = "8:{09D59766-8A0E-48CC-B8DD-A5DE3F154029}"
+        "PackageCode" = "8:{9346F0D1-5197-4097-B449-85A02F527053}"
         "UpgradeCode" = "8:{76F38173-D6FE-4221-B110-E68665ACD1AD}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -1105,6 +1125,62 @@
         }
         "MergeModule"
         {
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_5FA3B681B7C647769FCA9766EC8C7D5C"
+            {
+            "UseDynamicProperties" = "11:TRUE"
+            "IsDependency" = "11:FALSE"
+            "SourcePath" = "8:C:\\Program Files (x86)\\Common Files\\Merge Modules\\Microsoft_VC120_CRT_x86.msm"
+                "Properties"
+                {
+                }
+            "LanguageId" = "3:0"
+            "Exclude" = "11:FALSE"
+            "Folder" = "8:"
+            "Feature" = "8:"
+            "IsolateTo" = "8:"
+            }
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_A29A6B60034147968A5DA4F1C159D78C"
+            {
+            "UseDynamicProperties" = "11:TRUE"
+            "IsDependency" = "11:FALSE"
+            "SourcePath" = "8:C:\\Program Files (x86)\\Common Files\\Merge Modules\\Microsoft_VC140_CRT_x86.msm"
+                "Properties"
+                {
+                }
+            "LanguageId" = "3:0"
+            "Exclude" = "11:FALSE"
+            "Folder" = "8:"
+            "Feature" = "8:"
+            "IsolateTo" = "8:"
+            }
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_AB090313E193434C85A8FA759CB6BE2C"
+            {
+            "UseDynamicProperties" = "11:TRUE"
+            "IsDependency" = "11:FALSE"
+            "SourcePath" = "8:C:\\Program Files (x86)\\Common Files\\Merge Modules\\Microsoft_VC120_CRT_x64.msm"
+                "Properties"
+                {
+                }
+            "LanguageId" = "3:0"
+            "Exclude" = "11:FALSE"
+            "Folder" = "8:"
+            "Feature" = "8:"
+            "IsolateTo" = "8:"
+            }
+            "{CEE29DC0-9FBA-4B99-8D47-5BC643D9B626}:_BF8304C89F504814B6D214CBB097DD02"
+            {
+            "UseDynamicProperties" = "11:TRUE"
+            "IsDependency" = "11:FALSE"
+            "SourcePath" = "8:C:\\Program Files (x86)\\Common Files\\Merge Modules\\Microsoft_VC140_CRT_x64.msm"
+                "Properties"
+                {
+                }
+            "LanguageId" = "3:0"
+            "Exclude" = "11:FALSE"
+            "Folder" = "8:"
+            "Feature" = "8:"
+            "IsolateTo" = "8:"
+            }
         }
         "ProjectOutput"
         {
