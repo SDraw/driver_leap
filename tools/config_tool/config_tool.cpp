@@ -16,9 +16,15 @@ using namespace std;
 
 // execute a command and return its output
 wstring exec(const wstring &cmd) {
+
+    // escape the command to run in double quotes
+	// and send it to a command shell
+	wchar_t tmp[1024];
+	wsprintf(tmp, L"cmd.exe /S /C \"%s\"", cmd.c_str());
+
     wchar_t buffer[128];
     wstring result = L"";
-    shared_ptr<FILE> pipe(_wpopen(cmd.c_str(), L"r"), _pclose);
+    shared_ptr<FILE> pipe(_wpopen(tmp, L"r"), _pclose);
     if (!pipe) throw runtime_error("popen() failed!");
     while (!feof(pipe.get())) {
         if (fgetws(buffer, 128, pipe.get()) != NULL)
