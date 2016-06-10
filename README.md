@@ -11,9 +11,6 @@ not in the field of view of the Leap Motion, solid otherwise).
 
 ### Troubleshooting
 
-Try manually running this batch file in case the driver still does not appear to work
-C:\Program Files (x86)\SteamVR Leap Motion driver\register_driver.cmd
-
 If you experience frequent crashes of SteamVR on exit and this bothers you, uninstall my driver. I will try to fix this ASAP, but at the moment I have no clue why SteamVR is crashing.
 
 
@@ -116,7 +113,7 @@ I do not think I will be able to get animated hands into the 3D view, as the ren
 
 1. Install SteamVR.  It is under "Tools" in everyone's Steam Library.  steam://install/250820
 2. Install "Leap Motion Orion SDK V3.1.2".  https://developer.leapmotion.com/get-started
-3. Fetch the OpenVR SDK 0.9.19 from https://github.com/ValveSoftware/openvr .
+3. Fetch the OpenVR SDK 1.0.0 from https://github.com/ValveSoftware/openvr .
 
 The solution and project files are for Visual Studio 2015.
 
@@ -154,13 +151,11 @@ Driver leap : 2 displays
 ...
 ```
 
-You can also use "vrcmd --pollposes" (followed by an index number to limit the output) to see things are working.
+You can also use "vrcmd --pollposes" (followed by an index number to limit the output) to see if things are working.
 
 ## Licenses
 
 The code in this distribution is distributed under the terms of the LICENSE file in the root directory.
-
-The render models are based on work by Zoltan Erdokovy <zoltan.erdokovy@gmail.com> with permission.
 
 The compiled driver and the install directory use the Leap Motion Orion SDK.  Use subject to the terms of the Leap Motion SDK Agreement available at
 https://developer.leapmotion.com/sdk_agreement.
