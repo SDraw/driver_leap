@@ -6,10 +6,10 @@ Refer to [parent repository](https://github.com/cbuchner1/driver_leap) for base 
 * Build your platform:
   * x64 - build output is in "<solution_folder>/x64"
   * x86 - build output is in "<solution_folder>/Win32"
-* Copy build files to "SteamVR Leap Motion driver\leap\bin\<your_platform>":
+* Copy build files to "SteamVR Leap Motion driver/leap/bin/<your_platform>":
   * driver_leap.dll
   * gesture_checker.exe
   * leap_monitor.exe
-* Copy additional shared libraries to "SteamVR Leap Motion driver\leap\bin\<your_platform>":
+* Copy additional shared libraries to "SteamVR Leap Motion driver/leap/bin/<your_platform>":
   * vendor/LeapSDK/lib/<your_platform>/Leap.dll
   * vendor/openvr/lib/<your_platform>/openvr_api.dll
