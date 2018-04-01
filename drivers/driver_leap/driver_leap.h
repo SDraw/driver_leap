@@ -24,11 +24,11 @@ public:
     virtual ~CServerDriver_Leap();
 
     // Inherited via IServerTrackedDeviceProvider
-    virtual vr::EVRInitError Init( vr::IDriverLog * pDriverLog, vr::IServerDriverHost * pDriverHost, const char * pchUserDriverConfigDir, const char * pchDriverInstallDir ) override;
+    virtual vr::EVRInitError Init(vr::IDriverLog * pDriverLog, vr::IServerDriverHost * pDriverHost, const char * pchUserDriverConfigDir, const char * pchDriverInstallDir) override;
     virtual void Cleanup() override;
-    virtual uint32_t GetTrackedDeviceCount() override;
-    virtual vr::ITrackedDeviceServerDriver * GetTrackedDeviceDriver( uint32_t unWhich ) override;
-    virtual vr::ITrackedDeviceServerDriver * FindTrackedDeviceDriver( const char * pchId ) override;
+    virtual uint32_t GetTrackedDeviceCount();
+    virtual vr::ITrackedDeviceServerDriver * GetTrackedDeviceDriver( uint32_t unWhich );
+    virtual vr::ITrackedDeviceServerDriver * FindTrackedDeviceDriver( const char * pchId );
     virtual const char * const *GetInterfaceVersions() { return vr::k_InterfaceVersions; }
     virtual void RunFrame() override;
 
@@ -84,12 +84,12 @@ public:
     virtual ~CClientDriver_Leap();
 
     // Inherited via IClientTrackedDeviceProvider
-    virtual vr::EVRInitError Init( vr::IDriverLog * pDriverLog, vr::IClientDriverHost * pDriverHost, const char * pchUserDriverConfigDir, const char * pchDriverInstallDir ) override;
+    virtual vr::EVRInitError Init(vr::EClientDriverMode eDriverMode, vr::IDriverLog *pDriverLog, vr::IClientDriverHost *pDriverHost, const char *pchUserDriverConfigDir, const char *pchDriverInstallDir) override;
     virtual void Cleanup() override;
-    virtual bool BIsHmdPresent( const char * pchUserConfigDir ) override;
-    virtual vr::EVRInitError SetDisplayId( const char * pchDisplayId ) override;
-    virtual vr::HiddenAreaMesh_t GetHiddenAreaMesh( vr::EVREye eEye ) override;
-    virtual uint32_t GetMCImage( uint32_t *pImgWidth, uint32_t *pImgHeight, uint32_t *pChannels, void *pDataBuffer, uint32_t unBufferLen ) override;
+    virtual bool BIsHmdPresent(const char * pchUserConfigDir) override;
+    virtual vr::EVRInitError SetDisplayId(const char * pchDisplayId) override;
+    virtual vr::HiddenAreaMesh_t GetHiddenAreaMesh(vr::EVREye eEye, vr::EHiddenAreaMeshType type) override;
+    virtual uint32_t GetMCImage(uint32_t *pImgWidth, uint32_t *pImgHeight, uint32_t *pChannels, void *pDataBuffer, uint32_t unBufferLen) override;
 
 private:
     vr::IClientDriverHost* m_pDriverHost;
@@ -105,7 +105,7 @@ public:
     // Implementation of vr::ITrackedDeviceServerDriver
     virtual vr::EVRInitError Activate( uint32_t unObjectId ) override;
     virtual void Deactivate() override;
-    virtual void PowerOff() override;
+    void PowerOff();
     void *GetComponent( const char *pchComponentNameAndVersion ) override;
     virtual void DebugRequest( const char * pchRequest, char * pchResponseBuffer, uint32_t unResponseBufferSize ) override;
     virtual vr::DriverPose_t GetPose() override;
@@ -115,6 +115,7 @@ public:
     virtual uint64_t GetUint64TrackedDeviceProperty( vr::ETrackedDeviceProperty prop, vr::ETrackedPropertyError * pError ) override;
     virtual vr::HmdMatrix34_t GetMatrix34TrackedDeviceProperty( vr::ETrackedDeviceProperty prop, vr::ETrackedPropertyError *pError ) override;
     virtual uint32_t GetStringTrackedDeviceProperty( vr::ETrackedDeviceProperty prop, char * pchValue, uint32_t unBufferSize, vr::ETrackedPropertyError * pError ) override;
+    virtual void EnterStandby() override;
 
     // Implementation of vr::IVRControllerComponent
     virtual vr::VRControllerState_t GetControllerState() override;

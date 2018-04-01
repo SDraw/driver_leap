@@ -578,7 +578,7 @@ CClientDriver_Leap::~CClientDriver_Leap()
 {
 }
 
-vr::EVRInitError CClientDriver_Leap::Init( vr::IDriverLog * pDriverLog, vr::IClientDriverHost * pDriverHost, const char * pchUserDriverConfigDir, const char * pchDriverInstallDir )
+vr::EVRInitError CClientDriver_Leap::Init( vr::EClientDriverMode eDriverMode, vr::IDriverLog * pDriverLog, vr::IClientDriverHost * pDriverHost, const char * pchUserDriverConfigDir, const char * pchDriverInstallDir )
 {
     InitDriverLog( pDriverLog );
     DriverLog("CClientDriver_Leap::Init()\n");
@@ -602,7 +602,7 @@ vr::EVRInitError CClientDriver_Leap::SetDisplayId( const char * pchDisplayId )
     //return vr::VRInitError_Driver_HmdUnknown;
 }
 
-vr::HiddenAreaMesh_t CClientDriver_Leap::GetHiddenAreaMesh( vr::EVREye eEye )
+vr::HiddenAreaMesh_t CClientDriver_Leap::GetHiddenAreaMesh( vr::EVREye eEye, vr::EHiddenAreaMeshType type)
 {
     return vr::HiddenAreaMesh_t();
 }
@@ -647,11 +647,11 @@ CLeapHmdLatest::CLeapHmdLatest( vr::IServerDriverHost * pDriverHost, int base, i
 
     // Load rendermodel
     char tmp_[256];
-    settings_->GetString("leap", (m_nId ==  LEFT_CONTROLLER) ? "renderModel_lefthand" : (m_nId == RIGHT_CONTROLLER) ? "renderModel_righthand" : "renderModel", tmp_, sizeof(tmp_), "vr_controller_vive_1_5");
+    settings_->GetString("leap",(m_nId ==  LEFT_CONTROLLER) ? "renderModel_lefthand" : (m_nId == RIGHT_CONTROLLER) ? "renderModel_righthand" : "renderModel", tmp_, sizeof(tmp_));
     m_strRenderModel = tmp_;
 
     // set the 
-    m_gripAngleOffset = settings_->GetFloat("leap", (m_nId == LEFT_CONTROLLER) ? "gripAngleOffset_lefthand" : (m_nId == RIGHT_CONTROLLER) ? "gripAngleOffset_righthand" : "gripAngleOffset", 0.0);
+    m_gripAngleOffset = settings_->GetFloat("leap", (m_nId == LEFT_CONTROLLER) ? "gripAngleOffset_lefthand" : (m_nId == RIGHT_CONTROLLER) ? "gripAngleOffset_righthand" : "gripAngleOffset");
 }
 
 CLeapHmdLatest::~CLeapHmdLatest()
@@ -862,6 +862,11 @@ uint32_t CLeapHmdLatest::GetStringTrackedDeviceProperty( vr::ETrackedDevicePrope
         *pError = vr::TrackedProp_Success;
         return sRetVal.size() + 1;
     }
+}
+
+void CLeapHmdLatest::EnterStandby()
+{
+    DriverLog("CLeapHmdLatest::EnterStandby()\n");
 }
 
 vr::VRControllerState_t CLeapHmdLatest::GetControllerState()

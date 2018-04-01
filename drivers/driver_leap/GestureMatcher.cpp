@@ -174,7 +174,7 @@ bool GestureMatcher::MatchGestures(const Frame &frame, WhichHand which, float(&r
         merge(result[ThumbUp]     , std::min(fistHand, std::min(straightThumb, maprange((    up).dot(fingerdir[Finger::TYPE_THUMB]), 0.8f, 0.95f))));
         merge(result[ThumbInward] , std::min(fistHand, std::min(straightThumb, maprange((inward).dot(fingerdir[Finger::TYPE_THUMB]), 0.8f, 0.95f))));
 
-        if (otherhand.isValid()) // two handed gestures really need two hands
+        /*if (otherhand.isValid()) // two handed gestures really need two hands
         {
             // Timeout gesture. Note that only the lower hand forming the T shape will register the gesture.
             // TODO: might also validate that the lower hand points upward
@@ -243,7 +243,7 @@ bool GestureMatcher::MatchGestures(const Frame &frame, WhichHand which, float(&r
                     }
                 }
             }
-        }
+        }*/
 
 #if 0
         fprintf(stderr, "handdir %f %f %f\n", hand.direction().x, hand.direction().y, hand.direction().z);

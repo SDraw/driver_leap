@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -32,24 +32,24 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v140</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -81,6 +81,8 @@
     </CustomBuildAfterTargets>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <GenerateManifest>false</GenerateManifest>
@@ -89,6 +91,8 @@
     </CustomBuildAfterTargets>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <GenerateManifest>false</GenerateManifest>
@@ -102,15 +106,16 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
-      <AdditionalIncludeDirectories>$(LeapSDKDir)\include;$(OpenVRDir)\headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\vendor\LeapSDK\include;..\..\vendor\openvr\headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
-      <AdditionalLibraryDirectories>$(LeapSDKDir)\lib\x86;$(OpenVRDir)\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\vendor\LeapSDK\lib\x86;..\..\vendor\openvr\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Leap.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <CustomBuildStep>
       <Message>
@@ -121,11 +126,8 @@
       </Outputs>
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>mkdir "$(InstallDir)\bin\Win32"
-copy "$(OutDir)$(TargetName)$(TargetExt)" "$(InstallDir)\bin\Win32"
-copy "$(LeapSDKDir)\lib\x86\Leap.dll" "$(InstallDir)\bin\Win32"
-rem "$(SteamVRRuntimeDir)\bin\win32\vrpathreg" adddriver "$(InstallDir)"
-xcopy /s /i /y "$(SolutionDir)\resources" "$(InstallDir)\resources"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Install Binary</Message>
@@ -135,15 +137,16 @@ xcopy /s /i /y "$(SolutionDir)\resources" "$(InstallDir)\resources"</Command>
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
-      <AdditionalIncludeDirectories>$(LeapSDKDir)\include;$(OpenVRDir)\headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\vendor\LeapSDK\include;..\..\vendor\openvr\headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <EnablePREfast>false</EnablePREfast>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
-      <AdditionalLibraryDirectories>$(LeapSDKDir)\lib\x86;$(OpenVRDir)\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\vendor\LeapSDK\lib\x86;..\..\vendor\openvr\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Leap.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
     </Link>
     <CustomBuildStep>
       <Message>
@@ -154,11 +157,8 @@ xcopy /s /i /y "$(SolutionDir)\resources" "$(InstallDir)\resources"</Command>
       </Outputs>
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>mkdir "$(InstallDir)\bin\Win32"
-copy "$(OutDir)$(TargetName)$(TargetExt)" "$(InstallDir)\bin\Win32"
-copy "$(LeapSDKDir)\lib\x86\Leap.dll" "$(InstallDir)\bin\Win32"
-rem "$(SteamVRRuntimeDir)\bin\win32\vrpathreg" adddriver "$(InstallDir)"
-xcopy /s /i /y "$(SolutionDir)\resources" "$(InstallDir)\resources"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Install Binary</Message>
@@ -190,25 +190,23 @@ xcopy /s /i /y "$(SolutionDir)\resources" "$(InstallDir)\resources"</Command>
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
-      <AdditionalIncludeDirectories>$(LeapSDKDir)\include;$(OpenVRDir)\headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\vendor\LeapSDK\include;..\..\vendor\openvr\headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
-      <AdditionalLibraryDirectories>$(LeapSDKDir)\lib\x64;$(OpenVRDir)\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\vendor\LeapSDK\lib\x64;..\..\vendor\openvr\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Leap.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <CustomBuildStep>
       <Message />
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>mkdir "$(InstallDir)\bin\Win64"
-copy "$(OutDir)$(TargetName)$(TargetExt)" "$(InstallDir)\bin\Win64"
-copy "$(LeapSDKDir)\lib\x64\Leap.dll" "$(InstallDir)\bin\Win64"
-rem "$(SteamVRRuntimeDir)\bin\win32\vrpathreg" adddriver "$(InstallDir)"
-xcopy /s /i /y "$(SolutionDir)\resources" "$(InstallDir)\resources"</Command>
+      <Command>
+      </Command>
       <Message>Install Binary</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -216,25 +214,23 @@ xcopy /s /i /y "$(SolutionDir)\resources" "$(InstallDir)\resources"</Command>
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
-      <AdditionalIncludeDirectories>$(LeapSDKDir)\include;$(OpenVRDir)\headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\vendor\LeapSDK\include;..\..\vendor\openvr\headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
-      <AdditionalLibraryDirectories>$(LeapSDKDir)\lib\x64;$(OpenVRDir)\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\..\vendor\LeapSDK\lib\x64;..\..\vendor\openvr\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>Leap.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
     </Link>
     <CustomBuildStep>
       <Message />
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>mkdir "$(InstallDir)\bin\Win64"
-copy "$(OutDir)$(TargetName)$(TargetExt)" "$(InstallDir)\bin\Win64"
-copy "$(LeapSDKDir)\lib\x64\Leap.dll" "$(InstallDir)\bin\Win64"
-rem "$(SteamVRRuntimeDir)\bin\win32\vrpathreg" adddriver "$(InstallDir)"
-xcopy /s /i /y "$(SolutionDir)\resources" "$(InstallDir)\resources"</Command>
+      <Command>
+      </Command>
       <Message>Install Binary</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
