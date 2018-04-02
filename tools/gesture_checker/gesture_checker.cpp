@@ -27,7 +27,7 @@ public:
     virtual void onServiceDisconnect(const Controller&);
     virtual void onServiceChange(const Controller&);
     virtual void onDeviceFailure(const Controller&);
-    virtual void onLogMessage(const Controller&, MessageSeverity severity, int64_t timestamp, const char* msg);
+    virtual void onLogMessage(const Controller&, MessageSeverity s, int64_t t, const char* msg);
 };
 
 const std::string fingerNames[] = { "Thumb", "Index", "Middle", "Ring", "Pinky" };
@@ -118,7 +118,7 @@ void SampleListener::onFrame(const Controller& controller) {
     for (int i = 0; i < 2; i++)
     {
         float scores[GestureMatcher::NUM_GESTURES];
-        bool handFound = matcher.MatchGestures(frame, (GestureMatcher::WhichHand)(i + 1), scores);
+        bool handFound = GestureMatcher::MatchGestures(frame, (GestureMatcher::WhichHand)(i + 1), scores);
         if (handFound)
         {
             for (int j = 0; j < GestureMatcher::NUM_GESTURES; j++)
@@ -129,11 +129,12 @@ void SampleListener::onFrame(const Controller& controller) {
             }
 
             // Go through the hands in the dataset
-            HandList &hands = frame.hands();
+            /*HandList &hands = frame.hands();
             for (int h = 0; h < hands.count(); h++)
             {
                 Hand &hand = hands[h];
-            }
+            }*/
+            // Why was it here anyway?
         }
     }
 
