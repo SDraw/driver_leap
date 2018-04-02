@@ -2,7 +2,7 @@ Fork with updated LeapSDK to 3.2.1 and OpenVR to 1.0.5, disabled touchpad moveme
 Refer to [parent repository](https://github.com/cbuchner1/driver_leap) for base project.
 
 ### Building
-* Open project in Visual Studio 2017
+* Open solution in Visual Studio 2013
 * Build your platform:
   * x64 - build output is in "<solution_folder>/x64"
   * x86 - build output is in "<solution_folder>/Win32"
