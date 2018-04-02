@@ -287,8 +287,6 @@ void CLeapHmdLatest::SendButtonUpdates(ButtonUpdate ButtonEvent, uint64_t ulMask
 
 void CLeapHmdLatest::UpdateControllerState(Leap::Frame& frame)
 {
-    vr::VRControllerState_t NewState = { 0 };
-
     bool handFound = false;
     GestureMatcher::WhichHand which = (m_nId == LEFT_CONTROLLER) ? GestureMatcher::LeftHand :
         (m_nId == RIGHT_CONTROLLER) ? GestureMatcher::RightHand :
@@ -301,28 +299,29 @@ void CLeapHmdLatest::UpdateControllerState(Leap::Frame& frame)
     {
         // Changing unPacketNum tells anyone polling state that something might have
         // changed.  We don't try to be precise about that here.
+        vr::VRControllerState_t NewState = { 0 };
         NewState.unPacketNum = m_ControllerState.unPacketNum + 1;
 
         // system menu mapping (timeout gesture)
-        if(scores[GestureMatcher::Timeout] >= 0.5f)
+        if(scores[GestureMatcher::Timeout] >= 0.25f)
             NewState.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_System);
         if(scores[GestureMatcher::Timeout] >= 0.5f)
             NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_System);
 
         // application menu mapping (Flat hand towards your face gesture)
-        if(scores[GestureMatcher::FlatHandPalmTowards] >= 0.8f)
+        if(scores[GestureMatcher::FlatHandPalmTowards] >= 0.4f)
             NewState.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu);
         if(scores[GestureMatcher::FlatHandPalmTowards] >= 0.8f)
             NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu);
 
         // digital trigger mapping (fist clenching gesture)
-        if(scores[GestureMatcher::TriggerFinger] > 0.5f)
+        if(scores[GestureMatcher::TriggerFinger] > 0.25f)
             NewState.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Trigger);
         if(scores[GestureMatcher::TriggerFinger] > 0.5f)
             NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Trigger);
 
         // grip mapping (clench fist with middle, index, pinky fingers)
-        if(scores[GestureMatcher::LowerFist] >= 0.5f)
+        if(scores[GestureMatcher::LowerFist] >= 0.25f)
             NewState.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_Grip);
         if(scores[GestureMatcher::LowerFist] >= 0.5f)
             NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_Grip);
@@ -378,8 +377,8 @@ void CLeapHmdLatest::UpdateTrackingState(Leap::Frame &frame)
         Leap::Hand &hand = hands[h];
 
         // controller #0 is supposed to be the left hand, controller #1 the right one.
-        if(hand.isValid() && (m_nId == LEFT_CONTROLLER && hand.isLeft() ||
-            m_nId == RIGHT_CONTROLLER && hand.isRight()))
+        if(hand.isValid() && ((m_nId == LEFT_CONTROLLER && hand.isLeft()) ||
+            (m_nId == RIGHT_CONTROLLER && hand.isRight())))
         {
             handFound = true;
 

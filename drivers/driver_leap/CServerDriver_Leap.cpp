@@ -182,14 +182,15 @@ void CServerDriver_Leap::onDeviceChange(const Leap::Controller& controller)
 
     if(controller.isConnected())
     {
-        bool backgroundModeAllowed = controller.config().getInt32("background_app_mode") == 2;
+        Leap::Config configuraton = controller.config();
+        bool backgroundModeAllowed = (configuraton.getInt32("background_app_mode") == 2);
         if(!backgroundModeAllowed)
         {
             // TODO: Show dialog to request permission to allow background mode apps
             /*bool userPermission = true;
             if (userPermission) {*/
-            controller.config().setInt32("background_app_mode", 2);
-            controller.config().save();
+            configuraton.setInt32("background_app_mode", 2);
+            configuraton.save();
             //}
         }
 
@@ -296,6 +297,7 @@ CServerDriver_Leap::CServerDriver_Leap()
     //    DriverLog not yet initialized at this point.
     m_pDriverHost = nullptr;
     m_Controller = nullptr;
+    memset(&m_pInfoStartedProcess, 0, sizeof(PROCESS_INFORMATION));
     //    DriverLog("CServerDriver_Leap::CServerDriver_Leap()\n");
 }
 

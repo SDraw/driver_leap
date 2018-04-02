@@ -317,5 +317,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     CLeapMonitor LeapMonitor(resources);
 
     LeapMonitor.Run();
+    return EXIT_SUCCESS;
 }
 #endif
