@@ -1,6 +1,5 @@
 #pragma once
 
-// strangely, swapping the order here doesn't fix the swapped controllers in Audioshield
 #define LEFT_CONTROLLER 0
 #define RIGHT_CONTROLLER 1
 

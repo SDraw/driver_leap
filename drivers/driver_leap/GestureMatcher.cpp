@@ -38,7 +38,7 @@ static Leap::Vector matrix_vector(const float(*A)[3], Leap::Vector &v)
 }
 
 bool GestureMatcher::MatchGestures(const Leap::Frame &frame, WhichHand which, float(&result)[NUM_GESTURES],
-    Leap::Vector right, Leap::Vector in, Leap::Vector up)
+    const Leap::Vector& right, const Leap::Vector& in, const Leap::Vector& up)
 {
     // first, set all gesture matches to zero
     bool success = false;
@@ -236,14 +236,6 @@ bool GestureMatcher::MatchGestures(const Leap::Frame &frame, WhichHand which, fl
         }
         }
         }*/
-
-#if 0
-        fprintf(stderr, "handdir %f %f %f\n", hand.direction().x, hand.direction().y, hand.direction().z);
-        fprintf(stderr, "thumbdir %f %f %f\n", fingerdir[Finger::TYPE_THUMB].x, fingerdir[Finger::TYPE_THUMB].y, fingerdir[Finger::TYPE_THUMB].z);
-        fprintf(stderr, "indexdir %f %f %f\n", fingerdir[Finger::TYPE_INDEX].x, fingerdir[Finger::TYPE_INDEX].y, fingerdir[Finger::TYPE_INDEX].z);
-        fprintf(stderr, "palmpos %f %f %f\n", hand.palmPosition().x, hand.palmPosition().y, hand.palmPosition().z);
-        fprintf(stderr, "palmnormal %f %f %f\n", hand.palmNormal().x, hand.palmNormal().y, hand.palmNormal().z);
-#endif
     }
 
     return success;

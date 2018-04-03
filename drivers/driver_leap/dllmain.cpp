@@ -1,8 +1,10 @@
-﻿// dllmain.cpp : Defines the entry point for the DLL application.
-#include "stdafx.h"
+﻿#include "stdafx.h"
 
-BOOL APIENTRY DllMain(HMODULE /* hModule */, DWORD ul_reason_for_call, LPVOID /* lpReserved */)
+char g_ModuleFileName[2048];
+
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID /* lpReserved */)
 {
+    GetModuleFileNameA(hModule, g_ModuleFileName, 2048);
     switch(ul_reason_for_call)
     {
         case DLL_PROCESS_ATTACH:

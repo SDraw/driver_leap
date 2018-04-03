@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "CDriverLogHelper.h"
 
-vr::IDriverLog* CDriverLogHelper::ms_pLogFile = nullptr;
+vr::IVRDriverLog* CDriverLogHelper::ms_pLogFile = nullptr;
 
-bool CDriverLogHelper::InitDriverLog(vr::IDriverLog* pDriverLog)
+bool CDriverLogHelper::InitDriverLog(vr::IVRDriverLog* pDriverLog)
 {
     if(ms_pLogFile) return false;
     ms_pLogFile = pDriverLog;
@@ -27,10 +27,6 @@ void CDriverLogHelper::DriverLogVarArgs(const char *pMsgFormat, va_list args)
     if(ms_pLogFile) ms_pLogFile->Log(buf);
 }
 
-/** Provides printf-style debug logging via the vr::IDriverLog interface provided by SteamVR
-* during initialization.  Client logging ends up in vrclient_appname.txt and server logging
-* ends up in vrserver.txt.
-*/
 void CDriverLogHelper::DriverLog(const char *pMsgFormat, ...)
 {
     va_list args;

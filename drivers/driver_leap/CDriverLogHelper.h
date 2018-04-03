@@ -2,9 +2,9 @@
 
 class CDriverLogHelper
 {
-    static vr::IDriverLog *ms_pLogFile;
+    static vr::IVRDriverLog *ms_pLogFile;
 public:
-    static bool InitDriverLog(vr::IDriverLog* pDriverLog);
+    static bool InitDriverLog(vr::IVRDriverLog* pDriverLog);
     static void CleanupDriverLog();
     static void DriverLogVarArgs(const char* pMsgFormat, va_list args);
     static void DriverLog(const char* pMsgFormat, ...);

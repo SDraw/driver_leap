@@ -7,32 +7,23 @@ class CServerDriver_Leap : public vr::IServerTrackedDeviceProvider, public Leap:
 
     void LaunchLeapMonitor(const char* pchDriverInstallDir);
 
-    vr::IServerDriverHost* m_pDriverHost;
-    std::string m_strDriverInstallDir;
+    vr::IVRServerDriverHost* m_pDriverHost;
 
     bool m_bLaunchedLeapMonitor;
     PROCESS_INFORMATION m_pInfoStartedProcess;
 
-    // SteamVR's tracked controller objects
     std::vector<CLeapHmdLatest*> m_vecControllers;
-
-    // Leap Motion's Controller object
     Leap::Controller* m_Controller;
-
-    // a mutex for thread safety (Leap::Listener callbacks arrive from different threads)
-    //    std::recursive_mutex m_Mutex;
-    //    typedef std::lock_guard<std::recursive_mutex> scope_lock;
 public:
     CServerDriver_Leap();
     virtual ~CServerDriver_Leap();
 
-    // Inherited via IServerTrackedDeviceProvider
-    virtual vr::EVRInitError Init(vr::IDriverLog* pDriverLog, vr::IServerDriverHost* pDriverHost, const char* pchUserDriverConfigDir, const char* pchDriverInstallDir) override;
+    // vr::IServerTrackedDeviceProvider
+    virtual vr::EVRInitError Init(vr::IVRDriverContext *pDriverContext) override;
     virtual void Cleanup() override;
-    virtual uint32_t GetTrackedDeviceCount() override;
-    virtual vr::ITrackedDeviceServerDriver* GetTrackedDeviceDriver(uint32_t unWhich) override;
-    virtual vr::ITrackedDeviceServerDriver* FindTrackedDeviceDriver(const char* pchId) override;
-    virtual const char* const* GetInterfaceVersions() { return vr::k_InterfaceVersions; }
+    uint32_t GetTrackedDeviceCount();
+    vr::ITrackedDeviceServerDriver* FindTrackedDeviceDriver(const char* pchId);
+    virtual const char* const* GetInterfaceVersions() override { return vr::k_InterfaceVersions; }
     virtual void RunFrame() override;
 
     virtual bool ShouldBlockStandbyMode() override;
@@ -41,7 +32,7 @@ public:
 
     void LaunchLeapMonitor();
 
-    // Leap::Listener interface
+    // Leap::Listener
     void onInit(const Leap::Controller&);
     void onConnect(const Leap::Controller&);
     void onDisconnect(const Leap::Controller&);

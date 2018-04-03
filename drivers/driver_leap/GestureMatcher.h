@@ -59,7 +59,7 @@ public:
      * If AnyHand is specified, the gesture classifications will be merged together (typically std::max)
      */
     static bool MatchGestures(const Leap::Frame &frame, WhichHand which, float(&result)[NUM_GESTURES],
-        Leap::Vector right = RightVector, Leap::Vector in = InVector, Leap::Vector up = UpVector);
+        const Leap::Vector& right = RightVector, const Leap::Vector& in = InVector, const Leap::Vector &up = UpVector);
 
     /**
      * Map the GestureType enum to a string name.

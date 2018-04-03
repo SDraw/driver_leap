@@ -16,9 +16,7 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 #include <windows.h>
-#ifdef _WIN32
-#include <mmsystem.h>  // for timeBeginPeriod()
-#endif
+#include <mmsystem.h>
 
 #include <openvr_driver.h>
 #include "Leap.h"

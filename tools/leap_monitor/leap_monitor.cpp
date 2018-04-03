@@ -1,8 +1,3 @@
-//========= Copyright Valve Corporation ============//
-//
-// leap_monitor.cpp : Interacts with driver_leap to provide overlay instructions at startup
-//
-
 #include "stdafx.h"
 #include "leap_monitor.h"
 #include <openvr.h>
