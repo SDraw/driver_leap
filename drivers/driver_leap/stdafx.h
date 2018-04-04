@@ -1,8 +1,11 @@
 ﻿#pragma once
 
 #include "targetver.h"
-
+#define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
+#include <windows.h>
+#include <mmsystem.h>
+
 #include <string>
 #include <sstream>
 #include <vector>
@@ -12,11 +15,5 @@
 #include <chrono>
 #include <algorithm>
 
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#include <windows.h>
-#include <mmsystem.h>
-
-#include <openvr_driver.h>
+#include "openvr_driver.h"
 #include "Leap.h"
