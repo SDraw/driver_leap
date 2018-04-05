@@ -3,20 +3,20 @@
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="driver_leap.cpp" />
-    <ClCompile Include="GestureMatcher.cpp" />
     <ClCompile Include="CServerDriver_Leap.cpp" />
     <ClCompile Include="CDriverLogHelper.cpp" />
     <ClCompile Include="CLeapHmdLatest.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="CGestureMatcher.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="GestureMatcher.h" />
     <ClInclude Include="CServerDriver_Leap.h" />
     <ClInclude Include="CDriverLogHelper.h" />
     <ClInclude Include="CLeapHmdLatest.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="CGestureMatcher.h" />
   </ItemGroup>
 </Project>

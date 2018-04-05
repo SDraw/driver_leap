@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "CLeapHmdLatest.h"
 #include "CDriverLogHelper.h"
-#include "GestureMatcher.h"
+#include "CGestureMatcher.h"
 #include "CServerDriver_Leap.h"
 #include "Utils.h"
 
@@ -83,7 +83,7 @@ vr::EVRInitError CLeapHmdLatest::Activate(uint32_t unObjectId)
     propertyHelpers->SetUint64Property(propertyContainer, vr::Prop_HardwareRevision_Uint64, m_hardware_revision);
     propertyHelpers->SetUint64Property(propertyContainer, vr::Prop_FirmwareVersion_Uint64, m_firmware_revision);
 
-    vr::HmdMatrix34_t matrix = { 0.f, 0.f, 0.f, 0.f , 0.f, 0.f, 0.f, 0.f , 0.f, 0.f, 0.f, 0.f };
+    vr::HmdMatrix34_t matrix = { 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f };
     propertyHelpers->SetProperty(propertyContainer, vr::Prop_CameraToHeadTransform_Matrix34, &matrix, sizeof(vr::HmdMatrix34_t), vr::k_unHmdMatrix34PropertyTag);
 
     g_ServerTrackedDeviceProvider.LaunchLeapMonitor();
@@ -165,46 +165,46 @@ void CLeapHmdLatest::SendButtonUpdates(ButtonUpdate ButtonEvent, uint64_t ulMask
 void CLeapHmdLatest::UpdateControllerState(Leap::Frame& frame)
 {
     bool handFound = false;
-    GestureMatcher::WhichHand which = (m_nId == LEFT_CONTROLLER) ? GestureMatcher::LeftHand :
-        (m_nId == RIGHT_CONTROLLER) ? GestureMatcher::RightHand :
-        GestureMatcher::AnyHand;
+    CGestureMatcher::WhichHand which = (m_nId == LEFT_CONTROLLER) ? CGestureMatcher::LeftHand :
+        (m_nId == RIGHT_CONTROLLER) ? CGestureMatcher::RightHand :
+        CGestureMatcher::AnyHand;
 
-    float scores[GestureMatcher::NUM_GESTURES];
-    handFound = GestureMatcher::MatchGestures(frame, which, scores);
+    float scores[CGestureMatcher::NUM_GESTURES];
+    handFound = CGestureMatcher::MatchGestures(frame, which, scores);
 
     if(handFound)
     {
         vr::VRControllerState_t NewState = { 0 };
         NewState.unPacketNum = m_ControllerState.unPacketNum + 1;
 
-        if(scores[GestureMatcher::Timeout] >= 0.25f)
+        if(scores[CGestureMatcher::Timeout] >= 0.25f)
         {
             NewState.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_System);
-            if(scores[GestureMatcher::Timeout] >= 0.5f) NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_System);
+            if(scores[CGestureMatcher::Timeout] >= 0.5f) NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_System);
         }
 
-        if(scores[GestureMatcher::FlatHandPalmTowards] >= 0.4f)
+        if(scores[CGestureMatcher::FlatHandPalmTowards] >= 0.4f)
         {
             NewState.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu);
-            if(scores[GestureMatcher::FlatHandPalmTowards] >= 0.8f) NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu);
+            if(scores[CGestureMatcher::FlatHandPalmTowards] >= 0.8f) NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu);
         }
 
-        if(scores[GestureMatcher::TriggerFinger] >= 0.25f)
+        if(scores[CGestureMatcher::TriggerFinger] >= 0.25f)
         {
             NewState.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Trigger);
-            if(scores[GestureMatcher::TriggerFinger] >= 0.5f) NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Trigger);
+            if(scores[CGestureMatcher::TriggerFinger] >= 0.5f) NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Trigger);
         }
 
-        if(scores[GestureMatcher::LowerFist] >= 0.25f)
+        if(scores[CGestureMatcher::LowerFist] >= 0.25f)
         {
             NewState.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_Grip);
-            if(scores[GestureMatcher::LowerFist] >= 0.5f) NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_Grip);
+            if(scores[CGestureMatcher::LowerFist] >= 0.5f) NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_Grip);
         }
 
-        if(scores[GestureMatcher::Thumbpress] >= 0.5f)
+        if(scores[CGestureMatcher::Thumbpress] >= 0.5f)
         {
             NewState.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Touchpad);
-            if(scores[GestureMatcher::Thumbpress] >= 0.9f) NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Touchpad);
+            if(scores[CGestureMatcher::Thumbpress] >= 0.9f) NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Touchpad);
         }
 
         NewState.ulButtonTouched |= NewState.ulButtonPressed;
@@ -217,10 +217,10 @@ void CLeapHmdLatest::UpdateControllerState(Leap::Frame& frame)
         SendButtonUpdates(&vr::IVRServerDriverHost::TrackedDeviceButtonUnpressed, ulChangedPressed & ~NewState.ulButtonPressed);
         SendButtonUpdates(&vr::IVRServerDriverHost::TrackedDeviceButtonUntouched, ulChangedTouched & ~NewState.ulButtonTouched);
 
-        NewState.rAxis[0].x = scores[GestureMatcher::TouchpadAxisX];
-        NewState.rAxis[0].y = scores[GestureMatcher::TouchpadAxisY];
+        NewState.rAxis[0].x = scores[CGestureMatcher::TouchpadAxisX];
+        NewState.rAxis[0].y = scores[CGestureMatcher::TouchpadAxisY];
 
-        NewState.rAxis[1].x = scores[GestureMatcher::TriggerFinger];
+        NewState.rAxis[1].x = scores[CGestureMatcher::TriggerFinger];
         NewState.rAxis[1].y = 0.0f;
 
         if(NewState.rAxis[0].x != m_ControllerState.rAxis[0].x || NewState.rAxis[0].y != m_ControllerState.rAxis[0].y)
@@ -279,24 +279,28 @@ void CLeapHmdLatest::UpdateTrackingState(Leap::Frame &frame)
             Leap::Vector normal = hand.palmNormal(); normal /= normal.magnitude();
             Leap::Vector side = direction.cross(normal);
 
-            if(m_nId == LEFT_CONTROLLER)
+            switch(m_nId)
             {
-                float L[3][3] =
-                { { -normal.x, -normal.z, -normal.y },
-                { side.x, side.z, side.y },
-                { direction.x, direction.z, direction.y } };
-                m_Pose.qRotation = CalculateRotation(L);
-            }
-            else if(m_nId == RIGHT_CONTROLLER)
-            {
-                float R[3][3] =
-                { { normal.x, normal.z, normal.y },
-                { -side.x, -side.z, -side.y },
-                { direction.x, direction.z, direction.y } };
-                m_Pose.qRotation = CalculateRotation(R);
+                case LEFT_CONTROLLER:
+                {
+                    float L[3][3] =
+                    { { -normal.x, -normal.z, -normal.y },
+                    { side.x, side.z, side.y },
+                    { direction.x, direction.z, direction.y } };
+                    m_Pose.qRotation = CalculateRotation(L);
+                } break;
+                case RIGHT_CONTROLLER:
+                {
+
+                    float R[3][3] =
+                    { { normal.x, normal.z, normal.y },
+                    { -side.x, -side.z, -side.y },
+                    { direction.x, direction.z, direction.y } };
+                    m_Pose.qRotation = CalculateRotation(R);
+                } break;
             }
 
-            if(m_gripAngleOffset != 0)
+            if(m_gripAngleOffset != 0.f)
                 m_Pose.qRotation = rotate_around_axis(Leap::Vector(1.0, 0.0, 0.0), m_gripAngleOffset) * m_Pose.qRotation;
 
             m_Pose.vecAngularVelocity[0] = 0.0;

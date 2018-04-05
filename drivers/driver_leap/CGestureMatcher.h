@@ -4,7 +4,7 @@
  * Hand gesture recognizer that will return an array of matches against
  * a list of predefined finger and hand poses.
  */
-class GestureMatcher
+class CGestureMatcher
 {
 public:
 

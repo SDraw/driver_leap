@@ -131,6 +131,7 @@ vr::EVRInitError CServerDriver_Leap::Init(vr::IVRDriverContext *pDriverContext)
 void CServerDriver_Leap::Cleanup()
 {
     CDriverLogHelper::DriverLog("CServerDriver_Leap::Cleanup()\n");
+    CDriverLogHelper::CleanupDriverLog();
 
     if(m_bLaunchedLeapMonitor)
     {
@@ -228,8 +229,7 @@ void CServerDriver_Leap::ScanForNewControllers(bool bNotifyServer)
 
 void CServerDriver_Leap::LaunchLeapMonitor()
 {
-    if(m_bLaunchedLeapMonitor)
-        return;
+    if(m_bLaunchedLeapMonitor) return;
 
     CDriverLogHelper::DriverLog("CServerDriver_Leap::LaunchLeapMonitor()\n");
 

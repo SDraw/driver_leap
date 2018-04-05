@@ -1,9 +1,9 @@
 #include "stdafx.h"
-#include "GestureMatcher.h"
+#include "CGestureMatcher.h"
 
-const Leap::Vector GestureMatcher::RightVector = Leap::Vector(-1, 0, 0);
-const Leap::Vector GestureMatcher::InVector = Leap::Vector(0, 1, 0);
-const Leap::Vector GestureMatcher::UpVector = Leap::Vector(0, 0, -1);
+const Leap::Vector CGestureMatcher::RightVector = Leap::Vector(-1, 0, 0);
+const Leap::Vector CGestureMatcher::InVector = Leap::Vector(0, 1, 0);
+const Leap::Vector CGestureMatcher::UpVector = Leap::Vector(0, 0, -1);
 
 // invert a 3x3 matrix
 static void invert_3x3(const float(*A)[3], float(*R)[3])
@@ -37,7 +37,7 @@ static Leap::Vector matrix_vector(const float(*A)[3], Leap::Vector &v)
     return result;
 }
 
-bool GestureMatcher::MatchGestures(const Leap::Frame &frame, WhichHand which, float(&result)[NUM_GESTURES],
+bool CGestureMatcher::MatchGestures(const Leap::Frame &frame, WhichHand which, float(&result)[NUM_GESTURES],
     const Leap::Vector& right, const Leap::Vector& in, const Leap::Vector& up)
 {
     // first, set all gesture matches to zero
@@ -70,10 +70,10 @@ bool GestureMatcher::MatchGestures(const Leap::Frame &frame, WhichHand which, fl
         float sumbend[5] = { 0 };
 
         Leap::Vector fingerdir[5];
-        //Vector fingertip[5];
+        Leap::Vector fingertip[5];
         bool extended[5];
-        //memset(fingerdir, 0, sizeof(fingerdir));
-        //memset(fingertip, 0, sizeof(fingertip));
+        memset(fingerdir, 0, sizeof(fingerdir));
+        memset(fingertip, 0, sizeof(fingertip));
         memset(extended, 0, sizeof(extended));
 
         // Evaluate bending of all fingers
@@ -85,7 +85,7 @@ bool GestureMatcher::MatchGestures(const Leap::Frame &frame, WhichHand which, fl
             int f = finger.type(); // thumb, index, middle, ring, pinky
             if(finger.isFinger() && finger.isValid())
             {
-                //fingertip[f] = finger.tipPosition();
+                fingertip[f] = finger.tipPosition();
                 extended[f] = finger.isExtended();
 
                 // go through the finger's bones:
@@ -147,7 +147,7 @@ bool GestureMatcher::MatchGestures(const Leap::Frame &frame, WhichHand which, fl
             maprange((sumbend[Leap::Finger::TYPE_INDEX] + sumbend[Leap::Finger::TYPE_RING] + sumbend[Leap::Finger::TYPE_PINKY]) / 3, 120.0, 150.0)));
 
         // Victory gesture: make a nice V sign with your index and middle finger
-        //float angle = fingerdir[Finger::TYPE_INDEX].angleTo(fingerdir[Finger::TYPE_MIDDLE]);
+        float angle = fingerdir[Leap::Finger::TYPE_INDEX].angleTo(fingerdir[Leap::Finger::TYPE_MIDDLE]);
         merge(result[Victory], std::min(std::min(maprange((sumbend[Leap::Finger::TYPE_INDEX] + sumbend[Leap::Finger::TYPE_MIDDLE]) / 2, 50.0, 40.0),
             maprange((sumbend[Leap::Finger::TYPE_PINKY] + sumbend[Leap::Finger::TYPE_RING]) / 2, 120.0, 150.0)),
             maprange(57.2957795f * fingerdir[Leap::Finger::TYPE_INDEX].angleTo(fingerdir[Leap::Finger::TYPE_MIDDLE]), 10.0, 20.0)));
@@ -166,76 +166,77 @@ bool GestureMatcher::MatchGestures(const Leap::Frame &frame, WhichHand which, fl
         merge(result[ThumbUp], std::min(fistHand, std::min(straightThumb, maprange((up).dot(fingerdir[Leap::Finger::TYPE_THUMB]), 0.8f, 0.95f))));
         merge(result[ThumbInward], std::min(fistHand, std::min(straightThumb, maprange((inward).dot(fingerdir[Leap::Finger::TYPE_THUMB]), 0.8f, 0.95f))));
 
-        /*if (otherhand.isValid()) // two handed gestures really need two hands
+        if(otherhand.isValid()) // two handed gestures really need two hands
         {
-        // Timeout gesture. Note that only the lower hand forming the T shape will register the gesture.
-        // TODO: might also validate that the lower hand points upward
-        // TODO: might as well check that the other hand is also flat
-        merge(result[Timeout], std::min( flatHand,  // I reuse the flatHand metric from above
-        std::min( maprange(hand.direction().dot(-otherhand.palmNormal()), 0.8f, 0.95f),
-        maprange(fingertip[Leap::Finger::TYPE_INDEX].distanceTo(otherhand.palmPosition()), 80.0f, 60.0f) )
-        ));
+            // Timeout gesture. Note that only the lower hand forming the T shape will register the gesture.
+            // TODO: might also validate that the lower hand points upward
+            // TODO: might as well check that the other hand is also flat
+            merge(result[Timeout], std::min(flatHand,  // I reuse the flatHand metric from above
+                std::min(maprange(hand.direction().dot(-otherhand.palmNormal()), 0.8f, 0.95f),
+                maprange(fingertip[Leap::Finger::TYPE_INDEX].distanceTo(otherhand.palmPosition()), 80.0f, 60.0f))
+                ));
 
-        // Touchpad emulation
-        Finger otherIndex = otherhand.fingers().fingerType(Leap::Finger::TYPE_INDEX)[0];
-        if (otherIndex.isFinger() && otherIndex.isValid())
-        {
-        // we need the index finger direction and the other hand's palm to face opposing directions
-        if (otherIndex.direction().dot(hand.palmNormal()) < 0)
-        {
-        // Origin o of the plane is the hand's palm position
-        Vector o = hand.palmPosition();
+            // Touchpad emulation
+            Leap::Finger otherIndex = otherhand.fingers().fingerType(Leap::Finger::TYPE_INDEX)[0];
+            if(otherIndex.isFinger() && otherIndex.isValid())
+            {
+                // we need the index finger direction and the other hand's palm to face opposing directions
+                if(otherIndex.direction().dot(hand.palmNormal()) < 0)
+                {
+                    // Origin o of the plane is the hand's palm position
+                    Leap::Vector o = hand.palmPosition();
 
-        // sideways vector on the hand
-        Vector uvec = direction.cross(palmNormal) * hand.palmWidth() / 2;
+                    // sideways vector on the hand
+                    Leap::Vector uvec = direction.cross(palmNormal) * hand.palmWidth() / 2;
 
-        // vvec going from palm towards the hand's pointing direction
-        Vector vvec = hand.direction() * hand.palmWidth() / 2;
+                    // vvec going from palm towards the hand's pointing direction
+                    Leap::Vector vvec = hand.direction() * hand.palmWidth() / 2;
 
-        // p and d form a line originating at the index finger's tip
-        Vector p = otherIndex.tipPosition();
-        Vector d = otherIndex.direction();
+                    // p and d form a line originating at the index finger's tip
+                    Leap::Vector p = otherIndex.tipPosition();
+                    Leap::Vector d = otherIndex.direction();
 
-        //  solve this linear equation system
-        //  p0       d0     o0       uvec0       vvec0
-        //  p1 + n * d1  =  o1 + u * uvec1 + v * vvec1
-        //  p2       d2     o2       uvec1       vvec2
+                    //  solve this linear equation system
+                    //  p0       d0     o0       uvec0       vvec0
+                    //  p1 + n * d1  =  o1 + u * uvec1 + v * vvec1
+                    //  p2       d2     o2       uvec1       vvec2
 
-        //  u         u0 v0 d0       p0   o0
-        //  v =  inv( u1 v1 d1 ) * ( p1 - o1 )
-        //  n         u2 v2 d2       p2   o2
+                    //  u         u0 v0 d0       p0   o0
+                    //  v =  inv( u1 v1 d1 ) * ( p1 - o1 )
+                    //  n         u2 v2 d2       p2   o2
 
-        float A[3][3] = { {uvec.x, vvec.x, d.x},
-        {uvec.y, vvec.y, d.y},
-        {uvec.z, vvec.z, d.z} };
+                    float A[3][3] = { { uvec.x, vvec.x, d.x },
+                    { uvec.y, vvec.y, d.y },
+                    { uvec.z, vvec.z, d.z } };
 
-        float invA[3][3];
-        invert_3x3(A, invA);
-        Vector R = matrix_vector(invA, Vector(p.x - o.x, p.y - o.y, p.z - o.z));
+                    float invA[3][3];
+                    invert_3x3(A, invA);
+                    Leap::Vector R = matrix_vector(invA, Leap::Vector(p.x - o.x, p.y - o.y, p.z - o.z));
 
-        // u and v are in R.x and R.y respectively and are expected to be within -1...+1
-        // when the index finger points into the palm area
-        // n is contained in R.z and represents the distance in mm between the index finger tip and the palm
+                    // u and v are in R.x and R.y respectively and are expected to be within -1...+1
+                    // when the index finger points into the palm area
+                    // n is contained in R.z and represents the distance in mm between the index finger tip and the palm
 
-        // compute length of u,v vector in plane
-        float u = R.x;
-        float v = R.y;
-        float length = sqrtf(u*u + v*v);
+                    // compute length of u,v vector in plane
+                    float u = R.x;
+                    float v = R.y;
+                    float length = sqrtf(u*u + v*v);
 
-        // ignore if are we pointing way out of bounds
-        if (length < 5.0)
-        {
-        // limit vector to remain inside unit circle
-        if (length > 1.0) {
-        u /= length;
-        v /= length;
+                    // ignore if are we pointing way out of bounds
+                    if(length < 5.0)
+                    {
+                        // limit vector to remain inside unit circle
+                        if(length > 1.0)
+                        {
+                            u /= length;
+                            v /= length;
+                        }
+                        result[TouchpadAxisX] = u;
+                        result[TouchpadAxisY] = v;
+                    }
+                }
+            }
         }
-        result[TouchpadAxisX] = u;
-        result[TouchpadAxisY] = v;
-        }
-        }
-        }
-        }*/
     }
 
     return success;

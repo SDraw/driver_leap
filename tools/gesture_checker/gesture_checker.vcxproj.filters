@@ -2,6 +2,13 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="gesture_checker.cpp" />
-    <ClCompile Include="..\..\drivers\driver_leap\GestureMatcher.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="CGestureListener.cpp" />
+    <ClCompile Include="CGestureMatcher.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="CGestureListener.h" />
+    <ClInclude Include="CGestureMatcher.h" />
   </ItemGroup>
 </Project>
