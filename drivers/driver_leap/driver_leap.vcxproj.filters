@@ -9,6 +9,10 @@
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="CGestureMatcher.cpp" />
+    <ClCompile Include="CConfigHelper.cpp" />
+    <ClCompile Include="..\..\vendor\pugixml\pugixml.cpp">
+      <Filter>vendor\pugixml</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h" />
@@ -18,5 +22,14 @@
     <ClInclude Include="Utils.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="CGestureMatcher.h" />
+    <ClInclude Include="CConfigHelper.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="vendor">
+      <UniqueIdentifier>{4dd100d6-5318-4ebc-a9eb-9ef27f1ae76b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\pugixml">
+      <UniqueIdentifier>{21c081d3-867d-441e-90d0-ef26e9d05cae}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

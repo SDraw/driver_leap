@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "CServerDriver_Leap.h"
 #include "CDriverLogHelper.h"
+#include "CConfigHelper.h"
 #include "CLeapHmdLatest.h"
 #include "Utils.h"
 
@@ -115,14 +116,16 @@ CServerDriver_Leap::~CServerDriver_Leap()
 
 vr::EVRInitError CServerDriver_Leap::Init(vr::IVRDriverContext *pDriverContext)
 {
-    VR_INIT_SERVER_DRIVER_CONTEXT(pDriverContext);
+    vr::EVRInitError eError = vr::InitServerDriverContext(pDriverContext);
+    if(eError != vr::VRInitError_None) return eError;
+
     CDriverLogHelper::InitDriverLog(vr::VRDriverLog());
     CDriverLogHelper::DriverLog("CServerDriver_Leap::Init()\n");
+    CConfigHelper::LoadConfig();
 
     m_pDriverHost = vr::VRServerDriverHost();
 
     m_Controller = new Leap::Controller;
-
     m_Controller->addListener(*this);
 
     return vr::VRInitError_None;
@@ -149,6 +152,9 @@ void CServerDriver_Leap::Cleanup()
     for(auto it = m_vecControllers.begin(); it != m_vecControllers.end(); ++it)
         delete (*it);
     m_vecControllers.clear();
+
+    vr::CleanupDriverContext();
+    m_pDriverHost = nullptr;
 }
 
 uint32_t CServerDriver_Leap::GetTrackedDeviceCount()
@@ -158,19 +164,22 @@ uint32_t CServerDriver_Leap::GetTrackedDeviceCount()
 
 vr::ITrackedDeviceServerDriver* CServerDriver_Leap::FindTrackedDeviceDriver(const char* pchId)
 {
+    vr::ITrackedDeviceServerDriver* result = nullptr;
+
     for(auto it = m_vecControllers.begin(); it != m_vecControllers.end(); ++it)
     {
         if(0 == strcmp((*it)->GetSerialNumber(), pchId))
         {
-            return *it;
+            result = *it;
+            break;
         }
     }
-    return nullptr;
+    return result;
 }
 
 void CServerDriver_Leap::RunFrame()
 {
-    if(m_vecControllers.size() == 2)  CLeapHmdLatest::RealignCoordinates(m_vecControllers[0], m_vecControllers[1]);
+    if(m_vecControllers.size() == 2U) CLeapHmdLatest::RealignCoordinates(m_vecControllers[0], m_vecControllers[1]);
 
     if(m_Controller)
     {
@@ -181,12 +190,7 @@ void CServerDriver_Leap::RunFrame()
             for(auto it = m_vecControllers.begin(); it != m_vecControllers.end(); ++it)
             {
                 CLeapHmdLatest *pLeap = *it;
-                if(pLeap->IsActivated())
-                {
-                    if(!pLeap->Update(frame))
-                    {
-                    }
-                }
+                if(pLeap->IsActivated()) pLeap->Update(frame);
             }
         }
     }
@@ -209,7 +213,7 @@ void CServerDriver_Leap::LeaveStandby()
 
 void CServerDriver_Leap::ScanForNewControllers(bool bNotifyServer)
 {
-    while(m_vecControllers.size() < 2)
+    while(m_vecControllers.size() < 2U)
     {
         char buf[256];
         int base = 0;
@@ -233,12 +237,11 @@ void CServerDriver_Leap::LaunchLeapMonitor()
 
     CDriverLogHelper::DriverLog("CServerDriver_Leap::LaunchLeapMonitor()\n");
 
-    m_bLaunchedLeapMonitor = true;
-
     std::string path(g_ModuleFileName);
     path.erase(path.begin() + path.rfind('\\'), path.end());
     CDriverLogHelper::DriverLog("leap_monitor path: %s\n", path.c_str());
 
+    m_bLaunchedLeapMonitor = true;
     STARTUPINFOA sInfoProcess = { 0 };
     sInfoProcess.cb = sizeof(STARTUPINFOW);
     BOOL okay = CreateProcessA((path + "\\leap_monitor.exe").c_str(), NULL, NULL, NULL, FALSE, 0, NULL, path.c_str(), &sInfoProcess, &m_pInfoStartedProcess);
