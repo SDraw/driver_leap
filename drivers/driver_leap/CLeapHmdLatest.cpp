@@ -216,10 +216,16 @@ void CLeapHmdLatest::UpdateControllerState(Leap::Frame& frame)
 
         if(CConfigHelper::IsTouchpadEnabled())
         {
-            if(scores[CGestureMatcher::Thumbpress] >= 0.5f)
+            if(CConfigHelper::IsTouchpadTouchEnabled())
             {
-                NewState.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Touchpad);
-                if(scores[CGestureMatcher::Thumbpress] >= 0.9f) NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Touchpad);
+                if(scores[CGestureMatcher::Thumbpress] >= 0.5f)
+                {
+                    NewState.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Touchpad);
+                    if(CConfigHelper::IsTouchpadPressEnabled())
+                    {
+                        if(scores[CGestureMatcher::Thumbpress] >= 0.9f) NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Touchpad);
+                    }
+                }
             }
         }
 
@@ -239,7 +245,7 @@ void CLeapHmdLatest::UpdateControllerState(Leap::Frame& frame)
         NewState.rAxis[1].x = scores[CGestureMatcher::TriggerFinger];
         NewState.rAxis[1].y = 0.0f;
 
-        if(CConfigHelper::IsTouchpadAxesEnabled())
+        if(CConfigHelper::IsTouchpadEnabled() && CConfigHelper::IsTouchpadTouchEnabled() && CConfigHelper::IsTouchpadAxesEnabled())
         {
             if(NewState.rAxis[0].x != m_ControllerState.rAxis[0].x || NewState.rAxis[0].y != m_ControllerState.rAxis[0].y)
                 m_pDriverHost->TrackedDeviceAxisUpdated(m_unSteamVRTrackedDeviceId, 0, NewState.rAxis[0]);

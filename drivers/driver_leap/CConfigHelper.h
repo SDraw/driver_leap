@@ -7,6 +7,8 @@ class CConfigHelper
     static bool ms_trigger;
     static bool ms_grip;
     static bool ms_touchpad;
+    static bool ms_touchpadTouch;
+    static bool ms_touchpadPress;
     static bool ms_touchpadAxes;
 public:
     static void LoadConfig();
@@ -15,5 +17,7 @@ public:
     static inline bool IsTriggerEnabled() { return ms_trigger; }
     static inline bool IsGripEnabled() { return ms_grip; }
     static inline bool IsTouchpadEnabled() { return ms_touchpad; }
+    static inline bool IsTouchpadTouchEnabled() { return ms_touchpadTouch; }
+    static inline bool IsTouchpadPressEnabled() { return ms_touchpadPress; }
     static inline bool IsTouchpadAxesEnabled() { return ms_touchpadAxes; }
 };

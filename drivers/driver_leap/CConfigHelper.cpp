@@ -9,11 +9,14 @@ bool CConfigHelper::ms_applicationMenu = true;
 bool CConfigHelper::ms_trigger = true;
 bool CConfigHelper::ms_grip = true;
 bool CConfigHelper::ms_touchpad = true;
+bool CConfigHelper::ms_touchpadTouch = true;
+bool CConfigHelper::ms_touchpadPress = true;
 bool CConfigHelper::ms_touchpadAxes = true;
 
 const std::vector<std::string> g_configAttributeTable
 {
-    "menu", "applicationMenu", "trigger", "grip", "touchpad", "touchpadAxes"
+    "menu", "appMenu", "trigger", "grip",
+    "touchpad", "touchpadTouch", "touchpadPress", "touchpadAxes"
 };
 
 #define CONFIG_PARAM_MENU 0
@@ -21,7 +24,9 @@ const std::vector<std::string> g_configAttributeTable
 #define CONFIG_PARAM_TRIGGER 2
 #define CONFIG_PARAM_GRIP 3
 #define CONFIG_PARAM_TOUCHPAD 4
-#define CONFIG_PARAM_TOUCHPAD_AXES 5
+#define CONFIG_PARAM_TOUCHPAD_TOUCH 5
+#define CONFIG_PARAM_TOUCHPAD_PRESS 6
+#define CONFIG_PARAM_TOUCHPAD_AXES 7
 
 void CConfigHelper::LoadConfig()
 {
@@ -60,6 +65,12 @@ void CConfigHelper::LoadConfig()
                                 break;
                             case CONFIG_PARAM_TOUCHPAD:
                                 ms_touchpad = l_attrib.as_bool(true);
+                                break;
+                            case CONFIG_PARAM_TOUCHPAD_TOUCH:
+                                ms_touchpadTouch = l_attrib.as_bool(true);
+                                break;
+                            case CONFIG_PARAM_TOUCHPAD_PRESS:
+                                ms_touchpadPress = l_attrib.as_bool(true);
                                 break;
                             case CONFIG_PARAM_TOUCHPAD_AXES:
                                 ms_touchpadAxes = l_attrib.as_bool(true);

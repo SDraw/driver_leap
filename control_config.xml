@@ -1,8 +1,11 @@
 <config>
     <param name="menu" value="true"/>
-    <param name="applicationMenu" value="true"/>
+    <param name="appMenu" value="true"/>
     <param name="trigger" value="true"/>
     <param name="grip" value="true"/>
+    
     <param name="touchpad" value="true"/>
+    <param name="touchpadTouch" value="true"/>
+    <param name="touchpadPress" value="true"/>
     <param name="touchpadAxes" value="true"/>
 </config>
