@@ -1,11 +1,11 @@
 #include "stdafx.h"
 #include "Utils.h"
 
-void GenerateSerialNumber(char* p, int psize, int base, int controller)
+void GenerateSerialNumber(char* p, int psize, int controller)
 {
     char tmp[32];
     _snprintf(tmp, 32, "controller%d", controller);
-    _snprintf(p, psize, "leap%d_%s", base, (controller == LEFT_CONTROLLER) ? "lefthand" : (controller == RIGHT_CONTROLLER) ? "righthand" : tmp);
+    _snprintf(p, psize, "leap0_%s", (controller == LEFT_CONTROLLER) ? "lefthand" : (controller == RIGHT_CONTROLLER) ? "righthand" : tmp);
 }
 
 // convert a 3x3 rotation matrix into a rotation quaternion

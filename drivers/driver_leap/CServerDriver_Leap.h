@@ -32,9 +32,6 @@ public:
     void onConnect(const Leap::Controller&);
     void onDisconnect(const Leap::Controller&);
     void onExit(const Leap::Controller&);
-    void onFrame(const Leap::Controller&);
-    void onFocusGained(const Leap::Controller&);
-    void onFocusLost(const Leap::Controller&);
     void onServiceConnect(const Leap::Controller&);
     void onServiceDisconnect(const Leap::Controller&);
     void onDeviceChange(const Leap::Controller&);

@@ -12,11 +12,15 @@ bool CConfigHelper::ms_touchpad = true;
 bool CConfigHelper::ms_touchpadTouch = true;
 bool CConfigHelper::ms_touchpadPress = true;
 bool CConfigHelper::ms_touchpadAxes = true;
+float CConfigHelper::ms_gripOffsetX = 0.f;
+float CConfigHelper::ms_gripOffsetY = 0.f;
+float CConfigHelper::ms_gripOffsetZ = 0.f;
 
 const std::vector<std::string> g_configAttributeTable
 {
     "menu", "appMenu", "trigger", "grip",
-    "touchpad", "touchpadTouch", "touchpadPress", "touchpadAxes"
+    "touchpad", "touchpadTouch", "touchpadPress", "touchpadAxes",
+    "gripOffsetX", "gripOffsetY", "gripOffsetZ"
 };
 
 #define CONFIG_PARAM_MENU 0
@@ -27,6 +31,9 @@ const std::vector<std::string> g_configAttributeTable
 #define CONFIG_PARAM_TOUCHPAD_TOUCH 5
 #define CONFIG_PARAM_TOUCHPAD_PRESS 6
 #define CONFIG_PARAM_TOUCHPAD_AXES 7
+#define CONFIG_PARAM_GRIP_OFFSETX 8
+#define CONFIG_PARAM_GRIP_OFFSETY 9
+#define CONFIG_PARAM_GRIP_OFFSETZ 10
 
 void CConfigHelper::LoadConfig()
 {
@@ -74,6 +81,15 @@ void CConfigHelper::LoadConfig()
                                 break;
                             case CONFIG_PARAM_TOUCHPAD_AXES:
                                 ms_touchpadAxes = l_attrib.as_bool(true);
+                                break;
+                            case CONFIG_PARAM_GRIP_OFFSETX:
+                                ms_gripOffsetX = l_attrib.as_float(0.f);
+                                break;
+                            case CONFIG_PARAM_GRIP_OFFSETY:
+                                ms_gripOffsetY = l_attrib.as_float(0.f);
+                                break;
+                            case CONFIG_PARAM_GRIP_OFFSETZ:
+                                ms_gripOffsetZ = l_attrib.as_float(0.f);
                                 break;
                         }
                     }

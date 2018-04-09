@@ -3,13 +3,13 @@
 class CLeapHmdLatest : public vr::ITrackedDeviceServerDriver, public vr::IVRControllerComponent
 {
 public:
-    CLeapHmdLatest(vr::IVRServerDriverHost* pDriverHost, int base, int n);
+    CLeapHmdLatest(vr::IVRServerDriverHost* pDriverHost, int n);
     virtual ~CLeapHmdLatest();
 
     // vr::ITrackedDeviceServerDriver
     virtual vr::EVRInitError Activate(uint32_t unObjectId) override;
     virtual void Deactivate() override;
-    void *GetComponent(const char* pchComponentNameAndVersion) override;
+    void* GetComponent(const char* pchComponentNameAndVersion) override;
     virtual void DebugRequest(const char* pchRequest, char* pchResponseBuffer, uint32_t unResponseBufferSize) override;
     virtual vr::DriverPose_t GetPose() override;
     virtual void EnterStandby() override;
@@ -18,17 +18,12 @@ public:
     virtual vr::VRControllerState_t GetControllerState() override;
     virtual bool TriggerHapticPulse(uint32_t unAxisId, uint16_t usPulseDurationMicroseconds) override;
 
-    bool IsActivated() const;
-    bool HasControllerId(int nBase, int nId) const;
     bool Update(Leap::Frame& frame);
     const char* GetSerialNumber() const;
 
     static void RealignCoordinates(CLeapHmdLatest* pLeapA, CLeapHmdLatest* pLeapB);
     void FinishRealignCoordinates(float(*m)[3], float *v);
     void UpdateHmdPose(float* v, const vr::HmdQuaternion_t& q);
-
-    uint32_t GetDeviceId() const { return m_unSteamVRTrackedDeviceId; }
-
 private:
     static const std::chrono::milliseconds k_TrackingLatency;
 
@@ -40,7 +35,6 @@ private:
 
     vr::IVRServerDriverHost *m_pDriverHost;
 
-    int m_nBase;
     int m_nId;
     std::string m_strSerialNumber;
 
@@ -58,5 +52,5 @@ private:
     uint32_t m_unSteamVRTrackedDeviceId;
     std::string m_strRenderModel;
 
-    float m_gripAngleOffset;
+    Leap::Vector m_gripAngleOffset;
 };

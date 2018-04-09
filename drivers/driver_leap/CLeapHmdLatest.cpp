@@ -7,21 +7,24 @@
 
 const std::chrono::milliseconds CLeapHmdLatest::k_TrackingLatency(-30);
 
-CLeapHmdLatest::CLeapHmdLatest(vr::IVRServerDriverHost* pDriverHost, int base, int n)
+const Leap::Vector g_AxisX(1.f, 0.f, 0.f);
+const Leap::Vector g_AxisY(0.f, 1.f, 0.f);
+const Leap::Vector g_AxisZ(0.f, 0.f, 1.f);
+
+CLeapHmdLatest::CLeapHmdLatest(vr::IVRServerDriverHost* pDriverHost, int n)
     : m_pDriverHost(pDriverHost)
-    , m_nBase(base)
     , m_nId(n)
     , m_bCalibrated(true)
     , m_pAlignmentPartner(nullptr)
     , m_unSteamVRTrackedDeviceId(vr::k_unTrackedDeviceIndexInvalid)
 {
-    CDriverLogHelper::DriverLog("CLeapHmdLatest::CLeapHmdLatest(base=%d, n=%d)\n", base, n);
+    CDriverLogHelper::DriverLog("CLeapHmdLatest::CLeapHmdLatest(n=%d)\n", n);
 
     memset(m_hmdPos, 0, sizeof(m_hmdPos));
 
     char buf[256];
-    GenerateSerialNumber(buf, sizeof(buf), base, n);
-    m_strSerialNumber = buf;
+    GenerateSerialNumber(buf, sizeof(buf), n);
+    m_strSerialNumber.assign(buf);
 
     memset(&m_ControllerState, 0, sizeof(m_ControllerState));
     memset(&m_Pose, 0, sizeof(m_Pose));
@@ -31,21 +34,28 @@ CLeapHmdLatest::CLeapHmdLatest(vr::IVRServerDriverHost* pDriverHost, int base, i
     m_hardware_revision = 0x0001;
 
     vr::IVRSettings *settings_ = vr::VRSettings();
+    settings_->GetString("leap", (m_nId == LEFT_CONTROLLER) ? "renderModel_lefthand" : (m_nId == RIGHT_CONTROLLER) ? "renderModel_righthand" : "renderModel", buf, sizeof(buf));
+    m_strRenderModel.assign(buf);
 
-    char tmp_[256];
-    settings_->GetString("leap", (m_nId == LEFT_CONTROLLER) ? "renderModel_lefthand" : (m_nId == RIGHT_CONTROLLER) ? "renderModel_righthand" : "renderModel", tmp_, sizeof(tmp_));
-    m_strRenderModel = tmp_;
+    m_gripAngleOffset.x = CConfigHelper::GetGripOffsetX();
+    m_gripAngleOffset.y = CConfigHelper::GetGripOffsetY();
+    m_gripAngleOffset.z = CConfigHelper::GetGripOffsetZ();
+    if(m_nId == RIGHT_CONTROLLER)
+    {
+        // Only X axis isn't inverted for right controller
+        m_gripAngleOffset.y *= -1.f;
+        m_gripAngleOffset.z *= -1.f;
+    }
 
-    m_gripAngleOffset = settings_->GetFloat("leap", (m_nId == LEFT_CONTROLLER) ? "gripAngleOffset_lefthand" : (m_nId == RIGHT_CONTROLLER) ? "gripAngleOffset_righthand" : "gripAngleOffset");
     m_hmdRot = vr::HmdQuaternion_t{ .0, .0, .0, .0 };
 }
 
 CLeapHmdLatest::~CLeapHmdLatest()
 {
-    CDriverLogHelper::DriverLog("CLeapHmdLatest::~CLeapHmdLatest(base=%d, n=%d)\n", m_nBase, m_nId);
+    CDriverLogHelper::DriverLog("CLeapHmdLatest::~CLeapHmdLatest(n=%d)\n", m_nId);
 }
 
-void *CLeapHmdLatest::GetComponent(const char* pchComponentNameAndVersion)
+void* CLeapHmdLatest::GetComponent(const char* pchComponentNameAndVersion)
 {
     if(!stricmp(pchComponentNameAndVersion, vr::IVRControllerComponent_Version))
     {
@@ -295,8 +305,12 @@ void CLeapHmdLatest::UpdateTrackingState(Leap::Frame &frame)
             m_Pose.vecAcceleration[1] = 0.0;
             m_Pose.vecAcceleration[2] = 0.0;
 
-            Leap::Vector direction = hand.direction(); direction /= direction.magnitude();
-            Leap::Vector normal = hand.palmNormal(); normal /= normal.magnitude();
+            Leap::Vector direction = hand.direction();
+            direction /= direction.magnitude();
+
+            Leap::Vector normal = hand.palmNormal();
+            normal /= normal.magnitude();
+
             Leap::Vector side = direction.cross(normal);
 
             switch(m_nId)
@@ -320,8 +334,12 @@ void CLeapHmdLatest::UpdateTrackingState(Leap::Frame &frame)
                 } break;
             }
 
-            if(m_gripAngleOffset != 0.f)
-                m_Pose.qRotation = rotate_around_axis(Leap::Vector(1.0, 0.0, 0.0), m_gripAngleOffset) * m_Pose.qRotation;
+            if(m_gripAngleOffset.x != 0.f)
+                m_Pose.qRotation = rotate_around_axis(g_AxisX, m_gripAngleOffset.x) * m_Pose.qRotation;
+            if(m_gripAngleOffset.y != 0.f)
+                m_Pose.qRotation = rotate_around_axis(g_AxisY, m_gripAngleOffset.y) * m_Pose.qRotation;
+            if(m_gripAngleOffset.z != 0.f)
+                m_Pose.qRotation = rotate_around_axis(g_AxisZ, m_gripAngleOffset.z) * m_Pose.qRotation;
 
             m_Pose.vecAngularVelocity[0] = 0.0;
             m_Pose.vecAngularVelocity[1] = 0.0;
@@ -348,16 +366,6 @@ void CLeapHmdLatest::UpdateTrackingState(Leap::Frame &frame)
     m_Pose.shouldApplyHeadModel = false;
 
     m_pDriverHost->TrackedDevicePoseUpdated(m_unSteamVRTrackedDeviceId, m_Pose, sizeof(vr::DriverPose_t));
-}
-
-bool CLeapHmdLatest::IsActivated() const
-{
-    return m_unSteamVRTrackedDeviceId != vr::k_unTrackedDeviceIndexInvalid;
-}
-
-bool CLeapHmdLatest::HasControllerId(int nBase, int nId) const
-{
-    return nBase == m_nBase && nId == m_nId;
 }
 
 bool CLeapHmdLatest::Update(Leap::Frame &frame)

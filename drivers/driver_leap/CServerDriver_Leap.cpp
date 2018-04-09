@@ -28,12 +28,7 @@ void CServerDriver_Leap::onInit(const Leap::Controller& controller)
         // Generate VR controllers, serials are stored for whole VR session
         while(m_vecVRControllers.size() < 2U)
         {
-            char buf[256];
-            int base = 0;
-            int i = m_vecVRControllers.size();
-            GenerateSerialNumber(buf, sizeof(buf), base, i);
-
-            CLeapHmdLatest *l_leapHmd = new CLeapHmdLatest(m_pDriverHost, base, i);
+            CLeapHmdLatest *l_leapHmd = new CLeapHmdLatest(m_pDriverHost, m_vecVRControllers.size());
             m_vecVRControllers.push_back(l_leapHmd);
             if(m_pDriverHost)
             {
@@ -56,20 +51,6 @@ void CServerDriver_Leap::onDisconnect(const Leap::Controller& controller)
 void CServerDriver_Leap::onExit(const Leap::Controller& controller)
 {
     CDriverLogHelper::DriverLog("CServerDriver_Leap::onExit()\n");
-}
-
-void CServerDriver_Leap::onFrame(const Leap::Controller& controller)
-{
-}
-
-void CServerDriver_Leap::onFocusGained(const Leap::Controller& controller)
-{
-    //    DriverLog("CServerDriver_Leap::onFocusGained()\n");
-}
-
-void CServerDriver_Leap::onFocusLost(const Leap::Controller& controller)
-{
-    //    DriverLog("CServerDriver_Leap::onFocusLost()\n");
 }
 
 void CServerDriver_Leap::onServiceConnect(const Leap::Controller& controller)
@@ -170,10 +151,7 @@ void CServerDriver_Leap::RunFrame()
         {
             Leap::Frame frame = m_Controller->frame();
 
-            for(auto iter : m_vecVRControllers)
-            {
-                if(iter->IsActivated()) iter->Update(frame);
-            }
+            for(auto iter : m_vecVRControllers) iter->Update(frame);
         }
     }
 }
