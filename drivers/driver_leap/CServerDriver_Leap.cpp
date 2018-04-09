@@ -10,6 +10,37 @@ extern char g_ModuleFileName[];
 void CServerDriver_Leap::onInit(const Leap::Controller& controller)
 {
     CDriverLogHelper::DriverLog("CServerDriver_Leap::onInit()\n");
+
+    if(&controller == m_Controller)
+    {
+        // Set config for Leap controller
+        Leap::Config configuraton = m_Controller->config();
+        if(configuraton.getInt32("background_app_mode") != 2)
+        {
+            configuraton.setInt32("background_app_mode", 2);
+            configuraton.save();
+        }
+        m_Controller->setPolicy(Leap::Controller::POLICY_OPTIMIZE_HMD);
+        m_Controller->setPolicy(Leap::Controller::POLICY_BACKGROUND_FRAMES);
+        m_Controller->setPolicy((Leap::Controller::PolicyFlag)(15));
+        m_Controller->setPolicy((Leap::Controller::PolicyFlag)(23));
+
+        // Generate VR controllers, serials are stored for whole VR session
+        while(m_vecVRControllers.size() < 2U)
+        {
+            char buf[256];
+            int base = 0;
+            int i = m_vecVRControllers.size();
+            GenerateSerialNumber(buf, sizeof(buf), base, i);
+
+            CLeapHmdLatest *l_leapHmd = new CLeapHmdLatest(m_pDriverHost, base, i);
+            m_vecVRControllers.push_back(l_leapHmd);
+            if(m_pDriverHost)
+            {
+                m_pDriverHost->TrackedDeviceAdded(l_leapHmd->GetSerialNumber(), vr::ETrackedDeviceClass::TrackedDeviceClass_Controller, l_leapHmd);
+            }
+        }
+    }
 }
 
 void CServerDriver_Leap::onConnect(const Leap::Controller& controller)
@@ -54,34 +85,6 @@ void CServerDriver_Leap::onServiceDisconnect(const Leap::Controller& controller)
 void CServerDriver_Leap::onDeviceChange(const Leap::Controller& controller)
 {
     CDriverLogHelper::DriverLog("CServerDriver_Leap::onDeviceChange()\n");
-
-    if(controller.isConnected())
-    {
-        Leap::Config configuraton = controller.config();
-        bool backgroundModeAllowed = (configuraton.getInt32("background_app_mode") == 2);
-        if(!backgroundModeAllowed)
-        {
-            configuraton.setInt32("background_app_mode", 2);
-            configuraton.save();
-        }
-
-        controller.setPolicy(Leap::Controller::POLICY_OPTIMIZE_HMD);
-        controller.setPolicy(Leap::Controller::POLICY_BACKGROUND_FRAMES);
-        controller.setPolicy((Leap::Controller::PolicyFlag)(15));
-        controller.setPolicy((Leap::Controller::PolicyFlag)(23));
-
-        ScanForNewControllers(true);
-    }
-    else
-    {
-        for(auto it = m_vecControllers.begin(); it != m_vecControllers.end(); ++it)
-            delete (*it);
-        m_vecControllers.clear();
-    }
-}
-
-void CServerDriver_Leap::onImages(const Leap::Controller& controller)
-{
 }
 
 void CServerDriver_Leap::onServiceChange(const Leap::Controller& controller)
@@ -111,7 +114,6 @@ CServerDriver_Leap::CServerDriver_Leap()
 CServerDriver_Leap::~CServerDriver_Leap()
 {
     CDriverLogHelper::DriverLog("CServerDriver_Leap::~CServerDriver_Leap()\n");
-    Cleanup();
 }
 
 vr::EVRInitError CServerDriver_Leap::Init(vr::IVRDriverContext *pDriverContext)
@@ -128,6 +130,8 @@ vr::EVRInitError CServerDriver_Leap::Init(vr::IVRDriverContext *pDriverContext)
     m_Controller = new Leap::Controller;
     m_Controller->addListener(*this);
 
+    LaunchLeapMonitor();
+
     return vr::VRInitError_None;
 }
 
@@ -142,6 +146,9 @@ void CServerDriver_Leap::Cleanup()
         m_bLaunchedLeapMonitor = false;
     }
 
+    for(auto iter : m_vecVRControllers) delete iter;
+    m_vecVRControllers.clear();
+
     if(m_Controller)
     {
         m_Controller->removeListener(*this);
@@ -149,37 +156,13 @@ void CServerDriver_Leap::Cleanup()
         m_Controller = NULL;
     }
 
-    for(auto it = m_vecControllers.begin(); it != m_vecControllers.end(); ++it)
-        delete (*it);
-    m_vecControllers.clear();
-
     vr::CleanupDriverContext();
     m_pDriverHost = nullptr;
 }
 
-uint32_t CServerDriver_Leap::GetTrackedDeviceCount()
-{
-    return m_vecControllers.size();
-}
-
-vr::ITrackedDeviceServerDriver* CServerDriver_Leap::FindTrackedDeviceDriver(const char* pchId)
-{
-    vr::ITrackedDeviceServerDriver* result = nullptr;
-
-    for(auto it = m_vecControllers.begin(); it != m_vecControllers.end(); ++it)
-    {
-        if(0 == strcmp((*it)->GetSerialNumber(), pchId))
-        {
-            result = *it;
-            break;
-        }
-    }
-    return result;
-}
-
 void CServerDriver_Leap::RunFrame()
 {
-    if(m_vecControllers.size() == 2U) CLeapHmdLatest::RealignCoordinates(m_vecControllers[0], m_vecControllers[1]);
+    if(m_vecVRControllers.size() == 2U) CLeapHmdLatest::RealignCoordinates(m_vecVRControllers[0], m_vecVRControllers[1]);
 
     if(m_Controller)
     {
@@ -187,10 +170,9 @@ void CServerDriver_Leap::RunFrame()
         {
             Leap::Frame frame = m_Controller->frame();
 
-            for(auto it = m_vecControllers.begin(); it != m_vecControllers.end(); ++it)
+            for(auto iter : m_vecVRControllers)
             {
-                CLeapHmdLatest *pLeap = *it;
-                if(pLeap->IsActivated()) pLeap->Update(frame);
+                if(iter->IsActivated()) iter->Update(frame);
             }
         }
     }
@@ -209,26 +191,6 @@ void CServerDriver_Leap::EnterStandby()
 void CServerDriver_Leap::LeaveStandby()
 {
     CDriverLogHelper::DriverLog("CServerDriver_Leap::LeaveStandby()\n");
-}
-
-void CServerDriver_Leap::ScanForNewControllers(bool bNotifyServer)
-{
-    while(m_vecControllers.size() < 2U)
-    {
-        char buf[256];
-        int base = 0;
-        int i = m_vecControllers.size();
-        GenerateSerialNumber(buf, sizeof(buf), base, i);
-        if(!FindTrackedDeviceDriver(buf))
-        {
-            CDriverLogHelper::DriverLog("added new device %s\n", buf);
-            m_vecControllers.push_back(new CLeapHmdLatest(m_pDriverHost, base, i));
-            if(bNotifyServer && m_pDriverHost)
-            {
-                m_pDriverHost->TrackedDeviceAdded(m_vecControllers.back()->GetSerialNumber(), vr::ETrackedDeviceClass::TrackedDeviceClass_Controller, m_vecControllers.back());
-            }
-        }
-    }
 }
 
 void CServerDriver_Leap::LaunchLeapMonitor()

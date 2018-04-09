@@ -3,10 +3,7 @@
 #include "CDriverLogHelper.h"
 #include "CConfigHelper.h"
 #include "CGestureMatcher.h"
-#include "CServerDriver_Leap.h"
 #include "Utils.h"
-
-extern CServerDriver_Leap g_ServerTrackedDeviceProvider;
 
 const std::chrono::milliseconds CLeapHmdLatest::k_TrackingLatency(-30);
 
@@ -86,8 +83,6 @@ vr::EVRInitError CLeapHmdLatest::Activate(uint32_t unObjectId)
 
     vr::HmdMatrix34_t matrix = { 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f };
     propertyHelpers->SetProperty(propertyContainer, vr::Prop_CameraToHeadTransform_Matrix34, &matrix, sizeof(vr::HmdMatrix34_t), vr::k_unHmdMatrix34PropertyTag);
-
-    g_ServerTrackedDeviceProvider.LaunchLeapMonitor();
 
     return vr::VRInitError_None;
 }

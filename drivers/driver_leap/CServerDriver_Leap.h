@@ -3,17 +3,16 @@
 class CLeapHmdLatest;
 class CServerDriver_Leap : public vr::IServerTrackedDeviceProvider, public Leap::Listener
 {
-    void ScanForNewControllers(bool bNotifyServer);
-
-    void LaunchLeapMonitor(const char* pchDriverInstallDir);
 
     vr::IVRServerDriverHost* m_pDriverHost;
 
     bool m_bLaunchedLeapMonitor;
     PROCESS_INFORMATION m_pInfoStartedProcess;
 
-    std::vector<CLeapHmdLatest*> m_vecControllers;
+    std::vector<CLeapHmdLatest*> m_vecVRControllers;
     Leap::Controller* m_Controller;
+
+    void LaunchLeapMonitor();
 public:
     CServerDriver_Leap();
     virtual ~CServerDriver_Leap();
@@ -21,16 +20,12 @@ public:
     // vr::IServerTrackedDeviceProvider
     virtual vr::EVRInitError Init(vr::IVRDriverContext *pDriverContext) override;
     virtual void Cleanup() override;
-    uint32_t GetTrackedDeviceCount();
-    vr::ITrackedDeviceServerDriver* FindTrackedDeviceDriver(const char* pchId);
     virtual const char* const* GetInterfaceVersions() override { return vr::k_InterfaceVersions; }
     virtual void RunFrame() override;
 
     virtual bool ShouldBlockStandbyMode() override;
     virtual void EnterStandby() override;
     virtual void LeaveStandby() override;
-
-    void LaunchLeapMonitor();
 
     // Leap::Listener
     void onInit(const Leap::Controller&);
@@ -43,7 +38,6 @@ public:
     void onServiceConnect(const Leap::Controller&);
     void onServiceDisconnect(const Leap::Controller&);
     void onDeviceChange(const Leap::Controller&);
-    void onImages(const Leap::Controller&);
     void onServiceChange(const Leap::Controller&);
     void onDeviceFailure(const Leap::Controller&);
     void onLogMessage(const Leap::Controller&, Leap::MessageSeverity severity, int64_t timestamp, const char* msg);
