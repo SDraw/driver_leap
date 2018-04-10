@@ -5,17 +5,17 @@
 #include "CGestureMatcher.h"
 #include "Utils.h"
 
-const std::chrono::milliseconds CLeapHmdLatest::k_TrackingLatency(-30);
-
 const Leap::Vector g_AxisX(1.f, 0.f, 0.f);
 const Leap::Vector g_AxisY(0.f, 1.f, 0.f);
 const Leap::Vector g_AxisZ(0.f, 0.f, 1.f);
+
+const vr::VREvent_Data_t g_EmptyVREventData = { 0 };
+const long long g_VRTrackingLatency = -std::chrono::duration_cast<std::chrono::seconds>(std::chrono::milliseconds(-30)).count();
 
 CLeapHmdLatest::CLeapHmdLatest(vr::IVRServerDriverHost* pDriverHost, int n)
     : m_pDriverHost(pDriverHost)
     , m_nId(n)
     , m_bCalibrated(true)
-    , m_pAlignmentPartner(nullptr)
     , m_unSteamVRTrackedDeviceId(vr::k_unTrackedDeviceIndexInvalid)
 {
     CDriverLogHelper::DriverLog("CLeapHmdLatest::CLeapHmdLatest(n=%d)\n", n);
@@ -48,6 +48,7 @@ CLeapHmdLatest::CLeapHmdLatest(vr::IVRServerDriverHost* pDriverHost, int n)
     }
 
     m_hmdRot = vr::HmdQuaternion_t{ .0, .0, .0, .0 };
+    m_connected = true;
 }
 
 CLeapHmdLatest::~CLeapHmdLatest()
@@ -109,7 +110,7 @@ void CLeapHmdLatest::DebugRequest(const char* pchRequest, char* pchResponseBuffe
     std::string strCmd;
 
     ss >> strCmd;
-    if(strCmd == "leap:realign_coordinates")
+    if(!strCmd.compare("leap:realign_coordinates"))
     {
         float m[3][3], v[3];
         for(int i = 0; i < 3; ++i)
@@ -120,7 +121,11 @@ void CLeapHmdLatest::DebugRequest(const char* pchRequest, char* pchResponseBuffe
             }
             ss >> v[i];
         }
-        FinishRealignCoordinates(m, v);
+
+        vr::HmdQuaternion_t q = CalculateRotation(m);
+        memcpy(m_hmdPos, &v[0], sizeof(m_hmdPos));
+        m_hmdRot = q;
+        m_bCalibrated = true;
     }
 }
 
@@ -171,9 +176,7 @@ void CLeapHmdLatest::SendButtonUpdates(ButtonUpdate ButtonEvent, uint64_t ulMask
 void CLeapHmdLatest::UpdateControllerState(Leap::Frame& frame)
 {
     bool handFound = false;
-    CGestureMatcher::WhichHand which = (m_nId == LEFT_CONTROLLER) ? CGestureMatcher::LeftHand :
-        (m_nId == RIGHT_CONTROLLER) ? CGestureMatcher::RightHand :
-        CGestureMatcher::AnyHand;
+    CGestureMatcher::WhichHand which = ((m_nId == LEFT_CONTROLLER) ? CGestureMatcher::LeftHand : CGestureMatcher::RightHand);
 
     float scores[CGestureMatcher::NUM_GESTURES];
     handFound = CGestureMatcher::MatchGestures(frame, which, scores);
@@ -257,7 +260,7 @@ void CLeapHmdLatest::UpdateControllerState(Leap::Frame& frame)
         }
 
         if(NewState.rAxis[1].x != m_ControllerState.rAxis[1].x)
-                m_pDriverHost->TrackedDeviceAxisUpdated(m_unSteamVRTrackedDeviceId, 1, NewState.rAxis[1]);
+            m_pDriverHost->TrackedDeviceAxisUpdated(m_unSteamVRTrackedDeviceId, 1, NewState.rAxis[1]);
 
         m_ControllerState = NewState;
     }
@@ -368,44 +371,23 @@ void CLeapHmdLatest::UpdateTrackingState(Leap::Frame &frame)
     m_pDriverHost->TrackedDevicePoseUpdated(m_unSteamVRTrackedDeviceId, m_Pose, sizeof(vr::DriverPose_t));
 }
 
-bool CLeapHmdLatest::Update(Leap::Frame &frame)
+void CLeapHmdLatest::Update(Leap::Frame &frame)
 {
     UpdateTrackingState(frame);
     UpdateControllerState(frame);
-
-    return true;
 }
 
-void CLeapHmdLatest::RealignCoordinates(CLeapHmdLatest* pLeapA, CLeapHmdLatest* pLeapB)
+void CLeapHmdLatest::RealignCoordinates()
 {
-    if(pLeapA->m_unSteamVRTrackedDeviceId == vr::k_unTrackedDeviceIndexInvalid)
-        return;
+    if(m_unSteamVRTrackedDeviceId == vr::k_unTrackedDeviceIndexInvalid) return;
 
-    pLeapA->m_pAlignmentPartner = pLeapB;
-    pLeapB->m_pAlignmentPartner = pLeapA;
-
-    static vr::VREvent_Data_t nodata = { 0 };
-    pLeapA->m_pDriverHost->VendorSpecificEvent(pLeapA->m_unSteamVRTrackedDeviceId,
-        (vr::EVREventType) (vr::VREvent_VendorSpecific_Reserved_Start + 0), nodata,
-        -std::chrono::duration_cast<std::chrono::seconds>(k_TrackingLatency).count());
+    m_pDriverHost->VendorSpecificEvent(m_unSteamVRTrackedDeviceId, (vr::EVREventType) (vr::VREvent_VendorSpecific_Reserved_Start + 0), g_EmptyVREventData, g_VRTrackingLatency);
 }
 
-void CLeapHmdLatest::FinishRealignCoordinates(float(*m)[3], float* v)
+void CLeapHmdLatest::SetAsDisconnected()
 {
-    CLeapHmdLatest * pLeapA = this;
-    CLeapHmdLatest * pLeapB = m_pAlignmentPartner;
+    if(m_unSteamVRTrackedDeviceId == vr::k_unTrackedDeviceIndexInvalid) return;
 
-    if(!pLeapA || !pLeapB)
-        return;
-
-    vr::HmdQuaternion_t q = CalculateRotation(m);
-    pLeapA->UpdateHmdPose(v, q);
-    pLeapB->UpdateHmdPose(v, q);
-}
-
-void CLeapHmdLatest::UpdateHmdPose(float* v, const vr::HmdQuaternion_t& q)
-{
-    memcpy(m_hmdPos, &v[0], sizeof(m_hmdPos));
-    m_hmdRot = q;
-    m_bCalibrated = true;
+    m_Pose.deviceIsConnected = false;
+    m_pDriverHost->TrackedDevicePoseUpdated(m_unSteamVRTrackedDeviceId, m_Pose, sizeof(vr::DriverPose_t));
 }

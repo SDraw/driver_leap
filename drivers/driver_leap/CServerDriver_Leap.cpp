@@ -90,6 +90,7 @@ CServerDriver_Leap::CServerDriver_Leap()
     m_pDriverHost = nullptr;
     m_Controller = nullptr;
     memset(&m_pInfoStartedProcess, 0, sizeof(PROCESS_INFORMATION));
+    m_updatedVRConnectivity = false;
 }
 
 CServerDriver_Leap::~CServerDriver_Leap()
@@ -143,15 +144,24 @@ void CServerDriver_Leap::Cleanup()
 
 void CServerDriver_Leap::RunFrame()
 {
-    if(m_vecVRControllers.size() == 2U) CLeapHmdLatest::RealignCoordinates(m_vecVRControllers[0], m_vecVRControllers[1]);
+    for(auto iter : m_vecVRControllers) iter->RealignCoordinates();
 
     if(m_Controller)
     {
         if(m_Controller->isConnected())
         {
-            Leap::Frame frame = m_Controller->frame();
+            m_updatedVRConnectivity = false;
 
+            Leap::Frame frame = m_Controller->frame();
             for(auto iter : m_vecVRControllers) iter->Update(frame);
+        }
+        else
+        {
+            if(!m_updatedVRConnectivity)
+            {
+                for(auto iter : m_vecVRControllers) iter->SetAsDisconnected();
+                m_updatedVRConnectivity = true;
+            }
         }
     }
 }
