@@ -4,29 +4,25 @@ class CLeapHmdLatest : public vr::ITrackedDeviceServerDriver, public vr::IVRCont
 {
     typedef void (vr::IVRServerDriverHost::*ButtonUpdate)(uint32_t unWhichDevice, vr::EVRButtonId eButtonId, double eventTimeOffset);
 
-    void SendButtonUpdates(ButtonUpdate ButtonEvent, uint64_t ulMask);
-    void UpdateControllerState(Leap::Frame &frame);
-    void UpdateTrackingState(Leap::Frame &frame);
-
     vr::IVRServerDriverHost *m_pDriverHost;
 
     int m_nId;
     std::string m_strSerialNumber;
-
-    vr::DriverPose_t m_Pose;
-    vr::VRControllerState_t m_ControllerState;
-
-    bool m_bCalibrated;
-    float m_hmdPos[3];
-    vr::HmdQuaternion_t m_hmdRot;
-    bool m_connected;
-
     unsigned short m_firmware_revision;
     unsigned short m_hardware_revision;
     uint32_t m_unSteamVRTrackedDeviceId;
     std::string m_strRenderModel;
+    bool m_connected;
 
+    vr::DriverPose_t m_Pose;
+    vr::VRControllerState_t m_ControllerState;
+    float m_hmdPos[3];
+    vr::HmdQuaternion_t m_hmdRot;
     Leap::Vector m_gripAngleOffset;
+
+    void SendButtonUpdates(ButtonUpdate ButtonEvent, uint64_t ulMask);
+    void UpdateControllerState(Leap::Frame &frame);
+    void UpdateTrackingState(Leap::Frame &frame);
 public:
     CLeapHmdLatest(vr::IVRServerDriverHost* pDriverHost, int n);
     virtual ~CLeapHmdLatest();

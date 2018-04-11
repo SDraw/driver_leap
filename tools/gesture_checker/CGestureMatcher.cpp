@@ -40,9 +40,7 @@ static Leap::Vector matrix_vector(const float(*A)[3], Leap::Vector &v)
 bool CGestureMatcher::MatchGestures(const Leap::Frame &frame, WhichHand which, float(&result)[NUM_GESTURES],
     const Leap::Vector& right, const Leap::Vector& in, const Leap::Vector& up)
 {
-    // first, set all gesture matches to zero
     bool success = false;
-    memset(result, 0, sizeof(result));
 
     // Go through the hands in the dataset
     Leap::HandList &hands = frame.hands();
@@ -64,17 +62,14 @@ bool CGestureMatcher::MatchGestures(const Leap::Frame &frame, WhichHand which, f
         success = true;
 
         // stores the bend angles per finger and per joint
-        float bends[5][3] = { 0 };
+        float bends[5][3] = { { 0.f } };
 
         // total bend angle of a finger
-        float sumbend[5] = { 0 };
+        float sumbend[5] = { 0.f };
 
-        Leap::Vector fingerdir[5];
-        Leap::Vector fingertip[5];
-        bool extended[5];
-        memset(fingerdir, 0, sizeof(fingerdir));
-        memset(fingertip, 0, sizeof(fingertip));
-        memset(extended, 0, sizeof(extended));
+        Leap::Vector fingerdir[5] = { { 0.f, 0.f, 0.f } };
+        Leap::Vector fingertip[5] = { { 0.f, 0.f, 0.f } };
+        bool extended[5] = { false };
 
         // Evaluate bending of all fingers
         const Leap::FingerList &fingers = hand.fingers();

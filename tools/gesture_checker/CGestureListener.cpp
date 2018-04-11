@@ -54,7 +54,7 @@ void CGestureListener::onFrame(const Leap::Controller& controller)
 
     for(int i = 0; i < 2; i++)
     {
-        float scores[CGestureMatcher::NUM_GESTURES];
+        float scores[CGestureMatcher::NUM_GESTURES] = { 0.f };
         bool handFound = CGestureMatcher::MatchGestures(frame, (CGestureMatcher::WhichHand)(i + 1), scores);
         if(handFound)
         {
