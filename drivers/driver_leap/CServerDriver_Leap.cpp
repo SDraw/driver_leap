@@ -6,11 +6,10 @@
 #include "Utils.h"
 
 const char* const CServerDriver_Leap::ms_interfaces[] = {
-    vr::IVRSettings_Version,
     vr::ITrackedDeviceServerDriver_Version,
     vr::IVRControllerComponent_Version,
     vr::IServerTrackedDeviceProvider_Version,
-
+    nullptr
 };
 
 extern char g_ModuleFileName[];
@@ -128,7 +127,6 @@ vr::EVRInitError CServerDriver_Leap::Init(vr::IVRDriverContext *pDriverContext)
 void CServerDriver_Leap::Cleanup()
 {
     CDriverLogHelper::DriverLog("CServerDriver_Leap::Cleanup()\n");
-    CDriverLogHelper::CleanupDriverLog();
 
     if(m_bLaunchedLeapMonitor)
     {
@@ -143,9 +141,10 @@ void CServerDriver_Leap::Cleanup()
     {
         m_Controller->removeListener(*this);
         delete m_Controller;
-        m_Controller = NULL;
+        m_Controller = nullptr;
     }
 
+    CDriverLogHelper::CleanupDriverLog();
     m_pDriverHost = nullptr;
 }
 
