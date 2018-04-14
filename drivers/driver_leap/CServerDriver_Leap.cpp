@@ -5,6 +5,14 @@
 #include "CLeapHmdLatest.h"
 #include "Utils.h"
 
+const char* const CServerDriver_Leap::ms_interfaces[] = {
+    vr::IVRSettings_Version,
+    vr::ITrackedDeviceServerDriver_Version,
+    vr::IVRControllerComponent_Version,
+    vr::IServerTrackedDeviceProvider_Version,
+
+};
+
 extern char g_ModuleFileName[];
 
 void CServerDriver_Leap::onInit(const Leap::Controller& controller)
@@ -138,7 +146,6 @@ void CServerDriver_Leap::Cleanup()
         m_Controller = NULL;
     }
 
-    vr::CleanupDriverContext();
     m_pDriverHost = nullptr;
 }
 

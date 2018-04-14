@@ -5,6 +5,7 @@ class CServerDriver_Leap : public vr::IServerTrackedDeviceProvider, public Leap:
 {
 
     vr::IVRServerDriverHost* m_pDriverHost;
+    static const char* const ms_interfaces[];
 
     bool m_bLaunchedLeapMonitor;
     PROCESS_INFORMATION m_pInfoStartedProcess;
@@ -21,7 +22,7 @@ public:
     // vr::IServerTrackedDeviceProvider
     virtual vr::EVRInitError Init(vr::IVRDriverContext *pDriverContext) override;
     virtual void Cleanup() override;
-    virtual const char* const* GetInterfaceVersions() override { return vr::k_InterfaceVersions; }
+    virtual const char* const* GetInterfaceVersions() override { return ms_interfaces; }
     virtual void RunFrame() override;
 
     virtual bool ShouldBlockStandbyMode() override;
