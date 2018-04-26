@@ -9,6 +9,7 @@ const Leap::Vector g_AxisX(1.f, 0.f, 0.f);
 const Leap::Vector g_AxisY(0.f, 1.f, 0.f);
 const Leap::Vector g_AxisZ(0.f, 0.f, 1.f);
 
+extern char g_ModuleFileName[];
 const vr::VREvent_Data_t g_EmptyVREventData = { 0 };
 const long long g_VRTrackingLatency = -std::chrono::duration_cast<std::chrono::seconds>(std::chrono::milliseconds(-30)).count();
 
@@ -22,13 +23,7 @@ CLeapHmdLatest::CLeapHmdLatest(vr::IVRServerDriverHost* pDriverHost, int n)
     char buf[256];
     GenerateSerialNumber(buf, sizeof(buf), n);
     m_strSerialNumber.assign(buf);
-
-    m_firmware_revision = 0x0001;
-    m_hardware_revision = 0x0001;
-
-    vr::IVRSettings *settings_ = vr::VRSettings();
-    settings_->GetString("leap", (m_nId == LEFT_CONTROLLER) ? "renderModel_lefthand" : (m_nId == RIGHT_CONTROLLER) ? "renderModel_righthand" : "renderModel", buf, sizeof(buf));
-    m_strRenderModel.assign(buf);
+    m_propertyContainer = vr::k_ulInvalidPropertyContainer;
     m_connected = true;
 
     m_gripAngleOffset.x = CConfigHelper::GetGripOffsetX();
@@ -88,29 +83,44 @@ vr::EVRInitError CLeapHmdLatest::Activate(uint32_t unObjectId)
     CDriverLogHelper::DriverLog("CLeapHmdLatest::Activate: %s is object id %d\n", GetSerialNumber(), unObjectId);
     m_unSteamVRTrackedDeviceId = unObjectId;
 
-    vr::CVRPropertyHelpers *propertyHelpers = vr::VRProperties();
-    vr::PropertyContainerHandle_t propertyContainer = propertyHelpers->TrackedDeviceToPropertyContainer(m_unSteamVRTrackedDeviceId);
+    vr::CVRPropertyHelpers *l_vrProperties = vr::VRProperties();
+    m_propertyContainer = l_vrProperties->TrackedDeviceToPropertyContainer(m_unSteamVRTrackedDeviceId);
 
-    propertyHelpers->SetStringProperty(propertyContainer, vr::Prop_SerialNumber_String, m_strSerialNumber.c_str());
-    propertyHelpers->SetStringProperty(propertyContainer, vr::Prop_RenderModelName_String, m_strRenderModel.c_str());
-    propertyHelpers->SetStringProperty(propertyContainer, vr::Prop_ManufacturerName_String, "LeapMotion");
-    propertyHelpers->SetStringProperty(propertyContainer, vr::Prop_ModelNumber_String, "Controller");
-    propertyHelpers->SetStringProperty(propertyContainer, vr::Prop_TrackingFirmwareVersion_String, std::to_string(m_firmware_revision).c_str());
-    propertyHelpers->SetStringProperty(propertyContainer, vr::Prop_HardwareRevision_String, std::to_string(m_hardware_revision).c_str());
-    propertyHelpers->SetInt32Property(propertyContainer, vr::Prop_Axis0Type_Int32, vr::k_eControllerAxis_Joystick);
-    propertyHelpers->SetInt32Property(propertyContainer, vr::Prop_Axis1Type_Int32, vr::k_eControllerAxis_Trigger);
-    propertyHelpers->SetUint64Property(propertyContainer, vr::Prop_SupportedButtons_Uint64,
+    l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_WillDriftInYaw_Bool, false);
+    l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_DeviceIsWireless_Bool, false);
+
+    l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_DeviceClass_Int32, vr::TrackedDeviceClass_Controller);
+    l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_Axis0Type_Int32, vr::k_eControllerAxis_TrackPad);
+    l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_Axis1Type_Int32, vr::k_eControllerAxis_Trigger);
+
+    l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_SupportedButtons_Uint64,
         vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu) |
         vr::ButtonMaskFromId(vr::k_EButton_System) |
         vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Touchpad) |
         vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Trigger) |
         vr::ButtonMaskFromId(vr::k_EButton_Grip)
         );
-    propertyHelpers->SetUint64Property(propertyContainer, vr::Prop_HardwareRevision_Uint64, m_hardware_revision);
-    propertyHelpers->SetUint64Property(propertyContainer, vr::Prop_FirmwareVersion_Uint64, m_firmware_revision);
 
-    vr::HmdMatrix34_t matrix = { 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f };
-    propertyHelpers->SetProperty(propertyContainer, vr::Prop_CameraToHeadTransform_Matrix34, &matrix, sizeof(vr::HmdMatrix34_t), vr::k_unHmdMatrix34PropertyTag);
+    std::string l_modelLabel("leap_");
+    l_modelLabel.append(std::to_string(m_nId));
+    l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ModeLabel_String, l_modelLabel.c_str());
+
+    l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_ControllerRoleHint_Int32, (m_nId == LEFT_CONTROLLER) ? vr::TrackedControllerRole_LeftHand : vr::TrackedControllerRole_RightHand);
+    l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ManufacturerName_String, "HTC");
+
+    std::string l_path(g_ModuleFileName);
+    l_path.erase(l_path.begin() + l_path.rfind('\\'), l_path.end());
+    l_path.append("\\profile.json");
+    l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_InputProfileName_String, l_path.c_str());
+
+    l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_HardwareRevision_Uint64, 1313);
+    l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_FirmwareVersion_Uint64, 1315);
+    l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ModelNumber_String, "LeapMotion");
+    l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_SerialNumber_String, m_strSerialNumber.c_str());
+    l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_RenderModelName_String, "vr_controller_vive_1_5");
+
+    vr::HmdMatrix34_t matrix = { 0.f };
+    l_vrProperties->SetProperty(m_propertyContainer, vr::Prop_CameraToHeadTransform_Matrix34, &matrix, sizeof(vr::HmdMatrix34_t), vr::k_unHmdMatrix34PropertyTag);
 
     return vr::VRInitError_None;
 }

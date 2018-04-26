@@ -18,7 +18,7 @@ Refer to [parent repository](https://github.com/cbuchner1/driver_leap) for base 
 * Copy additional shared libraries to "SteamVR Leap Motion driver/leap/bin/<your_platform>":
   * vendor/LeapSDK/lib/<your_platform>/Leap.dll
   * vendor/openvr/bin/<your_platform>/openvr_api.dll
-* Copy control_config.xml from solution root to "SteamVR Leap Motion driver/leap/bin/<your_platform>"
+* Copy control_config.xml and profile.json from solution root to "SteamVR Leap Motion driver/leap/bin/<your_platform>"
   
 ### Configuration
 You can edit control_config.xml to disable specified controls.

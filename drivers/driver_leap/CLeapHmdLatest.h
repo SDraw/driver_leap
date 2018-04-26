@@ -8,10 +8,8 @@ class CLeapHmdLatest : public vr::ITrackedDeviceServerDriver, public vr::IVRCont
 
     int m_nId;
     std::string m_strSerialNumber;
-    unsigned short m_firmware_revision;
-    unsigned short m_hardware_revision;
+    vr::PropertyContainerHandle_t m_propertyContainer;
     uint32_t m_unSteamVRTrackedDeviceId;
-    std::string m_strRenderModel;
     bool m_connected;
 
     vr::DriverPose_t m_Pose;

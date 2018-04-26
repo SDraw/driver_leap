@@ -1,0 +1,5 @@
+{
+    "jsonid" : "input_profile",
+    "controller_type": "vive_controller",
+    "legacy_profile" :  "vive_controller"
+}
