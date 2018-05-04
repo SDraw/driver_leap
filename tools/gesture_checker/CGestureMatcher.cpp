@@ -161,6 +161,14 @@ bool CGestureMatcher::MatchGestures(const Leap::Frame &frame, WhichHand which, f
         merge(result[ThumbUp], std::min(fistHand, std::min(straightThumb, maprange((up).dot(fingerdir[Leap::Finger::TYPE_THUMB]), 0.8f, 0.95f))));
         merge(result[ThumbInward], std::min(fistHand, std::min(straightThumb, maprange((inward).dot(fingerdir[Leap::Finger::TYPE_THUMB]), 0.8f, 0.95f))));
 
+        // VRChat gestures
+        result[VRChat_Point] = (!extended[Leap::Finger::TYPE_THUMB] && extended[Leap::Finger::TYPE_INDEX] && !extended[Leap::Finger::TYPE_MIDDLE] && !extended[Leap::Finger::TYPE_RING] && !extended[Leap::Finger::TYPE_PINKY]) ? 1.f : 0.f;
+        result[VRChat_Gun] = (extended[Leap::Finger::TYPE_THUMB] && extended[Leap::Finger::TYPE_INDEX] && !extended[Leap::Finger::TYPE_MIDDLE] && !extended[Leap::Finger::TYPE_RING] && !extended[Leap::Finger::TYPE_PINKY]) ? 1.f : 0.f;
+        result[VRChat_SpreadHand] = (extended[Leap::Finger::TYPE_THUMB] && extended[Leap::Finger::TYPE_INDEX] && extended[Leap::Finger::TYPE_MIDDLE] && extended[Leap::Finger::TYPE_RING] && extended[Leap::Finger::TYPE_PINKY] && (hand.grabAngle() < Leap::PI / 6.f)) ? 1.f : 0.f;
+        result[VRChat_ThumbsUp] = (extended[Leap::Finger::TYPE_THUMB] && !extended[Leap::Finger::TYPE_INDEX] && !extended[Leap::Finger::TYPE_MIDDLE] && !extended[Leap::Finger::TYPE_RING] && !extended[Leap::Finger::TYPE_PINKY]) ? 1.f : 0.f;
+        result[VRChat_RockOut] = (!extended[Leap::Finger::TYPE_THUMB] && extended[Leap::Finger::TYPE_INDEX] && !extended[Leap::Finger::TYPE_MIDDLE] && !extended[Leap::Finger::TYPE_RING] && extended[Leap::Finger::TYPE_PINKY]) ? 1.f : 0.f;
+        result[VRChat_Victory] = (!extended[Leap::Finger::TYPE_THUMB] && extended[Leap::Finger::TYPE_INDEX] && extended[Leap::Finger::TYPE_MIDDLE] && !extended[Leap::Finger::TYPE_RING] && !extended[Leap::Finger::TYPE_PINKY]) ? 1.f : 0.f;
+
         if(otherhand.isValid()) // two handed gestures really need two hands
         {
             // Timeout gesture. Note that only the lower hand forming the T shape will register the gesture.

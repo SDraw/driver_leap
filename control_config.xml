@@ -1,4 +1,6 @@
 <config>
+    <param name="profile" value="default"/>
+    
     <param name="menu" value="true"/>
     <param name="appMenu" value="true"/>
     <param name="trigger" value="true"/>

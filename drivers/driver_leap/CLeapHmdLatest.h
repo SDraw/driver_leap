@@ -21,6 +21,9 @@ class CLeapHmdLatest : public vr::ITrackedDeviceServerDriver, public vr::IVRCont
     void SendButtonUpdates(ButtonUpdate ButtonEvent, uint64_t ulMask);
     void UpdateControllerState(Leap::Frame &frame);
     void UpdateTrackingState(Leap::Frame &frame);
+
+    void ProcessDefaultProfileGestures(vr::VRControllerState_t &l_state, float *l_scores);
+    void ProcessVRChatProfileGestures(vr::VRControllerState_t &l_state, float *l_scores);
 public:
     CLeapHmdLatest(vr::IVRServerDriverHost* pDriverHost, int n);
     virtual ~CLeapHmdLatest();

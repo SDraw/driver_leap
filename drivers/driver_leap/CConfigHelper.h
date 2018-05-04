@@ -2,6 +2,9 @@
 
 class CConfigHelper
 {
+    enum SGameProfile;
+
+    static SGameProfile ms_gameProfile;
     static bool ms_menu;
     static bool ms_applicationMenu;
     static bool ms_trigger;
@@ -14,7 +17,14 @@ class CConfigHelper
     static float ms_gripOffsetY;
     static float ms_gripOffsetZ;
 public:
+    enum SGameProfile
+    {
+        GP_Default = 0U,
+        GP_VRChat
+    };
+
     static void LoadConfig();
+    static inline SGameProfile GetGameProfile() { return ms_gameProfile; }
     static inline bool IsMenuEnabled() { return ms_menu; }
     static inline bool IsApplicationMenuEnabled() { return ms_applicationMenu; }
     static inline bool IsTriggerEnabled() { return ms_trigger; }

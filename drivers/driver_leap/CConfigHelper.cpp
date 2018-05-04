@@ -4,6 +4,7 @@
 
 extern char g_ModuleFileName[];
 
+CConfigHelper::SGameProfile CConfigHelper::ms_gameProfile = SGameProfile::GP_Default;
 bool CConfigHelper::ms_menu = true;
 bool CConfigHelper::ms_applicationMenu = true;
 bool CConfigHelper::ms_trigger = true;
@@ -18,22 +19,29 @@ float CConfigHelper::ms_gripOffsetZ = 0.f;
 
 const std::vector<std::string> g_configAttributeTable
 {
-    "menu", "appMenu", "trigger", "grip",
+    "profile", "menu", "appMenu", "trigger", "grip",
     "touchpad", "touchpadTouch", "touchpadPress", "touchpadAxes",
     "gripOffsetX", "gripOffsetY", "gripOffsetZ"
 };
+const std::vector<std::string> g_configProfileTable
+{
+    "default", "vrchat"
+};
 
-#define CONFIG_PARAM_MENU 0
-#define CONFIG_PARAM_APP_MENU 1
-#define CONFIG_PARAM_TRIGGER 2
-#define CONFIG_PARAM_GRIP 3
-#define CONFIG_PARAM_TOUCHPAD 4
-#define CONFIG_PARAM_TOUCHPAD_TOUCH 5
-#define CONFIG_PARAM_TOUCHPAD_PRESS 6
-#define CONFIG_PARAM_TOUCHPAD_AXES 7
-#define CONFIG_PARAM_GRIP_OFFSETX 8
-#define CONFIG_PARAM_GRIP_OFFSETY 9
-#define CONFIG_PARAM_GRIP_OFFSETZ 10
+#define CONFIG_PARAM_PROFILE 0
+#define CONFIG_PARAM_MENU 1
+#define CONFIG_PARAM_APP_MENU 2
+#define CONFIG_PARAM_TRIGGER 3
+#define CONFIG_PARAM_GRIP 4
+#define CONFIG_PARAM_TOUCHPAD 5
+#define CONFIG_PARAM_TOUCHPAD_TOUCH 6
+#define CONFIG_PARAM_TOUCHPAD_PRESS 7
+#define CONFIG_PARAM_TOUCHPAD_AXES 8
+#define CONFIG_PARAM_GRIP_OFFSETX 9
+#define CONFIG_PARAM_GRIP_OFFSETY 10
+#define CONFIG_PARAM_GRIP_OFFSETZ 11
+#define CONFIG_PROFILE_DEFAULT 0
+#define CONFIG_PROFILE_VRCHAT 1
 
 void CConfigHelper::LoadConfig()
 {
@@ -58,6 +66,19 @@ void CConfigHelper::LoadConfig()
                     {
                         switch(ReadEnumVector(l_param, g_configAttributeTable))
                         {
+                            case CONFIG_PARAM_PROFILE:
+                            {
+                                std::string l_profile = l_attrib.as_string("default");
+                                switch(ReadEnumVector(l_profile, g_configProfileTable))
+                                {
+                                    case CONFIG_PROFILE_DEFAULT:
+                                        ms_gameProfile = GP_Default;
+                                        break;
+                                    case CONFIG_PROFILE_VRCHAT:
+                                        ms_gameProfile = GP_VRChat;
+                                        break;
+                                }
+                            } break;
                             case CONFIG_PARAM_MENU:
                                 ms_menu = l_attrib.as_bool(true);
                                 break;

@@ -206,81 +206,23 @@ void CLeapHmdLatest::UpdateControllerState(Leap::Frame& frame)
         vr::VRControllerState_t NewState = { 0 };
         NewState.unPacketNum = m_ControllerState.unPacketNum + 1;
 
-        if(CConfigHelper::IsMenuEnabled())
+        switch(CConfigHelper::GetGameProfile())
         {
-            if(scores[CGestureMatcher::Timeout] >= 0.25f)
-            {
-                NewState.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_System);
-                if(scores[CGestureMatcher::Timeout] >= 0.5f) NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_System);
-            }
-        }
-
-        if(CConfigHelper::IsApplicationMenuEnabled())
-        {
-            if(scores[CGestureMatcher::FlatHandPalmTowards] >= 0.4f)
-            {
-                NewState.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu);
-                if(scores[CGestureMatcher::FlatHandPalmTowards] >= 0.8f) NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu);
-            }
-        }
-
-        if(CConfigHelper::IsTriggerEnabled())
-        {
-            if(scores[CGestureMatcher::TriggerFinger] >= 0.25f)
-            {
-                NewState.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Trigger);
-                if(scores[CGestureMatcher::TriggerFinger] >= 0.5f) NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Trigger);
-            }
-        }
-
-        if(CConfigHelper::IsGripEnabled())
-        {
-            if(scores[CGestureMatcher::LowerFist] >= 0.25f)
-            {
-                NewState.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_Grip);
-                if(scores[CGestureMatcher::LowerFist] >= 0.5f) NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_Grip);
-            }
-        }
-
-        if(CConfigHelper::IsTouchpadEnabled())
-        {
-            if(CConfigHelper::IsTouchpadTouchEnabled())
-            {
-                if(scores[CGestureMatcher::Thumbpress] >= 0.5f)
-                {
-                    NewState.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Touchpad);
-                    if(CConfigHelper::IsTouchpadPressEnabled())
-                    {
-                        if(scores[CGestureMatcher::Thumbpress] >= 0.9f) NewState.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Touchpad);
-                    }
-                }
-            }
+            case CConfigHelper::GP_Default:
+                ProcessDefaultProfileGestures(NewState, scores);
+                break;
+            case CConfigHelper::GP_VRChat:
+                ProcessVRChatProfileGestures(NewState, scores);
+                break;
         }
 
         NewState.ulButtonTouched |= NewState.ulButtonPressed;
-
         uint64_t ulChangedTouched = NewState.ulButtonTouched ^ m_ControllerState.ulButtonTouched;
         uint64_t ulChangedPressed = NewState.ulButtonPressed ^ m_ControllerState.ulButtonPressed;
-
         SendButtonUpdates(&vr::IVRServerDriverHost::TrackedDeviceButtonTouched, ulChangedTouched & NewState.ulButtonTouched);
         SendButtonUpdates(&vr::IVRServerDriverHost::TrackedDeviceButtonPressed, ulChangedPressed & NewState.ulButtonPressed);
         SendButtonUpdates(&vr::IVRServerDriverHost::TrackedDeviceButtonUnpressed, ulChangedPressed & ~NewState.ulButtonPressed);
         SendButtonUpdates(&vr::IVRServerDriverHost::TrackedDeviceButtonUntouched, ulChangedTouched & ~NewState.ulButtonTouched);
-
-        NewState.rAxis[0].x = scores[CGestureMatcher::TouchpadAxisX];
-        NewState.rAxis[0].y = scores[CGestureMatcher::TouchpadAxisY];
-
-        NewState.rAxis[1].x = scores[CGestureMatcher::TriggerFinger];
-        NewState.rAxis[1].y = 0.0f;
-
-        if(CConfigHelper::IsTouchpadEnabled() && CConfigHelper::IsTouchpadTouchEnabled() && CConfigHelper::IsTouchpadAxesEnabled())
-        {
-            if(NewState.rAxis[0].x != m_ControllerState.rAxis[0].x || NewState.rAxis[0].y != m_ControllerState.rAxis[0].y)
-                m_pDriverHost->TrackedDeviceAxisUpdated(m_unSteamVRTrackedDeviceId, 0, NewState.rAxis[0]);
-        }
-
-        if(NewState.rAxis[1].x != m_ControllerState.rAxis[1].x)
-            m_pDriverHost->TrackedDeviceAxisUpdated(m_unSteamVRTrackedDeviceId, 1, NewState.rAxis[1]);
 
         std::memcpy(&m_ControllerState, &NewState, sizeof(vr::VRControllerState_t));
     }
@@ -383,4 +325,131 @@ void CLeapHmdLatest::SetAsDisconnected()
 
     m_Pose.deviceIsConnected = false;
     m_pDriverHost->TrackedDevicePoseUpdated(m_unSteamVRTrackedDeviceId, m_Pose, sizeof(vr::DriverPose_t));
+}
+
+void CLeapHmdLatest::ProcessDefaultProfileGestures(vr::VRControllerState_t &l_state, float *l_scores)
+{
+    if(CConfigHelper::IsMenuEnabled())
+    {
+        if(l_scores[CGestureMatcher::Timeout] >= 0.25f)
+        {
+            l_state.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_System);
+            if(l_scores[CGestureMatcher::Timeout] >= 0.5f) l_state.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_System);
+        }
+    }
+
+    if(CConfigHelper::IsApplicationMenuEnabled())
+    {
+        if(l_scores[CGestureMatcher::FlatHandPalmTowards] >= 0.4f)
+        {
+            l_state.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu);
+            if(l_scores[CGestureMatcher::FlatHandPalmTowards] >= 0.8f) l_state.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu);
+        }
+    }
+
+    if(CConfigHelper::IsTriggerEnabled())
+    {
+        if(l_scores[CGestureMatcher::TriggerFinger] >= 0.25f)
+        {
+            l_state.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Trigger);
+            if(l_scores[CGestureMatcher::TriggerFinger] >= 0.5f) l_state.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Trigger);
+        }
+    }
+
+    if(CConfigHelper::IsGripEnabled())
+    {
+        if(l_scores[CGestureMatcher::LowerFist] >= 0.25f)
+        {
+            l_state.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_Grip);
+            if(l_scores[CGestureMatcher::LowerFist] >= 0.5f) l_state.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_Grip);
+        }
+    }
+
+    if(CConfigHelper::IsTouchpadEnabled())
+    {
+        if(CConfigHelper::IsTouchpadTouchEnabled())
+        {
+            if(l_scores[CGestureMatcher::Thumbpress] >= 0.5f)
+            {
+                l_state.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Touchpad);
+                if(CConfigHelper::IsTouchpadPressEnabled())
+                {
+                    if(l_scores[CGestureMatcher::Thumbpress] >= 0.9f) l_state.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Touchpad);
+                }
+            }
+        }
+    }
+
+    l_state.rAxis[0].x = l_scores[CGestureMatcher::TouchpadAxisX];
+    l_state.rAxis[0].y = l_scores[CGestureMatcher::TouchpadAxisY];
+    l_state.rAxis[1].x = l_scores[CGestureMatcher::TriggerFinger];
+    l_state.rAxis[1].y = 0.0f;
+
+    if(CConfigHelper::IsTouchpadEnabled() && CConfigHelper::IsTouchpadTouchEnabled() && CConfigHelper::IsTouchpadAxesEnabled())
+    {
+        if(l_state.rAxis[0].x != m_ControllerState.rAxis[0].x || l_state.rAxis[0].y != m_ControllerState.rAxis[0].y)
+            m_pDriverHost->TrackedDeviceAxisUpdated(m_unSteamVRTrackedDeviceId, 0, l_state.rAxis[0]);
+    }
+    if(l_state.rAxis[1].x != m_ControllerState.rAxis[1].x)
+        m_pDriverHost->TrackedDeviceAxisUpdated(m_unSteamVRTrackedDeviceId, 1, l_state.rAxis[1]);
+}
+void CLeapHmdLatest::ProcessVRChatProfileGestures(vr::VRControllerState_t &l_state, float *l_scores)
+{
+    // VRChat profile ignores control restrictions
+    if(l_scores[CGestureMatcher::Timeout] >= 0.75f)
+    {
+        l_state.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu);
+        l_state.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu);
+    }
+    if(l_scores[CGestureMatcher::LowerFist] >= 0.5f)
+    {
+        l_state.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Trigger);
+        l_state.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Trigger);
+    }
+    if(l_scores[CGestureMatcher::VRChat_SpreadHand] >= 0.75f)
+    {
+        l_state.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_Grip);
+        l_state.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_Grip);
+    }
+
+    l_state.rAxis[0].x = 0.f;
+    l_state.rAxis[0].y = 0.f;
+    if(l_scores[CGestureMatcher::VRChat_Point] >= 0.75f)
+    {
+        l_state.rAxis[0].x = 0.0f;
+        l_state.rAxis[0].y = 1.0f;
+    }
+    else if(l_scores[CGestureMatcher::VRChat_ThumbsUp] >= 0.75f)
+    {
+        l_state.rAxis[0].x = -0.95f;
+        l_state.rAxis[0].y = 0.31f;
+    }
+    else if(l_scores[CGestureMatcher::VRChat_Victory] >= 0.75f)
+    {
+        l_state.rAxis[0].x = 0.95f;
+        l_state.rAxis[0].y = 0.31f;
+    }
+    else if(l_scores[CGestureMatcher::VRChat_Gun] >= 0.75f)
+    {
+        l_state.rAxis[0].x = -0.59f;
+        l_state.rAxis[0].y = -0.81f;
+    }
+    else if(l_scores[CGestureMatcher::VRChat_RockOut] >= 0.75f)
+    {
+        l_state.rAxis[0].x = 0.59f;
+        l_state.rAxis[0].y = -0.81f;
+    }
+    if(l_state.rAxis[0].x != 0.f || l_state.rAxis[0].y != 0.f)
+    {
+        l_state.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Touchpad);
+        if(m_nId == LEFT_CONTROLLER) l_state.rAxis[0].x *= -1.f;
+    }
+
+    l_state.rAxis[1].x = l_scores[CGestureMatcher::LowerFist];
+    l_state.rAxis[1].y = 0.0f;
+
+    if(l_state.rAxis[0].x != m_ControllerState.rAxis[0].x || l_state.rAxis[0].y != m_ControllerState.rAxis[0].y)
+            m_pDriverHost->TrackedDeviceAxisUpdated(m_unSteamVRTrackedDeviceId, 0, l_state.rAxis[0]);
+    if (l_state.rAxis[1].x != m_ControllerState.rAxis[1].x)
+        m_pDriverHost->TrackedDeviceAxisUpdated(m_unSteamVRTrackedDeviceId, 1, l_state.rAxis[1]);
 }
