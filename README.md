@@ -35,12 +35,12 @@ Gestures:
   * Touchpad circle - index finger of hand directed to palm of another hand
 * **vrchat** - profile for VRChat. Control restrictions are ignored.
 Game gestures:
-* Gun - corresponding hand gesture
-* V-shape - corresponding hand gesture
-* Point - corresponding hand gesture
-* Rock out - corresponding hand gesture
-* Thumbs up - corresponding hand gesture
-* Spread hand - corresponding hand gesture
-* Trigger - grab gesture
-* Grip - slightly closed hand
-* Application menu - formed T-shape with two hands
+  * Gun - corresponding hand gesture
+  * V-shape - corresponding hand gesture
+  * Point - corresponding hand gesture
+  * Rock out - corresponding hand gesture
+  * Thumbs up - corresponding hand gesture
+  * Spread hand - corresponding hand gesture
+  * Trigger - grab gesture
+  * Grip - slightly closed hand
+  * Application menu - formed T-shape with two hands
