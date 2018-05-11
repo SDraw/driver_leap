@@ -1,10 +1,9 @@
 #pragma once
 
-class CLeapHmdLatest : public vr::ITrackedDeviceServerDriver, public vr::IVRControllerComponent
+class CLeapHmdLatest : public vr::ITrackedDeviceServerDriver
 {
-    typedef void (vr::IVRServerDriverHost::*ButtonUpdate)(uint32_t unWhichDevice, vr::EVRButtonId eButtonId, double eventTimeOffset);
-
     vr::IVRServerDriverHost *m_pDriverHost;
+    vr::IVRDriverInput *m_driverInput;
 
     int m_nId;
     std::string m_strSerialNumber;
@@ -13,17 +12,40 @@ class CLeapHmdLatest : public vr::ITrackedDeviceServerDriver, public vr::IVRCont
     bool m_connected;
 
     vr::DriverPose_t m_Pose;
-    vr::VRControllerState_t m_ControllerState;
     float m_hmdPos[3];
     vr::HmdQuaternion_t m_hmdRot;
     Leap::Vector m_gripAngleOffset;
 
-    void SendButtonUpdates(ButtonUpdate ButtonEvent, uint64_t ulMask);
+    enum EControllerButton
+    {
+        CB_SysClick = 0U,
+        CB_GripClick,
+        CB_AppMenuClick,
+        CB_TriggerClick,
+        CB_TriggerValue,
+        CB_TrackpadX,
+        CB_TrackpadY,
+        CB_TrackpadClick,
+        CB_TrackpadTouch,
+
+        CB_Count
+    };
+    struct SControllerButton
+    {
+        vr::VRInputComponentHandle_t m_handle = vr::k_ulInvalidInputComponentHandle;
+        union
+        {
+            float m_value;
+            bool m_state;
+        };
+    };
+    SControllerButton m_buttons[CB_Count];
+
     void UpdateControllerState(Leap::Frame &frame);
     void UpdateTrackingState(Leap::Frame &frame);
 
-    void ProcessDefaultProfileGestures(vr::VRControllerState_t &l_state, float *l_scores);
-    void ProcessVRChatProfileGestures(vr::VRControllerState_t &l_state, float *l_scores);
+    void ProcessDefaultProfileGestures(float *l_scores);
+    void ProcessVRChatProfileGestures(float *l_scores);
 public:
     CLeapHmdLatest(vr::IVRServerDriverHost* pDriverHost, int n);
     virtual ~CLeapHmdLatest();
@@ -35,10 +57,6 @@ public:
     virtual void DebugRequest(const char* pchRequest, char* pchResponseBuffer, uint32_t unResponseBufferSize) override;
     virtual vr::DriverPose_t GetPose() override;
     virtual void EnterStandby() override;
-
-    // vr::IVRControllerComponent
-    virtual vr::VRControllerState_t GetControllerState() override;
-    virtual bool TriggerHapticPulse(uint32_t unAxisId, uint16_t usPulseDurationMicroseconds) override;
 
     void Update(Leap::Frame& frame);
     const char* GetSerialNumber() const;

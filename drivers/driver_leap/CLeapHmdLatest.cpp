@@ -14,11 +14,13 @@ const vr::VREvent_Data_t g_EmptyVREventData = { 0 };
 const long long g_VRTrackingLatency = -std::chrono::duration_cast<std::chrono::seconds>(std::chrono::milliseconds(-30)).count();
 
 CLeapHmdLatest::CLeapHmdLatest(vr::IVRServerDriverHost* pDriverHost, int n)
-    : m_pDriverHost(pDriverHost)
-    , m_nId(n)
-    , m_unSteamVRTrackedDeviceId(vr::k_unTrackedDeviceIndexInvalid)
 {
     CDriverLogHelper::DriverLog("CLeapHmdLatest::CLeapHmdLatest(n=%d)\n", n);
+
+    m_pDriverHost = pDriverHost;
+    m_driverInput = nullptr;
+    m_nId = n;
+    m_unSteamVRTrackedDeviceId = vr::k_unTrackedDeviceIndexInvalid;
 
     char buf[256];
     GenerateSerialNumber(buf, sizeof(buf), n);
@@ -59,7 +61,6 @@ CLeapHmdLatest::CLeapHmdLatest(vr::IVRServerDriverHost* pDriverHost, int n)
     m_Pose.result = vr::TrackingResult_Uninitialized;
 
     std::fill_n(m_hmdPos, 3U, 0.f);
-    m_ControllerState = { 0 };
     m_hmdRot = { 1.0, .0, .0, .0 };
 }
 
@@ -70,11 +71,6 @@ CLeapHmdLatest::~CLeapHmdLatest()
 
 void* CLeapHmdLatest::GetComponent(const char* pchComponentNameAndVersion)
 {
-    if(!stricmp(pchComponentNameAndVersion, vr::IVRControllerComponent_Version))
-    {
-        return (vr::IVRControllerComponent*)this;
-    }
-
     return NULL;
 }
 
@@ -111,7 +107,7 @@ vr::EVRInitError CLeapHmdLatest::Activate(uint32_t unObjectId)
     std::string l_path(g_ModuleFileName);
     l_path.erase(l_path.begin() + l_path.rfind('\\'), l_path.end());
     l_path.append("\\profile.json");
-    l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_InputProfileName_String, l_path.c_str());
+    l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_InputProfilePath_String, l_path.c_str());
 
     l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_HardwareRevision_Uint64, 1313);
     l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_FirmwareVersion_Uint64, 1315);
@@ -121,6 +117,17 @@ vr::EVRInitError CLeapHmdLatest::Activate(uint32_t unObjectId)
 
     vr::HmdMatrix34_t matrix = { 0.f };
     l_vrProperties->SetProperty(m_propertyContainer, vr::Prop_CameraToHeadTransform_Matrix34, &matrix, sizeof(vr::HmdMatrix34_t), vr::k_unHmdMatrix34PropertyTag);
+
+    m_driverInput = vr::VRDriverInput();
+    m_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/system/click", &m_buttons[CB_SysClick].m_handle);
+    m_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/grip/click", &m_buttons[CB_GripClick].m_handle);
+    m_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/application_menu/click", &m_buttons[CB_AppMenuClick].m_handle);
+    m_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/trigger/click", &m_buttons[CB_TriggerClick].m_handle);
+    m_driverInput->CreateScalarComponent(m_propertyContainer, "/input/trigger/value", &m_buttons[CB_TriggerValue].m_handle, vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedOneSided);
+    m_driverInput->CreateScalarComponent(m_propertyContainer, "/input/trackpad/x", &m_buttons[CB_TrackpadX].m_handle, vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedTwoSided);
+    m_driverInput->CreateScalarComponent(m_propertyContainer, "/input/trackpad/y", &m_buttons[CB_TrackpadY].m_handle, vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedTwoSided);
+    m_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/trackpad/click", &m_buttons[CB_TrackpadClick].m_handle);
+    m_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/trackpad/touch", &m_buttons[CB_TrackpadTouch].m_handle);
 
     return vr::VRInitError_None;
 }
@@ -171,28 +178,6 @@ void CLeapHmdLatest::EnterStandby()
     CDriverLogHelper::DriverLog("CLeapHmdLatest::EnterStandby()\n");
 }
 
-vr::VRControllerState_t CLeapHmdLatest::GetControllerState()
-{
-    return m_ControllerState;
-}
-
-bool CLeapHmdLatest::TriggerHapticPulse(uint32_t unAxisId, uint16_t usPulseDurationMicroseconds)
-{
-    return true;
-}
-
-void CLeapHmdLatest::SendButtonUpdates(ButtonUpdate ButtonEvent, uint64_t ulMask)
-{
-    if(!ulMask) return;
-
-    for(int i = 0; i < vr::k_EButton_Max; i++)
-    {
-        vr::EVRButtonId button = (vr::EVRButtonId)i;
-        uint64_t bit = ButtonMaskFromId(button);
-        if(bit & ulMask) (m_pDriverHost->*ButtonEvent)(m_unSteamVRTrackedDeviceId, button, 0.0);
-    }
-}
-
 void CLeapHmdLatest::UpdateControllerState(Leap::Frame& frame)
 {
     bool handFound = false;
@@ -203,28 +188,15 @@ void CLeapHmdLatest::UpdateControllerState(Leap::Frame& frame)
 
     if(handFound)
     {
-        vr::VRControllerState_t NewState = { 0 };
-        NewState.unPacketNum = m_ControllerState.unPacketNum + 1;
-
         switch(CConfigHelper::GetGameProfile())
         {
             case CConfigHelper::GP_Default:
-                ProcessDefaultProfileGestures(NewState, scores);
+                ProcessDefaultProfileGestures(scores);
                 break;
             case CConfigHelper::GP_VRChat:
-                ProcessVRChatProfileGestures(NewState, scores);
+                ProcessVRChatProfileGestures(scores);
                 break;
         }
-
-        NewState.ulButtonTouched |= NewState.ulButtonPressed;
-        uint64_t ulChangedTouched = NewState.ulButtonTouched ^ m_ControllerState.ulButtonTouched;
-        uint64_t ulChangedPressed = NewState.ulButtonPressed ^ m_ControllerState.ulButtonPressed;
-        SendButtonUpdates(&vr::IVRServerDriverHost::TrackedDeviceButtonTouched, ulChangedTouched & NewState.ulButtonTouched);
-        SendButtonUpdates(&vr::IVRServerDriverHost::TrackedDeviceButtonPressed, ulChangedPressed & NewState.ulButtonPressed);
-        SendButtonUpdates(&vr::IVRServerDriverHost::TrackedDeviceButtonUnpressed, ulChangedPressed & ~NewState.ulButtonPressed);
-        SendButtonUpdates(&vr::IVRServerDriverHost::TrackedDeviceButtonUntouched, ulChangedTouched & ~NewState.ulButtonTouched);
-
-        std::memcpy(&m_ControllerState, &NewState, sizeof(vr::VRControllerState_t));
     }
 }
 
@@ -327,129 +299,185 @@ void CLeapHmdLatest::SetAsDisconnected()
     m_pDriverHost->TrackedDevicePoseUpdated(m_unSteamVRTrackedDeviceId, m_Pose, sizeof(vr::DriverPose_t));
 }
 
-void CLeapHmdLatest::ProcessDefaultProfileGestures(vr::VRControllerState_t &l_state, float *l_scores)
+void CLeapHmdLatest::ProcessDefaultProfileGestures(float *l_scores)
 {
     if(CConfigHelper::IsMenuEnabled())
     {
-        if(l_scores[CGestureMatcher::Timeout] >= 0.25f)
+        bool l_state = (l_scores[CGestureMatcher::Timeout] >= 0.25f);
+        SControllerButton &l_button = m_buttons[CB_SysClick];
+        if(l_button.m_state != l_state)
         {
-            l_state.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_System);
-            if(l_scores[CGestureMatcher::Timeout] >= 0.5f) l_state.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_System);
+            l_button.m_state = l_state;
+            m_driverInput->UpdateBooleanComponent(l_button.m_handle, l_state, .0);
         }
     }
 
     if(CConfigHelper::IsApplicationMenuEnabled())
     {
-        if(l_scores[CGestureMatcher::FlatHandPalmTowards] >= 0.4f)
+        bool l_state = (l_scores[CGestureMatcher::FlatHandPalmTowards] >= 0.8f);
+        SControllerButton &l_button = m_buttons[CB_AppMenuClick];
+        if(l_button.m_state != l_state)
         {
-            l_state.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu);
-            if(l_scores[CGestureMatcher::FlatHandPalmTowards] >= 0.8f) l_state.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu);
+            l_button.m_state = l_state;
+            m_driverInput->UpdateBooleanComponent(l_button.m_handle, l_state, .0);
         }
     }
 
     if(CConfigHelper::IsTriggerEnabled())
     {
-        if(l_scores[CGestureMatcher::TriggerFinger] >= 0.25f)
+        bool l_state = (l_scores[CGestureMatcher::TriggerFinger] >= 0.5f);
+        SControllerButton &l_button1 = m_buttons[CB_TriggerClick];
+        if(l_button1.m_state != l_state)
         {
-            l_state.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Trigger);
-            if(l_scores[CGestureMatcher::TriggerFinger] >= 0.5f) l_state.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Trigger);
+            l_button1.m_state = l_state;
+            m_driverInput->UpdateBooleanComponent(l_button1.m_handle, l_state, .0);
+        }
+
+        SControllerButton &l_button2 = m_buttons[CB_TriggerValue];
+        if(l_button2.m_value != l_scores[CGestureMatcher::TriggerFinger])
+        {
+            l_button2.m_value = l_scores[CGestureMatcher::TriggerFinger];
+            m_driverInput->UpdateScalarComponent(l_button2.m_handle, l_button2.m_value, .0);
         }
     }
 
     if(CConfigHelper::IsGripEnabled())
     {
-        if(l_scores[CGestureMatcher::LowerFist] >= 0.25f)
+        bool l_state = (l_scores[CGestureMatcher::LowerFist] >= 0.5f);
+        SControllerButton &l_button = m_buttons[CB_GripClick];
+        if(l_button.m_state != l_state)
         {
-            l_state.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_Grip);
-            if(l_scores[CGestureMatcher::LowerFist] >= 0.5f) l_state.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_Grip);
+            l_button.m_state = l_state;
+            m_driverInput->UpdateBooleanComponent(l_button.m_handle, l_state, .0);
         }
     }
 
     if(CConfigHelper::IsTouchpadEnabled())
     {
+        if(CConfigHelper::IsTouchpadAxesEnabled())
+        {
+            SControllerButton &l_button1 = m_buttons[CB_TrackpadX];
+            if(l_button1.m_value != l_scores[CGestureMatcher::TouchpadAxisX])
+            {
+                l_button1.m_value = l_scores[CGestureMatcher::TouchpadAxisX];
+                m_driverInput->UpdateScalarComponent(l_button1.m_handle, l_button1.m_value, .0);
+            }
+
+            SControllerButton &l_button2 = m_buttons[CB_TrackpadY];
+            if(l_button2.m_value != l_scores[CGestureMatcher::TouchpadAxisY])
+            {
+                l_button2.m_value = l_scores[CGestureMatcher::TouchpadAxisY];
+                m_driverInput->UpdateScalarComponent(l_button2.m_handle, l_button2.m_value, .0);
+            }
+        }
+
         if(CConfigHelper::IsTouchpadTouchEnabled())
         {
-            if(l_scores[CGestureMatcher::Thumbpress] >= 0.5f)
+            bool l_state = (l_scores[CGestureMatcher::Thumbpress] >= 0.5f);
+            SControllerButton &l_button = m_buttons[CB_TrackpadTouch];
+            if(l_button.m_state != l_state)
             {
-                l_state.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Touchpad);
-                if(CConfigHelper::IsTouchpadPressEnabled())
-                {
-                    if(l_scores[CGestureMatcher::Thumbpress] >= 0.9f) l_state.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Touchpad);
-                }
+                l_button.m_state = l_state;
+                m_driverInput->UpdateBooleanComponent(l_button.m_handle, l_state, .0);
+            }
+        }
+
+        if(CConfigHelper::IsTouchpadPressEnabled())
+        {
+            bool l_state = (l_scores[CGestureMatcher::Thumbpress] >= 0.9f);
+            SControllerButton &l_button = m_buttons[CB_TrackpadClick];
+            if(l_button.m_state != l_state)
+            {
+                l_button.m_state = l_state;
+                m_driverInput->UpdateBooleanComponent(l_button.m_handle, l_state, .0);
             }
         }
     }
-
-    l_state.rAxis[0].x = l_scores[CGestureMatcher::TouchpadAxisX];
-    l_state.rAxis[0].y = l_scores[CGestureMatcher::TouchpadAxisY];
-    l_state.rAxis[1].x = l_scores[CGestureMatcher::TriggerFinger];
-    l_state.rAxis[1].y = 0.0f;
-
-    if(CConfigHelper::IsTouchpadEnabled() && CConfigHelper::IsTouchpadTouchEnabled() && CConfigHelper::IsTouchpadAxesEnabled())
-    {
-        if(l_state.rAxis[0].x != m_ControllerState.rAxis[0].x || l_state.rAxis[0].y != m_ControllerState.rAxis[0].y)
-            m_pDriverHost->TrackedDeviceAxisUpdated(m_unSteamVRTrackedDeviceId, 0, l_state.rAxis[0]);
-    }
-    if(l_state.rAxis[1].x != m_ControllerState.rAxis[1].x)
-        m_pDriverHost->TrackedDeviceAxisUpdated(m_unSteamVRTrackedDeviceId, 1, l_state.rAxis[1]);
 }
-void CLeapHmdLatest::ProcessVRChatProfileGestures(vr::VRControllerState_t &l_state, float *l_scores)
+void CLeapHmdLatest::ProcessVRChatProfileGestures(float *l_scores)
 {
     // VRChat profile ignores control restrictions
-    if(l_scores[CGestureMatcher::Timeout] >= 0.75f)
+    bool l_state = (l_scores[CGestureMatcher::Timeout] >= 0.75f);
+    SControllerButton &l_button1 = m_buttons[CB_AppMenuClick];
+    if(l_button1.m_state != l_state)
     {
-        l_state.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu);
-        l_state.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu);
-    }
-    if(l_scores[CGestureMatcher::LowerFist] >= 0.5f)
-    {
-        l_state.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Trigger);
-        l_state.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Trigger);
-    }
-    if(l_scores[CGestureMatcher::VRChat_SpreadHand] >= 0.75f)
-    {
-        l_state.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_Grip);
-        l_state.ulButtonPressed |= vr::ButtonMaskFromId(vr::k_EButton_Grip);
+        l_button1.m_state = l_state;
+        m_driverInput->UpdateBooleanComponent(l_button1.m_handle, l_state, .0);
     }
 
-    l_state.rAxis[0].x = 0.f;
-    l_state.rAxis[0].y = 0.f;
+    l_state = (l_scores[CGestureMatcher::LowerFist] >= 0.5f);
+    SControllerButton &l_button2 = m_buttons[CB_TriggerClick];
+    if(l_button2.m_state != l_state)
+    {
+        l_button2.m_state = l_state;
+        m_driverInput->UpdateBooleanComponent(l_button2.m_handle, l_state, .0);
+    }
+
+    l_state = (l_scores[CGestureMatcher::VRChat_SpreadHand] >= 0.75f);
+    SControllerButton &l_button3 = m_buttons[CB_GripClick];
+    if(l_button3.m_state != l_state)
+    {
+        l_button3.m_state = l_state;
+        m_driverInput->UpdateBooleanComponent(l_button3.m_handle, l_state, .0);
+    }
+
+    vr::VRControllerAxis_t l_trackpadAxis = { 0.f };
     if(l_scores[CGestureMatcher::VRChat_Point] >= 0.75f)
     {
-        l_state.rAxis[0].x = 0.0f;
-        l_state.rAxis[0].y = 1.0f;
+        l_trackpadAxis.x = 0.0f;
+        l_trackpadAxis.y = 1.0f;
     }
     else if(l_scores[CGestureMatcher::VRChat_ThumbsUp] >= 0.75f)
     {
-        l_state.rAxis[0].x = -0.95f;
-        l_state.rAxis[0].y = 0.31f;
+        l_trackpadAxis.x = -0.95f;
+        l_trackpadAxis.y = 0.31f;
     }
     else if(l_scores[CGestureMatcher::VRChat_Victory] >= 0.75f)
     {
-        l_state.rAxis[0].x = 0.95f;
-        l_state.rAxis[0].y = 0.31f;
+        l_trackpadAxis.x = 0.95f;
+        l_trackpadAxis.y = 0.31f;
     }
     else if(l_scores[CGestureMatcher::VRChat_Gun] >= 0.75f)
     {
-        l_state.rAxis[0].x = -0.59f;
-        l_state.rAxis[0].y = -0.81f;
+        l_trackpadAxis.x = -0.59f;
+        l_trackpadAxis.y = -0.81f;
     }
     else if(l_scores[CGestureMatcher::VRChat_RockOut] >= 0.75f)
     {
-        l_state.rAxis[0].x = 0.59f;
-        l_state.rAxis[0].y = -0.81f;
+        l_trackpadAxis.x = 0.59f;
+        l_trackpadAxis.y = -0.81f;
     }
-    if(l_state.rAxis[0].x != 0.f || l_state.rAxis[0].y != 0.f)
+    
+    l_state = (l_trackpadAxis.x != 0.f || l_trackpadAxis.y != 0.f);
+    if(l_state)
     {
-        l_state.ulButtonTouched |= vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Touchpad);
-        if(m_nId == LEFT_CONTROLLER) l_state.rAxis[0].x *= -1.f;
+        if(m_nId == LEFT_CONTROLLER) l_trackpadAxis.x *= -1.f;
+
+        SControllerButton &l_button4 = m_buttons[CB_TrackpadX];
+        if(l_button4.m_value != l_trackpadAxis.x)
+        {
+            l_button4.m_value = l_trackpadAxis.x;
+            m_driverInput->UpdateScalarComponent(l_button4.m_handle, l_button4.m_value, .0);
+        }
+
+        SControllerButton &l_button5 = m_buttons[CB_TrackpadY];
+        if(l_button5.m_value != l_trackpadAxis.y)
+        {
+            l_button5.m_value = l_trackpadAxis.y;
+            m_driverInput->UpdateScalarComponent(l_button5.m_handle, l_button5.m_value, .0);
+        }
+    }
+    SControllerButton &l_button6 = m_buttons[CB_TrackpadTouch];
+    if(l_button6.m_state != l_state)
+    {
+        l_button6.m_state = l_state;
+        m_driverInput->UpdateBooleanComponent(l_button6.m_handle, l_state, .0);
     }
 
-    l_state.rAxis[1].x = l_scores[CGestureMatcher::LowerFist];
-    l_state.rAxis[1].y = 0.0f;
-
-    if(l_state.rAxis[0].x != m_ControllerState.rAxis[0].x || l_state.rAxis[0].y != m_ControllerState.rAxis[0].y)
-            m_pDriverHost->TrackedDeviceAxisUpdated(m_unSteamVRTrackedDeviceId, 0, l_state.rAxis[0]);
-    if (l_state.rAxis[1].x != m_ControllerState.rAxis[1].x)
-        m_pDriverHost->TrackedDeviceAxisUpdated(m_unSteamVRTrackedDeviceId, 1, l_state.rAxis[1]);
+    SControllerButton &l_button7 = m_buttons[CB_TriggerValue];
+    if(l_button7.m_value != l_scores[CGestureMatcher::LowerFist])
+    {
+        l_button7.m_value = l_scores[CGestureMatcher::LowerFist];
+        m_driverInput->UpdateScalarComponent(l_button7.m_handle, l_button7.m_value, .0);
+    }
 }

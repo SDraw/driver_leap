@@ -7,7 +7,6 @@
 
 const char* const CServerDriver_Leap::ms_interfaces[] = {
     vr::ITrackedDeviceServerDriver_Version,
-    vr::IVRControllerComponent_Version,
     vr::IServerTrackedDeviceProvider_Version,
     nullptr
 };
