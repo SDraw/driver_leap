@@ -69,6 +69,12 @@ void CLeapMonitor::MainLoop()
                         TriggerRealignCoordinates(Event);
                     }
                     break;
+                case vr::VREvent_SceneFocusChanged:
+                {
+                    char l_appKeyNew[vr::k_unMaxApplicationKeyLength];
+                    vr::VRApplications()->GetApplicationKeyByProcessId(Event.data.process.pid, l_appKeyNew, sizeof(l_appKeyNew));
+                    UpdateApplicationKey(l_appKeyNew);
+                } break;
             }
         }
     }
@@ -119,4 +125,15 @@ void CLeapMonitor::UpdateTrackedDevice(uint32_t unTrackedDeviceIndex)
 bool CLeapMonitor::IsLeapDevice(uint32_t unTrackedDeviceIndex)
 {
     return (m_setLeapDevices.count(unTrackedDeviceIndex) != 0);
+}
+
+void CLeapMonitor::UpdateApplicationKey(const char *f_appKey)
+{
+    if(!m_setLeapDevices.empty())
+    {
+        char l_response[32];
+        std::string l_data("app_key ");
+        l_data.append(f_appKey);
+        for(auto iter : m_setLeapDevices) vr::VRSystem()->DriverDebugRequest(iter, l_data.c_str(), l_response, sizeof(l_response));
+    }
 }

@@ -16,6 +16,13 @@ class CLeapHmdLatest : public vr::ITrackedDeviceServerDriver
     vr::HmdQuaternion_t m_hmdRot;
     Leap::Vector m_gripAngleOffset;
 
+    enum EGameProfile
+    {
+        GP_Default = 0U,
+        GP_VRChat
+    };
+    EGameProfile m_gameProfile;
+
     enum EControllerButton
     {
         CB_SysClick = 0U,
@@ -46,6 +53,8 @@ class CLeapHmdLatest : public vr::ITrackedDeviceServerDriver
 
     void ProcessDefaultProfileGestures(float *l_scores);
     void ProcessVRChatProfileGestures(float *l_scores);
+
+    void ResetControls();
 public:
     CLeapHmdLatest(vr::IVRServerDriverHost* pDriverHost, int n);
     virtual ~CLeapHmdLatest();

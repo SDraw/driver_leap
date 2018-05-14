@@ -13,6 +13,11 @@ extern char g_ModuleFileName[];
 const vr::VREvent_Data_t g_EmptyVREventData = { 0 };
 const long long g_VRTrackingLatency = -std::chrono::duration_cast<std::chrono::seconds>(std::chrono::milliseconds(-30)).count();
 
+const std::vector<std::string> g_appKeysTable = {
+    "steam.app.438100" // VRChat
+};
+#define CONTROLLER_GP_VRCHAT 0U
+
 CLeapHmdLatest::CLeapHmdLatest(vr::IVRServerDriverHost* pDriverHost, int n)
 {
     CDriverLogHelper::DriverLog("CLeapHmdLatest::CLeapHmdLatest(n=%d)\n", n);
@@ -62,6 +67,7 @@ CLeapHmdLatest::CLeapHmdLatest(vr::IVRServerDriverHost* pDriverHost, int n)
 
     std::fill_n(m_hmdPos, 3U, 0.f);
     m_hmdRot = { 1.0, .0, .0, .0 };
+    m_gameProfile = GP_Default;
 }
 
 CLeapHmdLatest::~CLeapHmdLatest()
@@ -160,6 +166,21 @@ void CLeapHmdLatest::DebugRequest(const char* pchRequest, char* pchResponseBuffe
         memcpy(m_hmdPos, &v[0], sizeof(m_hmdPos));
         m_hmdRot = q;
     }
+    else if(!strCmd.compare("app_key"))
+    {
+        std::string l_appKey;
+        ss >> l_appKey;
+
+        ResetControls();
+        switch(ReadEnumVector(l_appKey, g_appKeysTable))
+        {
+            case CONTROLLER_GP_VRCHAT:
+                m_gameProfile = GP_VRChat;
+                break;
+            default:
+                m_gameProfile = GP_VRChat;
+        }
+    }
 }
 
 const char* CLeapHmdLatest::GetSerialNumber() const
@@ -188,12 +209,12 @@ void CLeapHmdLatest::UpdateControllerState(Leap::Frame& frame)
 
     if(handFound)
     {
-        switch(CConfigHelper::GetGameProfile())
+        switch(m_gameProfile)
         {
-            case CConfigHelper::GP_Default:
+            case GP_Default:
                 ProcessDefaultProfileGestures(scores);
                 break;
-            case CConfigHelper::GP_VRChat:
+            case GP_VRChat:
                 ProcessVRChatProfileGestures(scores);
                 break;
         }
@@ -447,7 +468,7 @@ void CLeapHmdLatest::ProcessVRChatProfileGestures(float *l_scores)
         l_trackpadAxis.x = 0.59f;
         l_trackpadAxis.y = -0.81f;
     }
-    
+
     l_state = (l_trackpadAxis.x != 0.f || l_trackpadAxis.y != 0.f);
     if(l_state)
     {
@@ -480,4 +501,26 @@ void CLeapHmdLatest::ProcessVRChatProfileGestures(float *l_scores)
         l_button7.m_value = l_scores[CGestureMatcher::LowerFist];
         m_driverInput->UpdateScalarComponent(l_button7.m_handle, l_button7.m_value, .0);
     }
+}
+
+void CLeapHmdLatest::ResetControls()
+{
+    m_buttons[CB_SysClick].m_state = false;
+    m_driverInput->UpdateBooleanComponent(m_buttons[CB_SysClick].m_handle, false, .0);
+    m_buttons[CB_GripClick].m_state = false;
+    m_driverInput->UpdateBooleanComponent(m_buttons[CB_GripClick].m_handle, false, .0);
+    m_buttons[CB_AppMenuClick].m_state = false;
+    m_driverInput->UpdateBooleanComponent(m_buttons[CB_AppMenuClick].m_handle, false, .0);
+    m_buttons[CB_TriggerClick].m_state = false;
+    m_driverInput->UpdateBooleanComponent(m_buttons[CB_TriggerClick].m_handle, false, .0);
+    m_buttons[CB_TriggerValue].m_value = 0.f;
+    m_driverInput->UpdateScalarComponent(m_buttons[CB_TriggerValue].m_handle, 0.f, .0);
+    m_buttons[CB_TrackpadX].m_value = 0.f;
+    m_driverInput->UpdateScalarComponent(m_buttons[CB_TrackpadX].m_handle, 0.f, .0);
+    m_buttons[CB_TrackpadY].m_value = 0.f;
+    m_driverInput->UpdateScalarComponent(m_buttons[CB_TrackpadY].m_handle, 0.f, .0);
+    m_buttons[CB_TrackpadClick].m_state = false;
+    m_driverInput->UpdateBooleanComponent(m_buttons[CB_TrackpadClick].m_handle, false, .0);
+    m_buttons[CB_TrackpadTouch].m_state = false;
+    m_driverInput->UpdateBooleanComponent(m_buttons[CB_TrackpadTouch].m_handle, false, .0);
 }

@@ -23,24 +23,25 @@ Refer to [parent repository](https://github.com/cbuchner1/driver_leap) for base 
 You can use auto-build of latest commit from [latest release page](../../releases/latest) if you don't wish to build it yourself.
   
 ### Control configuration and inputs
-You can set current game profile by editing control_config.xml.
+You can set restrictions by editing control_config.xml in corresponding driver folder.
+
+Game profiles are enabled automatically when game is started from Steam.
 Available game profiles:
-* **default** - profile for all games. Control inputs can be restricted by setting parameters to "false".
-Gestures:
-  * Trigger - bending of the index finger
-  * Grip - grab gesture
-  * System menu - formed T-shape with two hands
-  * Application menu - hand with palm directed towards face
-  * Touchpad - Thumb press
-  * Touchpad circle - index finger of hand directed to palm of another hand
-* **vrchat** - profile for VRChat. Control restrictions are ignored.
-Game gestures:
-  * Gun - corresponding hand gesture
-  * V-shape - corresponding hand gesture
-  * Point - corresponding hand gesture
-  * Rock out - corresponding hand gesture
-  * Thumbs up - corresponding hand gesture
-  * Spread hand - corresponding hand gesture
-  * Trigger - grab gesture
-  * Grip - slightly closed hand
-  * Application menu - formed T-shape with two hands
+  * **vrchat** - profile for VRChat. Control restrictions are ignored.  
+  Game gestures:
+    * Gun - corresponding hand gesture
+    * V-shape - corresponding hand gesture
+    * Point - corresponding hand gesture
+    * Rock out - corresponding hand gesture
+    * Thumbs up - corresponding hand gesture
+    * Spread hand - corresponding hand gesture. Also corresponds to grip button.
+    * Trigger - grab gesture
+    * Application menu - formed T-shape with two hands
+  * **default** - profile for other games.  
+  Gestures:
+    * Trigger - bending of the index finger
+    * Grip - grab gesture
+    * System menu - formed T-shape with two hands
+    * Application menu - hand with palm directed towards face
+    * Touchpad - Thumb press
+    * Touchpad circle - index finger of hand directed to palm of another hand
