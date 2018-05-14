@@ -178,7 +178,7 @@ void CLeapHmdLatest::DebugRequest(const char* pchRequest, char* pchResponseBuffe
                 m_gameProfile = GP_VRChat;
                 break;
             default:
-                m_gameProfile = GP_VRChat;
+                m_gameProfile = GP_Default;
         }
     }
 }
