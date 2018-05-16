@@ -13,10 +13,17 @@ extern char g_ModuleFileName[];
 const vr::VREvent_Data_t g_EmptyVREventData = { 0 };
 const long long g_VRTrackingLatency = -std::chrono::duration_cast<std::chrono::seconds>(std::chrono::milliseconds(-30)).count();
 
-const std::vector<std::string> g_appKeysTable = {
+const std::vector<std::string> g_SteamAppKeysTable = {
     "steam.app.438100" // VRChat
 };
-#define CONTROLLER_GP_VRCHAT 0U
+#define STEAM_APPKEY_VRCHAT 0U
+
+const std::vector<std::string> g_DebugRequestStringTable = {
+    "leap:realign_coordinates",
+    "app_key"
+};
+#define CONTROLLER_DEBUGREQUEST_REALIGN 0U
+#define CONTROLLER_DEBUGREQUEST_APPKEY 1U
 
 CLeapHmdLatest::CLeapHmdLatest(vr::IVRServerDriverHost* pDriverHost, int n)
 {
@@ -150,36 +157,38 @@ void CLeapHmdLatest::DebugRequest(const char* pchRequest, char* pchResponseBuffe
     std::string strCmd;
 
     ss >> strCmd;
-    if(!strCmd.compare("leap:realign_coordinates"))
+    switch(ReadEnumVector(strCmd, g_DebugRequestStringTable))
     {
-        float m[3][3], v[3];
-        for(int i = 0; i < 3; ++i)
+        case CONTROLLER_DEBUGREQUEST_REALIGN:
         {
-            for(int j = 0; j < 3; ++j)
+            float m[3][3], v[3];
+            for(int i = 0; i < 3; ++i)
             {
-                ss >> m[j][i];
+                for(int j = 0; j < 3; ++j)
+                {
+                    ss >> m[j][i];
+                }
+                ss >> v[i];
             }
-            ss >> v[i];
-        }
 
-        vr::HmdQuaternion_t q = CalculateRotation(m);
-        memcpy(m_hmdPos, &v[0], sizeof(m_hmdPos));
-        m_hmdRot = q;
-    }
-    else if(!strCmd.compare("app_key"))
-    {
-        std::string l_appKey;
-        ss >> l_appKey;
-
-        ResetControls();
-        switch(ReadEnumVector(l_appKey, g_appKeysTable))
+            vr::HmdQuaternion_t q = CalculateRotation(m);
+            memcpy(m_hmdPos, &v[0], sizeof(m_hmdPos));
+            m_hmdRot = q;
+        } break;
+        case CONTROLLER_DEBUGREQUEST_APPKEY:
         {
-            case CONTROLLER_GP_VRCHAT:
-                m_gameProfile = GP_VRChat;
-                break;
-            default:
-                m_gameProfile = GP_Default;
-        }
+            std::string l_appKey;
+            ss >> l_appKey;
+            switch(ReadEnumVector(l_appKey, g_SteamAppKeysTable))
+            {
+                case STEAM_APPKEY_VRCHAT:
+                    m_gameProfile = GP_VRChat;
+                    break;
+                default:
+                    m_gameProfile = GP_Default;
+            }
+            ResetControls();
+        } break;
     }
 }
 
@@ -468,26 +477,23 @@ void CLeapHmdLatest::ProcessVRChatProfileGestures(float *l_scores)
         l_trackpadAxis.x = 0.59f;
         l_trackpadAxis.y = -0.81f;
     }
+    if(m_nId == LEFT_CONTROLLER) l_trackpadAxis.x *= -1.f;
+
+    SControllerButton &l_button4 = m_buttons[CB_TrackpadX];
+    if(l_button4.m_value != l_trackpadAxis.x)
+    {
+        l_button4.m_value = l_trackpadAxis.x;
+        m_driverInput->UpdateScalarComponent(l_button4.m_handle, l_button4.m_value, .0);
+    }
+
+    SControllerButton &l_button5 = m_buttons[CB_TrackpadY];
+    if(l_button5.m_value != l_trackpadAxis.y)
+    {
+        l_button5.m_value = l_trackpadAxis.y;
+        m_driverInput->UpdateScalarComponent(l_button5.m_handle, l_button5.m_value, .0);
+    }
 
     l_state = (l_trackpadAxis.x != 0.f || l_trackpadAxis.y != 0.f);
-    if(l_state)
-    {
-        if(m_nId == LEFT_CONTROLLER) l_trackpadAxis.x *= -1.f;
-
-        SControllerButton &l_button4 = m_buttons[CB_TrackpadX];
-        if(l_button4.m_value != l_trackpadAxis.x)
-        {
-            l_button4.m_value = l_trackpadAxis.x;
-            m_driverInput->UpdateScalarComponent(l_button4.m_handle, l_button4.m_value, .0);
-        }
-
-        SControllerButton &l_button5 = m_buttons[CB_TrackpadY];
-        if(l_button5.m_value != l_trackpadAxis.y)
-        {
-            l_button5.m_value = l_trackpadAxis.y;
-            m_driverInput->UpdateScalarComponent(l_button5.m_handle, l_button5.m_value, .0);
-        }
-    }
     SControllerButton &l_button6 = m_buttons[CB_TrackpadTouch];
     if(l_button6.m_state != l_state)
     {
