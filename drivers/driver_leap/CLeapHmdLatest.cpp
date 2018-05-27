@@ -19,7 +19,7 @@ const std::vector<std::string> g_SteamAppKeysTable = {
 #define STEAM_APPKEY_VRCHAT 0U
 
 const std::vector<std::string> g_DebugRequestStringTable = {
-    "leap:realign_coordinates",
+    "realign",
     "app_key"
 };
 #define CONTROLLER_DEBUGREQUEST_REALIGN 0U
@@ -170,10 +170,8 @@ void CLeapHmdLatest::DebugRequest(const char* pchRequest, char* pchResponseBuffe
                 }
                 ss >> v[i];
             }
-
-            vr::HmdQuaternion_t q = CalculateRotation(m);
-            memcpy(m_hmdPos, &v[0], sizeof(m_hmdPos));
-            m_hmdRot = q;
+            m_hmdRot = CalculateRotation(m);
+            memcpy(m_hmdPos, v, sizeof(m_hmdPos));
         } break;
         case CONTROLLER_DEBUGREQUEST_APPKEY:
         {
@@ -210,13 +208,8 @@ void CLeapHmdLatest::EnterStandby()
 
 void CLeapHmdLatest::UpdateControllerState(Leap::Frame& frame)
 {
-    bool handFound = false;
-    CGestureMatcher::WhichHand which = ((m_nId == LEFT_CONTROLLER) ? CGestureMatcher::LeftHand : CGestureMatcher::RightHand);
-
     float scores[CGestureMatcher::NUM_GESTURES] = { 0.f };
-    handFound = CGestureMatcher::MatchGestures(frame, which, scores);
-
-    if(handFound)
+    if(CGestureMatcher::MatchGestures(frame, ((m_nId == LEFT_CONTROLLER) ? CGestureMatcher::LeftHand : CGestureMatcher::RightHand), scores))
     {
         switch(m_gameProfile)
         {

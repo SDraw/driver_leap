@@ -72,8 +72,10 @@ void CLeapMonitor::MainLoop()
                 case vr::VREvent_SceneFocusChanged:
                 {
                     char l_appKeyNew[vr::k_unMaxApplicationKeyLength];
-                    vr::VRApplications()->GetApplicationKeyByProcessId(Event.data.process.pid, l_appKeyNew, sizeof(l_appKeyNew));
-                    UpdateApplicationKey(l_appKeyNew);
+                    if(vr::VRApplications()->GetApplicationKeyByProcessId(Event.data.process.pid, l_appKeyNew, sizeof(l_appKeyNew)) == vr::VRApplicationError_None)
+                        UpdateApplicationKey(l_appKeyNew);
+                    else
+                        UpdateApplicationKey("unknown");
                 } break;
             }
         }
@@ -94,7 +96,7 @@ bool CLeapMonitor::TriggerRealignCoordinates(const vr::VREvent_t& Event)
     std::ostringstream ss;
     char rgchReplyBuf[256];
 
-    ss << "leap:realign_coordinates";
+    ss << "realign";
     for(int i = 0; i < 3; ++i)
     {
         for(int j = 0; j < 4; ++j)
@@ -115,10 +117,7 @@ void CLeapMonitor::UpdateTrackedDevice(uint32_t unTrackedDeviceIndex)
     vr::VRSystem()->GetStringTrackedDeviceProperty(unTrackedDeviceIndex, vr::Prop_TrackingSystemName_String, rgchTrackingSystemName, sizeof(rgchTrackingSystemName), &eError);
     if(eError == vr::TrackedProp_Success)
     {
-        if(!strcmp(rgchTrackingSystemName, "leap"))
-        {
-            m_setLeapDevices.insert(unTrackedDeviceIndex);
-        }
+        if(!strcmp(rgchTrackingSystemName, "leap")) m_setLeapDevices.insert(unTrackedDeviceIndex);
     }
 }
 
