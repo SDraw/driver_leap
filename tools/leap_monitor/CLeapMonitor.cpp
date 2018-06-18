@@ -69,7 +69,7 @@ void CLeapMonitor::MainLoop()
                         TriggerRealignCoordinates(Event);
                     }
                     break;
-                case vr::VREvent_SceneFocusChanged:
+                case vr::VREvent_SceneApplicationChanged:
                 {
                     char l_appKeyNew[vr::k_unMaxApplicationKeyLength];
                     vr::VRApplications()->GetApplicationKeyByProcessId(Event.data.process.pid, l_appKeyNew, sizeof(l_appKeyNew));

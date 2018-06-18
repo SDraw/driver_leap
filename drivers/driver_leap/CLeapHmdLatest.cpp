@@ -177,7 +177,8 @@ void CLeapHmdLatest::DebugRequest(const char* pchRequest, char* pchResponseBuffe
         {
             std::string l_appKey;
             ss >> l_appKey;
-            CDriverLogHelper::DriverLog("New application uses scene - '%s'\n", l_appKey);
+
+            EGameProfile l_last = m_gameProfile;
             switch(ReadEnumVector(l_appKey, g_SteamAppKeysTable))
             {
                 case STEAM_APPKEY_VRCHAT:
@@ -186,7 +187,7 @@ void CLeapHmdLatest::DebugRequest(const char* pchRequest, char* pchResponseBuffe
                 default:
                     m_gameProfile = GP_Default;
             }
-            ResetControls();
+            if(l_last != m_gameProfile) ResetControls();
         } break;
     }
 }
