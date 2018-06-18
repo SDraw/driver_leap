@@ -177,6 +177,7 @@ void CLeapHmdLatest::DebugRequest(const char* pchRequest, char* pchResponseBuffe
         {
             std::string l_appKey;
             ss >> l_appKey;
+            CDriverLogHelper::DriverLog("New application uses scene - '%s'\n", l_appKey);
             switch(ReadEnumVector(l_appKey, g_SteamAppKeysTable))
             {
                 case STEAM_APPKEY_VRCHAT:

@@ -72,10 +72,8 @@ void CLeapMonitor::MainLoop()
                 case vr::VREvent_SceneFocusChanged:
                 {
                     char l_appKeyNew[vr::k_unMaxApplicationKeyLength];
-                    if(vr::VRApplications()->GetApplicationKeyByProcessId(Event.data.process.pid, l_appKeyNew, sizeof(l_appKeyNew)) == vr::VRApplicationError_None)
-                        UpdateApplicationKey(l_appKeyNew);
-                    else
-                        UpdateApplicationKey("unknown");
+                    vr::VRApplications()->GetApplicationKeyByProcessId(Event.data.process.pid, l_appKeyNew, sizeof(l_appKeyNew));
+                    UpdateApplicationKey(l_appKeyNew);
                 } break;
             }
         }
