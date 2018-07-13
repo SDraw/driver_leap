@@ -31,7 +31,8 @@ bool CLeapMonitor::Init()
 
 void CLeapMonitor::MainLoop()
 {
-    while(true)
+    bool l_quitEvent = false;
+    while(!l_quitEvent)
     {
         std::this_thread::sleep_for(k_MonitorInterval);
 
@@ -52,11 +53,9 @@ void CLeapMonitor::MainLoop()
             switch(Event.eventType)
             {
                 case vr::VREvent_Quit:
-                    exit(0);
-                    // NOTREAHED
-
-                case vr::VREvent_TrackedDeviceActivated:
-                case vr::VREvent_TrackedDeviceUpdated:
+                    l_quitEvent = true;
+                    break;
+                case vr::VREvent_TrackedDeviceActivated: case vr::VREvent_TrackedDeviceUpdated:
                     UpdateTrackedDevice(Event.trackedDeviceIndex);
                     break;
 
@@ -76,6 +75,7 @@ void CLeapMonitor::MainLoop()
                     UpdateApplicationKey(l_appKeyNew);
                 } break;
             }
+            if(l_quitEvent) break;
         }
     }
 }
@@ -102,7 +102,6 @@ bool CLeapMonitor::TriggerRealignCoordinates(const vr::VREvent_t& Event)
             ss << " " << hmdPose.mDeviceToAbsoluteTracking.m[i][j];
         }
     }
-    //        printf("%s\n", ss.str().c_str());
     vr::VRSystem()->DriverDebugRequest(Event.trackedDeviceIndex, ss.str().c_str(), rgchReplyBuf, sizeof(rgchReplyBuf));
     return true;
 }

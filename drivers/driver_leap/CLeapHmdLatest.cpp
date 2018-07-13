@@ -79,17 +79,16 @@ CLeapHmdLatest::CLeapHmdLatest(vr::IVRServerDriverHost* pDriverHost, int n)
 
 CLeapHmdLatest::~CLeapHmdLatest()
 {
-    CDriverLogHelper::DriverLog("CLeapHmdLatest::~CLeapHmdLatest(n=%d)\n", m_nId);
 }
 
 void* CLeapHmdLatest::GetComponent(const char* pchComponentNameAndVersion)
 {
-    return NULL;
+    if(!strcmp(pchComponentNameAndVersion, vr::ITrackedDeviceServerDriver_Version)) return this;
+    return nullptr;
 }
 
 vr::EVRInitError CLeapHmdLatest::Activate(uint32_t unObjectId)
 {
-    CDriverLogHelper::DriverLog("CLeapHmdLatest::Activate: %s is object id %d\n", GetSerialNumber(), unObjectId);
     m_unSteamVRTrackedDeviceId = unObjectId;
 
     vr::CVRPropertyHelpers *l_vrProperties = vr::VRProperties();
@@ -147,7 +146,6 @@ vr::EVRInitError CLeapHmdLatest::Activate(uint32_t unObjectId)
 
 void CLeapHmdLatest::Deactivate()
 {
-    CDriverLogHelper::DriverLog("CLeapHmdLatest::Deactivate: %s was object id %d\n", GetSerialNumber(), m_unSteamVRTrackedDeviceId);
     m_unSteamVRTrackedDeviceId = vr::k_unTrackedDeviceIndexInvalid;
 }
 
@@ -205,7 +203,6 @@ vr::DriverPose_t CLeapHmdLatest::GetPose()
 
 void CLeapHmdLatest::EnterStandby()
 {
-    CDriverLogHelper::DriverLog("CLeapHmdLatest::EnterStandby()\n");
 }
 
 void CLeapHmdLatest::UpdateControllerState(Leap::Frame& frame)

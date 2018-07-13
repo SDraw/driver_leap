@@ -60,12 +60,12 @@ public:
     virtual ~CLeapHmdLatest();
 
     // vr::ITrackedDeviceServerDriver
-    virtual vr::EVRInitError Activate(uint32_t unObjectId) override;
-    virtual void Deactivate() override;
-    void* GetComponent(const char* pchComponentNameAndVersion) override;
-    virtual void DebugRequest(const char* pchRequest, char* pchResponseBuffer, uint32_t unResponseBufferSize) override;
-    virtual vr::DriverPose_t GetPose() override;
-    virtual void EnterStandby() override;
+    virtual vr::EVRInitError Activate(uint32_t unObjectId);
+    virtual void Deactivate();
+    void* GetComponent(const char* pchComponentNameAndVersion);
+    virtual void DebugRequest(const char* pchRequest, char* pchResponseBuffer, uint32_t unResponseBufferSize);
+    virtual vr::DriverPose_t GetPose();
+    virtual void EnterStandby();
 
     void Update(Leap::Frame& frame);
     const char* GetSerialNumber() const;
