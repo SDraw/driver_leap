@@ -2,15 +2,17 @@
 
 Fork with updated LeapSDK and OpenVR.
 Refer to [parent repository](https://github.com/cbuchner1/driver_leap) for base project installation.
-
-### Building
-* Open solution in Visual Studio 2013
-* Build your platform:
-  * x64 - build output is in "<solution_folder>/x64"
-  * x86 - build output is in "<solution_folder>/Win32"
   
 ### Installation
 * Install [base project driver](https://github.com/cbuchner1/driver_leap)
+* Grab [latest release](../../releases/latest) for your platform
+* Extract files to "<your_drive_letter>:/Program Files/SteamVR Leap Motion driver/leap/bin/<your_platform>"
+
+### Building
+* Open solution in Visual Studio 2013/2015/2017
+* Build your platform:
+  * x64 - build output is in "<solution_folder>/x64"
+  * x86 - build output is in "<solution_folder>/Win32"
 * Copy build files to "SteamVR Leap Motion driver/leap/bin/<your_platform>":
   * driver_leap.dll
   * gesture_checker.exe
@@ -19,8 +21,6 @@ Refer to [parent repository](https://github.com/cbuchner1/driver_leap) for base 
   * vendor/LeapSDK/lib/<your_platform>/Leap.dll
   * vendor/openvr/bin/<your_platform>/openvr_api.dll
 * Copy control_config.xml and profile.json from solution root to "SteamVR Leap Motion driver/leap/bin/<your_platform>"
-
-You can use auto-build of latest commit from [latest release page](../../releases/latest) if you don't wish to build it yourself.
   
 ### Control configuration and inputs
 You can set restrictions by editing control_config.xml in corresponding driver folder.
