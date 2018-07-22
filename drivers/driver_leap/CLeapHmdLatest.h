@@ -23,7 +23,7 @@ class CLeapHmdLatest : public vr::ITrackedDeviceServerDriver
     };
     EGameProfile m_gameProfile;
 
-    enum EControllerButton
+    enum EControllerButton : size_t
     {
         CB_SysClick = 0U,
         CB_GripClick,

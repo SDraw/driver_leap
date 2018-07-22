@@ -50,7 +50,7 @@ CLeapHmdLatest::CLeapHmdLatest(vr::IVRServerDriverHost* pDriverHost, int n)
         m_gripAngleOffset.z *= -1.f;
     }
 
-    std::memset(&m_Pose, 0, sizeof(vr::DriverPose_t));
+    m_Pose = { 0 };
     m_Pose.qDriverFromHeadRotation.w = 1;
     m_Pose.qDriverFromHeadRotation.x = 0;
     m_Pose.qDriverFromHeadRotation.y = 0;
@@ -72,7 +72,9 @@ CLeapHmdLatest::CLeapHmdLatest(vr::IVRServerDriverHost* pDriverHost, int n)
     m_Pose.shouldApplyHeadModel = false;
     m_Pose.result = vr::TrackingResult_Uninitialized;
 
-    std::fill_n(m_hmdPos, 3U, 0.f);
+    m_hmdPos[0] = 0.f;
+    m_hmdPos[1] = 0.f;
+    m_hmdPos[2] = 0.f;
     m_hmdRot = { 1.0, .0, .0, .0 };
     m_gameProfile = GP_Default;
 }
