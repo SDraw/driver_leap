@@ -15,12 +15,15 @@ bool CConfigHelper::ms_touchpadAxes = true;
 float CConfigHelper::ms_gripOffsetX = 0.f;
 float CConfigHelper::ms_gripOffsetY = 0.f;
 float CConfigHelper::ms_gripOffsetZ = 0.f;
+bool CConfigHelper::ms_controllerLeftEnabled = true;
+bool CConfigHelper::ms_controllerRightEnabled = true;
 
 const std::vector<std::string> g_configAttributeTable
 {
-    "profile", "menu", "appMenu", "trigger", "grip",
+    "menu", "appMenu", "trigger", "grip",
     "touchpad", "touchpadTouch", "touchpadPress", "touchpadAxes",
-    "gripOffsetX", "gripOffsetY", "gripOffsetZ"
+    "gripOffsetX", "gripOffsetY", "gripOffsetZ",
+    "leftEnabled", "rightEnabled"
 };
 
 #define CONFIG_PARAM_MENU 0
@@ -34,6 +37,8 @@ const std::vector<std::string> g_configAttributeTable
 #define CONFIG_PARAM_GRIP_OFFSETX 8
 #define CONFIG_PARAM_GRIP_OFFSETY 9
 #define CONFIG_PARAM_GRIP_OFFSETZ 10
+#define CONFIG_PARAM_CONTROLLER_LEFTENABLED 11
+#define CONFIG_PARAM_CONTROLLER_RIGHTENABLED 12
 
 void CConfigHelper::LoadConfig()
 {
@@ -49,47 +54,53 @@ void CConfigHelper::LoadConfig()
         {
             for(pugi::xml_node l_node = l_configRoot.child("param"); l_node; l_node = l_node.next_sibling("param"))
             {
-                pugi::xml_attribute l_attrib = l_node.attribute("name");
-                if(l_attrib)
+                pugi::xml_attribute l_attribName = l_node.attribute("name");
+                if(l_attribName)
                 {
-                    std::string l_param = l_attrib.as_string();
-                    l_attrib = l_node.attribute("value");
-                    if(l_attrib)
+                    std::string l_param(l_attribName.as_string());
+                    pugi::xml_attribute l_attribValue = l_node.attribute("value");
+                    if(l_attribValue)
                     {
                         switch(ReadEnumVector(l_param, g_configAttributeTable))
                         {
                             case CONFIG_PARAM_MENU:
-                                ms_menu = l_attrib.as_bool(true);
+                                ms_menu = l_attribValue.as_bool(true);
                                 break;
                             case CONFIG_PARAM_APP_MENU:
-                                ms_applicationMenu = l_attrib.as_bool(true);
+                                ms_applicationMenu = l_attribValue.as_bool(true);
                                 break;
                             case CONFIG_PARAM_TRIGGER:
-                                ms_trigger = l_attrib.as_bool(true);
+                                ms_trigger = l_attribValue.as_bool(true);
                                 break;
                             case CONFIG_PARAM_GRIP:
-                                ms_grip = l_attrib.as_bool(true);
+                                ms_grip = l_attribValue.as_bool(true);
                                 break;
                             case CONFIG_PARAM_TOUCHPAD:
-                                ms_touchpad = l_attrib.as_bool(true);
+                                ms_touchpad = l_attribValue.as_bool(true);
                                 break;
                             case CONFIG_PARAM_TOUCHPAD_TOUCH:
-                                ms_touchpadTouch = l_attrib.as_bool(true);
+                                ms_touchpadTouch = l_attribValue.as_bool(true);
                                 break;
                             case CONFIG_PARAM_TOUCHPAD_PRESS:
-                                ms_touchpadPress = l_attrib.as_bool(true);
+                                ms_touchpadPress = l_attribValue.as_bool(true);
                                 break;
                             case CONFIG_PARAM_TOUCHPAD_AXES:
-                                ms_touchpadAxes = l_attrib.as_bool(true);
+                                ms_touchpadAxes = l_attribValue.as_bool(true);
                                 break;
                             case CONFIG_PARAM_GRIP_OFFSETX:
-                                ms_gripOffsetX = l_attrib.as_float(0.f);
+                                ms_gripOffsetX = l_attribValue.as_float(0.f);
                                 break;
                             case CONFIG_PARAM_GRIP_OFFSETY:
-                                ms_gripOffsetY = l_attrib.as_float(0.f);
+                                ms_gripOffsetY = l_attribValue.as_float(0.f);
                                 break;
                             case CONFIG_PARAM_GRIP_OFFSETZ:
-                                ms_gripOffsetZ = l_attrib.as_float(0.f);
+                                ms_gripOffsetZ = l_attribValue.as_float(0.f);
+                                break;
+                            case CONFIG_PARAM_CONTROLLER_LEFTENABLED:
+                                ms_controllerLeftEnabled = l_attribValue.as_bool(true);
+                                break;
+                            case CONFIG_PARAM_CONTROLLER_RIGHTENABLED:
+                                ms_controllerRightEnabled = l_attribValue.as_bool(true);
                                 break;
                         }
                     }

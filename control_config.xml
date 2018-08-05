@@ -12,4 +12,7 @@
     <param name="gripOffsetX" value="0.0"/>
     <param name="gripOffsetY" value="0.0"/>
     <param name="gripOffsetZ" value="0.0"/>
+    
+    <param name="rightEnabled" value="true"/>
+    <param name="leftEnabled" value="true"/>
 </config>

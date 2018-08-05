@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "CLeapHmdLatest.h"
-#include "CDriverLogHelper.h"
 #include "CConfigHelper.h"
 #include "CGestureMatcher.h"
 #include "Utils.h"
@@ -27,8 +26,6 @@ const std::vector<std::string> g_DebugRequestStringTable = {
 
 CLeapHmdLatest::CLeapHmdLatest(vr::IVRServerDriverHost* pDriverHost, int n)
 {
-    CDriverLogHelper::DriverLog("CLeapHmdLatest::CLeapHmdLatest(n=%d)\n", n);
-
     m_pDriverHost = pDriverHost;
     m_driverInput = nullptr;
     m_nId = n;
@@ -38,7 +35,6 @@ CLeapHmdLatest::CLeapHmdLatest(vr::IVRServerDriverHost* pDriverHost, int n)
     GenerateSerialNumber(buf, sizeof(buf), n);
     m_strSerialNumber.assign(buf);
     m_propertyContainer = vr::k_ulInvalidPropertyContainer;
-    m_connected = true;
 
     m_gripAngleOffset.x = CConfigHelper::GetGripOffsetX();
     m_gripAngleOffset.y = CConfigHelper::GetGripOffsetY();
@@ -77,6 +73,7 @@ CLeapHmdLatest::CLeapHmdLatest(vr::IVRServerDriverHost* pDriverHost, int n)
     m_hmdPos[2] = 0.f;
     m_hmdRot = { 1.0, .0, .0, .0 };
     m_gameProfile = GP_Default;
+    m_isEnabled = ((m_nId == RIGHT_CONTROLLER) ? CConfigHelper::IsRightControllerEnabled() : CConfigHelper::IsLeftControllerEnabled());
 }
 
 CLeapHmdLatest::~CLeapHmdLatest()
@@ -294,8 +291,16 @@ void CLeapHmdLatest::UpdateTrackingState(Leap::Frame &frame)
         }
     }
 
-    if(!handFound) m_Pose.result = vr::TrackingResult_Running_OutOfRange;
-    m_Pose.poseIsValid = handFound;
+    if(m_isEnabled)
+    {
+        if(!handFound) m_Pose.result = vr::TrackingResult_Running_OutOfRange;
+        m_Pose.poseIsValid = handFound;
+    }
+    else
+    {
+        m_Pose.result = vr::TrackingResult_Running_OutOfRange;
+        m_Pose.poseIsValid = false;
+    }
 
     if(!m_Pose.deviceIsConnected) m_Pose.deviceIsConnected = true;
 

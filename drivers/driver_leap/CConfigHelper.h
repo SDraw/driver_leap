@@ -13,6 +13,8 @@ class CConfigHelper
     static float ms_gripOffsetX;
     static float ms_gripOffsetY;
     static float ms_gripOffsetZ;
+    static bool ms_controllerLeftEnabled;
+    static bool ms_controllerRightEnabled;
 public:
     static void LoadConfig();
     static inline bool IsMenuEnabled() { return ms_menu; }
@@ -26,4 +28,6 @@ public:
     static inline float GetGripOffsetX() { return ms_gripOffsetX; }
     static inline float GetGripOffsetY() { return ms_gripOffsetY; }
     static inline float GetGripOffsetZ() { return ms_gripOffsetZ; }
+    static inline bool IsLeftControllerEnabled() { return ms_controllerLeftEnabled; }
+    static inline bool IsRightControllerEnabled() { return ms_controllerRightEnabled; }
 };

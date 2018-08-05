@@ -9,7 +9,6 @@ class CLeapHmdLatest : public vr::ITrackedDeviceServerDriver
     std::string m_strSerialNumber;
     vr::PropertyContainerHandle_t m_propertyContainer;
     uint32_t m_unSteamVRTrackedDeviceId;
-    bool m_connected;
 
     vr::DriverPose_t m_Pose;
     float m_hmdPos[3];
@@ -22,6 +21,7 @@ class CLeapHmdLatest : public vr::ITrackedDeviceServerDriver
         GP_VRChat
     };
     EGameProfile m_gameProfile;
+    bool m_isEnabled;
 
     enum EControllerButton : size_t
     {
