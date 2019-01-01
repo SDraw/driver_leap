@@ -16,5 +16,5 @@
 #include <algorithm>
 
 #include "openvr_driver.h"
-#include "Leap.h"
+#include "LeapC++.h"
 #include "pugixml.hpp"

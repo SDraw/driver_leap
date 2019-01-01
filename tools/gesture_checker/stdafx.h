@@ -7,4 +7,4 @@
 #include <iostream>
 #include <cstring>
 
-#include <Leap.h>
+#include "LeapC++.h"

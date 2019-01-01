@@ -18,14 +18,7 @@ void CServerDriver_Leap::onInit(const Leap::Controller& controller)
     if(&controller == m_Controller)
     {
         // Set config for Leap controller
-        Leap::Config configuraton = m_Controller->config();
-        if(configuraton.getInt32("background_app_mode") != 2)
-        {
-            configuraton.setInt32("background_app_mode", 2);
-            configuraton.save();
-        }
         m_Controller->setPolicy(Leap::Controller::POLICY_OPTIMIZE_HMD);
-        m_Controller->setPolicy(Leap::Controller::POLICY_BACKGROUND_FRAMES);
 
         // Generate VR controllers, serials are stored for whole VR session
         while(m_vecVRControllers.size() < 2U)

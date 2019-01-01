@@ -78,7 +78,7 @@ bool CGestureMatcher::MatchGestures(const Leap::Frame &frame, WhichHand which, f
             const Leap::Finger &finger = *fl;
 
             int f = finger.type(); // thumb, index, middle, ring, pinky
-            if(finger.isFinger() && finger.isValid())
+            if(finger.isValid())
             {
                 fingertip[f] = finger.tipPosition();
                 extended[f] = finger.isExtended();
@@ -181,7 +181,7 @@ bool CGestureMatcher::MatchGestures(const Leap::Frame &frame, WhichHand which, f
 
             // Touchpad emulation
             Leap::Finger otherIndex = otherhand.fingers().fingerType(Leap::Finger::TYPE_INDEX)[0];
-            if(otherIndex.isFinger() && otherIndex.isValid())
+            if(otherIndex.isValid())
             {
                 // we need the index finger direction and the other hand's palm to face opposing directions
                 if(otherIndex.direction().dot(hand.palmNormal()) < 0)

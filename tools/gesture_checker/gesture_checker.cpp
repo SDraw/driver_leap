@@ -7,8 +7,8 @@ int main(int argc, char** argv)
     Leap::Controller controller;
 
     controller.addListener(listener);
-    controller.setPolicy(Leap::Controller::POLICY_BACKGROUND_FRAMES);
     controller.setPolicy(Leap::Controller::POLICY_ALLOW_PAUSE_RESUME);
+    controller.setPolicy(Leap::Controller::POLICY_OPTIMIZE_HMD);
 
     std::cout << "Press Enter to quit, or enter 'p' to pause or unpause the service..." << std::endl;
 
