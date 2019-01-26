@@ -45,3 +45,15 @@ Available game profiles:
     * Application menu - hand with palm directed towards face
     * Touchpad - Thumb press
     * Touchpad circle - index finger of hand directed to palm of another hand
+
+### Troubleshooting
+Sometimes installation of [base project driver](https://github.com/cbuchner1/driver_leap) doesn't register driver folder for SteamVR. To manually add it:
+* Open console as administrator in *SteamVR/bin/win32* (or *SteamVR/bin/win64* if you have 64-bit OS) and execute command:
+```
+vrpathreg adddriver "path_to_leap_folder"
+```
+* Check if driver folder is added by calling 'vrpathreg' without any arguments
+* Open *steamvr.vrsettings* in *Steam/config* folder and add line in "steamvr" section:
+```JSON
+"activateMultipleDrivers": true,
+```
