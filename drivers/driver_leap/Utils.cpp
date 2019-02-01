@@ -9,50 +9,47 @@ void GenerateSerialNumber(char* p, int psize, int controller)
 }
 
 // convert a 3x3 rotation matrix into a rotation quaternion
-vr::HmdQuaternion_t CalculateRotation(float(* a)[3])
+void CalculateRotation(float(* a)[3], vr::HmdQuaternion_t &f_result)
 {
-    vr::HmdQuaternion_t q;
-
     float trace = a[0][0] + a[1][1] + a[2][2];
     if(trace > 0)
     {
         float s = 0.5f / sqrtf(trace + 1.0f);
-        q.w = 0.25f / s;
-        q.x = (a[2][1] - a[1][2]) * s;
-        q.y = (a[0][2] - a[2][0]) * s;
-        q.z = (a[1][0] - a[0][1]) * s;
+        f_result.w = 0.25f / s;
+        f_result.x = (a[2][1] - a[1][2]) * s;
+        f_result.y = (a[0][2] - a[2][0]) * s;
+        f_result.z = (a[1][0] - a[0][1]) * s;
     }
     else
     {
         if(a[0][0] > a[1][1] && a[0][0] > a[2][2])
         {
             float s = 2.0f * sqrtf(1.0f + a[0][0] - a[1][1] - a[2][2]);
-            q.w = (a[2][1] - a[1][2]) / s;
-            q.x = 0.25f * s;
-            q.y = (a[0][1] + a[1][0]) / s;
-            q.z = (a[0][2] + a[2][0]) / s;
+            f_result.w = (a[2][1] - a[1][2]) / s;
+            f_result.x = 0.25f * s;
+            f_result.y = (a[0][1] + a[1][0]) / s;
+            f_result.z = (a[0][2] + a[2][0]) / s;
         }
         else if(a[1][1] > a[2][2])
         {
             float s = 2.0f * sqrtf(1.0f + a[1][1] - a[0][0] - a[2][2]);
-            q.w = (a[0][2] - a[2][0]) / s;
-            q.x = (a[0][1] + a[1][0]) / s;
-            q.y = 0.25f * s;
-            q.z = (a[1][2] + a[2][1]) / s;
+            f_result.w = (a[0][2] - a[2][0]) / s;
+            f_result.x = (a[0][1] + a[1][0]) / s;
+            f_result.y = 0.25f * s;
+            f_result.z = (a[1][2] + a[2][1]) / s;
         }
         else
         {
             float s = 2.0f * sqrtf(1.0f + a[2][2] - a[0][0] - a[1][1]);
-            q.w = (a[1][0] - a[0][1]) / s;
-            q.x = (a[0][2] + a[2][0]) / s;
-            q.y = (a[1][2] + a[2][1]) / s;
-            q.z = 0.25f * s;
+            f_result.w = (a[1][0] - a[0][1]) / s;
+            f_result.x = (a[0][2] + a[2][0]) / s;
+            f_result.y = (a[1][2] + a[2][1]) / s;
+            f_result.z = 0.25f * s;
         }
     }
-    q.x = -q.x;
-    q.y = -q.y;
-    q.z = -q.z;
-    return q;
+    f_result.x = -f_result.x;
+    f_result.y = -f_result.y;
+    f_result.z = -f_result.z;
 }
 
 // generate a rotation quaternion around an arbitrary axis

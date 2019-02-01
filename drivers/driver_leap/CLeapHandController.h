@@ -1,19 +1,20 @@
 #pragma once
 
-class CLeapHmdLatest : public vr::ITrackedDeviceServerDriver
+class CLeapHandController : public vr::ITrackedDeviceServerDriver
 {
-    vr::IVRServerDriverHost *m_pDriverHost;
+    vr::IVRServerDriverHost *m_driverHost;
     vr::IVRDriverInput *m_driverInput;
 
-    int m_nId;
-    std::string m_strSerialNumber;
+    int m_id;
+    std::string m_serialNumber;
     vr::PropertyContainerHandle_t m_propertyContainer;
-    uint32_t m_unSteamVRTrackedDeviceId;
+    uint32_t m_trackedDeviceID;
 
-    vr::DriverPose_t m_Pose;
-    float m_hmdPos[3];
-    vr::HmdQuaternion_t m_hmdRot;
+    vr::DriverPose_t m_pose;
     Leap::Vector m_gripAngleOffset;
+
+    static float ms_headPos[3];
+    static vr::HmdQuaternion_t ms_headRot;
 
     enum EGameProfile
     {
@@ -56,8 +57,8 @@ class CLeapHmdLatest : public vr::ITrackedDeviceServerDriver
 
     void ResetControls();
 public:
-    CLeapHmdLatest(vr::IVRServerDriverHost* pDriverHost, int n);
-    virtual ~CLeapHmdLatest();
+    CLeapHandController(vr::IVRServerDriverHost* pDriverHost, int n);
+    virtual ~CLeapHandController();
 
     // vr::ITrackedDeviceServerDriver
     virtual vr::EVRInitError Activate(uint32_t unObjectId);
@@ -65,11 +66,11 @@ public:
     void* GetComponent(const char* pchComponentNameAndVersion);
     virtual void DebugRequest(const char* pchRequest, char* pchResponseBuffer, uint32_t unResponseBufferSize);
     virtual vr::DriverPose_t GetPose();
-    virtual void EnterStandby();
+    virtual void EnterStandby() {};
 
     void Update(Leap::Frame& frame);
     const char* GetSerialNumber() const;
 
-    void RealignCoordinates();
+    static void UpdateHMDCoordinates(vr::IVRServerDriverHost *f_host);
     void SetAsDisconnected();
 };

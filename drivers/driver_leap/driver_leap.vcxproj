@@ -238,8 +238,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CConfigHelper.h" />
-    <ClInclude Include="CLeapHmdLatest.h" />
-    <ClInclude Include="CServerDriver_Leap.h" />
+    <ClInclude Include="CLeapHandController.h" />
+    <ClInclude Include="CServerDriver.h" />
     <ClInclude Include="CDriverLogHelper.h" />
     <ClInclude Include="CGestureMatcher.h" />
     <ClInclude Include="stdafx.h" />
@@ -254,8 +254,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="CConfigHelper.cpp" />
-    <ClCompile Include="CLeapHmdLatest.cpp" />
-    <ClCompile Include="CServerDriver_Leap.cpp" />
+    <ClCompile Include="CLeapHandController.cpp" />
+    <ClCompile Include="CServerDriver.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="CDriverLogHelper.cpp" />
     <ClCompile Include="driver_leap.cpp" />

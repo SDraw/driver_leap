@@ -131,22 +131,6 @@ bool CGestureMatcher::MatchGestures(const Leap::Frame &frame, WhichHand which, f
             pinkyside = direction.cross(palmNormal);
         merge(result[Thumbpress], maprange(pinkyside.dot(fingerdir[Leap::Finger::TYPE_THUMB]), 0.0f, 0.6f));
 
-
-        // *UNRELIABLE* ILY gesture means pinky and index finger extended, middle and ring finger curled up
-        // Thumb doesn't matter. It's easier to point it inwards for many people.
-        merge(result[ILY], std::min(maprange((sumbend[Leap::Finger::TYPE_PINKY] + sumbend[Leap::Finger::TYPE_INDEX]) / 2, 50.0, 40.0),
-            maprange((sumbend[Leap::Finger::TYPE_MIDDLE] + sumbend[Leap::Finger::TYPE_RING]) / 2, 120.0, 150.0)));
-
-        // *UNRELIABLE* Flipping the Bird: You know how to flip a bird.
-        merge(result[FlippingTheBird], std::min(maprange(sumbend[Leap::Finger::TYPE_MIDDLE], 50.0, 40.0),
-            maprange((sumbend[Leap::Finger::TYPE_INDEX] + sumbend[Leap::Finger::TYPE_RING] + sumbend[Leap::Finger::TYPE_PINKY]) / 3, 120.0, 150.0)));
-
-        // Victory gesture: make a nice V sign with your index and middle finger
-        float angle = fingerdir[Leap::Finger::TYPE_INDEX].angleTo(fingerdir[Leap::Finger::TYPE_MIDDLE]);
-        merge(result[Victory], std::min(std::min(maprange((sumbend[Leap::Finger::TYPE_INDEX] + sumbend[Leap::Finger::TYPE_MIDDLE]) / 2, 50.0, 40.0),
-            maprange((sumbend[Leap::Finger::TYPE_PINKY] + sumbend[Leap::Finger::TYPE_RING]) / 2, 120.0, 150.0)),
-            maprange(57.2957795f * fingerdir[Leap::Finger::TYPE_INDEX].angleTo(fingerdir[Leap::Finger::TYPE_MIDDLE]), 10.0, 20.0)));
-
         // FlatHand gestures
         float flatHand = maprange((sumbend[Leap::Finger::TYPE_THUMB] + sumbend[Leap::Finger::TYPE_INDEX] + sumbend[Leap::Finger::TYPE_MIDDLE] + sumbend[Leap::Finger::TYPE_RING] + sumbend[Leap::Finger::TYPE_PINKY]) / 5, 50.0, 40.0);
         merge(result[FlatHandPalmUp], std::min(flatHand, maprange((up).dot(palmNormal), 0.8f, 0.95f)));

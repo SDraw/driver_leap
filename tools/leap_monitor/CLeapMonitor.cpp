@@ -58,16 +58,6 @@ void CLeapMonitor::MainLoop()
                 case vr::VREvent_TrackedDeviceActivated: case vr::VREvent_TrackedDeviceUpdated:
                     UpdateTrackedDevice(Event.trackedDeviceIndex);
                     break;
-
-                case vr::VREvent_VendorSpecific_Reserved_Start + 0:
-                    // User has made the "align" gesture.  The driver can't see the HMD
-                    // coordinates, so we forward those from our client view.
-                    if(IsLeapDevice(Event.trackedDeviceIndex))
-                    {
-                        //                        printf("received event vr::VREvent_VendorSpecific_Reserved_Start + 0 for device %d\n", Event.trackedDeviceIndex);
-                        TriggerRealignCoordinates(Event);
-                    }
-                    break;
                 case vr::VREvent_SceneApplicationChanged:
                 {
                     char l_appKeyNew[vr::k_unMaxApplicationKeyLength];
@@ -83,27 +73,6 @@ void CLeapMonitor::MainLoop()
 void CLeapMonitor::Shutdown()
 {
     vr::VR_Shutdown();
-}
-
-bool CLeapMonitor::TriggerRealignCoordinates(const vr::VREvent_t& Event)
-{
-    vr::TrackedDevicePose_t hmdPose;
-    vr::VRSystem()->GetDeviceToAbsoluteTrackingPose(vr::TrackingUniverseRawAndUncalibrated, -Event.eventAgeSeconds, &hmdPose, 1);
-    if(!hmdPose.bPoseIsValid) return false;
-
-    std::ostringstream ss;
-    char rgchReplyBuf[256];
-
-    ss << "realign";
-    for(int i = 0; i < 3; ++i)
-    {
-        for(int j = 0; j < 4; ++j)
-        {
-            ss << " " << hmdPose.mDeviceToAbsoluteTracking.m[i][j];
-        }
-    }
-    vr::VRSystem()->DriverDebugRequest(Event.trackedDeviceIndex, ss.str().c_str(), rgchReplyBuf, sizeof(rgchReplyBuf));
-    return true;
 }
 
 void CLeapMonitor::UpdateTrackedDevice(uint32_t unTrackedDeviceIndex)

@@ -1,9 +1,9 @@
 ﻿#include "stdafx.h"
-#include "CServerDriver_Leap.h"
+#include "CServerDriver.h"
 
 #define HMD_DLL_EXPORT extern "C" __declspec( dllexport )
 
-CServerDriver_Leap g_ServerTrackedDeviceProvider;
+CServerDriver g_ServerTrackedDeviceProvider;
 
 HMD_DLL_EXPORT void *HmdDriverFactory(const char *pInterfaceName, int *pReturnCode)
 {
