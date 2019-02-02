@@ -9,8 +9,6 @@ const Leap::Vector g_AxisY(0.f, 1.f, 0.f);
 const Leap::Vector g_AxisZ(0.f, 0.f, 1.f);
 
 extern char g_ModuleFileName[];
-const vr::VREvent_Data_t g_EmptyVREventData = { 0 };
-const long long g_VRTrackingLatency = -std::chrono::duration_cast<std::chrono::seconds>(std::chrono::milliseconds(-30)).count();
 
 const std::vector<std::string> g_SteamAppKeysTable = {
     "steam.app.438100" // VRChat
@@ -309,8 +307,6 @@ void CLeapHandController::UpdateHMDCoordinates(vr::IVRServerDriverHost *f_host)
         CalculateRotation(m, ms_headRot);
         memcpy(ms_headPos, v, sizeof(float) * 3U);
     }
-
-    //m_driverHost->VendorSpecificEvent(m_trackedDeviceID, (vr::EVREventType) (vr::VREvent_VendorSpecific_Reserved_Start + 0), g_EmptyVREventData, g_VRTrackingLatency);
 }
 
 void CLeapHandController::SetAsDisconnected()
