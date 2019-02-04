@@ -1,5 +1,37 @@
 #pragma once
 
+enum EControllerButtonInputType : unsigned char
+{
+    CBIT_Boolean = 0U,
+    CBIT_Float
+};
+class CControllerButton
+{
+    vr::VRInputComponentHandle_t m_handle;
+    float m_value;
+    bool m_state;
+    EControllerButtonInputType m_inputType;
+    bool m_updated;
+public:
+    CControllerButton();
+    ~CControllerButton();
+
+    inline vr::VRInputComponentHandle_t GetHandle() const { return m_handle; }
+    inline vr::VRInputComponentHandle_t& GetHandleRef() { return m_handle; }
+
+    inline void SetInputType(EControllerButtonInputType f_type) { m_inputType = f_type; }
+    inline EControllerButtonInputType GetInputType() const { return m_inputType; }
+
+    void SetValue(float f_value);
+    inline float GetValue() const { return m_value; }
+
+    void SetState(bool f_state);
+    inline bool GetState() const { return m_state; }
+
+    inline bool IsUpdated() const { return m_updated; }
+    inline void ResetUpdate() { m_updated = false; }
+};
+
 class CLeapHandController : public vr::ITrackedDeviceServerDriver
 {
     vr::IVRServerDriverHost *m_driverHost;
@@ -38,19 +70,11 @@ class CLeapHandController : public vr::ITrackedDeviceServerDriver
 
         CB_Count
     };
-    struct SControllerButton
-    {
-        vr::VRInputComponentHandle_t m_handle = vr::k_ulInvalidInputComponentHandle;
-        union
-        {
-            float m_value;
-            bool m_state;
-        };
-    };
-    SControllerButton m_buttons[CB_Count];
+    CControllerButton m_buttons[CB_Count];
 
     void UpdateControllerState(Leap::Frame &frame);
     void UpdateTrackingState(Leap::Frame &frame);
+    void UpdateButtonInput();
 
     void ProcessDefaultProfileGestures(float *l_scores);
     void ProcessVRChatProfileGestures(float *l_scores);
