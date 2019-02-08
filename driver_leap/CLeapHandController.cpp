@@ -4,13 +4,14 @@
 #include "CGestureMatcher.h"
 #include "Utils.h"
 
-extern char g_ModuleFileName[];
+extern char g_moduleFileName[];
 
 //----
 CControllerButton::CControllerButton()
 {
     m_handle = vr::k_ulInvalidInputComponentHandle;
     m_state = false;
+    m_value = 0.f;
     m_inputType = EControllerButtonInputType::CBIT_Boolean;
     m_updated = false;
 }
@@ -42,16 +43,12 @@ void CControllerButton::SetState(bool f_state)
 }
 
 //----
-const Leap::Vector g_AxisX(1.f, 0.f, 0.f);
-const Leap::Vector g_AxisY(0.f, 1.f, 0.f);
-const Leap::Vector g_AxisZ(0.f, 0.f, 1.f);
-
-const std::vector<std::string> g_SteamAppKeysTable = {
+const std::vector<std::string> g_steamAppKeysTable = {
     "steam.app.438100" // VRChat
 };
 #define STEAM_APPKEY_VRCHAT 0U
 
-const std::vector<std::string> g_DebugRequestStringTable = {
+const std::vector<std::string> g_debugRequestStringTable = {
     "app_key"
 };
 #define CONTROLLER_DEBUGREQUEST_APPKEY 0U
@@ -66,29 +63,24 @@ CLeapHandController::CLeapHandController(vr::IVRServerDriverHost* pDriverHost, i
     m_id = n;
     m_trackedDeviceID = vr::k_unTrackedDeviceIndexInvalid;
 
-    char buf[256];
-    GenerateSerialNumber(buf, sizeof(buf), n);
-    m_serialNumber.assign(buf);
+    m_serialNumber.assign("leap_");
+    m_serialNumber.append((m_id == LEFT_CONTROLLER) ? "lefthand" : "righthand");
     m_propertyContainer = vr::k_ulInvalidPropertyContainer;
 
-    m_gripAngleOffset.x = CConfigHelper::GetGripOffsetX();
-    m_gripAngleOffset.y = CConfigHelper::GetGripOffsetY();
-    m_gripAngleOffset.z = CConfigHelper::GetGripOffsetZ();
+    glm::vec3 l_eulerOffsetRot(CConfigHelper::GetGripOffsetX(), CConfigHelper::GetGripOffsetY(), CConfigHelper::GetGripOffsetZ());
     if(m_id == RIGHT_CONTROLLER)
     {
         // Only X axis isn't inverted for right controller
-        m_gripAngleOffset.y *= -1.f;
-        m_gripAngleOffset.z *= -1.f;
+        l_eulerOffsetRot.y *= -1.f;
+        l_eulerOffsetRot.z *= -1.f;
     }
+    m_gripAngleOffset = glm::quat(l_eulerOffsetRot);
 
     m_pose = { 0 };
-    m_pose.qDriverFromHeadRotation.w = 1;
-    m_pose.qDriverFromHeadRotation.x = 0;
-    m_pose.qDriverFromHeadRotation.y = 0;
-    m_pose.qDriverFromHeadRotation.z = 0;
-    m_pose.vecDriverFromHeadTranslation[0] = 0;
-    m_pose.vecDriverFromHeadTranslation[1] = 0;
-    m_pose.vecDriverFromHeadTranslation[2] = 0;
+    m_pose.qDriverFromHeadRotation = { 1.0, 0.0, 0.0, 0.0 };
+    m_pose.vecDriverFromHeadTranslation[0] = 0.0;
+    m_pose.vecDriverFromHeadTranslation[1] = 0.0;
+    m_pose.vecDriverFromHeadTranslation[2] = 0.0;
     m_pose.vecAngularVelocity[0] = 0.0;
     m_pose.vecAngularVelocity[1] = 0.0;
     m_pose.vecAngularVelocity[2] = 0.0;
@@ -108,12 +100,6 @@ CLeapHandController::CLeapHandController(vr::IVRServerDriverHost* pDriverHost, i
 }
 CLeapHandController::~CLeapHandController()
 {
-}
-
-void* CLeapHandController::GetComponent(const char* pchComponentNameAndVersion)
-{
-    if(!strcmp(pchComponentNameAndVersion, vr::ITrackedDeviceServerDriver_Version)) return this;
-    return nullptr;
 }
 
 vr::EVRInitError CLeapHandController::Activate(uint32_t unObjectId)
@@ -145,7 +131,7 @@ vr::EVRInitError CLeapHandController::Activate(uint32_t unObjectId)
     l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_ControllerRoleHint_Int32, (m_id == LEFT_CONTROLLER) ? vr::TrackedControllerRole_LeftHand : vr::TrackedControllerRole_RightHand);
     l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ManufacturerName_String, "HTC");
 
-    std::string l_path(g_ModuleFileName);
+    std::string l_path(g_moduleFileName);
     l_path.erase(l_path.begin() + l_path.rfind('\\'), l_path.end());
     l_path.append("\\profile.json");
     l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_InputProfilePath_String, l_path.c_str());
@@ -196,13 +182,19 @@ void CLeapHandController::Deactivate()
     m_trackedDeviceID = vr::k_unTrackedDeviceIndexInvalid;
 }
 
+void* CLeapHandController::GetComponent(const char* pchComponentNameAndVersion)
+{
+    if(!strcmp(pchComponentNameAndVersion, vr::ITrackedDeviceServerDriver_Version)) return this;
+    return nullptr;
+}
+
 void CLeapHandController::DebugRequest(const char* pchRequest, char* pchResponseBuffer, uint32_t unResponseBufferSize)
 {
-    std::istringstream ss(pchRequest);
+    std::stringstream ss(pchRequest);
     std::string strCmd;
 
     ss >> strCmd;
-    switch(ReadEnumVector(strCmd, g_DebugRequestStringTable))
+    switch(ReadEnumVector(strCmd, g_debugRequestStringTable))
     {
         case CONTROLLER_DEBUGREQUEST_APPKEY:
         {
@@ -210,7 +202,7 @@ void CLeapHandController::DebugRequest(const char* pchRequest, char* pchResponse
             ss >> l_appKey;
 
             EGameProfile l_last = m_gameProfile;
-            switch(ReadEnumVector(l_appKey, g_SteamAppKeysTable))
+            switch(ReadEnumVector(l_appKey, g_steamAppKeysTable))
             {
                 case STEAM_APPKEY_VRCHAT:
                     m_gameProfile = GP_VRChat;
@@ -223,17 +215,31 @@ void CLeapHandController::DebugRequest(const char* pchRequest, char* pchResponse
     }
 }
 
-const char* CLeapHandController::GetSerialNumber() const
-{
-    return m_serialNumber.c_str();
-}
-
 vr::DriverPose_t CLeapHandController::GetPose()
 {
     return m_pose;
 }
 
-void CLeapHandController::UpdateControllerState(Leap::Frame& frame)
+const char* CLeapHandController::GetSerialNumber() const
+{
+    return m_serialNumber.c_str();
+}
+
+void CLeapHandController::SetAsDisconnected()
+{
+    if(m_trackedDeviceID == vr::k_unTrackedDeviceIndexInvalid) return;
+
+    m_pose.deviceIsConnected = false;
+    m_driverHost->TrackedDevicePoseUpdated(m_trackedDeviceID, m_pose, sizeof(vr::DriverPose_t));
+}
+
+void CLeapHandController::Update(Leap::Frame &frame)
+{
+    UpdateTrasnformation(frame);
+    UpdateGestures(frame);
+}
+
+void CLeapHandController::UpdateGestures(Leap::Frame& frame)
 {
     float scores[CGestureMatcher::NUM_GESTURES] = { 0.f };
     if(CGestureMatcher::MatchGestures(frame, ((m_id == LEFT_CONTROLLER) ? CGestureMatcher::LeftHand : CGestureMatcher::RightHand), scores))
@@ -249,129 +255,6 @@ void CLeapHandController::UpdateControllerState(Leap::Frame& frame)
         }
         UpdateButtonInput();
     }
-}
-
-void CLeapHandController::UpdateTrackingState(Leap::Frame &frame)
-{
-    Leap::HandList &hands = frame.hands();
-
-    bool handFound = false;
-    for(int h = 0; h < hands.count(); h++)
-    {
-        Leap::Hand &hand = hands[h];
-
-        if(hand.isValid() && ((m_id == LEFT_CONTROLLER && hand.isLeft()) || (m_id == RIGHT_CONTROLLER && hand.isRight())))
-        {
-            handFound = true;
-
-            m_pose.qWorldFromDriverRotation = ms_headRot;
-            m_pose.vecWorldFromDriverTranslation[0] = ms_headPos[0];
-            m_pose.vecWorldFromDriverTranslation[1] = ms_headPos[1];
-            m_pose.vecWorldFromDriverTranslation[2] = ms_headPos[2];
-
-            Leap::Vector position = hand.palmPosition();
-
-            m_pose.vecPosition[0] = -0.001*position.x;
-            m_pose.vecPosition[1] = -0.001*position.z;
-            m_pose.vecPosition[2] = -0.001*position.y - 0.15;
-
-            Leap::Vector velocity = hand.palmVelocity();
-
-            m_pose.vecVelocity[0] = -0.001*velocity.x;
-            m_pose.vecVelocity[1] = -0.001*velocity.z;
-            m_pose.vecVelocity[2] = -0.001*velocity.y;
-
-            Leap::Vector direction = hand.direction();
-            direction /= direction.magnitude();
-
-            Leap::Vector normal = hand.palmNormal();
-            normal /= normal.magnitude();
-
-            Leap::Vector side = direction.cross(normal);
-
-            switch(m_id)
-            {
-                case LEFT_CONTROLLER:
-                {
-                    float L[3][3] =
-                    { { -normal.x, -normal.z, -normal.y },
-                    { side.x, side.z, side.y },
-                    { direction.x, direction.z, direction.y } };
-                    CalculateRotation(L, m_pose.qRotation);
-                } break;
-                case RIGHT_CONTROLLER:
-                {
-
-                    float R[3][3] =
-                    { { normal.x, normal.z, normal.y },
-                    { -side.x, -side.z, -side.y },
-                    { direction.x, direction.z, direction.y } };
-                    CalculateRotation(R, m_pose.qRotation);
-                } break;
-            }
-
-            if(m_gripAngleOffset.x != 0.f)
-                m_pose.qRotation = rotate_around_axis(g_AxisX, m_gripAngleOffset.x) * m_pose.qRotation;
-            if(m_gripAngleOffset.y != 0.f)
-                m_pose.qRotation = rotate_around_axis(g_AxisY, m_gripAngleOffset.y) * m_pose.qRotation;
-            if(m_gripAngleOffset.z != 0.f)
-                m_pose.qRotation = rotate_around_axis(g_AxisZ, m_gripAngleOffset.z) * m_pose.qRotation;
-
-            m_pose.result = vr::TrackingResult_Running_OK;
-
-            break;
-        }
-    }
-
-    if(m_isEnabled)
-    {
-        if(!handFound) m_pose.result = vr::TrackingResult_Running_OutOfRange;
-        m_pose.poseIsValid = handFound;
-    }
-    else
-    {
-        m_pose.result = vr::TrackingResult_Running_OutOfRange;
-        m_pose.poseIsValid = false;
-    }
-
-    if(!m_pose.deviceIsConnected) m_pose.deviceIsConnected = true;
-
-    m_driverHost->TrackedDevicePoseUpdated(m_trackedDeviceID, m_pose, sizeof(vr::DriverPose_t));
-}
-
-void CLeapHandController::Update(Leap::Frame &frame)
-{
-    UpdateTrackingState(frame);
-    UpdateControllerState(frame);
-}
-
-void CLeapHandController::UpdateHMDCoordinates(vr::IVRServerDriverHost *f_host)
-{
-    vr::TrackedDevicePose_t l_hmdPose;
-    f_host->GetRawTrackedDevicePoses(0.f, &l_hmdPose, 1U); // HMD has device ID 0
-    if(l_hmdPose.bPoseIsValid)
-    {
-        float m[3][3], v[3];
-        const auto &l_hmdMat = l_hmdPose.mDeviceToAbsoluteTracking.m;
-        for(int i = 0; i < 3; i++)
-        {
-            for(int j = 0; j < 3; j++)
-            {
-                m[j][i] = l_hmdMat[i][j];
-            }
-            v[i] = l_hmdMat[i][3];
-        }
-        CalculateRotation(m, ms_headRot);
-        memcpy(ms_headPos, v, sizeof(float) * 3U);
-    }
-}
-
-void CLeapHandController::SetAsDisconnected()
-{
-    if(m_trackedDeviceID == vr::k_unTrackedDeviceIndexInvalid) return;
-
-    m_pose.deviceIsConnected = false;
-    m_driverHost->TrackedDevicePoseUpdated(m_trackedDeviceID, m_pose, sizeof(vr::DriverPose_t));
 }
 
 void CLeapHandController::ProcessDefaultProfileGestures(float *l_scores)
@@ -439,6 +322,75 @@ void CLeapHandController::ProcessVRChatProfileGestures(float *l_scores)
     m_buttons[CB_GripClick].SetState(l_scores[CGestureMatcher::VRChat_SpreadHand] >= 0.75f);
 }
 
+void CLeapHandController::UpdateTrasnformation(Leap::Frame &frame)
+{
+    Leap::HandList &hands = frame.hands();
+
+    bool handFound = false;
+    for(int h = 0; h < hands.count(); h++)
+    {
+        Leap::Hand &hand = hands[h];
+
+        if(hand.isValid() && ((m_id == LEFT_CONTROLLER && hand.isLeft()) || (m_id == RIGHT_CONTROLLER && hand.isRight())))
+        {
+            handFound = true;
+
+            std::memcpy(&m_pose.qWorldFromDriverRotation, &ms_headRot, sizeof(vr::HmdQuaternion_t));
+            for(size_t i = 0U; i < 3U; i++) m_pose.vecWorldFromDriverTranslation[i] = ms_headPos[i];
+
+            Leap::Vector position = hand.palmPosition();
+            m_pose.vecPosition[0] = -0.001*position.x;
+            m_pose.vecPosition[1] = -0.001*position.z;
+            m_pose.vecPosition[2] = -0.001*position.y - 0.15; // ?
+
+            Leap::Vector velocity = hand.palmVelocity();
+            m_pose.vecVelocity[0] = -0.001*velocity.x;
+            m_pose.vecVelocity[1] = -0.001*velocity.z;
+            m_pose.vecVelocity[2] = -0.001*velocity.y;
+
+            Leap::Vector l_handDirection = hand.direction();
+            l_handDirection /= l_handDirection.magnitude();
+
+            Leap::Vector l_palmNormal = hand.palmNormal();
+            l_palmNormal /= l_palmNormal.magnitude();
+
+            Leap::Vector l_leapCross = l_handDirection.cross(l_palmNormal);
+
+            glm::mat3 l_rotMat(
+                l_palmNormal.x, l_palmNormal.z, l_palmNormal.y,
+                l_leapCross.x, l_leapCross.z, l_leapCross.y,
+                l_handDirection.x, l_handDirection.z, l_handDirection.y
+                );
+            for(size_t i = 0U; i < 3U; i++) l_rotMat[static_cast<size_t>(m_id)][i] *= -1.f; // Reverse normal for left controller and cross product for right controller
+            glm::quat l_finalRot(l_rotMat);
+            l_finalRot *= m_gripAngleOffset;
+
+            m_pose.qRotation.x = l_finalRot.x;
+            m_pose.qRotation.y = l_finalRot.y;
+            m_pose.qRotation.z = l_finalRot.z;
+            m_pose.qRotation.w = l_finalRot.w;
+
+            m_pose.result = vr::TrackingResult_Running_OK;
+            break;
+        }
+    }
+
+    if(m_isEnabled)
+    {
+        if(!handFound) m_pose.result = vr::TrackingResult_Running_OutOfRange;
+        m_pose.poseIsValid = handFound;
+    }
+    else
+    {
+        m_pose.result = vr::TrackingResult_Running_OutOfRange;
+        m_pose.poseIsValid = false;
+    }
+
+    if(!m_pose.deviceIsConnected) m_pose.deviceIsConnected = true;
+
+    m_driverHost->TrackedDevicePoseUpdated(m_trackedDeviceID, m_pose, sizeof(vr::DriverPose_t));
+}
+
 void CLeapHandController::UpdateButtonInput()
 {
     for(size_t i = 0U; i < CB_Count; i++)
@@ -449,16 +401,13 @@ void CLeapHandController::UpdateButtonInput()
             switch(l_button.GetInputType())
             {
                 case EControllerButtonInputType::CBIT_Boolean:
-                {
                     m_driverInput->UpdateBooleanComponent(l_button.GetHandle(), l_button.GetState(), .0);
-                    l_button.ResetUpdate();
-                } break;
+                    break;
                 case EControllerButtonInputType::CBIT_Float:
-                {
                     m_driverInput->UpdateScalarComponent(l_button.GetHandle(), l_button.GetValue(), .0);
-                    l_button.ResetUpdate();
-                } break;
+                    break;
             }
+            l_button.ResetUpdate();
         }
     }
 }
@@ -470,5 +419,28 @@ void CLeapHandController::ResetControls()
         CControllerButton &l_button = m_buttons[i];
         l_button.SetValue(0.f);
         l_button.SetState(false);
+    }
+}
+
+void CLeapHandController::UpdateHMDCoordinates(vr::IVRServerDriverHost *f_host)
+{
+    vr::TrackedDevicePose_t l_hmdPose;
+    f_host->GetRawTrackedDevicePoses(0.f, &l_hmdPose, 1U); // HMD has device ID 0
+    if(l_hmdPose.bPoseIsValid)
+    {
+        const auto &l_hmdMat = l_hmdPose.mDeviceToAbsoluteTracking.m;
+        glm::mat4 l_rotMat(
+            l_hmdMat[0][0], l_hmdMat[1][0], l_hmdMat[2][0], 0.f,
+            l_hmdMat[0][1], l_hmdMat[1][1], l_hmdMat[2][1], 0.f,
+            l_hmdMat[0][2], l_hmdMat[1][2], l_hmdMat[2][2], 0.f,
+            l_hmdMat[0][3], l_hmdMat[1][3], l_hmdMat[2][3], 1.f
+            );
+        glm::quat l_headRot(l_rotMat);
+        ms_headRot.x = l_headRot.x;
+        ms_headRot.y = l_headRot.y;
+        ms_headRot.z = l_headRot.z;
+        ms_headRot.w = l_headRot.w;
+
+        for(int i = 0; i < 3; i++) ms_headPos[i] = l_hmdMat[i][3];
     }
 }

@@ -5,7 +5,7 @@
 #include "CLeapHandController.h"
 #include "Utils.h"
 
-extern char g_ModuleFileName[];
+extern char g_moduleFileName[];
 
 void CLeapListener::onInit(const Leap::Controller& controller)
 {
@@ -83,6 +83,11 @@ void CServerDriver::Cleanup()
     m_driverHost = nullptr;
 }
 
+const char* const* CServerDriver::GetInterfaceVersions()
+{
+    return ms_interfaces;
+}
+
 void CServerDriver::RunFrame()
 {
     CLeapHandController::UpdateHMDCoordinates(m_driverHost);
@@ -115,19 +120,11 @@ bool CServerDriver::ShouldBlockStandbyMode()
     return false;
 }
 
-void CServerDriver::EnterStandby()
-{
-}
-
-void CServerDriver::LeaveStandby()
-{
-}
-
 void CServerDriver::LaunchLeapMonitor()
 {
     if(m_bLaunchedLeapMonitor) return;
 
-    std::string path(g_ModuleFileName);
+    std::string path(g_moduleFileName);
     path.erase(path.begin() + path.rfind('\\'), path.end());
 
     m_bLaunchedLeapMonitor = true;

@@ -10,7 +10,6 @@ class CLeapListener : public Leap::Listener
 
 class CServerDriver : public vr::IServerTrackedDeviceProvider
 {
-
     vr::IVRServerDriverHost* m_driverHost;
     static const char* const ms_interfaces[];
 
@@ -30,10 +29,10 @@ public:
     // vr::IServerTrackedDeviceProvider
     virtual vr::EVRInitError Init(vr::IVRDriverContext *pDriverContext);
     virtual void Cleanup();
-    virtual const char* const* GetInterfaceVersions() { return ms_interfaces; }
+    virtual const char* const* GetInterfaceVersions();
     virtual void RunFrame();
 
     virtual bool ShouldBlockStandbyMode();
-    virtual void EnterStandby();
-    virtual void LeaveStandby();
+    virtual void EnterStandby() {};
+    virtual void LeaveStandby() {};
 };

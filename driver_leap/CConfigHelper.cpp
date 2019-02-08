@@ -2,7 +2,7 @@
 #include "CConfigHelper.h"
 #include "Utils.h"
 
-extern char g_ModuleFileName[];
+extern char g_moduleFileName[];
 
 bool CConfigHelper::ms_menu = true;
 bool CConfigHelper::ms_applicationMenu = true;
@@ -42,7 +42,7 @@ const std::vector<std::string> g_configAttributeTable
 
 void CConfigHelper::LoadConfig()
 {
-    std::string l_path(g_ModuleFileName);
+    std::string l_path(g_moduleFileName);
     l_path.erase(l_path.begin() + l_path.rfind('\\'), l_path.end());
     l_path.append("\\control_config.xml");
 

@@ -5,38 +5,6 @@ const Leap::Vector CGestureMatcher::RightVector = Leap::Vector(-1, 0, 0);
 const Leap::Vector CGestureMatcher::InVector = Leap::Vector(0, 1, 0);
 const Leap::Vector CGestureMatcher::UpVector = Leap::Vector(0, 0, -1);
 
-// invert a 3x3 matrix
-static void invert_3x3(const float(*A)[3], float(*R)[3])
-{
-    float det;
-
-    det = A[0][0] * (A[2][2] * A[1][1] - A[2][1] * A[1][2])
-        - A[1][0] * (A[2][2] * A[0][1] - A[2][1] * A[0][2])
-        + A[2][0] * (A[1][2] * A[0][1] - A[1][1] * A[0][2]);
-
-    R[0][0] = (A[2][2] * A[1][1] - A[2][1] * A[1][2]) / det;
-    R[0][1] = -(A[2][2] * A[0][1] - A[2][1] * A[0][2]) / det;
-    R[0][2] = (A[1][2] * A[0][1] - A[1][1] * A[0][2]) / det;
-
-    R[1][0] = -(A[2][2] * A[1][0] - A[2][0] * A[1][2]) / det;
-    R[1][1] = (A[2][2] * A[0][0] - A[2][0] * A[0][2]) / det;
-    R[1][2] = -(A[1][2] * A[0][0] - A[1][0] * A[0][2]) / det;
-
-    R[2][0] = (A[2][1] * A[1][0] - A[2][0] * A[1][1]) / det;
-    R[2][1] = -(A[2][1] * A[0][0] - A[2][0] * A[0][1]) / det;
-    R[2][2] = (A[1][1] * A[0][0] - A[1][0] * A[0][1]) / det;
-}
-
-// compute matrix * column vector product
-static Leap::Vector matrix_vector(const float(*A)[3], Leap::Vector &v)
-{
-    Leap::Vector result;
-    result.x = A[0][0] * v.x + A[0][1] * v.y + A[0][2] * v.z;
-    result.y = A[1][0] * v.x + A[1][1] * v.y + A[1][2] * v.z;
-    result.z = A[2][0] * v.x + A[2][1] * v.y + A[2][2] * v.z;
-    return result;
-}
-
 bool CGestureMatcher::MatchGestures(const Leap::Frame &frame, WhichHand which, float(&result)[NUM_GESTURES],
     const Leap::Vector& right, const Leap::Vector& in, const Leap::Vector& up)
 {
@@ -131,6 +99,22 @@ bool CGestureMatcher::MatchGestures(const Leap::Frame &frame, WhichHand which, f
             pinkyside = direction.cross(palmNormal);
         merge(result[Thumbpress], maprange(pinkyside.dot(fingerdir[Leap::Finger::TYPE_THUMB]), 0.0f, 0.6f));
 
+
+        // *UNRELIABLE* ILY gesture means pinky and index finger extended, middle and ring finger curled up
+        // Thumb doesn't matter. It's easier to point it inwards for many people.
+        merge(result[ILY], std::min(maprange((sumbend[Leap::Finger::TYPE_PINKY] + sumbend[Leap::Finger::TYPE_INDEX]) / 2, 50.0, 40.0),
+            maprange((sumbend[Leap::Finger::TYPE_MIDDLE] + sumbend[Leap::Finger::TYPE_RING]) / 2, 120.0, 150.0)));
+
+        // *UNRELIABLE* Flipping the Bird: You know how to flip a bird.
+        merge(result[FlippingTheBird], std::min(maprange(sumbend[Leap::Finger::TYPE_MIDDLE], 50.0, 40.0),
+            maprange((sumbend[Leap::Finger::TYPE_INDEX] + sumbend[Leap::Finger::TYPE_RING] + sumbend[Leap::Finger::TYPE_PINKY]) / 3, 120.0, 150.0)));
+
+        // Victory gesture: make a nice V sign with your index and middle finger
+        float angle = fingerdir[Leap::Finger::TYPE_INDEX].angleTo(fingerdir[Leap::Finger::TYPE_MIDDLE]);
+        merge(result[Victory], std::min(std::min(maprange((sumbend[Leap::Finger::TYPE_INDEX] + sumbend[Leap::Finger::TYPE_MIDDLE]) / 2, 50.0, 40.0),
+            maprange((sumbend[Leap::Finger::TYPE_PINKY] + sumbend[Leap::Finger::TYPE_RING]) / 2, 120.0, 150.0)),
+            maprange(57.2957795f * fingerdir[Leap::Finger::TYPE_INDEX].angleTo(fingerdir[Leap::Finger::TYPE_MIDDLE]), 10.0, 20.0)));
+
         // FlatHand gestures
         float flatHand = maprange((sumbend[Leap::Finger::TYPE_THUMB] + sumbend[Leap::Finger::TYPE_INDEX] + sumbend[Leap::Finger::TYPE_MIDDLE] + sumbend[Leap::Finger::TYPE_RING] + sumbend[Leap::Finger::TYPE_PINKY]) / 5, 50.0, 40.0);
         merge(result[FlatHandPalmUp], std::min(flatHand, maprange((up).dot(palmNormal), 0.8f, 0.95f)));
@@ -192,34 +176,28 @@ bool CGestureMatcher::MatchGestures(const Leap::Frame &frame, WhichHand which, f
                     //  v =  inv( u1 v1 d1 ) * ( p1 - o1 )
                     //  n         u2 v2 d2       p2   o2
 
-                    float A[3][3] = { { uvec.x, vvec.x, d.x },
-                    { uvec.y, vvec.y, d.y },
-                    { uvec.z, vvec.z, d.z } };
+                    glm::mat3 A( uvec.x, vvec.x, d.x ,
+                    uvec.y, vvec.y, d.y ,
+                    uvec.z, vvec.z, d.z);
 
-                    float invA[3][3];
-                    invert_3x3(A, invA);
-                    Leap::Vector R = matrix_vector(invA, Leap::Vector(p.x - o.x, p.y - o.y, p.z - o.z));
+                    glm::mat3 invA = glm::inverse(A);
+                    glm::vec3 R = glm::vec3(p.x - o.x, p.y - o.y, p.z - o.z)*invA;
 
                     // u and v are in R.x and R.y respectively and are expected to be within -1...+1
                     // when the index finger points into the palm area
                     // n is contained in R.z and represents the distance in mm between the index finger tip and the palm
 
                     // compute length of u,v vector in plane
-                    float u = R.x;
-                    float v = R.y;
-                    float length = sqrtf(u*u + v*v);
+                    glm::vec2 uv(R);
+                    float length = glm::length(uv);
 
                     // ignore if are we pointing way out of bounds
                     if(length < 5.0)
                     {
                         // limit vector to remain inside unit circle
-                        if(length > 1.0)
-                        {
-                            u /= length;
-                            v /= length;
-                        }
-                        result[TouchpadAxisX] = u;
-                        result[TouchpadAxisY] = v;
+                        if(length > 1.0) uv /= length;
+                        result[TouchpadAxisX] = uv.x;
+                        result[TouchpadAxisY] = uv.y;
                     }
                 }
             }

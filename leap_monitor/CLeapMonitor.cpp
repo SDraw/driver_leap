@@ -2,7 +2,7 @@
 
 #include "CLeapMonitor.h"
 
-const std::chrono::milliseconds k_MonitorInterval(10);
+const std::chrono::milliseconds k_MonitorInterval(100U);
 
 CLeapMonitor::CLeapMonitor()
 {

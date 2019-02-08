@@ -1,3 +1,6 @@
 [submodule "vendor/openvr"]
 	path = vendor/openvr
 	url = git://github.com/ValveSoftware/openvr.git
+[submodule "vendor/glm"]
+	path = vendor/glm
+	url = git://github.com/g-truc/glm.git

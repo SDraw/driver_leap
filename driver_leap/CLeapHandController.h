@@ -2,7 +2,8 @@
 
 enum EControllerButtonInputType : unsigned char
 {
-    CBIT_Boolean = 0U,
+    CBIT_None = 0U,
+    CBIT_Boolean,
     CBIT_Float
 };
 class CControllerButton
@@ -43,7 +44,7 @@ class CLeapHandController : public vr::ITrackedDeviceServerDriver
     uint32_t m_trackedDeviceID;
 
     vr::DriverPose_t m_pose;
-    Leap::Vector m_gripAngleOffset;
+    glm::quat m_gripAngleOffset;
 
     static float ms_headPos[3];
     static vr::HmdQuaternion_t ms_headRot;
@@ -72,8 +73,8 @@ class CLeapHandController : public vr::ITrackedDeviceServerDriver
     };
     CControllerButton m_buttons[CB_Count];
 
-    void UpdateControllerState(Leap::Frame &frame);
-    void UpdateTrackingState(Leap::Frame &frame);
+    void UpdateGestures(Leap::Frame &frame);
+    void UpdateTrasnformation(Leap::Frame &frame);
     void UpdateButtonInput();
 
     void ProcessDefaultProfileGestures(float *l_scores);
@@ -92,9 +93,9 @@ public:
     virtual vr::DriverPose_t GetPose();
     virtual void EnterStandby() {};
 
-    void Update(Leap::Frame& frame);
     const char* GetSerialNumber() const;
-
-    static void UpdateHMDCoordinates(vr::IVRServerDriverHost *f_host);
     void SetAsDisconnected();
+
+    void Update(Leap::Frame& frame);
+    static void UpdateHMDCoordinates(vr::IVRServerDriverHost *f_host);
 };
