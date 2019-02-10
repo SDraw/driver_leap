@@ -46,9 +46,6 @@ class CLeapHandController : public vr::ITrackedDeviceServerDriver
     vr::DriverPose_t m_pose;
     glm::quat m_gripAngleOffset;
 
-    static float ms_headPos[3];
-    static vr::HmdQuaternion_t ms_headRot;
-
     enum EGameProfile
     {
         GP_Default = 0U,
@@ -72,6 +69,9 @@ class CLeapHandController : public vr::ITrackedDeviceServerDriver
         CB_Count
     };
     CControllerButton m_buttons[CB_Count];
+
+    static double ms_headPos[3];
+    static vr::HmdQuaternion_t ms_headRot;
 
     void UpdateGestures(Leap::Frame &frame);
     void UpdateTrasnformation(Leap::Frame &frame);

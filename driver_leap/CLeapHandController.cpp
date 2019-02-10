@@ -53,7 +53,7 @@ const std::vector<std::string> g_debugRequestStringTable = {
 };
 #define CONTROLLER_DEBUGREQUEST_APPKEY 0U
 
-float CLeapHandController::ms_headPos[] = { 0.f };
+double CLeapHandController::ms_headPos[] = { .0, .0, .0 };
 vr::HmdQuaternion_t CLeapHandController::ms_headRot = { 1.0, .0, .0, .0 };
 
 CLeapHandController::CLeapHandController(vr::IVRServerDriverHost* pDriverHost, int n)
@@ -77,26 +77,21 @@ CLeapHandController::CLeapHandController(vr::IVRServerDriverHost* pDriverHost, i
     m_gripAngleOffset = glm::quat(l_eulerOffsetRot);
 
     m_pose = { 0 };
-    m_pose.qDriverFromHeadRotation = { 1.0, 0.0, 0.0, 0.0 };
-    m_pose.vecDriverFromHeadTranslation[0] = 0.0;
-    m_pose.vecDriverFromHeadTranslation[1] = 0.0;
-    m_pose.vecDriverFromHeadTranslation[2] = 0.0;
-    m_pose.vecAngularVelocity[0] = 0.0;
-    m_pose.vecAngularVelocity[1] = 0.0;
-    m_pose.vecAngularVelocity[2] = 0.0;
-    m_pose.vecAcceleration[0] = 0.0;
-    m_pose.vecAcceleration[1] = 0.0;
-    m_pose.vecAcceleration[2] = 0.0;
-    m_pose.vecAngularAcceleration[0] = 0.0;
-    m_pose.vecAngularAcceleration[1] = 0.0;
-    m_pose.vecAngularAcceleration[2] = 0.0;
-    m_pose.poseTimeOffset = -0.016f;
+    m_pose.qDriverFromHeadRotation = { 1.0, .0, .0, .0 };
+    for(size_t i = 0U; i < 3U; i++)
+    {
+        m_pose.vecDriverFromHeadTranslation[i] = .0;
+        m_pose.vecAngularVelocity[i] = .0;
+        m_pose.vecAcceleration[i] = .0;
+        m_pose.vecAngularAcceleration[i] = .0;
+    }
+    m_pose.poseTimeOffset = -0.016;
     m_pose.willDriftInYaw = false;
     m_pose.shouldApplyHeadModel = false;
     m_pose.result = vr::TrackingResult_Uninitialized;
 
     m_gameProfile = GP_Default;
-    m_isEnabled = ((m_id == RIGHT_CONTROLLER) ? CConfigHelper::IsRightControllerEnabled() : CConfigHelper::IsLeftControllerEnabled());
+    m_isEnabled = ((m_id == LEFT_CONTROLLER) ? CConfigHelper::IsLeftControllerEnabled() : CConfigHelper::IsRightControllerEnabled());
 }
 CLeapHandController::~CLeapHandController()
 {
@@ -286,7 +281,7 @@ void CLeapHandController::ProcessVRChatProfileGestures(float *l_scores)
     // VRChat profile ignores control restrictions
     m_buttons[CB_AppMenuClick].SetState(l_scores[CGestureMatcher::Timeout] >= 0.75f);
 
-    vr::VRControllerAxis_t l_trackpadAxis = { 0.f, 0.f };
+    glm::vec2 l_trackpadAxis(0.f);
     if(l_scores[CGestureMatcher::VRChat_Point] >= 0.75f)
     {
         l_trackpadAxis.x = 0.0f;
@@ -336,7 +331,7 @@ void CLeapHandController::UpdateTrasnformation(Leap::Frame &frame)
             handFound = true;
 
             std::memcpy(&m_pose.qWorldFromDriverRotation, &ms_headRot, sizeof(vr::HmdQuaternion_t));
-            for(size_t i = 0U; i < 3U; i++) m_pose.vecWorldFromDriverTranslation[i] = ms_headPos[i];
+            std::memcpy(m_pose.vecWorldFromDriverTranslation, ms_headPos, sizeof(double) * 3U);
 
             Leap::Vector position = hand.palmPosition();
             m_pose.vecPosition[0] = -0.001*position.x;
@@ -361,7 +356,7 @@ void CLeapHandController::UpdateTrasnformation(Leap::Frame &frame)
                 l_leapCross.x, l_leapCross.z, l_leapCross.y,
                 l_handDirection.x, l_handDirection.z, l_handDirection.y
                 );
-            for(size_t i = 0U; i < 3U; i++) l_rotMat[static_cast<size_t>(m_id)][i] *= -1.f; // Reverse normal for left controller and cross product for right controller
+            for(size_t i = 0U; i < 3U; i++) l_rotMat[static_cast<size_t>(m_id)][i] *= -1.f; // Reverse normal for left controller (0) and cross product for right controller (1)
             glm::quat l_finalRot(l_rotMat);
             l_finalRot *= m_gripAngleOffset;
 
