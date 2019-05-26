@@ -321,32 +321,32 @@ void CLeapHandController::UpdateTrasnformation(Leap::Frame &frame)
 {
     Leap::HandList &hands = frame.hands();
 
-    bool handFound = false;
+    bool l_handFound = false;
     for(int h = 0; h < hands.count(); h++)
     {
-        Leap::Hand &hand = hands[h];
+        Leap::Hand &l_hand = hands[h];
 
-        if(hand.isValid() && ((m_id == LEFT_CONTROLLER && hand.isLeft()) || (m_id == RIGHT_CONTROLLER && hand.isRight())))
+        if(l_hand.isValid() && ((m_id == LEFT_CONTROLLER && l_hand.isLeft()) || (m_id == RIGHT_CONTROLLER && l_hand.isRight())))
         {
-            handFound = true;
+            l_handFound = true;
 
             std::memcpy(&m_pose.qWorldFromDriverRotation, &ms_headRot, sizeof(vr::HmdQuaternion_t));
             std::memcpy(m_pose.vecWorldFromDriverTranslation, ms_headPos, sizeof(double) * 3U);
 
-            Leap::Vector position = hand.palmPosition();
+            Leap::Vector position = l_hand.palmPosition();
             m_pose.vecPosition[0] = -0.001*position.x;
             m_pose.vecPosition[1] = -0.001*position.z;
             m_pose.vecPosition[2] = -0.001*position.y - 0.15; // ?
 
-            Leap::Vector velocity = hand.palmVelocity();
+            Leap::Vector velocity = l_hand.palmVelocity();
             m_pose.vecVelocity[0] = -0.001*velocity.x;
             m_pose.vecVelocity[1] = -0.001*velocity.z;
             m_pose.vecVelocity[2] = -0.001*velocity.y;
 
-            Leap::Vector l_handDirection = hand.direction();
+            Leap::Vector l_handDirection = l_hand.direction();
             l_handDirection /= l_handDirection.magnitude();
 
-            Leap::Vector l_palmNormal = hand.palmNormal();
+            Leap::Vector l_palmNormal = l_hand.palmNormal();
             l_palmNormal /= l_palmNormal.magnitude();
 
             Leap::Vector l_leapCross = l_handDirection.cross(l_palmNormal);
@@ -372,8 +372,8 @@ void CLeapHandController::UpdateTrasnformation(Leap::Frame &frame)
 
     if(m_isEnabled)
     {
-        if(!handFound) m_pose.result = vr::TrackingResult_Running_OutOfRange;
-        m_pose.poseIsValid = handFound;
+        if(!l_handFound) m_pose.result = vr::TrackingResult_Calibrating_InProgress;
+        m_pose.poseIsValid = l_handFound;
     }
     else
     {

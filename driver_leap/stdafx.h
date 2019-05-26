@@ -8,7 +8,6 @@
 #include <string>
 #include <sstream>
 #include <vector>
-#include <algorithm>
 
 #include "openvr_driver.h"
 #include "LeapC++.h"
