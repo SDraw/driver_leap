@@ -8,10 +8,10 @@
     <ClCompile Include="CConfigHelper.cpp" />
     <ClCompile Include="CServerDriver.cpp" />
     <ClCompile Include="CLeapHandController.cpp" />
-    <ClCompile Include="..\vendor\pugixml\pugixml.cpp">
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="..\vendor\pugixml\src\pugixml.cpp">
       <Filter>vendor\pugixml</Filter>
     </ClCompile>
-    <ClCompile Include="dllmain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="targetver.h" />
