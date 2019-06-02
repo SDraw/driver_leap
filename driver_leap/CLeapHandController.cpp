@@ -373,7 +373,7 @@ void CLeapHandController::UpdateTrasnformation(Leap::Frame &frame)
     if(m_isEnabled)
     {
         if(!l_handFound) m_pose.result = vr::TrackingResult_Calibrating_InProgress;
-        m_pose.poseIsValid = l_handFound;
+        m_pose.poseIsValid = ((m_gameProfile == GP_VRChat) ? true : l_handFound);
     }
     else
     {
