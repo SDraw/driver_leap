@@ -1,7 +1,6 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/2pc49d2hpt2hx944?svg=true)](https://ci.appveyor.com/project/SDraw/driver-leap) [![Release](http://img.shields.io/github/release/SDraw/driver_leap.svg)](../../releases/latest)
+[![Donate](https://liberapay.com/assets/widgets/donate.svg)](https://liberapay.com/SDraw/donate) [![Build status](https://ci.appveyor.com/api/projects/status/2pc49d2hpt2hx944?svg=true)](https://ci.appveyor.com/project/SDraw/driver-leap) [![Release](http://img.shields.io/github/release/SDraw/driver_leap.svg)](../../releases/latest)
 
-Fork with updated LeapSDK and OpenVR.
-Refer to [parent repository](https://github.com/cbuchner1/driver_leap) for base project installation.
+Fork with updated LeapSDK and OpenVR. Refer to [parent repository](https://github.com/cbuchner1/driver_leap) for base project installation.
   
 ### Installation
 * Install [base project driver](https://github.com/cbuchner1/driver_leap)
