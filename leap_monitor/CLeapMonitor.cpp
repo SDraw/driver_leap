@@ -29,24 +29,28 @@ bool CLeapMonitor::Init()
     return true;
 }
 
+bool g_keyPress[256U];
+bool IsKeyDown(int key)
+{
+    return (GetAsyncKeyState(key) & 0x8000) != 0;
+}
+
 void CLeapMonitor::MainLoop()
 {
+    for(size_t i = 0U; i < 256U; i++) g_keyPress[i] = false;
     bool l_quitEvent = false;
     while(!l_quitEvent)
     {
-        std::this_thread::sleep_for(k_MonitorInterval);
-
-#if defined( WIN32 )
+        // System messages
         MSG msg = { 0 };
         while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
         {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
-
         if(msg.message == WM_QUIT) break;
-#endif
 
+        // VR messages
         vr::VREvent_t Event;
         while(vr::VRSystem()->PollNextEvent(&Event, sizeof(Event)))
         {
@@ -67,6 +71,8 @@ void CLeapMonitor::MainLoop()
             }
             if(l_quitEvent) break;
         }
+
+        std::this_thread::sleep_for(k_MonitorInterval);
     }
 }
 

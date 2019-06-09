@@ -5,10 +5,11 @@ const Leap::Vector CGestureMatcher::RightVector = Leap::Vector(-1, 0, 0);
 const Leap::Vector CGestureMatcher::InVector = Leap::Vector(0, 1, 0);
 const Leap::Vector CGestureMatcher::UpVector = Leap::Vector(0, 0, -1);
 
-bool CGestureMatcher::MatchGestures(const Leap::Frame &frame, WhichHand which, float(&result)[NUM_GESTURES],
+bool CGestureMatcher::MatchGestures(const Leap::Frame &frame, WhichHand which, std::vector<float> &result,
     const Leap::Vector& right, const Leap::Vector& in, const Leap::Vector& up)
 {
     bool success = false;
+    result.resize(NUM_GESTURES, 0.f);
 
     // Go through the hands in the dataset
     Leap::HandList &hands = frame.hands();
@@ -137,6 +138,42 @@ bool CGestureMatcher::MatchGestures(const Leap::Frame &frame, WhichHand which, f
         result[VRChat_RockOut] = (!extended[Leap::Finger::TYPE_THUMB] && extended[Leap::Finger::TYPE_INDEX] && !extended[Leap::Finger::TYPE_MIDDLE] && !extended[Leap::Finger::TYPE_RING] && extended[Leap::Finger::TYPE_PINKY]) ? 1.f : 0.f;
         result[VRChat_Victory] = (!extended[Leap::Finger::TYPE_THUMB] && extended[Leap::Finger::TYPE_INDEX] && extended[Leap::Finger::TYPE_MIDDLE] && !extended[Leap::Finger::TYPE_RING] && !extended[Leap::Finger::TYPE_PINKY]) ? 1.f : 0.f;
 
+        // Index controller
+        result[IndexFinger_Index] = maprange(sumbend[Leap::Finger::TYPE_INDEX], 90.f, 180.f);
+        result[IndexFinger_Middle] = maprange(sumbend[Leap::Finger::TYPE_MIDDLE], 90.f, 180.f);
+        result[IndexFinger_Ring] = maprange(sumbend[Leap::Finger::TYPE_RING], 90.f, 180.f);
+        result[IndexFinger_Pinky] = maprange(sumbend[Leap::Finger::TYPE_PINKY], 90.f, 180.f);
+
+        // Find index finger on same hand
+        for(Leap::Finger l_fingerA : hand.fingers())
+        {
+            if(l_fingerA.isValid())
+            {
+                if(l_fingerA.type() == Leap::Finger::TYPE_THUMB)
+                {
+                    for(Leap::Finger l_fingerB : hand.fingers())
+                    {
+                        if(l_fingerB.isValid())
+                        {
+                            if(l_fingerB.type() == Leap::Finger::TYPE_INDEX)
+                            {
+                                Leap::Vector l_vec = l_fingerA.tipPosition() - l_fingerB.tipPosition();
+                                float l_length = l_vec.magnitude();
+                                result[IndexButtonA] = (l_length <= 35.f) ? std::max((35.f - l_length) / 20.f, 1.f) : 0.f;
+                            }
+                            if(l_fingerB.type() == Leap::Finger::TYPE_PINKY)
+                            {
+                                Leap::Vector l_vec = l_fingerA.tipPosition() - l_fingerB.tipPosition();
+                                float l_length = l_vec.magnitude();
+                                result[IndexButtonB] = (l_length <= 35.f) ? std::max((35.f - l_length) / 20.f, 1.f) : 0.f;
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
         if(otherhand.isValid()) // two handed gestures really need two hands
         {
             // Timeout gesture. Note that only the lower hand forming the T shape will register the gesture.
@@ -176,9 +213,9 @@ bool CGestureMatcher::MatchGestures(const Leap::Frame &frame, WhichHand which, f
                     //  v =  inv( u1 v1 d1 ) * ( p1 - o1 )
                     //  n         u2 v2 d2       p2   o2
 
-                    glm::mat3 A( uvec.x, vvec.x, d.x ,
-                    uvec.y, vvec.y, d.y ,
-                    uvec.z, vvec.z, d.z);
+                    glm::mat3 A(uvec.x, vvec.x, d.x,
+                        uvec.y, vvec.y, d.y,
+                        uvec.z, vvec.z, d.z);
 
                     glm::mat3 invA = glm::inverse(A);
                     glm::vec3 R = glm::vec3(p.x - o.x, p.y - o.y, p.z - o.z)*invA;
@@ -201,8 +238,31 @@ bool CGestureMatcher::MatchGestures(const Leap::Frame &frame, WhichHand which, f
                     }
                 }
             }
+
+            // Index thumbstick
+            for(Leap::Finger l_fingerA : hand.fingers())
+            {
+                if(l_fingerA.isValid())
+                {
+                    if(l_fingerA.type() == Leap::Finger::TYPE_THUMB)
+                    {
+                        // Find index finger on another hand
+                        for(Leap::Finger l_fingerB : otherhand.fingers())
+                        {
+                            if(l_fingerB.isValid())
+                            {
+                                if(l_fingerB.type() == Leap::Finger::TYPE_INDEX)
+                                {
+                                    Leap::Vector l_vec = l_fingerA.tipPosition() - l_fingerB.tipPosition();
+                                    float l_length = l_vec.magnitude();
+                                    result[IndexThumbstick] = (l_length <= 35.f) ? std::max((35.f - l_length) / 20.f, 1.f) : 0.f;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
-
     return success;
 }

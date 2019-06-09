@@ -7,7 +7,6 @@
 
 #include <chrono>
 #include <set>
-#include <sstream>
 #include <thread>
 
 #include "openvr.h"

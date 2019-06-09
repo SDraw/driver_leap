@@ -54,7 +54,7 @@ void CGestureListener::onFrame(const Leap::Controller& controller)
 
     for(int i = 0; i < 2; i++)
     {
-        float scores[CGestureMatcher::NUM_GESTURES] = { 0.f };
+        std::vector<float> scores;
         bool handFound = CGestureMatcher::MatchGestures(frame, (CGestureMatcher::WhichHand)(i + 1), scores);
         if(handFound)
         {
@@ -64,13 +64,6 @@ void CGestureListener::onFrame(const Leap::Controller& controller)
                 if(!tmp.empty())
                     fprintf(stderr, "%-10s %-30s - %4.2f\n", i ? "Right Hand" : "Left Hand", tmp.c_str(), scores[j]);
             }
-
-            // Go through the hands in the dataset
-            /*HandList &hands = frame.hands();
-            for (int h = 0; h < hands.count(); h++)
-            {
-            Hand &hand = hands[h];
-            }*/
         }
     }
 
@@ -89,15 +82,16 @@ void CGestureListener::onFocusLost(const Leap::Controller& controller)
 
 void CGestureListener::onDeviceChange(const Leap::Controller& controller)
 {
-    /*std::cout << "Device Changed" << std::endl;
-    const DeviceList devices = controller.devices();
+    std::cout << "Device Changed" << std::endl;
+    const Leap::DeviceList devices = controller.devices();
 
-    for (int i = 0; i < devices.count(); ++i) {
-    std::cout << "id: " << devices[i].toString() << std::endl;
-    std::cout << "  isStreaming: " << (devices[i].isStreaming() ? "true" : "false") << std::endl;
-    std::cout << "  isSmudged:" << (devices[i].isSmudged() ? "true" : "false") << std::endl;
-    std::cout << "  isLightingBad:" << (devices[i].isLightingBad() ? "true" : "false") << std::endl;
-    }*/
+    for(int i = 0; i < devices.count(); ++i)
+    {
+        std::cout << "id: " << devices[i].toString() << std::endl;
+        std::cout << "  isStreaming: " << (devices[i].isStreaming() ? "true" : "false") << std::endl;
+        std::cout << "  isSmudged:" << (devices[i].isSmudged() ? "true" : "false") << std::endl;
+        std::cout << "  isLightingBad:" << (devices[i].isLightingBad() ? "true" : "false") << std::endl;
+    }
 }
 
 void CGestureListener::onServiceConnect(const Leap::Controller& controller)

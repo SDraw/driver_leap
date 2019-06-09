@@ -4,13 +4,15 @@
     <ClCompile Include="CDriverLogHelper.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="CGestureMatcher.cpp" />
     <ClCompile Include="CConfigHelper.cpp" />
     <ClCompile Include="CServerDriver.cpp" />
-    <ClCompile Include="CLeapHandController.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="..\vendor\pugixml\src\pugixml.cpp">
       <Filter>vendor\pugixml</Filter>
+    </ClCompile>
+    <ClCompile Include="CLeapHandController.cpp" />
+    <ClCompile Include="..\shared\CGestureMatcher.cpp">
+      <Filter>shared</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -18,7 +20,6 @@
     <ClInclude Include="CDriverLogHelper.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="CGestureMatcher.h" />
     <ClInclude Include="CConfigHelper.h" />
     <ClInclude Include="CServerDriver.h" />
     <ClInclude Include="CLeapHandController.h" />
@@ -29,6 +30,9 @@
     </Filter>
     <Filter Include="vendor\pugixml">
       <UniqueIdentifier>{21c081d3-867d-441e-90d0-ef26e9d05cae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shared">
+      <UniqueIdentifier>{4781f094-d8be-42ee-9340-d6b35780a3dc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

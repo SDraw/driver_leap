@@ -1,0 +1,5 @@
+{
+    "jsonid" : "input_profile",
+    "controller_type": "knuckles",
+    "legacy_profile" : "index_controller"
+}

@@ -45,7 +45,16 @@ public:
         // Two handed gestures
         Timeout,                 // both Hands form a T shape, signals a Timeout in sports
         TouchpadAxisX,           // Touchpad emulation: index finger of other hand points towards palm 
-        TouchpadAxisY,           // Touchpad emulation: index finger of other hand points towards palm 
+        TouchpadAxisY,           // Touchpad emulation: index finger of other hand points towards palm
+
+        // Index controller gestures
+        IndexFinger_Index,
+        IndexFinger_Middle,
+        IndexFinger_Ring,
+        IndexFinger_Pinky,
+        IndexThumbstick, // Touch of thumb finger of one hand and index finger of other hand
+        IndexButtonA, // Same as pinch, why is it here anyway?
+        IndexButtonB,
 
         NUM_GESTURES,
 
@@ -62,7 +71,7 @@ public:
      * Perform gesture detection and quantification for the specified hand.
      * If AnyHand is specified, the gesture classifications will be merged together (typically std::max)
      */
-    static bool MatchGestures(const Leap::Frame &frame, WhichHand which, float(&result)[NUM_GESTURES],
+    static bool MatchGestures(const Leap::Frame &frame, WhichHand which, std::vector<float> &result,
         const Leap::Vector& right = RightVector, const Leap::Vector& in = InVector, const Leap::Vector &up = UpVector);
 
     /**
@@ -94,6 +103,13 @@ public:
             case Timeout: return "Timeout"; break;
             case TouchpadAxisX: return "TouchpadAxisX"; break;
             case TouchpadAxisY: return "TouchpadAxisY"; break;
+            case IndexFinger_Index: return "IndexFinger_Index"; break;
+            case IndexFinger_Middle: return "IndexFinger_Middle"; break;
+            case IndexFinger_Ring: return "IndexFinger_Ring"; break;
+            case IndexFinger_Pinky: return "IndexFinger_Pinky"; break;
+            case IndexThumbstick: return "IndexThumbstick"; break;
+            case IndexButtonA: return "IndexButtonA"; break;
+            case IndexButtonB: return "IndexButtonB"; break;
             default: return ""; break;
         }
     }
@@ -126,12 +142,19 @@ public:
         else if(name.compare("Timeout") == 0) return Timeout;
         else if(name.compare("TouchpadAxisX") == 0) return TouchpadAxisX;
         else if(name.compare("TouchpadAxisY") == 0) return TouchpadAxisY;
+        else if(name.compare("IndexFinger_Index") == 0) return IndexFinger_Index;
+        else if(name.compare("IndexFinger_Middle") == 0) return IndexFinger_Middle;
+        else if(name.compare("IndexFinger_Ring") == 0) return IndexFinger_Ring;
+        else if(name.compare("IndexFinger_Pinky") == 0) return IndexFinger_Pinky;
+        else if(name.compare("IndexThumbstick") == 0) return IndexThumbstick;
+        else if(name.compare("IndexButtonA") == 0) return IndexButtonA;
+        else if(name.compare("IndexButtonB") == 0) return IndexButtonB;
         else return INVALID_GESTURE;
     }
 
 protected:
 
-    // some utility functions
+    // Some utility functions
 
     static float maprange(float input, float minimum, float maximum)
     {

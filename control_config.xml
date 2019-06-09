@@ -1,18 +1,22 @@
 <config>
+    <param name="emulated_controller" value="vive"/> <!--"vive" or "index"-->
+    <param name="rightHand" value="true"/>
+    <param name="leftHand" value="true"/>
+    <param name="offsetX" value="0.0"/> <!--Euler angle in radians-->
+    <param name="offsetY" value="0.0"/> <!--Euler angle in radians-->
+    <param name="offsetZ" value="0.0"/> <!--Euler angle in radians-->
+    <param name="trackingLevel" value="partial"/> <!--"partial" or "full", only Index controller-->
+    
+    <param name="input" value="true"/>
     <param name="menu" value="true"/>
-    <param name="appMenu" value="true"/>
+    <param name="appMenu" value="true"/> <!--Only Vive controller-->
     <param name="trigger" value="true"/>
     <param name="grip" value="true"/>
-    
     <param name="touchpad" value="true"/>
     <param name="touchpadTouch" value="true"/>
     <param name="touchpadPress" value="true"/>
     <param name="touchpadAxes" value="true"/>
-    
-    <param name="gripOffsetX" value="0.0"/>
-    <param name="gripOffsetY" value="0.0"/>
-    <param name="gripOffsetZ" value="0.0"/>
-    
-    <param name="rightEnabled" value="true"/>
-    <param name="leftEnabled" value="true"/>
+    <param name="buttonA" value="true"/> <!--Only Index controller-->
+    <param name="buttonB" value="true"/> <!--Only Index controller-->
+    <param name="thumbstick" value = "true"/> <!--Only Index controller-->
 </config>

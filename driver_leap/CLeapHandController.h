@@ -54,10 +54,13 @@ class CLeapHandController : public vr::ITrackedDeviceServerDriver
     EGameProfile m_gameProfile;
     bool m_isEnabled;
 
-    enum EControllerButton : size_t
+    enum EControllerViveButton : size_t
     {
         CB_SysClick = 0U,
         CB_GripClick,
+        CB_GripForce,
+        CB_GripTouch,
+        CB_GripValue,
         CB_AppMenuClick,
         CB_TriggerClick,
         CB_TriggerValue,
@@ -65,6 +68,19 @@ class CLeapHandController : public vr::ITrackedDeviceServerDriver
         CB_TrackpadY,
         CB_TrackpadClick,
         CB_TrackpadTouch,
+        CB_TrackpadForce,
+        CB_ThumbstickClick,
+        CB_ThumbstickTouch,
+        CB_ThumbstickX,
+        CB_ThumbstickY,
+        CB_IndexAClick,
+        CB_IndexATouch,
+        CB_IndexBClick,
+        CB_IndexBTouch,
+        CB_FingerIndex,
+        CB_FingerMiddle,
+        CB_FingerRing,
+        CB_FingerPinky,
 
         CB_Count
     };
@@ -73,12 +89,52 @@ class CLeapHandController : public vr::ITrackedDeviceServerDriver
     static double ms_headPos[3];
     static vr::HmdQuaternion_t ms_headRot;
 
-    void UpdateGestures(Leap::Frame &frame);
-    void UpdateTrasnformation(Leap::Frame &frame);
+    // Index
+    vr::VRInputComponentHandle_t m_skeletonHandle;
+    enum HandSkeletonBone : size_t
+    {
+	    HSB_Root = 0,
+	    HSB_Wrist,
+	    HSB_Thumb0,
+	    HSB_Thumb1,
+	    HSB_Thumb2,
+	    HSB_Thumb3,
+	    HSB_IndexFinger0,
+	    HSB_IndexFinger1,
+	    HSB_IndexFinger2,
+	    HSB_IndexFinger3,
+	    HSB_IndexFinger4,
+	    HSB_MiddleFinger0,
+	    HSB_MiddleFinger1,
+	    HSB_MiddleFinger2,
+	    HSB_MiddleFinger3,
+	    HSB_MiddleFinger4,
+	    HSB_RingFinger0,
+	    HSB_RingFinger1,
+	    HSB_RingFinger2,
+	    HSB_RingFinger3,
+	    HSB_RingFinger4,
+	    HSB_PinkyFinger0,
+	    HSB_PinkyFinger1,
+	    HSB_PinkyFinger2,
+	    HSB_PinkyFinger3,
+	    HSB_PinkyFinger4,
+	    HSB_Aux_Thumb, // Not used yet
+	    HSB_Aux_IndexFinger, // Not used yet
+	    HSB_Aux_MiddleFinger, // Not used yet
+	    HSB_Aux_RingFinger, // Not used yet
+	    HSB_Aux_PinkyFinger, // Not used yet
+	    HSB_Count
+    };
+    vr::VRBoneTransform_t m_boneTransform[HSB_Count];
+
+    void UpdateGestures(const Leap::Frame &frame);
+    void UpdateTrasnformation(const Leap::Frame &frame);
     void UpdateButtonInput();
 
-    void ProcessDefaultProfileGestures(float *l_scores);
-    void ProcessVRChatProfileGestures(float *l_scores);
+    void ProcessViveDefaultProfileGestures(const std::vector<float> &l_scores);
+    void ProcessViveVRChatProfileGestures(const std::vector<float> &l_scores);
+    void ProcessIndexGestures(const Leap::Frame &frame, const std::vector<float> &l_scores);
 
     void ResetControls();
 public:
@@ -96,6 +152,6 @@ public:
     const char* GetSerialNumber() const;
     void SetAsDisconnected();
 
-    void Update(Leap::Frame& frame);
+    void Update(const Leap::Frame& frame);
     static void UpdateHMDCoordinates(vr::IVRServerDriverHost *f_host);
 };
