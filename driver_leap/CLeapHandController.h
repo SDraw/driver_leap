@@ -38,7 +38,12 @@ class CLeapHandController : public vr::ITrackedDeviceServerDriver
     vr::IVRServerDriverHost *m_driverHost;
     vr::IVRDriverInput *m_driverInput;
 
-    int m_id;
+    enum EControllerHandAssignment : unsigned char
+    {
+        CHA_Left = 0U,
+        CHA_Right
+    };
+    unsigned char m_id;
     std::string m_serialNumber;
     vr::PropertyContainerHandle_t m_propertyContainer;
     uint32_t m_trackedDeviceID;
@@ -54,7 +59,7 @@ class CLeapHandController : public vr::ITrackedDeviceServerDriver
     EGameProfile m_gameProfile;
     bool m_isEnabled;
 
-    enum EControllerViveButton : size_t
+    enum EControllerButton : size_t
     {
         CB_SysClick = 0U,
         CB_GripClick,
@@ -91,7 +96,7 @@ class CLeapHandController : public vr::ITrackedDeviceServerDriver
 
     // Index
     vr::VRInputComponentHandle_t m_skeletonHandle;
-    enum HandSkeletonBone : size_t
+    enum EHandSkeletonBone : size_t
     {
 	    HSB_Root = 0,
 	    HSB_Wrist,

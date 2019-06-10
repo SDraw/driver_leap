@@ -10,6 +10,7 @@ bool CConfigHelper::ms_rightHand = true;
 float CConfigHelper::ms_offsetX = 0.f;
 float CConfigHelper::ms_offsetY = 0.f;
 float CConfigHelper::ms_offsetZ = 0.f;
+bool CConfigHelper::ms_skeleton = true;
 unsigned char CConfigHelper::ms_trackingLevel = CConfigHelper::TrackingLevel::TL_Partial;
 bool CConfigHelper::ms_input = true;
 bool CConfigHelper::ms_menu = true;
@@ -27,7 +28,7 @@ bool CConfigHelper::ms_thumbstick = true;
 const std::vector<std::string> g_configAttributeTable
 {
     "emulated_controller", "leftHand", "rightHand",
-    "offsetX", "offsetY", "offsetZ", "trackingLevel"
+    "offsetX", "offsetY", "offsetZ", "skeleton", "trackingLevel"
     "input", "menu", "appMenu", "trigger", "grip",
     "touchpad", "touchpadTouch", "touchpadPress", "touchpadAxes",
     "buttonA", "buttonB", "thumbstick"
@@ -40,6 +41,7 @@ enum ConfigParamIndex
     CPI_OffsetX,
     CPI_OffsetY,
     CPI_OffsetZ,
+    CPI_Skeleton,
     CPI_TrackingLevel,
     CPI_Input,
     CPI_Menu,
@@ -106,6 +108,9 @@ void CConfigHelper::LoadConfig()
                                 break;
                             case ConfigParamIndex::CPI_OffsetZ:
                                 ms_offsetZ = l_attribValue.as_float(0.f);
+                                break;
+                            case ConfigParamIndex::CPI_Skeleton:
+                                ms_skeleton = l_attribValue.as_bool(true);
                                 break;
                             case ConfigParamIndex::CPI_TrackingLevel:
                             {

@@ -5,6 +5,7 @@
     <param name="offsetX" value="0.0"/> <!--Euler angle in radians-->
     <param name="offsetY" value="0.0"/> <!--Euler angle in radians-->
     <param name="offsetZ" value="0.0"/> <!--Euler angle in radians-->
+    <param name="skeleton" value="true"/> <!--Only Index controller-->
     <param name="trackingLevel" value="partial"/> <!--"partial" or "full", only Index controller-->
     
     <param name="input" value="true"/>

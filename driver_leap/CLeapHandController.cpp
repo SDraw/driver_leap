@@ -47,12 +47,18 @@ void CControllerButton::SetState(bool f_state)
 const std::vector<std::string> g_steamAppKeysTable = {
     "steam.app.438100" // VRChat
 };
-#define STEAM_APPKEY_VRCHAT 0U
+enum ESteamAppID
+{
+    SAI_VRChat = 0
+};
 
-const std::vector<std::string> g_debugRequestStringTable = {
+const std::vector<std::string> g_debugRequestsTable = {
     "app_key"
 };
-#define CONTROLLER_DEBUGREQUEST_APPKEY 0U
+enum EDebugRequest
+{
+    DR_AppKey = 0
+};
 
 extern const vr::VRBoneTransform_t g_openHandGesture[];
 
@@ -63,15 +69,15 @@ CLeapHandController::CLeapHandController(vr::IVRServerDriverHost* pDriverHost, i
 {
     m_driverHost = pDriverHost;
     m_driverInput = nullptr;
-    m_id = n;
+    m_id = static_cast<unsigned char>(n % 2);
     m_trackedDeviceID = vr::k_unTrackedDeviceIndexInvalid;
 
     m_serialNumber.assign("leap_");
-    m_serialNumber.append((m_id == LEFT_CONTROLLER) ? "lefthand" : "righthand");
+    m_serialNumber.append((m_id == CHA_Left) ? "lefthand" : "righthand");
     m_propertyContainer = vr::k_ulInvalidPropertyContainer;
 
     glm::vec3 l_eulerOffsetRot(CConfigHelper::GetOffsetX(), CConfigHelper::GetOffsetY(), CConfigHelper::GetOffsetZ());
-    if(m_id == RIGHT_CONTROLLER)
+    if(m_id == CHA_Right)
     {
         // Only X axis isn't inverted for right controller
         l_eulerOffsetRot.y *= -1.f;
@@ -96,7 +102,7 @@ CLeapHandController::CLeapHandController(vr::IVRServerDriverHost* pDriverHost, i
     // Skeletal data
     m_skeletonHandle = vr::k_ulInvalidInputComponentHandle;
     for(size_t i = 0U; i < HSB_Count; i++) m_boneTransform[i] = g_openHandGesture[i];
-    if(m_id == RIGHT_CONTROLLER)
+    if(m_id == CHA_Right)
     {
         // Transformation inversion along 0YZ plane
         for(size_t i = 1U; i < HSB_Count; i++)
@@ -122,7 +128,7 @@ CLeapHandController::CLeapHandController(vr::IVRServerDriverHost* pDriverHost, i
     }
 
     m_gameProfile = GP_Default;
-    m_isEnabled = ((m_id == LEFT_CONTROLLER) ? CConfigHelper::IsLeftHandEnabled() : CConfigHelper::IsRightHandEnabled());
+    m_isEnabled = ((m_id == CHA_Left) ? CConfigHelper::IsLeftHandEnabled() : CConfigHelper::IsRightHandEnabled());
 }
 CLeapHandController::~CLeapHandController()
 {
@@ -138,7 +144,7 @@ vr::EVRInitError CLeapHandController::Activate(uint32_t unObjectId)
     l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_WillDriftInYaw_Bool, false);
     l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_DeviceIsWireless_Bool, false);
     l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_DeviceClass_Int32, vr::TrackedDeviceClass_Controller);
-    l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_ControllerRoleHint_Int32, (m_id == LEFT_CONTROLLER) ? vr::TrackedControllerRole_LeftHand : vr::TrackedControllerRole_RightHand);
+    l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_ControllerRoleHint_Int32, (m_id == CHA_Left) ? vr::TrackedControllerRole_LeftHand : vr::TrackedControllerRole_RightHand);
 
     // Input Properties
     l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_Axis0Type_Int32, vr::k_eControllerAxis_TrackPad);
@@ -194,7 +200,7 @@ vr::EVRInitError CLeapHandController::Activate(uint32_t unObjectId)
         {
             l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_HardwareRevision_Uint64, 1515);
             l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_FirmwareVersion_Uint64, 1515);
-            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_RenderModelName_String, (m_id == LEFT_CONTROLLER) ? "valve_controller_knu_ev2_0_left" : "valve_controller_knu_ev2_0_right");
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_RenderModelName_String, (m_id == CHA_Left) ? "valve_controller_knu_ev2_0_left" : "valve_controller_knu_ev2_0_right");
         } break;
     }
 
@@ -333,10 +339,10 @@ vr::EVRInitError CLeapHandController::Activate(uint32_t unObjectId)
             }
             switch(m_id)
             {
-                case LEFT_CONTROLLER:
+                case CHA_Left:
                     m_driverInput->CreateSkeletonComponent(m_propertyContainer, "/input/skeleton/left", "/skeleton/hand/left", "/pose/raw", l_trackingLevel, nullptr, 0U, &m_skeletonHandle);
                     break;
-                case RIGHT_CONTROLLER:
+                case CHA_Right:
                     m_driverInput->CreateSkeletonComponent(m_propertyContainer, "/input/skeleton/right", "/skeleton/hand/right", "/pose/raw", l_trackingLevel, nullptr, 0U, &m_skeletonHandle);
                     break;
             }
@@ -363,9 +369,9 @@ void CLeapHandController::DebugRequest(const char* pchRequest, char* pchResponse
     std::string strCmd;
 
     ss >> strCmd;
-    switch(ReadEnumVector(strCmd, g_debugRequestStringTable))
+    switch(ReadEnumVector(strCmd, g_debugRequestsTable))
     {
-        case CONTROLLER_DEBUGREQUEST_APPKEY:
+        case EDebugRequest::DR_AppKey:
         {
             std::string l_appKey;
             ss >> l_appKey;
@@ -373,7 +379,7 @@ void CLeapHandController::DebugRequest(const char* pchRequest, char* pchResponse
             EGameProfile l_last = m_gameProfile;
             switch(ReadEnumVector(l_appKey, g_steamAppKeysTable))
             {
-                case STEAM_APPKEY_VRCHAT:
+                case ESteamAppID::SAI_VRChat:
                     m_gameProfile = GP_VRChat;
                     break;
                 default:
@@ -411,7 +417,7 @@ void CLeapHandController::Update(const Leap::Frame &frame)
 void CLeapHandController::UpdateGestures(const Leap::Frame& frame)
 {
     std::vector<float> scores;
-    if(CGestureMatcher::MatchGestures(frame, ((m_id == LEFT_CONTROLLER) ? CGestureMatcher::LeftHand : CGestureMatcher::RightHand), scores))
+    if(CGestureMatcher::MatchGestures(frame, ((m_id == CHA_Left) ? CGestureMatcher::LeftHand : CGestureMatcher::RightHand), scores))
     {
         switch(CConfigHelper::GetEmulatedController())
         {
@@ -498,7 +504,7 @@ void CLeapHandController::ProcessViveVRChatProfileGestures(const std::vector<flo
             l_trackpadAxis.x = 0.59f;
             l_trackpadAxis.y = -0.81f;
         }
-        if(m_id == LEFT_CONTROLLER) l_trackpadAxis.x *= -1.f;
+        if(m_id == CHA_Left) l_trackpadAxis.x *= -1.f;
         m_buttons[CB_TrackpadX].SetValue(l_trackpadAxis.x);
         m_buttons[CB_TrackpadY].SetValue(l_trackpadAxis.y);
         m_buttons[CB_TrackpadTouch].SetState((l_trackpadAxis.x != 0.f) || (l_trackpadAxis.y != 0.f));
@@ -570,81 +576,84 @@ void CLeapHandController::ProcessIndexGestures(const Leap::Frame &frame, const s
     m_buttons[CB_FingerPinky].SetValue(l_scores[CGestureMatcher::IndexFinger_Pinky]);
 
     // Update skeleton
-    for(Leap::Hand l_hand : frame.hands())
+    if(CConfigHelper::IsSkeletonEnabled())
     {
-        if(l_hand.isValid() && ((l_hand.isLeft() && (m_id == LEFT_CONTROLLER)) || (l_hand.isRight() && (m_id == RIGHT_CONTROLLER))))
+        for(Leap::Hand l_hand : frame.hands())
         {
-            glm::mat4 l_handMat;
-            Leap::Matrix l_leapMat = l_hand.basis();
-            ConvertMatrix(l_leapMat, l_handMat);
-            glm::mat4 l_handMatInv = glm::inverse(l_handMat);
-
-            for(Leap::Finger l_finger : l_hand.fingers())
+            if(l_hand.isValid() && ((l_hand.isLeft() && (m_id == CHA_Left)) || (l_hand.isRight() && (m_id == CHA_Right))))
             {
-                if(l_finger.isValid())
+                glm::mat4 l_handMat;
+                Leap::Matrix l_leapMat = l_hand.basis();
+                ConvertMatrix(l_leapMat, l_handMat);
+                glm::mat4 l_handMatInv = glm::inverse(l_handMat);
+
+                for(Leap::Finger l_finger : l_hand.fingers())
                 {
-                    size_t l_transformIndex = 0U;
-                    switch(l_finger.type())
+                    if(l_finger.isValid())
                     {
-                        case Leap::Finger::TYPE_INDEX:
-                            l_transformIndex = HSB_IndexFinger1;
-                            break;
-                        case Leap::Finger::TYPE_MIDDLE:
-                            l_transformIndex = HSB_MiddleFinger1;
-                            break;
-                        case Leap::Finger::TYPE_PINKY:
-                            l_transformIndex = HSB_PinkyFinger1;
-                            break;
-                        case Leap::Finger::TYPE_RING:
-                            l_transformIndex = HSB_RingFinger1;
-                            break;
-                        case Leap::Finger::TYPE_THUMB:
-                            l_transformIndex = HSB_Thumb0;
-                            break;
-                    }
-
-                    glm::mat4 l_boneMat;
-                    glm::quat l_result;
-
-                    // Segment 1
-                    l_leapMat = l_finger.bone(Leap::Bone::TYPE_PROXIMAL).basis();
-                    ConvertMatrix(l_leapMat, l_boneMat);
-                    l_result = l_boneMat*l_handMatInv;
-                    if(l_finger.type() == Leap::Finger::TYPE_THUMB)
-                    {
-                        if(m_id == LEFT_CONTROLLER) l_result = glm::rotate(l_result, glm::pi<float>(), glm::vec3(1.f, 0.f, 0.f));
-                        else
+                        size_t l_transformIndex = 0U;
+                        switch(l_finger.type())
                         {
-                            l_result.w *= -1.f;
-                            l_result.z *= -1.f;
-                            l_result = glm::rotate(l_result, glm::pi<float>(), glm::vec3(0.f, 1.f, 0.f));
+                            case Leap::Finger::TYPE_INDEX:
+                                l_transformIndex = HSB_IndexFinger1;
+                                break;
+                            case Leap::Finger::TYPE_MIDDLE:
+                                l_transformIndex = HSB_MiddleFinger1;
+                                break;
+                            case Leap::Finger::TYPE_PINKY:
+                                l_transformIndex = HSB_PinkyFinger1;
+                                break;
+                            case Leap::Finger::TYPE_RING:
+                                l_transformIndex = HSB_RingFinger1;
+                                break;
+                            case Leap::Finger::TYPE_THUMB:
+                                l_transformIndex = HSB_Thumb0;
+                                break;
                         }
+
+                        glm::mat4 l_boneMat;
+                        glm::quat l_result;
+
+                        // Segment 1
+                        l_leapMat = l_finger.bone(Leap::Bone::TYPE_PROXIMAL).basis();
+                        ConvertMatrix(l_leapMat, l_boneMat);
+                        l_result = l_boneMat*l_handMatInv;
+                        if(l_finger.type() == Leap::Finger::TYPE_THUMB)
+                        {
+                            if(m_id == CHA_Left) l_result = glm::rotate(l_result, glm::pi<float>(), glm::vec3(1.f, 0.f, 0.f));
+                            else
+                            {
+                                l_result.w *= -1.f;
+                                l_result.z *= -1.f;
+                                l_result = glm::rotate(l_result, glm::pi<float>(), glm::vec3(0.f, 1.f, 0.f));
+                            }
+                        }
+                        ConvertQuaternion(l_result, m_boneTransform[l_transformIndex].orientation);
+                        std::swap(m_boneTransform[l_transformIndex].orientation.x, m_boneTransform[l_transformIndex].orientation.z);
+                        m_boneTransform[l_transformIndex].orientation.y *= -1.f;
+
+                        // Segment 2
+                        glm::mat4 l_inversedProximal = glm::inverse(l_boneMat);
+                        l_leapMat = l_finger.bone(Leap::Bone::TYPE_INTERMEDIATE).basis();
+                        ConvertMatrix(l_leapMat, l_boneMat);
+                        l_result = l_boneMat*l_inversedProximal;
+                        ConvertQuaternion(l_result, m_boneTransform[l_transformIndex + 1U].orientation);
+                        std::swap(m_boneTransform[l_transformIndex + 1U].orientation.x, m_boneTransform[l_transformIndex + 1U].orientation.z);
+                        m_boneTransform[l_transformIndex + 1U].orientation.y *= -1.f;
+
+                        // Segment 3
+                        glm::mat4 l_inversedIntermediate = glm::inverse(l_boneMat);
+                        l_leapMat = l_finger.bone(Leap::Bone::TYPE_DISTAL).basis();
+                        ConvertMatrix(l_leapMat, l_boneMat);
+                        l_result = l_boneMat*l_inversedIntermediate;
+                        ConvertQuaternion(l_result, m_boneTransform[l_transformIndex + 2U].orientation);
+                        std::swap(m_boneTransform[l_transformIndex + 2U].orientation.x, m_boneTransform[l_transformIndex + 2U].orientation.z);
+                        m_boneTransform[l_transformIndex + 2U].orientation.y *= -1.f;
                     }
-                    ConvertQuaternion(l_result, m_boneTransform[l_transformIndex].orientation);
-                    std::swap(m_boneTransform[l_transformIndex].orientation.x, m_boneTransform[l_transformIndex].orientation.z);
-                    m_boneTransform[l_transformIndex].orientation.y *= -1.f;
-
-                    // Segment 2
-                    glm::mat4 l_inversedProximal = glm::inverse(l_boneMat);
-                    l_leapMat = l_finger.bone(Leap::Bone::TYPE_INTERMEDIATE).basis();
-                    ConvertMatrix(l_leapMat, l_boneMat);
-                    l_result = l_boneMat*l_inversedProximal;
-                    ConvertQuaternion(l_result, m_boneTransform[l_transformIndex + 1U].orientation);
-                    std::swap(m_boneTransform[l_transformIndex + 1U].orientation.x, m_boneTransform[l_transformIndex + 1U].orientation.z);
-                    m_boneTransform[l_transformIndex + 1U].orientation.y *= -1.f;
-
-                    // Segment 3
-                    glm::mat4 l_inversedIntermediate = glm::inverse(l_boneMat);
-                    l_leapMat = l_finger.bone(Leap::Bone::TYPE_DISTAL).basis();
-                    ConvertMatrix(l_leapMat, l_boneMat);
-                    l_result = l_boneMat*l_inversedIntermediate;
-                    ConvertQuaternion(l_result, m_boneTransform[l_transformIndex + 2U].orientation);
-                    std::swap(m_boneTransform[l_transformIndex + 2U].orientation.x, m_boneTransform[l_transformIndex + 2U].orientation.z);
-                    m_boneTransform[l_transformIndex + 2U].orientation.y *= -1.f;
                 }
-            }
 
-            break;
+                break;
+            }
         }
     }
 }
@@ -658,7 +667,7 @@ void CLeapHandController::UpdateTrasnformation(const Leap::Frame &frame)
     {
         Leap::Hand &l_hand = hands[h];
 
-        if(l_hand.isValid() && ((m_id == LEFT_CONTROLLER && l_hand.isLeft()) || (m_id == RIGHT_CONTROLLER && l_hand.isRight())))
+        if(l_hand.isValid() && ((m_id == CHA_Left && l_hand.isLeft()) || (m_id == CHA_Right && l_hand.isRight())))
         {
             l_handFound = true;
 

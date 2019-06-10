@@ -8,6 +8,7 @@ class CConfigHelper
     static float ms_offsetX;
     static float ms_offsetY;
     static float ms_offsetZ;
+    static bool ms_skeleton;
     static unsigned char ms_trackingLevel;
     static bool ms_input;
     static bool ms_menu;
@@ -41,6 +42,7 @@ public:
     static inline float GetOffsetX() { return ms_offsetX; }
     static inline float GetOffsetY() { return ms_offsetY; }
     static inline float GetOffsetZ() { return ms_offsetZ; }
+    static inline bool IsSkeletonEnabled() { return ms_skeleton; }
     static inline unsigned char GetTrackingLevel() { return ms_trackingLevel; }
     static inline bool IsInputEnabled() { return ms_input; }
     static inline bool IsMenuEnabled() { return ms_menu; }

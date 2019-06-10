@@ -11,7 +11,6 @@ class CLeapMonitor
     /** Keep track of which devices are using driver_leap */
     void UpdateTrackedDevice(uint32_t unTrackedDeviceIndex);
     void UpdateApplicationKey(const char *f_appKey);
-    void DebugTransformation(const char *f_debug);
 
     bool IsLeapDevice(uint32_t unTrackedDeviceIndex);
 public:

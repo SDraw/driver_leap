@@ -29,15 +29,8 @@ bool CLeapMonitor::Init()
     return true;
 }
 
-bool g_keyPress[256U];
-bool IsKeyDown(int key)
-{
-    return (GetAsyncKeyState(key) & 0x8000) != 0;
-}
-
 void CLeapMonitor::MainLoop()
 {
-    for(size_t i = 0U; i < 256U; i++) g_keyPress[i] = false;
     bool l_quitEvent = false;
     while(!l_quitEvent)
     {
