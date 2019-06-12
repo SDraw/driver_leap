@@ -16,7 +16,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="targetver.h" />
     <ClInclude Include="CDriverLogHelper.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="stdafx.h" />

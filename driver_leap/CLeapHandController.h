@@ -38,12 +38,7 @@ class CLeapHandController : public vr::ITrackedDeviceServerDriver
     vr::IVRServerDriverHost *m_driverHost;
     vr::IVRDriverInput *m_driverInput;
 
-    enum EControllerHandAssignment : unsigned char
-    {
-        CHA_Left = 0U,
-        CHA_Right
-    };
-    unsigned char m_id;
+    unsigned char m_handAssigment;
     std::string m_serialNumber;
     vr::PropertyContainerHandle_t m_propertyContainer;
     uint32_t m_trackedDeviceID;
@@ -57,7 +52,6 @@ class CLeapHandController : public vr::ITrackedDeviceServerDriver
         GP_VRChat
     };
     EGameProfile m_gameProfile;
-    bool m_isEnabled;
 
     enum EControllerButton : size_t
     {
@@ -91,8 +85,8 @@ class CLeapHandController : public vr::ITrackedDeviceServerDriver
     };
     CControllerButton m_buttons[CB_Count];
 
-    static double ms_headPos[3];
-    static vr::HmdQuaternion_t ms_headRot;
+    // Haptic
+    vr::VRInputComponentHandle_t m_haptic;
 
     // Index
     vr::VRInputComponentHandle_t m_skeletonHandle;
@@ -133,17 +127,27 @@ class CLeapHandController : public vr::ITrackedDeviceServerDriver
     };
     vr::VRBoneTransform_t m_boneTransform[HSB_Count];
 
-    void UpdateGestures(const Leap::Frame &frame);
-    void UpdateTrasnformation(const Leap::Frame &frame);
+    // HMD transformation
+    static double ms_headPos[3];
+    static vr::HmdQuaternion_t ms_headRot;
+
+    void UpdateTrasnformation(const Leap::Frame &f_frame);
     void UpdateButtonInput();
 
-    void ProcessViveDefaultProfileGestures(const std::vector<float> &l_scores);
-    void ProcessViveVRChatProfileGestures(const std::vector<float> &l_scores);
-    void ProcessIndexGestures(const Leap::Frame &frame, const std::vector<float> &l_scores);
+    void UpdateGestures(const Leap::Frame &f_frame);
+    void ProcessViveDefaultProfileGestures(const std::vector<float> &f_scores);
+    void ProcessViveVRChatProfileGestures(const std::vector<float> &f_scores);
+    void ProcessIndexGestures(const Leap::Frame &f_frame, const std::vector<float> &f_scores);
 
     void ResetControls();
 public:
-    CLeapHandController(vr::IVRServerDriverHost* pDriverHost, int n);
+    enum EControllerHandAssignment : unsigned char
+    {
+        CHA_Left = 0U,
+        CHA_Right
+    };
+
+    CLeapHandController(vr::IVRServerDriverHost* f_driverHost, EControllerHandAssignment f_hand);
     virtual ~CLeapHandController();
 
     // vr::ITrackedDeviceServerDriver
@@ -153,10 +157,9 @@ public:
     virtual void DebugRequest(const char* pchRequest, char* pchResponseBuffer, uint32_t unResponseBufferSize);
     virtual vr::DriverPose_t GetPose();
     virtual void EnterStandby() {};
-
     const char* GetSerialNumber() const;
-    void SetAsDisconnected();
 
-    void Update(const Leap::Frame& frame);
+    void SetAsDisconnected();
+    void Update(const Leap::Frame& f_frame);
     static void UpdateHMDCoordinates(vr::IVRServerDriverHost *f_host);
 };

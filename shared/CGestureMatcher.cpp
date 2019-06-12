@@ -256,9 +256,13 @@ bool CGestureMatcher::MatchGestures(const Leap::Frame &frame, WhichHand which, s
                                     Leap::Vector l_vec = l_fingerA.tipPosition() - l_fingerB.tipPosition();
                                     float l_length = l_vec.magnitude();
                                     result[IndexThumbstick] = (l_length <= 35.f) ? std::max((35.f - l_length) / 20.f, 1.f) : 0.f;
+
+                                    break;
                                 }
                             }
                         }
+
+                        break;
                     }
                 }
             }
