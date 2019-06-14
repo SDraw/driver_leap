@@ -473,7 +473,11 @@ void CLeapHandController::UpdateTrasnformation(const Leap::Frame &f_frame)
             }
         }
 
-        if(!l_handFound) m_pose.result = vr::TrackingResult_Calibrating_InProgress;
+        if(!l_handFound)
+        {
+            for(size_t i = 0U; i < 3U; i++) m_pose.vecVelocity[i] = .0;
+            m_pose.result = vr::TrackingResult_Calibrating_InProgress;
+        }
         m_pose.poseIsValid = ((m_gameProfile == GP_VRChat) ? true : l_handFound);
         if(!m_pose.deviceIsConnected) m_pose.deviceIsConnected = true;
 
