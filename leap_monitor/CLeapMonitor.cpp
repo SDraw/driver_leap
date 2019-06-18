@@ -2,8 +2,6 @@
 
 #include "CLeapMonitor.h"
 
-const std::chrono::milliseconds k_MonitorInterval(100U);
-
 CLeapMonitor::CLeapMonitor()
 {
 }
@@ -31,7 +29,9 @@ bool CLeapMonitor::Init()
 
 void CLeapMonitor::MainLoop()
 {
+    const std::chrono::milliseconds l_monitorInterval(100U);
     bool l_quitEvent = false;
+
     while(!l_quitEvent)
     {
         // System messages
@@ -65,7 +65,7 @@ void CLeapMonitor::MainLoop()
             if(l_quitEvent) break;
         }
 
-        std::this_thread::sleep_for(k_MonitorInterval);
+        std::this_thread::sleep_for(l_monitorInterval);
     }
 }
 
@@ -84,11 +84,6 @@ void CLeapMonitor::UpdateTrackedDevice(uint32_t unTrackedDeviceIndex)
     {
         if(!strcmp(rgchTrackingSystemName, "leap")) m_setLeapDevices.insert(unTrackedDeviceIndex);
     }
-}
-
-bool CLeapMonitor::IsLeapDevice(uint32_t unTrackedDeviceIndex)
-{
-    return (m_setLeapDevices.count(unTrackedDeviceIndex) != 0);
 }
 
 void CLeapMonitor::UpdateApplicationKey(const char *f_appKey)

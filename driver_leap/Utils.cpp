@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Utils.h"
 
+const glm::vec3 g_axisX(1.f, 0.f, 0.f);
+
 // Left hand open gesture transformation, thanks to https://github.com/spayne and his soft_knuckles repository
 extern const vr::VRBoneTransform_t g_openHandGesture[31U] = {
     { { 0.000000f, 0.000000f, 0.000000f, 1.000000f }, { 1.000000f, -0.000000f, -0.000000f, 0.000000f } },
@@ -78,4 +80,27 @@ void ConvertQuaternion(const vr::HmdQuaternionf_t &f_vrQuat, glm::quat& f_glmQua
     f_glmQuat.y = f_vrQuat.y;
     f_glmQuat.z = f_vrQuat.z;
     f_glmQuat.w = f_vrQuat.w;
+}
+
+void ConvertVector3(const vr::HmdVector4_t &f_vrVec, glm::vec3 &f_glmVec)
+{
+    for(size_t i = 0U; i < 3U; i++) f_glmVec[i] = f_vrVec.v[i];
+}
+void ConvertVector3(const glm::vec3 &f_glmVec, vr::HmdVector4_t &f_vrVec)
+{
+    for(size_t i = 0U; i < 3U; i++) f_vrVec.v[i] = f_glmVec[i];
+}
+
+void SwitchBoneAxes(glm::quat &f_rot)
+{
+    std::swap(f_rot.x, f_rot.z);
+    f_rot.y *= -1.f;
+}
+void FixAuxBoneTransformation(glm::vec3 &f_pos, glm::quat &f_rot)
+{
+    f_pos.y *= -1.f;
+    f_pos.z *= -1.f;
+    f_rot.y *= -1.f;
+    f_rot.z *= -1.f;
+    f_rot = glm::rotate(f_rot, glm::pi<float>(), g_axisX);
 }

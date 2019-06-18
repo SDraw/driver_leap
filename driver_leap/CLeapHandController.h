@@ -118,11 +118,11 @@ class CLeapHandController : public vr::ITrackedDeviceServerDriver
 	    HSB_PinkyFinger2,
 	    HSB_PinkyFinger3,
 	    HSB_PinkyFinger4,
-	    HSB_Aux_Thumb, // Not used yet
-	    HSB_Aux_IndexFinger, // Not used yet
-	    HSB_Aux_MiddleFinger, // Not used yet
-	    HSB_Aux_RingFinger, // Not used yet
-	    HSB_Aux_PinkyFinger, // Not used yet
+	    HSB_Aux_Thumb,
+	    HSB_Aux_IndexFinger,
+	    HSB_Aux_MiddleFinger,
+	    HSB_Aux_RingFinger,
+	    HSB_Aux_PinkyFinger,
 	    HSB_Count
     };
     vr::VRBoneTransform_t m_boneTransform[HSB_Count];
