@@ -14,14 +14,14 @@ Fork with updated vendor libraries and extended features.
 * Build your platform:
   * x64 - build output is in "<solution_folder>/x64"
   * x86 - build output is in "<solution_folder>/Win32"
-* Copy build files to "SteamVR Leap Motion driver/leap/bin/<your_platform>":
+* Copy build files to "<base_project_installation_folder>/leap/bin/<your_platform>":
   * driver_leap.dll
   * gesture_checker.exe
   * leap_monitor.exe
-* Copy additional shared libraries to "SteamVR Leap Motion driver/leap/bin/<your_platform>":
+* Copy additional shared libraries to "<base_project_installation_folder>/leap/bin/<your_platform>":
   * vendor/LeapSDK/lib/<your_platform>/LeapC.dll
   * vendor/openvr/bin/<your_platform>/openvr_api.dll
-* Copy control_config.xml, vive_profile.json and index_profile.json from solution root to "SteamVR Leap Motion driver/leap/cfg"
+* Copy control_config.xml, vive_profile.json and index_profile.json from solution root to "<base_project_installation_folder>/leap/cfg"
   
 ### Control configuration and inputs
 Driver can emulate HTC Vive controllers and Valve Index controllers with skeletal animation. It's adjusted by control_config.xml in 'cfg' folder.  
