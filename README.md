@@ -7,7 +7,7 @@ Fork with updated vendor libraries and extended features.
 ### Installation
 * Install [base project driver](https://github.com/cbuchner1/driver_leap)
 * Grab [latest release](../../releases/latest) for your platform
-* Extract files to "<your_drive_letter>:/Program Files/SteamVR Leap Motion driver/leap"
+* Extract files to "<base_project_installation_folder>/leap"
 
 ### Building
 * Open solution in Visual Studio 2013/2015/2017
