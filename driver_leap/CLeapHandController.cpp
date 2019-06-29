@@ -381,18 +381,30 @@ void CLeapHandController::DebugRequest(const char* pchRequest, char* pchResponse
         case EDebugRequest::DR_AppKey:
         {
             std::string l_appKey;
+            std::string l_gameName;
             l_stream >> l_appKey;
 
             EGameProfile l_last = m_gameProfile;
             switch(ReadEnumVector(l_appKey, g_steamAppKeysTable))
             {
                 case ESteamAppID::SAI_VRChat:
+                {
                     m_gameProfile = GP_VRChat;
-                    break;
+                    l_gameName.assign("VRChat");
+                } break;
                 default:
+                {
                     m_gameProfile = GP_Default;
+                    l_gameName.assign("Default");
+                } break;
             }
+
             if(l_last != m_gameProfile) ResetControls();
+            if(!l_gameName.empty())
+            {
+                pchResponseBuffer[0U] = l_gameName.length();
+                std::memcpy(&pchResponseBuffer[1U], l_gameName.c_str(), l_gameName.length());
+            }
         } break;
     }
 }
@@ -651,12 +663,14 @@ void CLeapHandController::ProcessIndexGestures(const Leap::Frame &f_frame, const
     m_buttons[CB_FingerPinky].SetValue(f_scores[CGestureMatcher::IndexFinger_Pinky]);
 
     // Update skeleton
+    // 
     if(CConfigHelper::IsSkeletonEnabled())
     {
         for(Leap::Hand l_hand : f_frame.hands())
         {
             if(l_hand.isValid() && ((l_hand.isLeft() && (m_handAssigment == CHA_Left)) || (l_hand.isRight() && (m_handAssigment == CHA_Right))))
             {
+                // Update rotations
                 glm::mat4 l_handMat;
                 Leap::Matrix l_leapMat = l_hand.basis();
                 ConvertMatrix(l_leapMat, l_handMat);
@@ -724,7 +738,7 @@ void CLeapHandController::ProcessIndexGestures(const Leap::Frame &f_frame, const
                     }
                 }
 
-                // Update aux bones
+                // Update aux bones, completed
                 glm::vec3 l_position;
                 glm::quat l_rotation;
                 ConvertVector3(m_boneTransform[HSB_Wrist].position, l_position);

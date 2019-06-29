@@ -11,7 +11,6 @@ void CLeapListener::onInit(const Leap::Controller &controller)
 {
     controller.setPolicy(Leap::Controller::POLICY_OPTIMIZE_HMD);
 }
-
 void CLeapListener::onLogMessage(const Leap::Controller &controller, Leap::MessageSeverity severity, int64_t timestamp, const char *msg)
 {
     CDriverLogHelper::DriverLog("(%d) - %s\n", static_cast<int>(severity), msg);
