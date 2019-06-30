@@ -5,9 +5,14 @@ class CLeapMonitor;
 class CLeapListener : public Leap::Listener
 {
     CLeapMonitor *m_monitor = nullptr;
+    bool m_lastLightState = false;
 
-    virtual void onInit(const Leap::Controller &controller);
-    virtual void onLogMessage(const Leap::Controller &controller, Leap::MessageSeverity severity, int64_t timestamp, const char *msg);
+    virtual void onInit(const Leap::Controller &controller); // Async?
+    virtual void onConnect(const Leap::Controller &controller); // Async
+    virtual void onDisconnect(const Leap::Controller &controller); // Async
+    virtual void onServiceConnect(const Leap::Controller &controller); // Async
+    virtual void onServiceDisconnect(const Leap::Controller &controller); // Async
+    virtual void onLogMessage(const Leap::Controller &controller, Leap::MessageSeverity severity, int64_t timestamp, const char *msg); // Async
 public:
     inline void SetMonitor(CLeapMonitor *f_monitor) { m_monitor = f_monitor; }
 };
@@ -19,6 +24,7 @@ class CLeapMonitor
     vr::IVRNotifications *m_vrNotifications;
     vr::VROverlayHandle_t m_overlayHandle;
     vr::VRNotificationId m_notificationID;
+    std::mutex m_notificationLock;
     std::set<uint32_t> m_setLeapDevices;
     uint32_t m_lastApplication;
 

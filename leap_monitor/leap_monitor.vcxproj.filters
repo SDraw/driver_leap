@@ -6,9 +6,9 @@
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="leap_monitor.cpp" />
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="CLeapMonitor.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="leap_monitor.ico" />

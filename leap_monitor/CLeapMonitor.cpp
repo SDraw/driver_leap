@@ -6,17 +6,59 @@ void CLeapListener::onInit(const Leap::Controller &controller)
 {
     controller.setPolicy(Leap::Controller::POLICY_OPTIMIZE_HMD);
 }
-void CLeapListener::onLogMessage(const Leap::Controller &controller, Leap::MessageSeverity severity, int64_t timestamp, const char *msg)
+void CLeapListener::onConnect(const Leap::Controller &controller)
 {
-    if(severity != Leap::MESSAGE_INFORMATION)
+    if(m_monitor)
     {
-        std::string l_message(msg);
+        std::string l_message("Controller connected");
         m_monitor->SendNotification(l_message);
     }
 }
+void CLeapListener::onDisconnect(const Leap::Controller &controller)
+{
+    if(m_monitor)
+    {
+        std::string l_message("Controller disconnected");
+        m_monitor->SendNotification(l_message);
+    }
+}
+void CLeapListener::onServiceConnect(const Leap::Controller &controller)
+{
+    if(m_monitor)
+    {
+        std::string l_message("Service connected");
+        m_monitor->SendNotification(l_message);
+    }
+}
+void CLeapListener::onServiceDisconnect(const Leap::Controller &controller)
+{
+    if(m_monitor)
+    {
+        std::string l_message("Service disconnected");
+        m_monitor->SendNotification(l_message);
+    }
+}
+void CLeapListener::onLogMessage(const Leap::Controller &controller, Leap::MessageSeverity severity, int64_t timestamp, const char *msg)
+{
+    if(severity <= Leap::MESSAGE_CRITICAL)
+    {
+        if(m_monitor)
+        {
+            std::string l_message(msg);
+            m_monitor->SendNotification(l_message);
+        }
+    }
+}
+// ----
 
 CLeapMonitor::CLeapMonitor()
 {
+    m_vrSystem = nullptr;
+    m_vrOverlay = nullptr;
+    m_vrNotifications = nullptr;
+    m_notificationID = 0U;
+    m_lastApplication = 0U;
+    m_leapController = nullptr;
 }
 CLeapMonitor::~CLeapMonitor()
 {
@@ -37,8 +79,6 @@ bool CLeapMonitor::Init()
     m_vrOverlay = vr::VROverlay();
     m_vrOverlay->CreateOverlay("leap_monitor_overlay", "Leap Motion Monitor", &m_overlayHandle);
     m_vrNotifications = vr::VRNotifications();
-    m_notificationID = 0U;
-    m_lastApplication = 0U;
 
     // Keep track of which devices use driver_leap
     for(int i = 0; i < vr::k_unMaxTrackedDeviceCount; ++i) UpdateTrackedDevice(i);
@@ -113,8 +153,10 @@ void CLeapMonitor::SendNotification(const std::string &f_text)
 {
     if(!f_text.empty())
     {
+        m_notificationLock.lock();
         if(m_notificationID) m_vrNotifications->RemoveNotification(m_notificationID);
         m_vrNotifications->CreateNotification(m_overlayHandle, 500U, vr::EVRNotificationType_Transient, f_text.c_str(), vr::EVRNotificationStyle_None, nullptr, &m_notificationID);
+        m_notificationLock.unlock();
     }
 }
 
@@ -137,9 +179,12 @@ void CLeapMonitor::UpdateApplicationKey(const char *f_appKey)
 
     if(!m_setLeapDevices.empty())
     {
-        char l_response[32] = { 0 };
+        char l_response[32];
+        std::memset(l_response, 0U, sizeof(l_response));
+
         std::string l_data("app_key ");
         l_data.append(f_appKey);
+
         for(auto iter : m_setLeapDevices) vr::VRSystem()->DriverDebugRequest(iter, l_data.c_str(), l_response, sizeof(l_response));
         if(!l_notify)
         {

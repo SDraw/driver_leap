@@ -68,6 +68,10 @@ const glm::vec4 g_zeroPoint(0.f, 0.f, 0.f, 1.f);
 
 double CLeapHandController::ms_headPos[] = { .0, .0, .0 };
 vr::HmdQuaternion_t CLeapHandController::ms_headRot = { 1.0, .0, .0, .0 };
+const std::string g_profileName[2U]
+{
+    "Default", "VRChat"
+};
 
 CLeapHandController::CLeapHandController(vr::IVRServerDriverHost* f_driverHost, EControllerHandAssignment f_hand)
 {
@@ -381,31 +385,28 @@ void CLeapHandController::DebugRequest(const char* pchRequest, char* pchResponse
         case EDebugRequest::DR_AppKey:
         {
             std::string l_appKey;
-            std::string l_gameName;
             l_stream >> l_appKey;
 
             EGameProfile l_last = m_gameProfile;
             switch(ReadEnumVector(l_appKey, g_steamAppKeysTable))
             {
                 case ESteamAppID::SAI_VRChat:
-                {
                     m_gameProfile = GP_VRChat;
-                    l_gameName.assign("VRChat");
-                } break;
+                    break;
                 default:
-                {
                     m_gameProfile = GP_Default;
-                    l_gameName.assign("Default");
-                } break;
+                    break;
             }
 
-            if(l_last != m_gameProfile) ResetControls();
-            if(!l_gameName.empty())
+            if(l_last != m_gameProfile)
             {
-                pchResponseBuffer[0U] = l_gameName.length();
-                std::memcpy(&pchResponseBuffer[1U], l_gameName.c_str(), l_gameName.length());
+                size_t l_length = g_profileName[m_gameProfile].length();
+                pchResponseBuffer[0U] = static_cast<char>(l_length);
+                std::memcpy(&pchResponseBuffer[1U], g_profileName[m_gameProfile].c_str(), l_length);
+                ResetControls();
             }
-        } break;
+            else pchResponseBuffer[0U] = 0U;
+        }
     }
 }
 
@@ -663,7 +664,6 @@ void CLeapHandController::ProcessIndexGestures(const Leap::Frame &f_frame, const
     m_buttons[CB_FingerPinky].SetValue(f_scores[CGestureMatcher::IndexFinger_Pinky]);
 
     // Update skeleton
-    // 
     if(CConfigHelper::IsSkeletonEnabled())
     {
         for(Leap::Hand l_hand : f_frame.hands())
@@ -738,7 +738,7 @@ void CLeapHandController::ProcessIndexGestures(const Leap::Frame &f_frame, const
                     }
                 }
 
-                // Update aux bones, completed
+                // Update aux bones
                 glm::vec3 l_position;
                 glm::quat l_rotation;
                 ConvertVector3(m_boneTransform[HSB_Wrist].position, l_position);
@@ -756,7 +756,7 @@ void CLeapHandController::ProcessIndexGestures(const Leap::Frame &f_frame, const
                 l_position = l_chainMat*g_zeroPoint;
                 l_rotation = glm::quat_cast(l_chainMat);
                 if(m_handAssigment == CHA_Left) FixAuxBoneTransformation(l_position, l_rotation);
-                ConvertVector3(l_position,m_boneTransform[HSB_Aux_Thumb].position);
+                ConvertVector3(l_position, m_boneTransform[HSB_Aux_Thumb].position);
                 ConvertQuaternion(l_rotation, m_boneTransform[HSB_Aux_Thumb].orientation);
 
                 // Index aux
@@ -770,7 +770,7 @@ void CLeapHandController::ProcessIndexGestures(const Leap::Frame &f_frame, const
                 l_position = l_chainMat*g_zeroPoint;
                 l_rotation = glm::quat_cast(l_chainMat);
                 if(m_handAssigment == CHA_Left) FixAuxBoneTransformation(l_position, l_rotation);
-                ConvertVector3(l_position,m_boneTransform[HSB_Aux_IndexFinger].position);
+                ConvertVector3(l_position, m_boneTransform[HSB_Aux_IndexFinger].position);
                 ConvertQuaternion(l_rotation, m_boneTransform[HSB_Aux_IndexFinger].orientation);
 
                 // Middle aux
@@ -784,7 +784,7 @@ void CLeapHandController::ProcessIndexGestures(const Leap::Frame &f_frame, const
                 l_position = l_chainMat*g_zeroPoint;
                 l_rotation = glm::quat_cast(l_chainMat);
                 if(m_handAssigment == CHA_Left) FixAuxBoneTransformation(l_position, l_rotation);
-                ConvertVector3(l_position,m_boneTransform[HSB_Aux_MiddleFinger].position);
+                ConvertVector3(l_position, m_boneTransform[HSB_Aux_MiddleFinger].position);
                 ConvertQuaternion(l_rotation, m_boneTransform[HSB_Aux_MiddleFinger].orientation);
 
                 // Ring aux
@@ -798,7 +798,7 @@ void CLeapHandController::ProcessIndexGestures(const Leap::Frame &f_frame, const
                 l_position = l_chainMat*g_zeroPoint;
                 l_rotation = glm::quat_cast(l_chainMat);
                 if(m_handAssigment == CHA_Left) FixAuxBoneTransformation(l_position, l_rotation);
-                ConvertVector3(l_position,m_boneTransform[HSB_Aux_RingFinger].position);
+                ConvertVector3(l_position, m_boneTransform[HSB_Aux_RingFinger].position);
                 ConvertQuaternion(l_rotation, m_boneTransform[HSB_Aux_RingFinger].orientation);
 
                 // Pinky aux
@@ -812,7 +812,7 @@ void CLeapHandController::ProcessIndexGestures(const Leap::Frame &f_frame, const
                 l_position = l_chainMat*g_zeroPoint;
                 l_rotation = glm::quat_cast(l_chainMat);
                 if(m_handAssigment == CHA_Left) FixAuxBoneTransformation(l_position, l_rotation);
-                ConvertVector3(l_position,m_boneTransform[HSB_Aux_PinkyFinger].position);
+                ConvertVector3(l_position, m_boneTransform[HSB_Aux_PinkyFinger].position);
                 ConvertQuaternion(l_rotation, m_boneTransform[HSB_Aux_PinkyFinger].orientation);
 
                 break;
