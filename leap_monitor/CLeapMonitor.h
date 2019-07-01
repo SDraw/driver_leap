@@ -4,45 +4,49 @@ class CLeapMonitor;
 
 class CLeapListener : public Leap::Listener
 {
-    CLeapMonitor *m_monitor = nullptr;
-    bool m_lastLightState = false;
+    CLeapMonitor* m_monitor = nullptr;
+    std::mutex m_monitorMutex;
 
-    virtual void onInit(const Leap::Controller &controller); // Async?
-    virtual void onConnect(const Leap::Controller &controller); // Async
-    virtual void onDisconnect(const Leap::Controller &controller); // Async
-    virtual void onServiceConnect(const Leap::Controller &controller); // Async
-    virtual void onServiceDisconnect(const Leap::Controller &controller); // Async
+    virtual void onInit(const Leap::Controller &controller);
+    virtual void onConnect(const Leap::Controller &controller);
+    virtual void onDisconnect(const Leap::Controller &controller);
+    virtual void onServiceConnect(const Leap::Controller &controller);
+    virtual void onServiceDisconnect(const Leap::Controller &controller);
     virtual void onLogMessage(const Leap::Controller &controller, Leap::MessageSeverity severity, int64_t timestamp, const char *msg); // Async
 public:
-    inline void SetMonitor(CLeapMonitor *f_monitor) { m_monitor = f_monitor; }
+    void SetMonitor(CLeapMonitor *f_monitor); // Async method
 };
 
 class CLeapMonitor
 {
+    std::atomic<bool> m_initialized;
     vr::IVRSystem *m_vrSystem;
+    vr::IVRApplications *m_vrApplications;
     vr::IVROverlay *m_vrOverlay;
     vr::IVRNotifications *m_vrNotifications;
     vr::VROverlayHandle_t m_overlayHandle;
     vr::VRNotificationId m_notificationID;
     std::mutex m_notificationLock;
     std::set<uint32_t> m_setLeapDevices;
-    uint32_t m_lastApplication;
 
     Leap::Controller *m_leapController;
     CLeapListener m_leapListener;
 
-    bool Init();
-    void MainLoop();
-    void Shutdown();
+    enum GameProfile : unsigned char
+    {
+        GP_Default = 0U,
+        GP_VRChat
+    } m_gameProfile;
 
-    /** Keep track of which devices are using driver_leap */
     void UpdateTrackedDevice(uint32_t unTrackedDeviceIndex);
-    void UpdateApplicationKey(const char *f_appKey);
+    void UpdateGameProfile();
 public:
-    explicit CLeapMonitor();
+    CLeapMonitor();
     ~CLeapMonitor();
 
+    bool Init();
     void Run();
+    void Terminate();
 
-    void SendNotification(const std::string &f_text);
+    void SendNotification(const std::string &f_text); // Async method
 };

@@ -4,11 +4,13 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="CLeapMonitor.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="CLeapMonitor.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="leap_monitor.ico" />

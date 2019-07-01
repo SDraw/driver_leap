@@ -1,6 +1,6 @@
 #pragma once
 
-enum EControllerButtonInputType : unsigned char
+enum ControllerButtonInputType : unsigned char
 {
     CBIT_None = 0U,
     CBIT_Boolean,
@@ -11,7 +11,7 @@ class CControllerButton
     vr::VRInputComponentHandle_t m_handle;
     float m_value;
     bool m_state;
-    EControllerButtonInputType m_inputType;
+    ControllerButtonInputType m_inputType;
     bool m_updated;
 public:
     CControllerButton();
@@ -20,8 +20,8 @@ public:
     inline vr::VRInputComponentHandle_t GetHandle() const { return m_handle; }
     inline vr::VRInputComponentHandle_t& GetHandleRef() { return m_handle; }
 
-    inline void SetInputType(EControllerButtonInputType f_type) { m_inputType = f_type; }
-    inline EControllerButtonInputType GetInputType() const { return m_inputType; }
+    inline void SetInputType(ControllerButtonInputType f_type) { m_inputType = f_type; }
+    inline ControllerButtonInputType GetInputType() const { return m_inputType; }
 
     void SetValue(float f_value);
     inline float GetValue() const { return m_value; }
@@ -46,12 +46,12 @@ class CLeapHandController : public vr::ITrackedDeviceServerDriver
     vr::DriverPose_t m_pose;
     glm::quat m_gripAngleOffset;
 
-    enum EGameProfile
+    enum GameProfile
     {
         GP_Default = 0U,
         GP_VRChat
     };
-    EGameProfile m_gameProfile;
+    GameProfile m_gameProfile;
 
     enum EControllerButton : size_t
     {
@@ -90,7 +90,7 @@ class CLeapHandController : public vr::ITrackedDeviceServerDriver
 
     // Index
     vr::VRInputComponentHandle_t m_skeletonHandle;
-    enum EHandSkeletonBone : size_t
+    enum HandSkeletonBone : size_t
     {
 	    HSB_Root = 0,
 	    HSB_Wrist,
@@ -132,7 +132,7 @@ class CLeapHandController : public vr::ITrackedDeviceServerDriver
     static vr::HmdQuaternion_t ms_headRot;
 
     void UpdateTrasnformation(const Leap::Frame &f_frame);
-    void UpdateButtonInput();
+    void UpdateInput();
 
     void UpdateGestures(const Leap::Frame &f_frame);
     void ProcessViveDefaultProfileGestures(const std::vector<float> &f_scores);

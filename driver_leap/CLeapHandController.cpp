@@ -7,13 +7,36 @@
 
 extern char g_moduleFileName[];
 
-//----
+const std::vector<std::string> g_gameProfiles = {
+    "Default", "VRChat"
+};
+
+const std::vector<std::string> g_debugRequests = {
+    "profile"
+};
+enum DebugRequest : int
+{
+    DR_Profile = 0
+};
+
+const std::string g_profileName[2U]
+{
+    "Default", "VRChat"
+};
+
+extern const vr::VRBoneTransform_t g_openHandGesture[];
+const glm::vec3 g_axisX(1.f, 0.f, 0.f);
+const glm::vec3 g_axisY(0.f, 1.f, 0.f);
+const glm::mat4 g_identityMatrix(1.f);
+const glm::vec4 g_zeroPoint(0.f, 0.f, 0.f, 1.f);
+
+// ----
 CControllerButton::CControllerButton()
 {
     m_handle = vr::k_ulInvalidInputComponentHandle;
     m_state = false;
     m_value = 0.f;
-    m_inputType = EControllerButtonInputType::CBIT_Boolean;
+    m_inputType = ControllerButtonInputType::CBIT_Boolean;
     m_updated = false;
 }
 CControllerButton::~CControllerButton()
@@ -22,7 +45,7 @@ CControllerButton::~CControllerButton()
 
 void CControllerButton::SetValue(float f_value)
 {
-    if(m_inputType == EControllerButtonInputType::CBIT_Float)
+    if(m_inputType == ControllerButtonInputType::CBIT_Float)
     {
         if(m_value != f_value)
         {
@@ -33,7 +56,7 @@ void CControllerButton::SetValue(float f_value)
 }
 void CControllerButton::SetState(bool f_state)
 {
-    if(m_inputType == EControllerButtonInputType::CBIT_Boolean)
+    if(m_inputType == ControllerButtonInputType::CBIT_Boolean)
     {
         if(m_state != f_state)
         {
@@ -42,36 +65,10 @@ void CControllerButton::SetState(bool f_state)
         }
     }
 }
-//----
-
-const std::vector<std::string> g_steamAppKeysTable = {
-    "steam.app.438100" // VRChat
-};
-enum ESteamAppID
-{
-    SAI_VRChat = 0
-};
-
-const std::vector<std::string> g_debugRequestsTable = {
-    "app_key"
-};
-enum EDebugRequest
-{
-    DR_AppKey = 0
-};
-
-extern const vr::VRBoneTransform_t g_openHandGesture[];
-const glm::vec3 g_axisX(1.f, 0.f, 0.f);
-const glm::vec3 g_axisY(0.f, 1.f, 0.f);
-const glm::mat4 g_identityMatrix(1.f);
-const glm::vec4 g_zeroPoint(0.f, 0.f, 0.f, 1.f);
+// ----
 
 double CLeapHandController::ms_headPos[] = { .0, .0, .0 };
 vr::HmdQuaternion_t CLeapHandController::ms_headRot = { 1.0, .0, .0, .0 };
-const std::string g_profileName[2U]
-{
-    "Default", "VRChat"
-};
 
 CLeapHandController::CLeapHandController(vr::IVRServerDriverHost* f_driverHost, EControllerHandAssignment f_hand)
 {
@@ -237,99 +234,99 @@ vr::EVRInitError CLeapHandController::Activate(uint32_t unObjectId)
         case CConfigHelper::EC_Vive:
         {
             m_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/system/click", &m_buttons[CB_SysClick].GetHandleRef());
-            m_buttons[CB_SysClick].SetInputType(EControllerButtonInputType::CBIT_Boolean);
+            m_buttons[CB_SysClick].SetInputType(ControllerButtonInputType::CBIT_Boolean);
 
             m_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/grip/click", &m_buttons[CB_GripClick].GetHandleRef());
-            m_buttons[CB_GripClick].SetInputType(EControllerButtonInputType::CBIT_Boolean);
+            m_buttons[CB_GripClick].SetInputType(ControllerButtonInputType::CBIT_Boolean);
 
             m_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/application_menu/click", &m_buttons[CB_AppMenuClick].GetHandleRef());
-            m_buttons[CB_AppMenuClick].SetInputType(EControllerButtonInputType::CBIT_Boolean);
+            m_buttons[CB_AppMenuClick].SetInputType(ControllerButtonInputType::CBIT_Boolean);
 
             m_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/trigger/click", &m_buttons[CB_TriggerClick].GetHandleRef());
-            m_buttons[CB_TriggerClick].SetInputType(EControllerButtonInputType::CBIT_Boolean);
+            m_buttons[CB_TriggerClick].SetInputType(ControllerButtonInputType::CBIT_Boolean);
 
             m_driverInput->CreateScalarComponent(m_propertyContainer, "/input/trigger/value", &m_buttons[CB_TriggerValue].GetHandleRef(), vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedOneSided);
-            m_buttons[CB_TriggerValue].SetInputType(EControllerButtonInputType::CBIT_Float);
+            m_buttons[CB_TriggerValue].SetInputType(ControllerButtonInputType::CBIT_Float);
 
             m_driverInput->CreateScalarComponent(m_propertyContainer, "/input/trackpad/x", &m_buttons[CB_TrackpadX].GetHandleRef(), vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedTwoSided);
-            m_buttons[CB_TrackpadX].SetInputType(EControllerButtonInputType::CBIT_Float);
+            m_buttons[CB_TrackpadX].SetInputType(ControllerButtonInputType::CBIT_Float);
 
             m_driverInput->CreateScalarComponent(m_propertyContainer, "/input/trackpad/y", &m_buttons[CB_TrackpadY].GetHandleRef(), vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedTwoSided);
-            m_buttons[CB_TrackpadY].SetInputType(EControllerButtonInputType::CBIT_Float);
+            m_buttons[CB_TrackpadY].SetInputType(ControllerButtonInputType::CBIT_Float);
 
             m_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/trackpad/click", &m_buttons[CB_TrackpadClick].GetHandleRef());
-            m_buttons[CB_TrackpadClick].SetInputType(EControllerButtonInputType::CBIT_Boolean);
+            m_buttons[CB_TrackpadClick].SetInputType(ControllerButtonInputType::CBIT_Boolean);
 
             m_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/trackpad/touch", &m_buttons[CB_TrackpadTouch].GetHandleRef());
-            m_buttons[CB_TrackpadTouch].SetInputType(EControllerButtonInputType::CBIT_Boolean);
+            m_buttons[CB_TrackpadTouch].SetInputType(ControllerButtonInputType::CBIT_Boolean);
         } break;
         case CConfigHelper::EC_Index:
         {
             m_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/system/click", &m_buttons[CB_SysClick].GetHandleRef());
-            m_buttons[CB_SysClick].SetInputType(EControllerButtonInputType::CBIT_Boolean);
+            m_buttons[CB_SysClick].SetInputType(ControllerButtonInputType::CBIT_Boolean);
 
             m_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/grip/touch", &m_buttons[CB_GripTouch].GetHandleRef());
-            m_buttons[CB_GripTouch].SetInputType(EControllerButtonInputType::CBIT_Boolean);
+            m_buttons[CB_GripTouch].SetInputType(ControllerButtonInputType::CBIT_Boolean);
 
             m_driverInput->CreateScalarComponent(m_propertyContainer, "/input/grip/force", &m_buttons[CB_GripForce].GetHandleRef(), vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedOneSided);
-            m_buttons[CB_GripForce].SetInputType(EControllerButtonInputType::CBIT_Float);
+            m_buttons[CB_GripForce].SetInputType(ControllerButtonInputType::CBIT_Float);
 
             m_driverInput->CreateScalarComponent(m_propertyContainer, "/input/grip/value", &m_buttons[CB_GripValue].GetHandleRef(), vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedOneSided);
-            m_buttons[CB_GripValue].SetInputType(EControllerButtonInputType::CBIT_Float);
+            m_buttons[CB_GripValue].SetInputType(ControllerButtonInputType::CBIT_Float);
 
             m_driverInput->CreateScalarComponent(m_propertyContainer, "/input/trackpad/x", &m_buttons[CB_TrackpadX].GetHandleRef(), vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedTwoSided);
-            m_buttons[CB_TrackpadX].SetInputType(EControllerButtonInputType::CBIT_Float);
+            m_buttons[CB_TrackpadX].SetInputType(ControllerButtonInputType::CBIT_Float);
 
             m_driverInput->CreateScalarComponent(m_propertyContainer, "/input/trackpad/y", &m_buttons[CB_TrackpadY].GetHandleRef(), vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedTwoSided);
-            m_buttons[CB_TrackpadY].SetInputType(EControllerButtonInputType::CBIT_Float);
+            m_buttons[CB_TrackpadY].SetInputType(ControllerButtonInputType::CBIT_Float);
 
             m_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/trackpad/touch", &m_buttons[CB_TrackpadTouch].GetHandleRef());
-            m_buttons[CB_TrackpadTouch].SetInputType(EControllerButtonInputType::CBIT_Boolean);
+            m_buttons[CB_TrackpadTouch].SetInputType(ControllerButtonInputType::CBIT_Boolean);
 
             m_driverInput->CreateScalarComponent(m_propertyContainer, "/input/trackpad/force", &m_buttons[CB_TrackpadForce].GetHandleRef(), vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedOneSided);
-            m_buttons[CB_TrackpadForce].SetInputType(EControllerButtonInputType::CBIT_Float);
+            m_buttons[CB_TrackpadForce].SetInputType(ControllerButtonInputType::CBIT_Float);
 
             m_driverInput->CreateScalarComponent(m_propertyContainer, "/input/thumbstick/x", &m_buttons[CB_ThumbstickX].GetHandleRef(), vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedTwoSided);
-            m_buttons[CB_ThumbstickX].SetInputType(EControllerButtonInputType::CBIT_Float);
+            m_buttons[CB_ThumbstickX].SetInputType(ControllerButtonInputType::CBIT_Float);
 
             m_driverInput->CreateScalarComponent(m_propertyContainer, "/input/thumbstick/y", &m_buttons[CB_ThumbstickY].GetHandleRef(), vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedTwoSided);
-            m_buttons[CB_ThumbstickY].SetInputType(EControllerButtonInputType::CBIT_Float);
+            m_buttons[CB_ThumbstickY].SetInputType(ControllerButtonInputType::CBIT_Float);
 
             m_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/thumbstick/click", &m_buttons[CB_ThumbstickClick].GetHandleRef());
-            m_buttons[CB_ThumbstickClick].SetInputType(EControllerButtonInputType::CBIT_Boolean);
+            m_buttons[CB_ThumbstickClick].SetInputType(ControllerButtonInputType::CBIT_Boolean);
 
             m_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/thumbstick/touch", &m_buttons[CB_ThumbstickTouch].GetHandleRef());
-            m_buttons[CB_ThumbstickTouch].SetInputType(EControllerButtonInputType::CBIT_Boolean);
+            m_buttons[CB_ThumbstickTouch].SetInputType(ControllerButtonInputType::CBIT_Boolean);
 
             m_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/a/click", &m_buttons[CB_IndexAClick].GetHandleRef());
-            m_buttons[CB_IndexAClick].SetInputType(EControllerButtonInputType::CBIT_Boolean);
+            m_buttons[CB_IndexAClick].SetInputType(ControllerButtonInputType::CBIT_Boolean);
 
             m_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/a/touch", &m_buttons[CB_IndexATouch].GetHandleRef());
-            m_buttons[CB_IndexATouch].SetInputType(EControllerButtonInputType::CBIT_Boolean);
+            m_buttons[CB_IndexATouch].SetInputType(ControllerButtonInputType::CBIT_Boolean);
 
             m_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/b/click", &m_buttons[CB_IndexBClick].GetHandleRef());
-            m_buttons[CB_IndexBClick].SetInputType(EControllerButtonInputType::CBIT_Boolean);
+            m_buttons[CB_IndexBClick].SetInputType(ControllerButtonInputType::CBIT_Boolean);
 
             m_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/b/touch", &m_buttons[CB_IndexBTouch].GetHandleRef());
-            m_buttons[CB_IndexBTouch].SetInputType(EControllerButtonInputType::CBIT_Boolean);
+            m_buttons[CB_IndexBTouch].SetInputType(ControllerButtonInputType::CBIT_Boolean);
 
             m_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/trigger/click", &m_buttons[CB_TriggerClick].GetHandleRef());
-            m_buttons[CB_TriggerClick].SetInputType(EControllerButtonInputType::CBIT_Boolean);
+            m_buttons[CB_TriggerClick].SetInputType(ControllerButtonInputType::CBIT_Boolean);
 
             m_driverInput->CreateScalarComponent(m_propertyContainer, "/input/trigger/value", &m_buttons[CB_TriggerValue].GetHandleRef(), vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedOneSided);
-            m_buttons[CB_TriggerValue].SetInputType(EControllerButtonInputType::CBIT_Float);
+            m_buttons[CB_TriggerValue].SetInputType(ControllerButtonInputType::CBIT_Float);
 
             m_driverInput->CreateScalarComponent(m_propertyContainer, "/input/finger/index", &m_buttons[CB_FingerIndex].GetHandleRef(), vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedOneSided);
-            m_buttons[CB_FingerIndex].SetInputType(EControllerButtonInputType::CBIT_Float);
+            m_buttons[CB_FingerIndex].SetInputType(ControllerButtonInputType::CBIT_Float);
 
             m_driverInput->CreateScalarComponent(m_propertyContainer, "/input/finger/middle", &m_buttons[CB_FingerMiddle].GetHandleRef(), vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedOneSided);
-            m_buttons[CB_FingerMiddle].SetInputType(EControllerButtonInputType::CBIT_Float);
+            m_buttons[CB_FingerMiddle].SetInputType(ControllerButtonInputType::CBIT_Float);
 
             m_driverInput->CreateScalarComponent(m_propertyContainer, "/input/finger/ring", &m_buttons[CB_FingerRing].GetHandleRef(), vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedOneSided);
-            m_buttons[CB_FingerRing].SetInputType(EControllerButtonInputType::CBIT_Float);
+            m_buttons[CB_FingerRing].SetInputType(ControllerButtonInputType::CBIT_Float);
 
             m_driverInput->CreateScalarComponent(m_propertyContainer, "/input/finger/pinky", &m_buttons[CB_FingerPinky].GetHandleRef(), vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedOneSided);
-            m_buttons[CB_FingerPinky].SetInputType(EControllerButtonInputType::CBIT_Float);
+            m_buttons[CB_FingerPinky].SetInputType(ControllerButtonInputType::CBIT_Float);
 
             vr::EVRSkeletalTrackingLevel l_trackingLevel;
             switch(CConfigHelper::GetTrackingLevel())
@@ -380,32 +377,35 @@ void CLeapHandController::DebugRequest(const char* pchRequest, char* pchResponse
     std::string l_command;
 
     l_stream >> l_command;
-    switch(ReadEnumVector(l_command, g_debugRequestsTable))
+    if(!l_stream.fail())
     {
-        case EDebugRequest::DR_AppKey:
+        switch(ReadEnumVector(l_command, g_debugRequests))
         {
-            std::string l_appKey;
-            l_stream >> l_appKey;
-
-            EGameProfile l_last = m_gameProfile;
-            switch(ReadEnumVector(l_appKey, g_steamAppKeysTable))
+            case DebugRequest::DR_Profile:
             {
-                case ESteamAppID::SAI_VRChat:
-                    m_gameProfile = GP_VRChat;
-                    break;
-                default:
-                    m_gameProfile = GP_Default;
-                    break;
-            }
+                if(CConfigHelper::GetEmulatedController() == CConfigHelper::EC_Vive)
+                {
+                    std::string l_profile;
+                    l_stream >> l_profile;
 
-            if(l_last != m_gameProfile)
-            {
-                size_t l_length = g_profileName[m_gameProfile].length();
-                pchResponseBuffer[0U] = static_cast<char>(l_length);
-                std::memcpy(&pchResponseBuffer[1U], g_profileName[m_gameProfile].c_str(), l_length);
-                ResetControls();
+                    if(!l_stream.fail())
+                    {
+                        switch(ReadEnumVector(l_profile, g_gameProfiles))
+                        {
+                            case GP_Default:
+                                m_gameProfile = GP_Default;
+                                break;
+                            case GP_VRChat:
+                                m_gameProfile = GP_VRChat;
+                                break;
+                            default:
+                                m_gameProfile = GP_Default;
+                                break;
+                        }
+                        ResetControls();
+                    }
+                }
             }
-            else pchResponseBuffer[0U] = 0U;
         }
     }
 }
@@ -433,6 +433,7 @@ void CLeapHandController::Update(const Leap::Frame &f_frame)
 {
     UpdateTrasnformation(f_frame);
     UpdateGestures(f_frame);
+    UpdateInput();
 }
 
 void CLeapHandController::UpdateTrasnformation(const Leap::Frame &f_frame)
@@ -471,12 +472,21 @@ void CLeapHandController::UpdateTrasnformation(const Leap::Frame &f_frame)
 
                 Leap::Vector l_leapCross = l_handDirection.cross(l_palmNormal);
 
+                switch(m_handAssigment)
+                {
+                    case CHA_Left:
+                        l_palmNormal *= -1.f;
+                        break;
+                    case CHA_Right:
+                        l_leapCross *= -1.f;
+                        break;
+                }
+
                 glm::mat3 l_rotMat(
                     l_palmNormal.x, l_palmNormal.z, l_palmNormal.y,
                     l_leapCross.x, l_leapCross.z, l_leapCross.y,
                     l_handDirection.x, l_handDirection.z, l_handDirection.y
                     );
-                for(size_t i = 0U; i < 3U; i++) l_rotMat[static_cast<size_t>(m_handAssigment)][i] *= -1.f; // Reverse normal for left controller (0) and cross product for right controller (1)
                 glm::quat l_finalRot = glm::quat_cast(l_rotMat);
                 l_finalRot *= m_gripAngleOffset;
 
@@ -527,8 +537,6 @@ void CLeapHandController::UpdateGestures(const Leap::Frame& f_frame)
                 ProcessIndexGestures(f_frame, scores);
             } break;
         }
-
-        UpdateButtonInput();
     }
 }
 
@@ -821,7 +829,7 @@ void CLeapHandController::ProcessIndexGestures(const Leap::Frame &f_frame, const
     }
 }
 
-void CLeapHandController::UpdateButtonInput()
+void CLeapHandController::UpdateInput()
 {
     for(size_t i = 0U; i < CB_Count; i++)
     {
@@ -830,10 +838,10 @@ void CLeapHandController::UpdateButtonInput()
         {
             switch(l_button.GetInputType())
             {
-                case EControllerButtonInputType::CBIT_Boolean:
+                case ControllerButtonInputType::CBIT_Boolean:
                     m_driverInput->UpdateBooleanComponent(l_button.GetHandle(), l_button.GetState(), .0);
                     break;
-                case EControllerButtonInputType::CBIT_Float:
+                case ControllerButtonInputType::CBIT_Float:
                     m_driverInput->UpdateScalarComponent(l_button.GetHandle(), l_button.GetValue(), .0);
                     break;
             }
