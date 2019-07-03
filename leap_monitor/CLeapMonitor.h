@@ -27,7 +27,7 @@ class CLeapMonitor
     vr::VROverlayHandle_t m_overlayHandle;
     vr::VRNotificationId m_notificationID;
     std::mutex m_notificationLock;
-    std::set<uint32_t> m_setLeapDevices;
+    std::set<uint32_t> m_leapDevices;
 
     Leap::Controller *m_leapController;
     CLeapListener m_leapListener;
@@ -38,8 +38,9 @@ class CLeapMonitor
         GP_VRChat
     } m_gameProfile;
 
-    void UpdateTrackedDevice(uint32_t unTrackedDeviceIndex);
-    void UpdateGameProfile();
+    void AddTrackedDevice(uint32_t unTrackedDeviceIndex);
+    void RemoveTrackedDevice(uint32_t unTrackedDeviceIndex);
+    void UpdateGameProfile(const char *f_appKey);
 public:
     CLeapMonitor();
     ~CLeapMonitor();

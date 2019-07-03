@@ -111,7 +111,7 @@ bool CLeapMonitor::Init()
             m_vrOverlay->CreateOverlay("leap_monitor_overlay", "Leap Motion Monitor", &m_overlayHandle);
             m_vrNotifications = vr::VRNotifications();
 
-            for(int i = 0; i < vr::k_unMaxTrackedDeviceCount; ++i) UpdateTrackedDevice(i);
+            for(int i = 0; i < vr::k_unMaxTrackedDeviceCount; ++i) AddTrackedDevice(i);
 
             m_leapController = new Leap::Controller();
             m_leapController->addListener(m_leapListener);
@@ -142,38 +142,25 @@ void CLeapMonitor::Run()
             if(msg.message == WM_QUIT) break;
 
             // VR messages
-            vr::VREvent_t Event;
-            while(vr::VRSystem()->PollNextEvent(&Event, sizeof(Event)))
+            vr::VREvent_t l_event;
+            while(vr::VRSystem()->PollNextEvent(&l_event, sizeof(vr::VREvent_t)))
             {
-                switch(Event.eventType)
+                switch(l_event.eventType)
                 {
                     case vr::VREvent_Quit:
                         l_quitEvent = true;
                         break;
                     case vr::VREvent_TrackedDeviceActivated:
-                        UpdateTrackedDevice(Event.trackedDeviceIndex);
+                        AddTrackedDevice(l_event.trackedDeviceIndex);
+                        break;
+                    case vr::VREvent_TrackedDeviceDeactivated:
+                        RemoveTrackedDevice(l_event.trackedDeviceIndex);
                         break;
                     case vr::VREvent_ApplicationTransitionNewAppLaunchComplete:
                     {
-                        char l_appKeyNew[vr::k_unMaxApplicationKeyLength];
-                        m_vrApplications->GetApplicationKeyByProcessId(Event.data.process.pid, l_appKeyNew, vr::k_unMaxApplicationKeyLength);
-
-                        std::string l_appString(l_appKeyNew);
-                        switch(ReadEnumVector(l_appString, g_steamAppKeys))
-                        {
-                            case SAI_VRChat:
-                                m_gameProfile = GP_VRChat;
-                                break;
-                            default:
-                                m_gameProfile = GP_Default;
-                                break;
-                        }
-                        UpdateGameProfile();
-
-                        std::string l_notifyText("Game profile has been changed to '");
-                        l_notifyText.append(g_profileName[m_gameProfile]);
-                        l_notifyText.push_back('\'');
-                        SendNotification(l_notifyText);
+                        char l_appKey[vr::k_unMaxApplicationKeyLength];
+                        m_vrApplications->GetApplicationKeyByProcessId(l_event.data.process.pid, l_appKey, vr::k_unMaxApplicationKeyLength);
+                        UpdateGameProfile(l_appKey);
                     } break;
                 }
                 if(l_quitEvent) break;
@@ -225,7 +212,7 @@ void CLeapMonitor::SendNotification(const std::string &f_text)
     }
 }
 
-void CLeapMonitor::UpdateTrackedDevice(uint32_t unTrackedDeviceIndex)
+void CLeapMonitor::AddTrackedDevice(uint32_t unTrackedDeviceIndex)
 {
     char rgchTrackingSystemName[vr::k_unMaxPropertyStringSize];
     vr::ETrackedPropertyError eError;
@@ -233,18 +220,44 @@ void CLeapMonitor::UpdateTrackedDevice(uint32_t unTrackedDeviceIndex)
     m_vrSystem->GetStringTrackedDeviceProperty(unTrackedDeviceIndex, vr::Prop_TrackingSystemName_String, rgchTrackingSystemName, vr::k_unMaxPropertyStringSize, &eError);
     if(eError == vr::TrackedProp_Success)
     {
-        if(!strcmp(rgchTrackingSystemName, "leap")) m_setLeapDevices.insert(unTrackedDeviceIndex);
+        if(!strcmp(rgchTrackingSystemName, "leap")) m_leapDevices.insert(unTrackedDeviceIndex);
     }
 }
-
-void CLeapMonitor::UpdateGameProfile()
+void CLeapMonitor::RemoveTrackedDevice(uint32_t unTrackedDeviceIndex)
 {
-    if(!m_setLeapDevices.empty())
-    {
-        char l_response[32U];
-        std::string l_data("profile ");
-        l_data.append(g_profileName[m_gameProfile]);
+    auto l_searchIter = m_leapDevices.find(unTrackedDeviceIndex);
+    if(l_searchIter != m_leapDevices.end()) m_leapDevices.erase(l_searchIter);
+}
 
-        for(auto iter : m_setLeapDevices) m_vrSystem->DriverDebugRequest(iter, l_data.c_str(), l_response, 32U);
+void CLeapMonitor::UpdateGameProfile(const char *f_appKey)
+{
+    std::string l_appString(f_appKey);
+    GameProfile l_newProfile;
+    switch(ReadEnumVector(l_appString, g_steamAppKeys))
+    {
+        case SAI_VRChat:
+            l_newProfile = GP_VRChat;
+            break;
+        default:
+            l_newProfile = GP_Default;
+            break;
+    }
+    if(m_gameProfile != l_newProfile)
+    {
+        m_gameProfile = l_newProfile;
+
+        if(!m_leapDevices.empty())
+        {
+            char l_response[32U];
+            std::string l_data("profile ");
+            l_data.append(g_profileName[m_gameProfile]);
+
+            for(auto l_device : m_leapDevices) m_vrSystem->DriverDebugRequest(l_device, l_data.c_str(), l_response, 32U);
+        }
+
+        std::string l_notifyText("Game profile has been changed to '");
+        l_notifyText.append(g_profileName[m_gameProfile]);
+        l_notifyText.push_back('\'');
+        SendNotification(l_notifyText);
     }
 }

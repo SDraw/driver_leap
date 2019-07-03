@@ -390,19 +390,24 @@ void CLeapHandController::DebugRequest(const char* pchRequest, char* pchResponse
 
                     if(!l_stream.fail())
                     {
+                        GameProfile l_newProfile;
                         switch(ReadEnumVector(l_profile, g_gameProfiles))
                         {
                             case GP_Default:
-                                m_gameProfile = GP_Default;
+                                l_newProfile = GP_Default;
                                 break;
                             case GP_VRChat:
-                                m_gameProfile = GP_VRChat;
+                                l_newProfile = GP_VRChat;
                                 break;
                             default:
-                                m_gameProfile = GP_Default;
+                                l_newProfile = GP_Default;
                                 break;
                         }
-                        ResetControls();
+                        if(m_gameProfile != l_newProfile)
+                        {
+                            m_gameProfile = l_newProfile;
+                            ResetControls();
+                        }
                     }
                 }
             }
