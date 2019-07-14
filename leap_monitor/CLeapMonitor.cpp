@@ -106,12 +106,13 @@ bool CLeapMonitor::Init()
         m_vrSystem = vr::VR_Init(&eVRInitError, vr::VRApplication_Background);
         if(eVRInitError == vr::VRInitError_None)
         {
+            m_vrDebug = vr::VRDebug();
             m_vrApplications = vr::VRApplications();
             m_vrOverlay = vr::VROverlay();
             m_vrOverlay->CreateOverlay("leap_monitor_overlay", "Leap Motion Monitor", &m_overlayHandle);
             m_vrNotifications = vr::VRNotifications();
 
-            for(int i = 0; i < vr::k_unMaxTrackedDeviceCount; ++i) AddTrackedDevice(i);
+            for(uint32_t i = 0U; i < vr::k_unMaxTrackedDeviceCount; i++) AddTrackedDevice(i);
 
             m_leapController = new Leap::Controller();
             m_leapController->addListener(m_leapListener);
@@ -187,6 +188,7 @@ void CLeapMonitor::Terminate()
         vr::VR_Shutdown();
 
         m_vrSystem = nullptr;
+        m_vrDebug = nullptr;
         m_vrApplications = nullptr;
         m_vrOverlay = nullptr;
         m_vrNotifications = nullptr;
@@ -252,7 +254,7 @@ void CLeapMonitor::UpdateGameProfile(const char *f_appKey)
             std::string l_data("profile ");
             l_data.append(g_profileName[m_gameProfile]);
 
-            for(auto l_device : m_leapDevices) m_vrSystem->DriverDebugRequest(l_device, l_data.c_str(), l_response, 32U);
+            for(auto l_device : m_leapDevices) m_vrDebug->DriverDebugRequest(l_device, l_data.c_str(), l_response, 32U);
         }
 
         std::string l_notifyText("Game profile has been changed to '");

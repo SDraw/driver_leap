@@ -21,6 +21,7 @@ class CLeapMonitor
 {
     std::atomic<bool> m_initialized;
     vr::IVRSystem *m_vrSystem;
+    vr::IVRDebug *m_vrDebug;
     vr::IVRApplications *m_vrApplications;
     vr::IVROverlay *m_vrOverlay;
     vr::IVRNotifications *m_vrNotifications;
