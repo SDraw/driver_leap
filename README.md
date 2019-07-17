@@ -4,35 +4,44 @@ Fork with updated vendor libraries and extended features.
 
 [![](./.github/repository_img.png)](https://www.youtube.com/playlist?list=PLiEPsxTlqsDk5GKcgsmeDQNRs7KV8lI-s)
   
-### Installation
+### Installation (for users)
 * Install [latest Orion Beta](https://developer.leapmotion.com/get-started)
-* Install [base project driver](https://github.com/cbuchner1/driver_leap)
-* Grab [latest release](../../releases/latest) for your platform
-* Extract files to "<base_project_installation_folder>/leap"
+* **Method #1:**
+  * Install [base project driver](https://github.com/cbuchner1/driver_leap/releases/tag/alpha8)
+  * Grab [latest release archive](../../releases/latest) for your platform
+  * Extract archive to '<base_project_installation_folder>/leap'
+* **Method #2:**
+  * Create 'leap' folder in '<SteamVR_folder>/drivers'
+  * Grab [latest release archive](../../releases/latest) for your platform
+  * Extract archive to '<SteamVR_folder>/drivers/leap'
+  * Add line in section 'steamvr' of '<Steam_folder>/config/steamvr.vrsettings' file:
+  ```JSON
+  "activateMultipleDrivers": true,
+  ```
 
-### Building
+### Building (for developers)
 * Open solution in Visual Studio 2013/2015/2017
 * Build your platform:
-  * x64 - build output is in "<solution_folder>/x64"
-  * x86 - build output is in "<solution_folder>/Win32"
-* Copy build files to "<base_project_installation_folder>/leap/bin/<your_platform>":
+  * x64 - build output is in '<solution_folder>/x64'
+  * x86 - build output is in '<solution_folder>/Win32'
+* Copy build files to '<base_project_installation_folder>/leap/bin/<your_platform>':
   * driver_leap.dll
   * gesture_checker.exe
   * leap_monitor.exe
-* Copy additional shared libraries to "<base_project_installation_folder>/leap/bin/<your_platform>":
+* Copy additional shared libraries to '<base_project_installation_folder>/leap/bin/<your_platform>':
   * vendor/LeapSDK/lib/<your_platform>/LeapC.dll
   * vendor/openvr/bin/<your_platform>/openvr_api.dll
-* Copy control_config.xml, vive_profile.json and index_profile.json from solution root to "<base_project_installation_folder>/leap/cfg"
+* Copy control_config.xml, vive_profile.json and index_profile.json from solution root to '<base_project_installation_folder>/leap/cfg'
   
 ### Control configuration and inputs
 Driver can emulate HTC Vive controllers and Valve Index controllers with skeletal animation. It's adjusted by control_config.xml in 'cfg' folder.  
 There are more configurable restrictions, such as global input, trackpad, trigger, grab and etc.
 
-### Game profiles for HTC Vive controllers emulation
-Game profiles are enabled automatically when game is started from Steam.
+### HTC Vive controllers emulation
+Controls are specified by game profiles that are enabled automatically when game is started.
 Available game profiles:
   * **vrchat** - profile for VRChat. Control restrictions are ignored.  
-  Game gestures:
+  Game controls list:
     * Gun - corresponding hand gesture
     * V-shape - corresponding hand gesture
     * Point - corresponding hand gesture
@@ -42,7 +51,7 @@ Available game profiles:
     * Trigger - grab gesture
     * Application menu - formed T-shape with two hands
   * **default** - profile for other games.  
-  Gestures:
+  Control list:
     * Trigger - bending of the index finger
     * Grip - grab gesture
     * System menu - formed T-shape with two hands
@@ -52,8 +61,8 @@ Available game profiles:
     
 ### Valve Index controllers emulation
 By default, controller models aren't in right folder of SteamVR, and you have to add them by yourself.
-Copy all folders from '<SteamVR_folder>\drivers\indexcontroller\resources\rendermodels' to '<SteamVR_folder>\resources\rendermodels'.  
-List of available gestures:
+Copy all folders from '<SteamVR_folder>/drivers/indexcontroller/resources/rendermodels' to '<SteamVR_folder>/resources/rendermodels'.  
+Controls list:
 * Trigger - bending of the index finger
 * Grip - bending of middle, ring and pinky fingers
 * Touchpad - thumb press
@@ -67,12 +76,12 @@ Currently, there are no free gestures that can simulate thumbstick direction.
 
 ### Troubleshooting
 Sometimes installation of [base project driver](https://github.com/cbuchner1/driver_leap) doesn't register driver folder for SteamVR. To manually add it:
-* Open console as administrator in *SteamVR/bin/win32* (or *SteamVR/bin/win64* if you have 64-bit OS) and execute command:
+* Open console as administrator in '<SteamVR_folder>/bin/win32' (or '<SteamVR_folder>/bin/win64') and execute command:
 ```
 vrpathreg adddriver "path_to_leap_folder"
 ```
 * Check if driver folder is added by calling 'vrpathreg' without any arguments
-* Open *steamvr.vrsettings* in *Steam/config* folder and add line in "steamvr" section:
+* Open '<Steam_folder>/config/steamvr.vrsettings' file and add line in 'steamvr' section:
 ```JSON
 "activateMultipleDrivers": true,
 ```
