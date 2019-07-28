@@ -81,7 +81,7 @@ CLeapHandController::CLeapHandController(vr::IVRServerDriverHost* f_driverHost, 
     m_serialNumber.append((m_handAssigment == CHA_Left) ? "lefthand" : "righthand");
     m_propertyContainer = vr::k_ulInvalidPropertyContainer;
 
-    glm::vec3 l_eulerOffsetRot(CConfigHelper::GetOffsetX(), CConfigHelper::GetOffsetY(), CConfigHelper::GetOffsetZ());
+    glm::vec3 l_eulerOffsetRot(CConfigHelper::GetRotationOffsetX(), CConfigHelper::GetRotationOffsetY(), CConfigHelper::GetRotationOffsetZ());
     if(m_handAssigment == CHA_Right)
     {
         // Only X axis isn't inverted for right controller
@@ -456,50 +456,106 @@ void CLeapHandController::UpdateTrasnformation(const Leap::Frame &f_frame)
             {
                 l_handFound = true;
 
-                std::memcpy(&m_pose.qWorldFromDriverRotation, &ms_headRot, sizeof(vr::HmdQuaternion_t));
-                std::memcpy(m_pose.vecWorldFromDriverTranslation, ms_headPos, sizeof(double) * 3U);
-
-                Leap::Vector position = l_hand.palmPosition();
-                m_pose.vecPosition[0] = -0.001*position.x;
-                m_pose.vecPosition[1] = -0.001*position.z;
-                m_pose.vecPosition[2] = -0.001*position.y - 0.15; // ?
-
-                Leap::Vector velocity = l_hand.palmVelocity();
-                m_pose.vecVelocity[0] = -0.001*velocity.x;
-                m_pose.vecVelocity[1] = -0.001*velocity.z;
-                m_pose.vecVelocity[2] = -0.001*velocity.y;
-
-                Leap::Vector l_handDirection = l_hand.direction();
-                l_handDirection /= l_handDirection.magnitude();
-
-                Leap::Vector l_palmNormal = l_hand.palmNormal();
-                l_palmNormal /= l_palmNormal.magnitude();
-
-                Leap::Vector l_leapCross = l_handDirection.cross(l_palmNormal);
-
-                switch(m_handAssigment)
+                switch(CConfigHelper::GetOrientationMode())
                 {
-                    case CHA_Left:
-                        l_palmNormal *= -1.f;
-                        break;
-                    case CHA_Right:
-                        l_leapCross *= -1.f;
-                        break;
+                    case CConfigHelper::OM_HMD:
+                    {
+                        std::memcpy(&m_pose.qWorldFromDriverRotation, &ms_headRot, sizeof(vr::HmdQuaternion_t));
+                        std::memcpy(m_pose.vecWorldFromDriverTranslation, ms_headPos, sizeof(double) * 3U);
+
+                        Leap::Vector position = l_hand.palmPosition();
+                        m_pose.vecPosition[0] = -0.001*position.x;
+                        m_pose.vecPosition[1] = -0.001*position.z;
+                        m_pose.vecPosition[2] = -0.001*position.y - 0.15; // ?
+
+                        Leap::Vector velocity = l_hand.palmVelocity();
+                        m_pose.vecVelocity[0] = -0.001*velocity.x;
+                        m_pose.vecVelocity[1] = -0.001*velocity.z;
+                        m_pose.vecVelocity[2] = -0.001*velocity.y;
+
+                        Leap::Vector l_handDirection = l_hand.direction();
+                        l_handDirection /= l_handDirection.magnitude();
+
+                        Leap::Vector l_palmNormal = l_hand.palmNormal();
+                        l_palmNormal /= l_palmNormal.magnitude();
+
+                        Leap::Vector l_leapCross = l_handDirection.cross(l_palmNormal);
+
+                        switch(m_handAssigment)
+                        {
+                            case CHA_Left:
+                                l_palmNormal *= -1.f;
+                                break;
+                            case CHA_Right:
+                                l_leapCross *= -1.f;
+                                break;
+                        }
+
+                        glm::mat3 l_rotMat(
+                            l_palmNormal.x, l_palmNormal.z, l_palmNormal.y,
+                            l_leapCross.x, l_leapCross.z, l_leapCross.y,
+                            l_handDirection.x, l_handDirection.z, l_handDirection.y
+                            );
+                        glm::quat l_finalRot = glm::quat_cast(l_rotMat);
+                        l_finalRot *= m_gripAngleOffset;
+
+                        m_pose.qRotation.x = l_finalRot.x;
+                        m_pose.qRotation.y = l_finalRot.y;
+                        m_pose.qRotation.z = l_finalRot.z;
+                        m_pose.qRotation.w = l_finalRot.w;
+                    } break;
+                    case CConfigHelper::OM_Desktop:
+                    {
+                        m_pose.qWorldFromDriverRotation.x = .0;
+                        m_pose.qWorldFromDriverRotation.y = .0;
+                        m_pose.qWorldFromDriverRotation.z = .0;
+                        m_pose.qWorldFromDriverRotation.w = 1.0;
+                        m_pose.vecWorldFromDriverTranslation[0U] = CConfigHelper::GetDesktopRootX();
+                        m_pose.vecWorldFromDriverTranslation[1U] = CConfigHelper::GetDesktopRootY();
+                        m_pose.vecWorldFromDriverTranslation[2U] = CConfigHelper::GetDesktopRootZ();
+
+                        Leap::Vector position = l_hand.palmPosition();
+                        m_pose.vecPosition[0] = 0.001*position.x;
+                        m_pose.vecPosition[1] = 0.001*position.y;
+                        m_pose.vecPosition[2] = 0.001*position.z;
+
+                        Leap::Vector velocity = l_hand.palmVelocity();
+                        m_pose.vecVelocity[0] = 0.001*velocity.x;
+                        m_pose.vecVelocity[1] = 0.001*velocity.y;
+                        m_pose.vecVelocity[2] = 0.001*velocity.z;
+
+                        Leap::Vector l_handDirection = -l_hand.direction();
+                        l_handDirection /= l_handDirection.magnitude();
+
+                        Leap::Vector l_palmNormal = -l_hand.palmNormal();
+                        l_palmNormal /= l_palmNormal.magnitude();
+
+                        Leap::Vector l_leapCross = -l_handDirection.cross(l_palmNormal);
+
+                        switch(m_handAssigment)
+                        {
+                            case CHA_Left:
+                                l_palmNormal *= -1.f;
+                                break;
+                            case CHA_Right:
+                                l_leapCross *= -1.f;
+                                break;
+                        }
+
+                        glm::mat3 l_rotMat(
+                            l_palmNormal.x, l_palmNormal.y, l_palmNormal.z,
+                            l_leapCross.x, l_leapCross.y, l_leapCross.z,
+                            l_handDirection.x, l_handDirection.y, l_handDirection.z
+                            );
+                        glm::quat l_finalRot = glm::quat_cast(l_rotMat);
+                        l_finalRot *= m_gripAngleOffset;
+
+                        m_pose.qRotation.x = l_finalRot.x;
+                        m_pose.qRotation.y = l_finalRot.y;
+                        m_pose.qRotation.z = l_finalRot.z;
+                        m_pose.qRotation.w = l_finalRot.w;
+                    } break;
                 }
-
-                glm::mat3 l_rotMat(
-                    l_palmNormal.x, l_palmNormal.z, l_palmNormal.y,
-                    l_leapCross.x, l_leapCross.z, l_leapCross.y,
-                    l_handDirection.x, l_handDirection.z, l_handDirection.y
-                    );
-                glm::quat l_finalRot = glm::quat_cast(l_rotMat);
-                l_finalRot *= m_gripAngleOffset;
-
-                m_pose.qRotation.x = l_finalRot.x;
-                m_pose.qRotation.y = l_finalRot.y;
-                m_pose.qRotation.z = l_finalRot.z;
-                m_pose.qRotation.w = l_finalRot.w;
-
                 m_pose.result = vr::TrackingResult_Running_OK;
                 break;
             }

@@ -5,9 +5,13 @@ class CConfigHelper
     static unsigned char ms_emulatedController;
     static bool ms_leftHand;
     static bool ms_rightHand;
-    static float ms_offsetX;
-    static float ms_offsetY;
-    static float ms_offsetZ;
+    static unsigned char ms_orientation;
+    static float ms_desktopRootX;
+    static float ms_desktopRootY;
+    static float ms_desktopRootZ;
+    static float ms_rotationOffsetX;
+    static float ms_rotationOffsetY;
+    static float ms_rotationOffsetZ;
     static bool ms_skeleton;
     static unsigned char ms_trackingLevel;
     static bool ms_input;
@@ -28,6 +32,11 @@ public:
         EC_Vive = 0U,
         EC_Index
     };
+    enum OrientationMode : unsigned char
+    {
+        OM_HMD = 0U,
+        OM_Desktop
+    };
     enum TrackingLevel : unsigned char
     {
         TL_Partial = 0U,
@@ -39,9 +48,13 @@ public:
     static inline bool GetEmulatedController() { return ms_emulatedController; }
     static inline bool IsLeftHandEnabled() { return ms_leftHand; }
     static inline bool IsRightHandEnabled() { return ms_rightHand; }
-    static inline float GetOffsetX() { return ms_offsetX; }
-    static inline float GetOffsetY() { return ms_offsetY; }
-    static inline float GetOffsetZ() { return ms_offsetZ; }
+    static inline unsigned char GetOrientationMode() { return ms_orientation; }
+    static inline float GetDesktopRootX() { return ms_desktopRootX; }
+    static inline float GetDesktopRootY() { return ms_desktopRootY; }
+    static inline float GetDesktopRootZ() { return ms_desktopRootZ; }
+    static inline float GetRotationOffsetX() { return ms_rotationOffsetX; }
+    static inline float GetRotationOffsetY() { return ms_rotationOffsetY; }
+    static inline float GetRotationOffsetZ() { return ms_rotationOffsetZ; }
     static inline bool IsSkeletonEnabled() { return ms_skeleton; }
     static inline unsigned char GetTrackingLevel() { return ms_trackingLevel; }
     static inline bool IsInputEnabled() { return ms_input; }

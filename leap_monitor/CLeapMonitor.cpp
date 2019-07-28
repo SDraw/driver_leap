@@ -12,7 +12,6 @@ void CLeapListener::SetMonitor(CLeapMonitor *f_monitor)
 }
 void CLeapListener::onInit(const Leap::Controller &controller)
 {
-    controller.setPolicy(Leap::Controller::POLICY_OPTIMIZE_HMD);
 }
 void CLeapListener::onConnect(const Leap::Controller &controller)
 {

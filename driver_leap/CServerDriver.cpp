@@ -9,7 +9,6 @@ extern char g_moduleFileName[];
 
 void CLeapListener::onInit(const Leap::Controller &controller)
 {
-    controller.setPolicy(Leap::Controller::POLICY_OPTIMIZE_HMD);
 }
 void CLeapListener::onLogMessage(const Leap::Controller &controller, Leap::MessageSeverity severity, int64_t timestamp, const char *msg)
 {
@@ -61,6 +60,7 @@ vr::EVRInitError CServerDriver::Init(vr::IVRDriverContext *pDriverContext)
 
     m_leapController = new Leap::Controller();
     m_leapController->addListener(m_leapListener);
+    if(CConfigHelper::GetOrientationMode() == CConfigHelper::OM_HMD) m_leapController->setPolicy(Leap::Controller::POLICY_OPTIMIZE_HMD);
 
     LaunchLeapMonitor();
 

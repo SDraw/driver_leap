@@ -2,9 +2,9 @@
     <param name="emulated_controller" value="vive"/> <!--"vive" or "index"-->
     <param name="rightHand" value="true"/>
     <param name="leftHand" value="true"/>
-    <param name="offsetX" value="0.0"/> <!--Euler angle in radians-->
-    <param name="offsetY" value="0.0"/> <!--Euler angle in radians-->
-    <param name="offsetZ" value="0.0"/> <!--Euler angle in radians-->
+    <param name="orientation" value="desktop"/> <!--"hmd" or "desktop"-->
+    <param name="desktopRoot" value="0.0 -0.5 -0.5"/> <!--Only in desktop orientation-->
+    <param name="rotationOffset" value="0.0 0.0 0.0"/> <!--Euler angle in radians-->
     <param name="skeleton" value="true"/> <!--Only Index controller-->
     <param name="trackingLevel" value="partial"/> <!--"partial" or "full", only Index controller-->
     

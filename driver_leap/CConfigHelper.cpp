@@ -4,14 +4,18 @@
 
 extern char g_moduleFileName[];
 
-unsigned char CConfigHelper::ms_emulatedController = CConfigHelper::EmulatedController::EC_Vive;
+unsigned char CConfigHelper::ms_emulatedController = CConfigHelper::EC_Vive;
 bool CConfigHelper::ms_leftHand = true;
 bool CConfigHelper::ms_rightHand = true;
-float CConfigHelper::ms_offsetX = 0.f;
-float CConfigHelper::ms_offsetY = 0.f;
-float CConfigHelper::ms_offsetZ = 0.f;
+unsigned char CConfigHelper::ms_orientation = CConfigHelper::OM_HMD;
+float CConfigHelper::ms_desktopRootX = 0.f;
+float CConfigHelper::ms_desktopRootY = 0.f;
+float CConfigHelper::ms_desktopRootZ = 0.f;
+float CConfigHelper::ms_rotationOffsetX = 0.f;
+float CConfigHelper::ms_rotationOffsetY = 0.f;
+float CConfigHelper::ms_rotationOffsetZ = 0.f;
 bool CConfigHelper::ms_skeleton = true;
-unsigned char CConfigHelper::ms_trackingLevel = CConfigHelper::TrackingLevel::TL_Partial;
+unsigned char CConfigHelper::ms_trackingLevel = CConfigHelper::TL_Partial;
 bool CConfigHelper::ms_input = true;
 bool CConfigHelper::ms_menu = true;
 bool CConfigHelper::ms_applicationMenu = true;
@@ -28,7 +32,8 @@ bool CConfigHelper::ms_thumbstick = true;
 const std::vector<std::string> g_configAttributeTable
 {
     "emulated_controller", "leftHand", "rightHand",
-    "offsetX", "offsetY", "offsetZ", "skeleton", "trackingLevel"
+    "orientation", "desktopRoot", "rotationOffset",
+    "skeleton", "trackingLevel"
     "input", "menu", "appMenu", "trigger", "grip",
     "touchpad", "touchpadTouch", "touchpadPress", "touchpadAxes",
     "buttonA", "buttonB", "thumbstick"
@@ -38,9 +43,9 @@ enum ConfigParamIndex
     CPI_EmulatedController = 0,
     CPI_LeftHand,
     CPI_RightHand,
-    CPI_OffsetX,
-    CPI_OffsetY,
-    CPI_OffsetZ,
+    CPI_Orientation,
+    CPI_DesktopRoot,
+    CPI_RotationOffset,
     CPI_Skeleton,
     CPI_TrackingLevel,
     CPI_Input,
@@ -55,6 +60,10 @@ enum ConfigParamIndex
     CPI_ButtonA,
     CPI_ButtonB,
     CPI_Thumbstick
+};
+const std::vector<std::string> g_orientationMode
+{
+    "hmd", "desktop"
 };
 const std::vector<std::string> g_emulatedControllersTable
 {
@@ -100,15 +109,22 @@ void CConfigHelper::LoadConfig()
                             case ConfigParamIndex::CPI_RightHand:
                                 ms_rightHand = l_attribValue.as_bool(true);
                                 break;
-                            case ConfigParamIndex::CPI_OffsetX:
-                                ms_offsetX = l_attribValue.as_float(0.f);
-                                break;
-                            case ConfigParamIndex::CPI_OffsetY:
-                                ms_offsetY = l_attribValue.as_float(0.f);
-                                break;
-                            case ConfigParamIndex::CPI_OffsetZ:
-                                ms_offsetZ = l_attribValue.as_float(0.f);
-                                break;
+                            case ConfigParamIndex::CPI_Orientation:
+                            {
+                                std::string l_orientation = l_attribValue.as_string();
+                                int l_tableIndex = ReadEnumVector(l_orientation, g_orientationMode);
+                                if(l_tableIndex != -1) ms_orientation = static_cast<unsigned char>(l_tableIndex);
+                            } break;
+                            case ConfigParamIndex::CPI_DesktopRoot:
+                            {
+                                std::stringstream l_root(l_attribValue.as_string());
+                                l_root >> ms_desktopRootX >> ms_desktopRootY >> ms_desktopRootZ;
+                            } break;
+                            case ConfigParamIndex::CPI_RotationOffset:
+                            {
+                                std::stringstream l_offset(l_attribValue.as_string());
+                                l_offset >> ms_rotationOffsetX >> ms_rotationOffsetY >> ms_rotationOffsetZ;
+                            } break;
                             case ConfigParamIndex::CPI_Skeleton:
                                 ms_skeleton = l_attribValue.as_bool(true);
                                 break;

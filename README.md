@@ -34,7 +34,7 @@ Fork with updated vendor libraries and extended features.
 * Copy control_config.xml, vive_profile.json and index_profile.json from solution root to '<base_project_installation_folder>/leap/cfg'
   
 ### Control configuration and inputs
-Driver can emulate HTC Vive controllers and Valve Index controllers with skeletal animation. It's adjusted by control_config.xml in 'cfg' folder.  
+Driver can emulate HTC Vive controllers and Valve Index controllers with skeletal animation and work in desktop and HMD orientations. It's adjusted by editing control_config.xml in 'cfg' folder.  
 There are more configurable restrictions, such as global input, trackpad, trigger, grab and etc.
 
 ### HTC Vive controllers emulation
