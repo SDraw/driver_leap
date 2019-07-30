@@ -38,10 +38,12 @@ class CLeapMonitor
         GP_Default = 0U,
         GP_VRChat
     } m_gameProfile;
+    bool m_specialCombinationState;
 
     void AddTrackedDevice(uint32_t unTrackedDeviceIndex);
     void RemoveTrackedDevice(uint32_t unTrackedDeviceIndex);
     void UpdateGameProfile(const char *f_appKey);
+    void SendSpecialCommand(const char *f_cmd);
 public:
     CLeapMonitor();
     ~CLeapMonitor();

@@ -128,6 +128,7 @@
       <AdditionalIncludeDirectories>./;../vendor/LeapCxx/include;../vendor/openvr/headers;../vendor/pugixml/src;../vendor/glm;../shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <EnablePREfast>false</EnablePREfast>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -203,6 +204,7 @@
       <CompileAsWinRT>false</CompileAsWinRT>
       <AdditionalIncludeDirectories>./;../vendor/LeapCxx/include;../vendor/openvr/headers;../vendor/pugixml/src;../vendor/glm;../shared;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

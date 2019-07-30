@@ -7,21 +7,37 @@
 
 extern char g_moduleFileName[];
 
-const std::vector<std::string> g_gameProfiles = {
+const std::vector<std::string> g_gameProfiles
+{
     "Default", "VRChat"
 };
 
-const std::vector<std::string> g_debugRequests = {
-    "profile"
+const std::vector<std::string> g_debugRequests
+{
+    "profile", "game"
 };
 enum DebugRequest : int
 {
-    DR_Profile = 0
+    DR_Profile = 0,
+    DR_Game
 };
 
-const std::string g_profileName[2U]
+const std::vector<std::string> g_gameList
 {
-    "Default", "VRChat"
+    "vrchat"
+};
+enum GameList : int
+{
+    GL_VRChat = 0
+};
+
+const std::vector<std::string> g_gameCommands
+{
+    "drawing_mode" // VRChat
+};
+enum GameCommand : int
+{
+    CC_DrawingMode = 0 // VRChat
 };
 
 extern const vr::VRBoneTransform_t g_openHandGesture[];
@@ -377,7 +393,7 @@ void CLeapHandController::DebugRequest(const char* pchRequest, char* pchResponse
     std::string l_command;
 
     l_stream >> l_command;
-    if(!l_stream.fail())
+    if(!l_stream.fail() && !l_command.empty())
     {
         switch(ReadEnumVector(l_command, g_debugRequests))
         {
@@ -388,7 +404,7 @@ void CLeapHandController::DebugRequest(const char* pchRequest, char* pchResponse
                     std::string l_profile;
                     l_stream >> l_profile;
 
-                    if(!l_stream.fail())
+                    if(!l_stream.fail() && !l_profile.empty())
                     {
                         GameProfile l_newProfile;
                         switch(ReadEnumVector(l_profile, g_gameProfiles))
@@ -411,6 +427,33 @@ void CLeapHandController::DebugRequest(const char* pchRequest, char* pchResponse
                     }
                 }
             }
+
+            case DR_Game:
+            {
+                std::string l_game;
+                l_stream >> l_game;
+                if(!l_stream.fail() && !l_game.empty())
+                {
+                    switch(ReadEnumVector(l_game, g_gameList))
+                    {
+                        case GL_VRChat:
+                        {
+                            std::string l_gameCommand;
+                            l_stream >> l_gameCommand;
+                            if(!l_stream.fail() && !l_game.empty())
+                            {
+                                switch(ReadEnumVector(l_gameCommand, g_gameCommands))
+                                {
+                                    case CC_DrawingMode:
+                                    {
+                                        m_gameSpecialModes.m_vrchatDrawingMode = !m_gameSpecialModes.m_vrchatDrawingMode;
+                                    } break;
+                                }
+                            }
+                        } break;
+                    }
+                }
+            } break;
         }
     }
 }
@@ -633,42 +676,55 @@ void CLeapHandController::ProcessViveVRChatProfileGestures(const std::vector<flo
     // Only global input restriction
     if(CConfigHelper::IsInputEnabled())
     {
-        m_buttons[CB_AppMenuClick].SetState(f_scores[CGestureMatcher::Timeout] >= 0.75f);
+        if(!m_gameSpecialModes.m_vrchatDrawingMode)
+        {
+            m_buttons[CB_AppMenuClick].SetState(f_scores[CGestureMatcher::Timeout] >= 0.75f);
 
-        glm::vec2 l_trackpadAxis(0.f);
-        if(f_scores[CGestureMatcher::VRChat_Point] >= 0.75f)
-        {
-            l_trackpadAxis.x = 0.0f;
-            l_trackpadAxis.y = 1.0f;
-        }
-        else if(f_scores[CGestureMatcher::VRChat_ThumbsUp] >= 0.75f)
-        {
-            l_trackpadAxis.x = -0.95f;
-            l_trackpadAxis.y = 0.31f;
-        }
-        else if(f_scores[CGestureMatcher::VRChat_Victory] >= 0.75f)
-        {
-            l_trackpadAxis.x = 0.95f;
-            l_trackpadAxis.y = 0.31f;
-        }
-        else if(f_scores[CGestureMatcher::VRChat_Gun] >= 0.75f)
-        {
-            l_trackpadAxis.x = -0.59f;
-            l_trackpadAxis.y = -0.81f;
-        }
-        else if(f_scores[CGestureMatcher::VRChat_RockOut] >= 0.75f)
-        {
-            l_trackpadAxis.x = 0.59f;
-            l_trackpadAxis.y = -0.81f;
-        }
-        if(m_handAssigment == CHA_Left) l_trackpadAxis.x *= -1.f;
-        m_buttons[CB_TrackpadX].SetValue(l_trackpadAxis.x);
-        m_buttons[CB_TrackpadY].SetValue(l_trackpadAxis.y);
-        m_buttons[CB_TrackpadTouch].SetState((l_trackpadAxis.x != 0.f) || (l_trackpadAxis.y != 0.f));
+            glm::vec2 l_trackpadAxis(0.f);
+            if(f_scores[CGestureMatcher::VRChat_Point] >= 0.75f)
+            {
+                l_trackpadAxis.x = 0.0f;
+                l_trackpadAxis.y = 1.0f;
+            }
+            else if(f_scores[CGestureMatcher::VRChat_ThumbsUp] >= 0.75f)
+            {
+                l_trackpadAxis.x = -0.95f;
+                l_trackpadAxis.y = 0.31f;
+            }
+            else if(f_scores[CGestureMatcher::VRChat_Victory] >= 0.75f)
+            {
+                l_trackpadAxis.x = 0.95f;
+                l_trackpadAxis.y = 0.31f;
+            }
+            else if(f_scores[CGestureMatcher::VRChat_Gun] >= 0.75f)
+            {
+                l_trackpadAxis.x = -0.59f;
+                l_trackpadAxis.y = -0.81f;
+            }
+            else if(f_scores[CGestureMatcher::VRChat_RockOut] >= 0.75f)
+            {
+                l_trackpadAxis.x = 0.59f;
+                l_trackpadAxis.y = -0.81f;
+            }
+            if(m_handAssigment == CHA_Left) l_trackpadAxis.x *= -1.f;
+            m_buttons[CB_TrackpadX].SetValue(l_trackpadAxis.x);
+            m_buttons[CB_TrackpadY].SetValue(l_trackpadAxis.y);
+            m_buttons[CB_TrackpadTouch].SetState((l_trackpadAxis.x != 0.f) || (l_trackpadAxis.y != 0.f));
 
-        m_buttons[CB_TriggerValue].SetValue(f_scores[CGestureMatcher::LowerFist]);
-        m_buttons[CB_TriggerClick].SetState(f_scores[CGestureMatcher::LowerFist] >= 0.5f);
-        m_buttons[CB_GripClick].SetState(f_scores[CGestureMatcher::VRChat_SpreadHand] >= 0.75f);
+            m_buttons[CB_TriggerValue].SetValue(f_scores[CGestureMatcher::LowerFist]);
+            m_buttons[CB_TriggerClick].SetState(f_scores[CGestureMatcher::LowerFist] >= 0.5f);
+            m_buttons[CB_GripClick].SetState(f_scores[CGestureMatcher::VRChat_SpreadHand] >= 0.75f);
+        }
+        else
+        {
+            m_buttons[CB_AppMenuClick].SetState(false);
+            m_buttons[CB_TrackpadX].SetValue(0.f);
+            m_buttons[CB_TrackpadY].SetValue(0.f);
+            m_buttons[CB_TrackpadTouch].SetState(false);
+            m_buttons[CB_TriggerValue].SetValue((f_scores[CGestureMatcher::LowerFist] >= 0.85f) ? 0.85f : 0.f);
+            m_buttons[CB_TriggerClick].SetState(f_scores[CGestureMatcher::LowerFist] >= 0.85f);
+            m_buttons[CB_GripClick].SetState(false);
+        }
     }
 }
 void CLeapHandController::ProcessIndexGestures(const Leap::Frame &f_frame, const std::vector<float> &f_scores)

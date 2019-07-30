@@ -52,6 +52,11 @@ class CLeapHandController : public vr::ITrackedDeviceServerDriver
         GP_VRChat
     };
     GameProfile m_gameProfile;
+    
+    struct GameSpecialMode
+    {
+        bool m_vrchatDrawingMode = false;
+    } m_gameSpecialModes;
 
     enum EControllerButton : size_t
     {

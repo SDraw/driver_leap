@@ -92,6 +92,7 @@ CLeapMonitor::CLeapMonitor()
     m_notificationID = 0U;
     m_leapController = nullptr;
     m_gameProfile = GP_Default;
+    m_specialCombinationState = false;
 }
 CLeapMonitor::~CLeapMonitor()
 {
@@ -166,6 +167,18 @@ void CLeapMonitor::Run()
                 if(l_quitEvent) break;
             }
 
+            bool l_combinationState = ((GetAsyncKeyState(VK_CONTROL) & 0x8000) && (GetAsyncKeyState(0x58) & 0x8000)); // Ctrl+X
+            if(m_specialCombinationState != l_combinationState)
+            {
+                m_specialCombinationState = l_combinationState;
+                if(m_specialCombinationState)
+                {
+                    SendSpecialCommand("game vrchat drawing_mode");
+                    std::string l_message("VRChat drawing mode toggled");
+                    SendNotification(l_message);
+                }
+            }
+
             std::this_thread::sleep_for(l_monitorInterval);
         }
     }
@@ -194,6 +207,7 @@ void CLeapMonitor::Terminate()
         m_notificationID = 0U;
         m_leapController = nullptr;
         m_gameProfile = GP_Default;
+        m_specialCombinationState = false;
 
         vr::VR_Shutdown();
     }
@@ -261,4 +275,10 @@ void CLeapMonitor::UpdateGameProfile(const char *f_appKey)
         l_notifyText.push_back('\'');
         SendNotification(l_notifyText);
     }
+}
+
+void CLeapMonitor::SendSpecialCommand(const char *f_char)
+{
+    char l_response[32U];
+    for(auto l_device : m_leapDevices) m_vrDebug->DriverDebugRequest(l_device, f_char, l_response, 32U);
 }

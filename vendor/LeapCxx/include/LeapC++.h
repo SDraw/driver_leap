@@ -2738,7 +2738,7 @@ namespace Leap {
           fValue = v.fValue;
           break;
         case TYPE_STRING:
-          strValue = v.strValue ? strdup(v.strValue) : nullptr;
+          strValue = v.strValue ? _strdup(v.strValue) : nullptr;
         default:
           break;
         }
@@ -2809,13 +2809,13 @@ namespace Leap {
     bool setValue(const std::string& key, const char* value) {
       Value v;
       v.type = ValueType::TYPE_STRING;
-      v.strValue = value ? strdup(value) : nullptr;
+      v.strValue = value ? _strdup(value) : nullptr;
       return setValue(key, v);
     }
     bool setValue(const std::string& key, const std::string& value) {
       Value v;
       v.type = ValueType::TYPE_STRING;
-      v.strValue = !value.empty() ? strdup(value.c_str()) : nullptr;
+      v.strValue = !value.empty() ? _strdup(value.c_str()) : nullptr;
       return setValue(key, v);
     }
   };
