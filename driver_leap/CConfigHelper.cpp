@@ -33,14 +33,14 @@ const std::vector<std::string> g_configAttributeTable
 {
     "emulated_controller", "leftHand", "rightHand",
     "orientation", "desktopRoot", "rotationOffset",
-    "skeleton", "trackingLevel"
+    "skeleton", "trackingLevel",
     "input", "menu", "appMenu", "trigger", "grip",
     "touchpad", "touchpadTouch", "touchpadPress", "touchpadAxes",
     "buttonA", "buttonB", "thumbstick"
 };
-enum ConfigParamIndex
+enum ConfigParamIndex : size_t
 {
-    CPI_EmulatedController = 0,
+    CPI_EmulatedController = 0U,
     CPI_LeftHand,
     CPI_RightHand,
     CPI_Orientation,
@@ -100,8 +100,8 @@ void CConfigHelper::LoadConfig()
                             case ConfigParamIndex::CPI_EmulatedController:
                             {
                                 std::string l_emulated = l_attribValue.as_string();
-                                int l_tableIndex = ReadEnumVector(l_emulated, g_emulatedControllersTable);
-                                if(l_tableIndex != -1) ms_emulatedController = static_cast<unsigned char>(l_tableIndex);
+                                size_t l_tableIndex = ReadEnumVector(l_emulated, g_emulatedControllersTable);
+                                if(l_tableIndex != std::numeric_limits<size_t>::max()) ms_emulatedController = static_cast<unsigned char>(l_tableIndex);
                             } break;
                             case ConfigParamIndex::CPI_LeftHand:
                                 ms_leftHand = l_attribValue.as_bool(true);
@@ -112,8 +112,8 @@ void CConfigHelper::LoadConfig()
                             case ConfigParamIndex::CPI_Orientation:
                             {
                                 std::string l_orientation = l_attribValue.as_string();
-                                int l_tableIndex = ReadEnumVector(l_orientation, g_orientationMode);
-                                if(l_tableIndex != -1) ms_orientation = static_cast<unsigned char>(l_tableIndex);
+                                size_t l_tableIndex = ReadEnumVector(l_orientation, g_orientationMode);
+                                if(l_tableIndex != std::numeric_limits<size_t>::max()) ms_orientation = static_cast<unsigned char>(l_tableIndex);
                             } break;
                             case ConfigParamIndex::CPI_DesktopRoot:
                             {
@@ -131,8 +131,8 @@ void CConfigHelper::LoadConfig()
                             case ConfigParamIndex::CPI_TrackingLevel:
                             {
                                 std::string l_trackingLevel = l_attribValue.as_string();
-                                int l_tableIndex = ReadEnumVector(l_trackingLevel, g_trackingLevelsTable);
-                                if(l_tableIndex != -1) ms_trackingLevel = static_cast<unsigned char>(l_tableIndex);
+                                size_t l_tableIndex = ReadEnumVector(l_trackingLevel, g_trackingLevelsTable);
+                                if(l_tableIndex != std::numeric_limits<size_t>::max()) ms_trackingLevel = static_cast<unsigned char>(l_tableIndex);
                             } break;
                             case ConfigParamIndex::CPI_Input:
                                 ms_input = l_attribValue.as_bool(true);
