@@ -16,9 +16,9 @@ const std::vector<std::string> g_debugRequests
 {
     "profile", "game"
 };
-enum DebugRequest : int
+enum DebugRequest : size_t
 {
-    DR_Profile = 0,
+    DR_Profile = 0U,
     DR_Game
 };
 
@@ -26,18 +26,18 @@ const std::vector<std::string> g_gameList
 {
     "vrchat"
 };
-enum GameList : int
+enum GameList : size_t
 {
-    GL_VRChat = 0
+    GL_VRChat = 0U
 };
 
 const std::vector<std::string> g_gameCommands
 {
     "drawing_mode" // VRChat
 };
-enum GameCommand : int
+enum GameCommand : size_t
 {
-    CC_DrawingMode = 0 // VRChat
+    CC_DrawingMode = 0U // VRChat
 };
 
 extern const vr::VRBoneTransform_t g_openHandGesture[];
@@ -167,12 +167,13 @@ vr::EVRInitError CLeapHandController::Activate(uint32_t unObjectId)
     l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_ControllerRoleHint_Int32, (m_handAssigment == CHA_Left) ? vr::TrackedControllerRole_LeftHand : vr::TrackedControllerRole_RightHand);
 
     // Input Properties
-    l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_Axis0Type_Int32, vr::k_eControllerAxis_TrackPad);
-    l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_Axis1Type_Int32, vr::k_eControllerAxis_Trigger);
     switch(CConfigHelper::GetEmulatedController())
     {
         case CConfigHelper::EC_Vive:
         {
+            l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_Axis0Type_Int32, vr::k_eControllerAxis_TrackPad);
+            l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_Axis1Type_Int32, vr::k_eControllerAxis_Trigger);
+
             l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_SupportedButtons_Uint64,
                 vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu) |
                 vr::ButtonMaskFromId(vr::k_EButton_System) |
@@ -183,12 +184,19 @@ vr::EVRInitError CLeapHandController::Activate(uint32_t unObjectId)
         } break;
         case CConfigHelper::EC_Index:
         {
+            l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_Axis0Type_Int32, vr::k_eControllerAxis_TrackPad);
+            l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_Axis1Type_Int32, vr::k_eControllerAxis_Trigger);
+            l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_Axis3Type_Int32, vr::k_eControllerAxis_Joystick);
+            l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_Axis4Type_Int32, vr::k_eControllerAxis_Trigger);
+
             l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_SupportedButtons_Uint64,
                 vr::ButtonMaskFromId(vr::k_EButton_System) |
                 vr::ButtonMaskFromId(vr::k_EButton_IndexController_A) |
                 vr::ButtonMaskFromId(vr::k_EButton_IndexController_B) |
                 vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Touchpad) |
-                vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Trigger)
+                vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Trigger) |
+                vr::ButtonMaskFromId(vr::k_EButton_IndexController_JoyStick) |
+                vr::ButtonMaskFromId(vr::k_EButton_Axis4)
                 );
         } break;
     }
@@ -206,18 +214,20 @@ vr::EVRInitError CLeapHandController::Activate(uint32_t unObjectId)
             l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ManufacturerName_String, "Valve"); // Or is it?
             break;
     }
-    l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ModelNumber_String, "LeapMotion");
     l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_SerialNumber_String, m_serialNumber.c_str());
     switch(CConfigHelper::GetEmulatedController())
     {
         case CConfigHelper::EC_Vive:
         {
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ModelNumber_String, "vive"); // VRTK 3.3.0 fuzzy match
             l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_HardwareRevision_Uint64, 1313);
             l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_FirmwareVersion_Uint64, 1315);
             l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_RenderModelName_String, "vr_controller_vive_1_5");
         } break;
         case CConfigHelper::EC_Index:
         {
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ModelNumber_String, "knuckles"); // VRTK 3.3.0 fuzzy match
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_RegisteredDeviceType_String, "index_controller"); // VRChat fuzzy match
             l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_HardwareRevision_Uint64, 1515);
             l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_FirmwareVersion_Uint64, 1515);
             l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_RenderModelName_String, (m_handAssigment == CHA_Left) ? "valve_controller_knu_ev2_0_left" : "valve_controller_knu_ev2_0_right");
@@ -280,6 +290,9 @@ vr::EVRInitError CLeapHandController::Activate(uint32_t unObjectId)
         {
             m_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/system/click", &m_buttons[CB_SysClick].GetHandleRef());
             m_buttons[CB_SysClick].SetInputType(ControllerButtonInputType::CBIT_Boolean);
+
+            m_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/system/touch", &m_buttons[CB_SysTouch].GetHandleRef());
+            m_buttons[CB_SysTouch].SetInputType(ControllerButtonInputType::CBIT_Boolean);
 
             m_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/grip/touch", &m_buttons[CB_GripTouch].GetHandleRef());
             m_buttons[CB_GripTouch].SetInputType(ControllerButtonInputType::CBIT_Boolean);
@@ -344,17 +357,14 @@ vr::EVRInitError CLeapHandController::Activate(uint32_t unObjectId)
             m_driverInput->CreateScalarComponent(m_propertyContainer, "/input/finger/pinky", &m_buttons[CB_FingerPinky].GetHandleRef(), vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedOneSided);
             m_buttons[CB_FingerPinky].SetInputType(ControllerButtonInputType::CBIT_Float);
 
-            vr::EVRSkeletalTrackingLevel l_trackingLevel;
+            vr::EVRSkeletalTrackingLevel l_trackingLevel = vr::VRSkeletalTracking_Partial;
             switch(CConfigHelper::GetTrackingLevel())
             {
-                case CConfigHelper::TrackingLevel::TL_Partial:
+                case CConfigHelper::TL_Partial:
                     l_trackingLevel = vr::VRSkeletalTracking_Partial;
                     break;
-                case CConfigHelper::TrackingLevel::TL_Full:
+                case CConfigHelper::TL_Full:
                     l_trackingLevel = vr::VRSkeletalTracking_Full;
-                    break;
-                default:
-                    l_trackingLevel = vr::VRSkeletalTracking_Partial;
                     break;
             }
             switch(m_handAssigment)
@@ -399,31 +409,28 @@ void CLeapHandController::DebugRequest(const char* pchRequest, char* pchResponse
         {
             case DebugRequest::DR_Profile:
             {
-                if(CConfigHelper::GetEmulatedController() == CConfigHelper::EC_Vive)
-                {
-                    std::string l_profile;
-                    l_stream >> l_profile;
+                std::string l_profile;
+                l_stream >> l_profile;
 
-                    if(!l_stream.fail() && !l_profile.empty())
+                if(!l_stream.fail() && !l_profile.empty())
+                {
+                    GameProfile l_newProfile;
+                    switch(ReadEnumVector(l_profile, g_gameProfiles))
                     {
-                        GameProfile l_newProfile;
-                        switch(ReadEnumVector(l_profile, g_gameProfiles))
-                        {
-                            case GP_Default:
-                                l_newProfile = GP_Default;
-                                break;
-                            case GP_VRChat:
-                                l_newProfile = GP_VRChat;
-                                break;
-                            default:
-                                l_newProfile = GP_Default;
-                                break;
-                        }
-                        if(m_gameProfile != l_newProfile)
-                        {
-                            m_gameProfile = l_newProfile;
-                            ResetControls();
-                        }
+                        case GP_Default:
+                            l_newProfile = GP_Default;
+                            break;
+                        case GP_VRChat:
+                            l_newProfile = GP_VRChat;
+                            break;
+                        default:
+                            l_newProfile = GP_Default;
+                            break;
+                    }
+                    if(m_gameProfile != l_newProfile)
+                    {
+                        m_gameProfile = l_newProfile;
+                        ResetControls();
                     }
                 }
             }
@@ -549,6 +556,7 @@ void CLeapHandController::UpdateTrasnformation(const Leap::Frame &f_frame)
                     } break;
                     case CConfigHelper::OM_Desktop:
                     {
+                        // Head position and rotation are fixed
                         m_pose.qWorldFromDriverRotation.x = .0;
                         m_pose.qWorldFromDriverRotation.y = .0;
                         m_pose.qWorldFromDriverRotation.z = .0;
@@ -624,173 +632,217 @@ void CLeapHandController::UpdateGestures(const Leap::Frame& f_frame)
         switch(CConfigHelper::GetEmulatedController())
         {
             case CConfigHelper::EC_Vive:
-            {
-                switch(m_gameProfile)
-                {
-                    case GP_Default:
-                        ProcessViveDefaultProfileGestures(scores);
-                        break;
-                    case GP_VRChat:
-                        ProcessViveVRChatProfileGestures(scores);
-                        break;
-                }
-            } break;
+                ProcessViveGestures(scores);
+                break;
             case CConfigHelper::EC_Index:
-            {
-                // No game profiles at the moment
                 ProcessIndexGestures(f_frame, scores);
-            } break;
+                break;
         }
     }
 }
 
-void CLeapHandController::ProcessViveDefaultProfileGestures(const std::vector<float> &f_scores)
+void CLeapHandController::ProcessViveGestures(const std::vector<float> &f_scores)
 {
-    if(CConfigHelper::IsInputEnabled())
+    switch(m_gameProfile)
     {
-        if(CConfigHelper::IsMenuEnabled()) m_buttons[CB_SysClick].SetState(f_scores[CGestureMatcher::Timeout] >= 0.25f);
-        if(CConfigHelper::IsApplicationMenuEnabled()) m_buttons[CB_AppMenuClick].SetState(f_scores[CGestureMatcher::FlatHandPalmTowards] >= 0.8f);
+        case GP_Default:
+        {
+            if(CConfigHelper::IsInputEnabled())
+            {
+                if(CConfigHelper::IsMenuEnabled()) m_buttons[CB_SysClick].SetState(f_scores[CGestureMatcher::Timeout] >= 0.25f);
+                if(CConfigHelper::IsApplicationMenuEnabled()) m_buttons[CB_AppMenuClick].SetState(f_scores[CGestureMatcher::FlatHandPalmTowards] >= 0.8f);
 
-        if(CConfigHelper::IsTriggerEnabled())
-        {
-            m_buttons[CB_TriggerClick].SetState(f_scores[CGestureMatcher::TriggerFinger] >= 0.75f);
-            m_buttons[CB_TriggerValue].SetValue(f_scores[CGestureMatcher::TriggerFinger]);
-        }
-
-        if(CConfigHelper::IsGripEnabled()) m_buttons[CB_GripClick].SetState(f_scores[CGestureMatcher::LowerFist] >= 0.5f);
-
-        if(CConfigHelper::IsTouchpadEnabled())
-        {
-            if(CConfigHelper::IsTouchpadAxesEnabled())
-            {
-                m_buttons[CB_TrackpadX].SetValue(f_scores[CGestureMatcher::TouchpadAxisX]);
-                m_buttons[CB_TrackpadY].SetValue(f_scores[CGestureMatcher::TouchpadAxisY]);
-            }
-            if(CConfigHelper::IsTouchpadTouchEnabled()) m_buttons[CB_TrackpadTouch].SetState(f_scores[CGestureMatcher::Thumbpress] <= 0.5f);
-            if(CConfigHelper::IsTouchpadPressEnabled()) m_buttons[CB_TrackpadClick].SetState(f_scores[CGestureMatcher::Thumbpress] <= 0.1f);
-        }
-    }
-}
-void CLeapHandController::ProcessViveVRChatProfileGestures(const std::vector<float> &f_scores)
-{
-    // Only global input restriction
-    if(CConfigHelper::IsInputEnabled())
-    {
-        if(!m_gameSpecialModes.m_vrchatDrawingMode)
-        {
-            m_buttons[CB_AppMenuClick].SetState(f_scores[CGestureMatcher::Timeout] >= 0.75f);
-
-            glm::vec2 l_trackpadAxis(0.f);
-            if(f_scores[CGestureMatcher::VRChat_Point] >= 0.75f)
-            {
-                l_trackpadAxis.x = 0.0f;
-                l_trackpadAxis.y = 1.0f;
-            }
-            else if(f_scores[CGestureMatcher::VRChat_ThumbsUp] >= 0.75f)
-            {
-                l_trackpadAxis.x = -0.95f;
-                l_trackpadAxis.y = 0.31f;
-            }
-            else if(f_scores[CGestureMatcher::VRChat_Victory] >= 0.75f)
-            {
-                l_trackpadAxis.x = 0.95f;
-                l_trackpadAxis.y = 0.31f;
-            }
-            else if(f_scores[CGestureMatcher::VRChat_Gun] >= 0.75f)
-            {
-                l_trackpadAxis.x = -0.59f;
-                l_trackpadAxis.y = -0.81f;
-            }
-            else if(f_scores[CGestureMatcher::VRChat_RockOut] >= 0.75f)
-            {
-                l_trackpadAxis.x = 0.59f;
-                l_trackpadAxis.y = -0.81f;
-            }
-            if(m_handAssigment == CHA_Left) l_trackpadAxis.x *= -1.f;
-            m_buttons[CB_TrackpadX].SetValue(l_trackpadAxis.x);
-            m_buttons[CB_TrackpadY].SetValue(l_trackpadAxis.y);
-            m_buttons[CB_TrackpadTouch].SetState((l_trackpadAxis.x != 0.f) || (l_trackpadAxis.y != 0.f));
-
-            m_buttons[CB_TriggerValue].SetValue(f_scores[CGestureMatcher::LowerFist]);
-            m_buttons[CB_TriggerClick].SetState(f_scores[CGestureMatcher::LowerFist] >= 0.5f);
-            m_buttons[CB_GripClick].SetState(f_scores[CGestureMatcher::VRChat_SpreadHand] >= 0.75f);
-        }
-        else
-        {
-            m_buttons[CB_AppMenuClick].SetState(false);
-            m_buttons[CB_TrackpadX].SetValue(0.f);
-            m_buttons[CB_TrackpadY].SetValue(0.f);
-            m_buttons[CB_TrackpadTouch].SetState(false);
-            m_buttons[CB_TriggerValue].SetValue((f_scores[CGestureMatcher::LowerFist] >= 0.85f) ? 0.85f : 0.f);
-            m_buttons[CB_TriggerClick].SetState(f_scores[CGestureMatcher::LowerFist] >= 0.85f);
-            m_buttons[CB_GripClick].SetState(false);
-        }
-    }
-}
-void CLeapHandController::ProcessIndexGestures(const Leap::Frame &f_frame, const std::vector<float> &f_scores)
-{
-    if(CConfigHelper::IsInputEnabled())
-    {
-        if(CConfigHelper::IsMenuEnabled()) m_buttons[CB_SysClick].SetState(f_scores[CGestureMatcher::Timeout] >= 0.25f);
-        if(CConfigHelper::IsGripEnabled())
-        {
-            m_buttons[CB_GripTouch].SetState(f_scores[CGestureMatcher::LowerFist] >= 0.75f);
-            m_buttons[CB_GripValue].SetValue(f_scores[CGestureMatcher::LowerFist]);
-            m_buttons[CB_GripForce].SetValue(f_scores[CGestureMatcher::LowerFist] >= 0.75f ? (f_scores[CGestureMatcher::LowerFist] - 0.75f) / 0.25f : 0.f);
-        }
-        if(CConfigHelper::IsTouchpadEnabled())
-        {
-            if(CConfigHelper::IsTouchpadTouchEnabled())
-            {
-                float l_fixedThumbpress = 1.f - f_scores[CGestureMatcher::Thumbpress];
-                if(l_fixedThumbpress >= 0.5f)
+                if(CConfigHelper::IsTriggerEnabled())
                 {
-                    m_buttons[CB_TrackpadTouch].SetState(true);
-                    m_buttons[CB_TrackpadForce].SetValue(l_fixedThumbpress >= 0.75f ? (l_fixedThumbpress - 0.75f) / 0.25f : 0.f);
+                    m_buttons[CB_TriggerClick].SetState(f_scores[CGestureMatcher::TriggerFinger] >= 0.75f);
+                    m_buttons[CB_TriggerValue].SetValue(f_scores[CGestureMatcher::TriggerFinger]);
+                }
+
+                if(CConfigHelper::IsGripEnabled()) m_buttons[CB_GripClick].SetState(f_scores[CGestureMatcher::LowerFist] >= 0.5f);
+
+                if(CConfigHelper::IsTouchpadEnabled())
+                {
                     if(CConfigHelper::IsTouchpadAxesEnabled())
                     {
                         m_buttons[CB_TrackpadX].SetValue(f_scores[CGestureMatcher::TouchpadAxisX]);
                         m_buttons[CB_TrackpadY].SetValue(f_scores[CGestureMatcher::TouchpadAxisY]);
                     }
+                    if(CConfigHelper::IsTouchpadTouchEnabled()) m_buttons[CB_TrackpadTouch].SetState(f_scores[CGestureMatcher::Thumbpress] <= 0.5f);
+                    if(CConfigHelper::IsTouchpadPressEnabled()) m_buttons[CB_TrackpadClick].SetState(f_scores[CGestureMatcher::Thumbpress] <= 0.1f);
+                }
+            }
+        } break;
+
+        case GP_VRChat:
+        {
+            if(CConfigHelper::IsInputEnabled())
+            {
+                if(!m_gameSpecialModes.m_vrchatDrawingMode)
+                {
+                    m_buttons[CB_AppMenuClick].SetState(f_scores[CGestureMatcher::Timeout] >= 0.75f);
+
+                    glm::vec2 l_trackpadAxis(0.f);
+                    if(f_scores[CGestureMatcher::VRChat_Point] >= 0.75f)
+                    {
+                        l_trackpadAxis.x = 0.0f;
+                        l_trackpadAxis.y = 1.0f;
+                    }
+                    else if(f_scores[CGestureMatcher::VRChat_ThumbsUp] >= 0.75f)
+                    {
+                        l_trackpadAxis.x = -0.95f;
+                        l_trackpadAxis.y = 0.31f;
+                    }
+                    else if(f_scores[CGestureMatcher::VRChat_Victory] >= 0.75f)
+                    {
+                        l_trackpadAxis.x = 0.95f;
+                        l_trackpadAxis.y = 0.31f;
+                    }
+                    else if(f_scores[CGestureMatcher::VRChat_Gun] >= 0.75f)
+                    {
+                        l_trackpadAxis.x = -0.59f;
+                        l_trackpadAxis.y = -0.81f;
+                    }
+                    else if(f_scores[CGestureMatcher::VRChat_RockOut] >= 0.75f)
+                    {
+                        l_trackpadAxis.x = 0.59f;
+                        l_trackpadAxis.y = -0.81f;
+                    }
+                    if(m_handAssigment == CHA_Left) l_trackpadAxis.x *= -1.f;
+                    m_buttons[CB_TrackpadX].SetValue(l_trackpadAxis.x);
+                    m_buttons[CB_TrackpadY].SetValue(l_trackpadAxis.y);
+                    m_buttons[CB_TrackpadTouch].SetState((l_trackpadAxis.x != 0.f) || (l_trackpadAxis.y != 0.f));
+
+                    m_buttons[CB_TriggerValue].SetValue(f_scores[CGestureMatcher::LowerFist]);
+                    m_buttons[CB_TriggerClick].SetState(f_scores[CGestureMatcher::LowerFist] >= 0.5f);
+                    m_buttons[CB_GripClick].SetState(f_scores[CGestureMatcher::VRChat_SpreadHand] >= 0.75f);
                 }
                 else
                 {
+                    m_buttons[CB_AppMenuClick].SetState(false);
+                    m_buttons[CB_TrackpadX].SetValue(0.f);
+                    m_buttons[CB_TrackpadY].SetValue(0.f);
                     m_buttons[CB_TrackpadTouch].SetState(false);
-                    m_buttons[CB_TrackpadForce].SetValue(0.f);
+                    m_buttons[CB_TriggerValue].SetValue((f_scores[CGestureMatcher::LowerFist] >= 0.85f) ? 0.85f : 0.f);
+                    m_buttons[CB_TriggerClick].SetState(f_scores[CGestureMatcher::LowerFist] >= 0.85f);
+                    m_buttons[CB_GripClick].SetState(false);
                 }
             }
-        }
-        if(CConfigHelper::IsTriggerEnabled())
-        {
-            m_buttons[CB_TriggerClick].SetState(f_scores[CGestureMatcher::TriggerFinger] >= 0.75f);
-            m_buttons[CB_TriggerValue].SetValue(f_scores[CGestureMatcher::TriggerFinger]);
-        }
-        if(CConfigHelper::IsThumbstickEnabled())
-        {
-            m_buttons[CB_ThumbstickTouch].SetState(f_scores[CGestureMatcher::IndexThumbstick] >= 0.5f);
-            m_buttons[CB_ThumbstickClick].SetState(f_scores[CGestureMatcher::IndexThumbstick] >= 0.75f);
-        }
-        if(CConfigHelper::IsButtonAEnabled())
-        {
-            m_buttons[CB_IndexATouch].SetState(f_scores[CGestureMatcher::IndexButtonA] >= 0.5f);
-            m_buttons[CB_IndexAClick].SetState(f_scores[CGestureMatcher::IndexButtonA] >= 0.75f);
-        }
-        if(CConfigHelper::IsButtonBEnabled())
-        {
-            m_buttons[CB_IndexBTouch].SetState(f_scores[CGestureMatcher::IndexButtonB] >= 0.5f);
-            m_buttons[CB_IndexBClick].SetState(f_scores[CGestureMatcher::IndexButtonB] >= 0.75f);
-        }
+        } break;
     }
+}
 
-    // Internal hidden values, possibly useless
-    m_buttons[CB_FingerIndex].SetValue(f_scores[CGestureMatcher::IndexFinger_Index]);
-    m_buttons[CB_FingerMiddle].SetValue(f_scores[CGestureMatcher::IndexFinger_Middle]);
-    m_buttons[CB_FingerRing].SetValue(f_scores[CGestureMatcher::IndexFinger_Ring]);
-    m_buttons[CB_FingerPinky].SetValue(f_scores[CGestureMatcher::IndexFinger_Pinky]);
+void CLeapHandController::ProcessIndexGestures(const Leap::Frame &f_frame, const std::vector<float> &f_scores)
+{
+    switch(m_gameProfile)
+    {
+        case GP_Default:
+        {
+            if(CConfigHelper::IsInputEnabled())
+            {
+                if(CConfigHelper::IsMenuEnabled())
+                {
+                    m_buttons[CB_SysClick].SetState(f_scores[CGestureMatcher::Timeout] >= 0.5f);
+                    m_buttons[CB_SysTouch].SetState(f_scores[CGestureMatcher::Timeout] >= 0.25f);
+                }
+                if(CConfigHelper::IsGripEnabled())
+                {
+                    m_buttons[CB_GripTouch].SetState(f_scores[CGestureMatcher::LowerFist] >= 0.75f);
+                    m_buttons[CB_GripValue].SetValue(f_scores[CGestureMatcher::LowerFist]);
+                    m_buttons[CB_GripForce].SetValue(f_scores[CGestureMatcher::LowerFist] >= 0.75f ? (f_scores[CGestureMatcher::LowerFist] - 0.75f) / 0.25f : 0.f);
+                }
+                if(CConfigHelper::IsTouchpadEnabled())
+                {
+                    if(CConfigHelper::IsTouchpadTouchEnabled())
+                    {
+                        float l_fixedThumbpress = 1.f - f_scores[CGestureMatcher::Thumbpress];
+                        if(l_fixedThumbpress >= 0.5f)
+                        {
+                            m_buttons[CB_TrackpadTouch].SetState(true);
+                            m_buttons[CB_TrackpadForce].SetValue(l_fixedThumbpress >= 0.75f ? (l_fixedThumbpress - 0.75f) / 0.25f : 0.f);
+                            if(CConfigHelper::IsTouchpadAxesEnabled())
+                            {
+                                m_buttons[CB_TrackpadX].SetValue(f_scores[CGestureMatcher::TouchpadAxisX]);
+                                m_buttons[CB_TrackpadY].SetValue(f_scores[CGestureMatcher::TouchpadAxisY]);
+                            }
+                        }
+                        else
+                        {
+                            m_buttons[CB_TrackpadTouch].SetState(false);
+                            m_buttons[CB_TrackpadForce].SetValue(0.f);
+                        }
+                    }
+                }
+                if(CConfigHelper::IsTriggerEnabled())
+                {
+                    m_buttons[CB_TriggerClick].SetState(f_scores[CGestureMatcher::TriggerFinger] >= 0.75f);
+                    m_buttons[CB_TriggerValue].SetValue(f_scores[CGestureMatcher::TriggerFinger]);
+                }
+                if(CConfigHelper::IsThumbstickEnabled())
+                {
+                    m_buttons[CB_ThumbstickTouch].SetState(f_scores[CGestureMatcher::IndexThumbstick] >= 0.5f);
+                    m_buttons[CB_ThumbstickClick].SetState(f_scores[CGestureMatcher::IndexThumbstick] >= 0.75f);
+                }
+                if(CConfigHelper::IsButtonAEnabled())
+                {
+                    m_buttons[CB_IndexATouch].SetState(f_scores[CGestureMatcher::IndexButtonA] >= 0.5f);
+                    m_buttons[CB_IndexAClick].SetState(f_scores[CGestureMatcher::IndexButtonA] >= 0.75f);
+                }
+                if(CConfigHelper::IsButtonBEnabled())
+                {
+                    m_buttons[CB_IndexBTouch].SetState(f_scores[CGestureMatcher::IndexButtonB] >= 0.5f);
+                    m_buttons[CB_IndexBClick].SetState(f_scores[CGestureMatcher::IndexButtonB] >= 0.75f);
+                }
+            }
+        } break;
+        case GP_VRChat:
+        {
+            if(CConfigHelper::IsInputEnabled())
+            {
+                if(CConfigHelper::IsTouchpadEnabled())
+                {
+                    if(CConfigHelper::IsTouchpadTouchEnabled())
+                    {
+                        float l_fixedThumbpress = 1.f - f_scores[CGestureMatcher::Thumbpress];
+                        if(l_fixedThumbpress >= 0.5f)
+                        {
+                            m_buttons[CB_TrackpadTouch].SetState(true);
+                            m_buttons[CB_TrackpadForce].SetValue(l_fixedThumbpress >= 0.75f ? (l_fixedThumbpress - 0.75f) / 0.25f : 0.f);
+                        }
+                        else
+                        {
+                            m_buttons[CB_TrackpadTouch].SetState(false);
+                            m_buttons[CB_TrackpadForce].SetValue(0.f);
+                        }
+                    }
+                    if(CConfigHelper::IsTriggerEnabled())
+                    {
+                        m_buttons[CB_TriggerClick].SetState(f_scores[CGestureMatcher::TriggerFinger] >= 0.75f);
+                        m_buttons[CB_TriggerValue].SetValue(f_scores[CGestureMatcher::TriggerFinger]);
+                    }
+                    if(CConfigHelper::IsGripEnabled())
+                    {
+                        m_buttons[CB_GripTouch].SetState(f_scores[CGestureMatcher::LowerFist] >= 0.85f);
+                        m_buttons[CB_GripValue].SetValue(f_scores[CGestureMatcher::LowerFist]);
+                        m_buttons[CB_GripForce].SetValue(f_scores[CGestureMatcher::LowerFist] >= 0.85f ? (f_scores[CGestureMatcher::LowerFist] - 0.85f) / 0.15f : 0.f);
+                    }
+                    if(CConfigHelper::IsButtonBEnabled())
+                    {
+                        m_buttons[CB_IndexBTouch].SetState(f_scores[CGestureMatcher::Timeout] >= 0.5f);
+                        m_buttons[CB_IndexBClick].SetState(f_scores[CGestureMatcher::Timeout] >= 0.75f);
+                    }
+                }
+            }
+        } break;
+    }
 
     // Update skeleton
     if(CConfigHelper::IsSkeletonEnabled())
     {
+        m_buttons[CB_FingerIndex].SetValue(f_scores[CGestureMatcher::IndexFinger_Index]);
+        m_buttons[CB_FingerMiddle].SetValue(f_scores[CGestureMatcher::IndexFinger_Middle]);
+        m_buttons[CB_FingerRing].SetValue(f_scores[CGestureMatcher::IndexFinger_Ring]);
+        m_buttons[CB_FingerPinky].SetValue(f_scores[CGestureMatcher::IndexFinger_Pinky]);
+
         for(Leap::Hand l_hand : f_frame.hands())
         {
             if(l_hand.isValid() && ((l_hand.isLeft() && (m_handAssigment == CHA_Left)) || (l_hand.isRight() && (m_handAssigment == CHA_Right))))

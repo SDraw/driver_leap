@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "Utils.h"
 
-int ReadEnumVector(const std::string &f_val, const std::vector<std::string> &f_vec)
+size_t ReadEnumVector(const std::string &f_val, const std::vector<std::string> &f_vec)
 {
-    int l_result = -1;
+    size_t l_result = std::numeric_limits<size_t>::max();
     for(auto iter = f_vec.begin(), iterEnd = f_vec.end(); iter != iterEnd; ++iter)
     {
         if(!iter->compare(f_val))

@@ -72,9 +72,9 @@ const std::vector<std::string> g_steamAppKeys
 {
     "steam.app.438100" // VRChat
 };
-enum SteamAppID : int
+enum SteamAppID : size_t
 {
-    SAI_VRChat = 0
+    SAI_VRChat = 0U
 };
 
 const std::string g_profileName[2]
@@ -86,6 +86,7 @@ CLeapMonitor::CLeapMonitor()
 {
     m_initialized = false;
     m_vrSystem = nullptr;
+    m_vrDebug = nullptr;
     m_vrApplications = nullptr;
     m_vrOverlay = nullptr;
     m_vrNotifications = nullptr;

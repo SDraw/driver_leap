@@ -46,7 +46,7 @@ class CLeapHandController : public vr::ITrackedDeviceServerDriver
     vr::DriverPose_t m_pose;
     glm::quat m_gripAngleOffset;
 
-    enum GameProfile
+    enum GameProfile : size_t
     {
         GP_Default = 0U,
         GP_VRChat
@@ -61,6 +61,7 @@ class CLeapHandController : public vr::ITrackedDeviceServerDriver
     enum EControllerButton : size_t
     {
         CB_SysClick = 0U,
+        CB_SysTouch,
         CB_GripClick,
         CB_GripForce,
         CB_GripTouch,
@@ -97,7 +98,7 @@ class CLeapHandController : public vr::ITrackedDeviceServerDriver
     vr::VRInputComponentHandle_t m_skeletonHandle;
     enum HandSkeletonBone : size_t
     {
-	    HSB_Root = 0,
+	    HSB_Root = 0U,
 	    HSB_Wrist,
 	    HSB_Thumb0,
 	    HSB_Thumb1,
@@ -128,6 +129,7 @@ class CLeapHandController : public vr::ITrackedDeviceServerDriver
 	    HSB_Aux_MiddleFinger,
 	    HSB_Aux_RingFinger,
 	    HSB_Aux_PinkyFinger,
+
 	    HSB_Count
     };
     vr::VRBoneTransform_t m_boneTransform[HSB_Count];
@@ -140,8 +142,7 @@ class CLeapHandController : public vr::ITrackedDeviceServerDriver
     void UpdateInput();
 
     void UpdateGestures(const Leap::Frame &f_frame);
-    void ProcessViveDefaultProfileGestures(const std::vector<float> &f_scores);
-    void ProcessViveVRChatProfileGestures(const std::vector<float> &f_scores);
+    void ProcessViveGestures(const std::vector<float> &f_scores);
     void ProcessIndexGestures(const Leap::Frame &f_frame, const std::vector<float> &f_scores);
 
     void ResetControls();
