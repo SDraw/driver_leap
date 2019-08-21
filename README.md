@@ -35,13 +35,13 @@ Fork with updated vendor libraries and extended features.
   
 ### Control configuration and inputs
 Driver can emulate HTC Vive controllers and Valve Index controllers with skeletal animation and work in desktop and HMD orientations. It's adjusted by editing control_config.xml in 'cfg' folder.  
-There are more configurable restrictions, such as global input, trackpad, trigger, grab and etc.
+There are more configurable restrictions, such as global input, trackpad, trigger, grab and etc.  
+Controls are configured by game profiles that are enabled automatically when game is started from Steam.
 
 ### HTC Vive controllers emulation
-Controls are specified by game profiles that are enabled automatically when game is started.
-Available game profiles:
+Game profiles:
   * **vrchat** - profile for VRChat. Control restrictions are ignored.  
-  Game controls list:
+  Controls list:
     * Gun - corresponding hand gesture
     * V-shape - corresponding hand gesture
     * Point - corresponding hand gesture
@@ -51,7 +51,7 @@ Available game profiles:
     * Trigger - grab gesture
     * Application menu - formed T-shape with two hands
   * **default** - profile for other games.  
-  Control list:
+  Controls list:
     * Trigger - bending of the index finger
     * Grip - grab gesture
     * System menu - formed T-shape with two hands
@@ -62,15 +62,22 @@ Available game profiles:
 ### Valve Index controllers emulation
 By default, controller models aren't in right folder of SteamVR, and you have to add them by yourself.
 Copy all folders from '<SteamVR_folder>/drivers/indexcontroller/resources/rendermodels' to '<SteamVR_folder>/resources/rendermodels'.  
-Controls list:
-* Trigger - bending of the index finger
-* Grip - bending of middle, ring and pinky fingers
-* Touchpad - thumb press
-* Touchpad circle - index finger of another hand directed to palm
-* Thumbstick press - touch of thumb finger tip by index finger tip of another hand
-* Button A - pinch gesture (tips of thumb finger and index finger)
-* Button B - tips of thumb finger and pinky finger
-* System button - formed T-shape with two hands
+Game profiles:
+  * **vrchat** - profile for VRChat. Note: game gestures are not implemented due to finger tracking, grip input profile should be used.  
+  Controls list:
+    * Trigger - bending of the index finger
+    * Grip - grab gesture
+    * Game menu - formed T-shape with two hands
+  * **default** - profile for other games.  
+  Controls list:
+    * Trigger - bending of the index finger
+    * Grip - bending of middle, ring and pinky fingers
+    * Touchpad - thumb press
+    * Touchpad circle - index finger of another hand directed to palm
+    * Thumbstick press - touch of thumb finger tip by index finger tip of another hand
+    * Button A - pinch gesture (tips of thumb finger and index finger)
+    * Button B - tips of thumb finger and pinky finger
+    * System button - formed T-shape with two hands
 
 Currently, there are no free gestures that can simulate thumbstick direction.
 
@@ -85,3 +92,5 @@ vrpathreg adddriver "path_to_leap_folder"
 ```JSON
 "activateMultipleDrivers": true,
 ```
+### Help in driver development
+Are you an owner of real HTC Vive or Valve Index kit? You can help in driver development by sharing controller's properties dump. Follow instruction from [dumper project](https://github.com/SDraw/controller_dumper), create an issue and attach generated XML file. By doing this driver can be improved to be identified as real controllers for all games.
