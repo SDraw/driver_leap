@@ -36,7 +36,7 @@ Fork with updated vendor libraries and extended features.
 ### Control configuration and inputs
 Driver can emulate HTC Vive controllers and Valve Index controllers with skeletal animation and work in desktop and HMD orientations. It's adjusted by editing control_config.xml in 'cfg' folder.  
 There are more configurable restrictions, such as global input, trackpad, trigger, grab and etc.  
-Controls are configured by game profiles that are enabled automatically when game is started from Steam.
+Controls are changed by game profiles that are enabled automatically when game is started from Steam.
 
 ### HTC Vive controllers emulation
 Game profiles:
