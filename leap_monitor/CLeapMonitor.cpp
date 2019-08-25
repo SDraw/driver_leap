@@ -230,14 +230,7 @@ void CLeapMonitor::SendNotification(const std::string &f_text)
 
 void CLeapMonitor::AddTrackedDevice(uint32_t unTrackedDeviceIndex)
 {
-    char rgchTrackingSystemName[vr::k_unMaxPropertyStringSize];
-    vr::ETrackedPropertyError eError;
-
-    m_vrSystem->GetStringTrackedDeviceProperty(unTrackedDeviceIndex, vr::Prop_TrackingSystemName_String, rgchTrackingSystemName, vr::k_unMaxPropertyStringSize, &eError);
-    if(eError == vr::TrackedProp_Success)
-    {
-        if(!strcmp(rgchTrackingSystemName, "leap")) m_leapDevices.insert(unTrackedDeviceIndex);
-    }
+    if(m_vrSystem->GetUint64TrackedDeviceProperty(unTrackedDeviceIndex, vr::Prop_VendorSpecific_Reserved_Start) == 0x1EA8U) m_leapDevices.insert(unTrackedDeviceIndex);
 }
 void CLeapMonitor::RemoveTrackedDevice(uint32_t unTrackedDeviceIndex)
 {

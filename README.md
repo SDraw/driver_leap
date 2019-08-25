@@ -31,7 +31,7 @@ Fork with updated vendor libraries and extended features.
 * Copy additional shared libraries to '<base_project_installation_folder>/leap/bin/<your_platform>':
   * vendor/LeapSDK/lib/<your_platform>/LeapC.dll
   * vendor/openvr/bin/<your_platform>/openvr_api.dll
-* Copy control_config.xml, vive_profile.json and index_profile.json from solution root to '<base_project_installation_folder>/leap/cfg'
+* Copy 'control_config.xml' from solution root to '<base_project_installation_folder>/leap/cfg'
   
 ### Control configuration and inputs
 Driver can emulate HTC Vive controllers and Valve Index controllers with skeletal animation and work in desktop and HMD orientations. It's adjusted by editing control_config.xml in 'cfg' folder.  
@@ -59,9 +59,7 @@ Game profiles:
     * Touchpad - thumb press
     * Touchpad circle - index finger of another hand directed to palm
     
-### Valve Index controllers emulation
-By default, controller models aren't in right folder of SteamVR, and you have to add them by yourself.
-Copy all folders from '<SteamVR_folder>/drivers/indexcontroller/resources/rendermodels' to '<SteamVR_folder>/resources/rendermodels'.  
+### Valve Index controllers emulation 
 Game profiles:
   * **vrchat** - profile for VRChat. Note: game gestures are not implemented due to finger tracking, grip input profile should be used.  
   Controls list:
@@ -74,9 +72,9 @@ Game profiles:
     * Grip - bending of middle, ring and pinky fingers
     * Touchpad - thumb press
     * Touchpad circle - index finger of another hand directed to palm
-    * Thumbstick press - touch of thumb finger tip by index finger tip of another hand
-    * Button A - pinch gesture (tips of thumb finger and index finger)
-    * Button B - tips of thumb finger and pinky finger
+    * Thumbstick press - touching of thumb finger tip and index finger tip of another hand
+    * Button A - touching of thumb and middle finger tips
+    * Button B - touching of thumb and pinky finger tips
     * System button - formed T-shape with two hands
 
 Currently, there are no free gestures that can simulate thumbstick direction.
@@ -92,5 +90,3 @@ vrpathreg adddriver "path_to_leap_folder"
 ```JSON
 "activateMultipleDrivers": true,
 ```
-### Help in driver development
-Are you an owner of real HTC Vive or Valve Index kit? You can help in driver development by sharing controller's properties dump. Follow instruction from [dumper project](https://github.com/SDraw/controller_dumper), create an issue and attach generated XML file. By doing this driver can be improved to be identified as real controllers for all games.

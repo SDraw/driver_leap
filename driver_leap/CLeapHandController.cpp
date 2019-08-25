@@ -161,97 +161,101 @@ vr::EVRInitError CLeapHandController::Activate(uint32_t unObjectId)
     vr::CVRPropertyHelpers *l_vrProperties = vr::VRProperties();
     m_propertyContainer = l_vrProperties->TrackedDeviceToPropertyContainer(m_trackedDeviceID);
 
+    // Shared properties
+    l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_TrackingSystemName_String, "lighthouse");
     l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_WillDriftInYaw_Bool, false);
-    l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_DeviceIsWireless_Bool, false);
+    l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_DeviceIsWireless_Bool, true);
+    l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_DeviceIsCharging_Bool, false);
+    l_vrProperties->SetFloatProperty(m_propertyContainer, vr::Prop_DeviceBatteryPercentage_Float, 1.f); // Always charged
+
+    vr::HmdMatrix34_t l_matrix = { -1.f, 0.f, 0.f, 0.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f };
+    l_vrProperties->SetProperty(m_propertyContainer, vr::Prop_StatusDisplayTransform_Matrix34, &l_matrix, sizeof(vr::HmdMatrix34_t), vr::k_unHmdMatrix34PropertyTag);
+
+    l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_Firmware_UpdateAvailable_Bool, false);
+    l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_Firmware_ManualUpdate_Bool, false);
+    l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_Firmware_ManualUpdateURL_String, "https://developer.valvesoftware.com/wiki/SteamVR/HowTo_Update_Firmware");
+    l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_DeviceProvidesBatteryStatus_Bool, true);
+    l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_DeviceCanPowerOff_Bool, true);
     l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_DeviceClass_Int32, vr::TrackedDeviceClass_Controller);
+    l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_Firmware_ForceUpdateRequired_Bool, false);
+    l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_Identifiable_Bool, true);
+    l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_Firmware_RemindUpdate_Bool, false);
+    l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_Axis0Type_Int32, vr::k_eControllerAxis_TrackPad);
+    l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_Axis1Type_Int32, vr::k_eControllerAxis_Trigger);
     l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_ControllerRoleHint_Int32, (m_handAssigment == CHA_Left) ? vr::TrackedControllerRole_LeftHand : vr::TrackedControllerRole_RightHand);
+    l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_HasDisplayComponent_Bool, false);
+    l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_HasCameraComponent_Bool, false);
+    l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_HasDriverDirectModeComponent_Bool, false);
+    l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_HasVirtualDisplayComponent_Bool, false);
+    l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_ControllerHandSelectionPriority_Int32, 0);
 
-    // Input Properties
+    // Specific properties
     switch(CConfigHelper::GetEmulatedController())
     {
         case CConfigHelper::EC_Vive:
         {
-            l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_Axis0Type_Int32, vr::k_eControllerAxis_TrackPad);
-            l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_Axis1Type_Int32, vr::k_eControllerAxis_Trigger);
-
-            l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_SupportedButtons_Uint64,
-                vr::ButtonMaskFromId(vr::k_EButton_ApplicationMenu) |
-                vr::ButtonMaskFromId(vr::k_EButton_System) |
-                vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Touchpad) |
-                vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Trigger) |
-                vr::ButtonMaskFromId(vr::k_EButton_Grip)
-                );
-        } break;
-        case CConfigHelper::EC_Index:
-        {
-            l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_Axis0Type_Int32, vr::k_eControllerAxis_TrackPad);
-            l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_Axis1Type_Int32, vr::k_eControllerAxis_Trigger);
-            l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_Axis3Type_Int32, vr::k_eControllerAxis_Joystick);
-            l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_Axis4Type_Int32, vr::k_eControllerAxis_Trigger);
-
-            l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_SupportedButtons_Uint64,
-                vr::ButtonMaskFromId(vr::k_EButton_System) |
-                vr::ButtonMaskFromId(vr::k_EButton_IndexController_A) |
-                vr::ButtonMaskFromId(vr::k_EButton_IndexController_B) |
-                vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Touchpad) |
-                vr::ButtonMaskFromId(vr::k_EButton_SteamVR_Trigger) |
-                vr::ButtonMaskFromId(vr::k_EButton_IndexController_JoyStick) |
-                vr::ButtonMaskFromId(vr::k_EButton_Axis4)
-                );
-        } break;
-    }
-
-    // Model
-    std::string l_modelLabel("leap_");
-    l_modelLabel.append(std::to_string(m_handAssigment));
-    l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ModeLabel_String, l_modelLabel.c_str());
-    switch(CConfigHelper::GetEmulatedController())
-    {
-        case CConfigHelper::EC_Vive:
-            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ManufacturerName_String, "HTC");
-            break;
-        case CConfigHelper::EC_Index:
-            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ManufacturerName_String, "Valve"); // Or is it?
-            break;
-    }
-    l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_SerialNumber_String, m_serialNumber.c_str());
-    switch(CConfigHelper::GetEmulatedController())
-    {
-        case CConfigHelper::EC_Vive:
-        {
-            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ModelNumber_String, "vive"); // VRTK 3.3.0 fuzzy match
-            l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_HardwareRevision_Uint64, 1313);
-            l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_FirmwareVersion_Uint64, 1315);
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ModelNumber_String, "Vive. Controller MV");
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_SerialNumber_String, (m_handAssigment == CHA_Left) ? "LHR-F94B3BD8" : "LHR-F94B3BD9"); // Changed
             l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_RenderModelName_String, "vr_controller_vive_1_5");
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ManufacturerName_String, "HTC");
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_TrackingFirmwareVersion_String, "1533720215 htcvrsoftware@firmware-win32 2018-08-08 FPGA 262(1.6/0/0) BL 0 VRC 1533720214 Radio 1532585738");
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_HardwareRevision_String, "product 129 rev 1.5.0 lot 2000/0/0 0");
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ConnectedWirelessDongle_String, "1E8092840E"); // Changed
+            l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_HardwareRevision_Uint64, 2164327680U);
+            l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_FirmwareVersion_Uint64, 1533720215U);
+            l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_FPGAVersion_Uint64, 262U);
+            l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_VRCVersion_Uint64, 1533720214U);
+            l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_RadioVersion_Uint64, 1532585738U);
+            l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_DongleVersion_Uint64, 1461100729U);
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_Firmware_ProgrammingTarget_String, (m_handAssigment == CHA_Left) ? "LHR-F94B3BD8" : "LHR-F94B3BD9"); // Changed
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ResourceRoot_String, "htc");
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_RegisteredDeviceType_String, (m_handAssigment == CHA_Left) ? "htc/vive_controllerLHR-F94B3BD8" : "htc/vive_controllerLHR-F94B3BD9"); // Changed
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_InputProfilePath_String, "{htc}/input/vive_controller_profile.json");
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceOff_String, "{htc}/icons/controller_status_off.png");
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceSearching_String, "{htc}/icons/controller_status_searching.gif");
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceSearchingAlert_String, "{htc}/icons/controller_status_searching_alert.gif");
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceReady_String, "{htc}/icons/controller_status_ready.png");
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceReadyAlert_String, "{htc}/icons/controller_status_ready_alert.png");
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceNotReady_String, "{htc}/icons/controller_status_error.png");
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceStandby_String, "{htc}/icons/controller_status_off.png");
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceAlertLow_String, "{htc}/icons/controller_status_ready_low.png");
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ControllerType_String, "vive_controller");
         } break;
+
         case CConfigHelper::EC_Index:
         {
-            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ModelNumber_String, "knuckles"); // VRTK 3.3.0 fuzzy match
-            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_RegisteredDeviceType_String, "index_controller"); // VRChat fuzzy match
-            l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_HardwareRevision_Uint64, 1515);
-            l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_FirmwareVersion_Uint64, 1515);
-            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_RenderModelName_String, (m_handAssigment == CHA_Left) ? "valve_controller_knu_ev2_0_left" : "valve_controller_knu_ev2_0_right");
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ModelNumber_String, (m_handAssigment == CHA_Left) ? "Knuckles Left" : "Knuckles Right");
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_SerialNumber_String, (m_handAssigment == CHA_Left) ? "LHR-E217CD00" : "LHR-E217CD01"); // Changed
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_RenderModelName_String, (m_handAssigment == CHA_Left) ? "{indexcontroller}valve_controller_knu_1_0_left" : "{indexcontroller}valve_controller_knu_1_0_right");
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ManufacturerName_String, "Valve");
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_TrackingFirmwareVersion_String, "1562916277 watchman@ValveBuilder02 2019-07-12 FPGA 538(2.26/10/2) BL 0 VRC 1562916277 Radio 1562882729");
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_HardwareRevision_String, "product 17 rev 14.1.9 lot 2019/4/20 0");
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ConnectedWirelessDongle_String, "C2F75F5986-FYI"); // Changed
+            l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_HardwareRevision_Uint64, 286130441U);
+            l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_FirmwareVersion_Uint64, 1562916277U);
+            l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_FPGAVersion_Uint64, 538U);
+            l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_VRCVersion_Uint64, 1562916277U);
+            l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_RadioVersion_Uint64, 1562882729U);
+            l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_DongleVersion_Uint64, 1558748372U);
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_Firmware_ProgrammingTarget_String, (m_handAssigment == CHA_Left) ? "LHR-E217CD00" : "LHR-E217CD01"); // Changed
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ResourceRoot_String, "indexcontroller");
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_RegisteredDeviceType_String, (m_handAssigment == CHA_Left) ? "valve/index_controllerLHR-E217CD00" : "valve/index_controllerLHR-E217CD01"); // Changed
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_InputProfilePath_String, "{indexcontroller}/input/index_controller_profile.json");
+            l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_Axis2Type_Int32, vr::k_eControllerAxis_Trigger);
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceOff_String, (m_handAssigment == CHA_Left) ? "{indexcontroller}/icons/left_controller_status_off.png" : "{indexcontroller}/icons/right_controller_status_off.png");
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceSearching_String, (m_handAssigment == CHA_Left) ? "{indexcontroller}/icons/left_controller_status_searching.gif" : "{indexcontroller}/icons/right_controller_status_searching.gif");
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceSearchingAlert_String, (m_handAssigment == CHA_Left) ? "{indexcontroller}/icons/left_controller_status_searching_alert.gif" : "{indexcontroller}/icons//right_controller_status_searching_alert.gif");
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceReady_String, (m_handAssigment == CHA_Left) ? "{indexcontroller}/icons/left_controller_status_ready.png" : "{indexcontroller}/icons//right_controller_status_ready.png");
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceReadyAlert_String, (m_handAssigment == CHA_Left) ? "{indexcontroller}/icons/left_controller_status_ready_alert.png" : "{indexcontroller}/icons//right_controller_status_ready_alert.png");
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceNotReady_String, (m_handAssigment == CHA_Left) ? "{indexcontroller}/icons/left_controller_status_error.png" : "{indexcontroller}/icons//right_controller_status_error.png");
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceStandby_String, (m_handAssigment == CHA_Left) ? "{indexcontroller}/icons/left_controller_status_off.png" : "{indexcontroller}/icons//right_controller_status_off.png");
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceAlertLow_String, (m_handAssigment == CHA_Left) ? "{indexcontroller}/icons/left_controller_status_ready_low.png" : "{indexcontroller}/icons//right_controller_status_ready_low.png");
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ControllerType_String, "knuckles");
         } break;
     }
 
-    // Profile
-    std::string l_path(g_moduleFileName);
-    l_path.erase(l_path.begin() + l_path.rfind('\\'), l_path.end());
-    l_path.append("\\..\\..\\cfg\\");
-    switch(CConfigHelper::GetEmulatedController())
-    {
-        case CConfigHelper::EC_Vive:
-            l_path.append("vive_profile.json");
-            break;
-        case CConfigHelper::EC_Index:
-            l_path.append("index_profile.json");
-            break;
-    }
-    l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_InputProfilePath_String, l_path.c_str());
-
-    // Matrix
-    vr::HmdMatrix34_t l_matrix = { 0.f };
-    l_vrProperties->SetProperty(m_propertyContainer, vr::Prop_CameraToHeadTransform_Matrix34, &l_matrix, sizeof(vr::HmdMatrix34_t), vr::k_unHmdMatrix34PropertyTag);
+    // Hidden property for leap_monitor
+    l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_VendorSpecific_Reserved_Start, 0x1EA8U);
 
     // Inputs
     m_driverInput = vr::VRDriverInput();
@@ -495,120 +499,118 @@ void CLeapHandController::UpdateTrasnformation(const Leap::Frame &f_frame)
 {
     if(m_trackedDeviceID != vr::k_unTrackedDeviceIndexInvalid)
     {
-        Leap::HandList &l_hands = f_frame.hands();
-
         bool l_handFound = false;
-        for(int h = 0; h < l_hands.count(); h++)
+        Leap::HandList &l_hands = f_frame.hands();
+        for(auto l_hand : l_hands)
         {
-            Leap::Hand &l_hand = l_hands[h];
-
-            if(l_hand.isValid() && ((m_handAssigment == CHA_Left && l_hand.isLeft()) || (m_handAssigment == CHA_Right && l_hand.isRight())))
+            if(l_hand.isValid())
             {
-                l_handFound = true;
-
-                switch(CConfigHelper::GetOrientationMode())
+                if(((m_handAssigment == CHA_Left) && l_hand.isLeft()) || ((m_handAssigment == CHA_Right) && l_hand.isRight()))
                 {
-                    case CConfigHelper::OM_HMD:
+                    switch(CConfigHelper::GetOrientationMode())
                     {
-                        std::memcpy(&m_pose.qWorldFromDriverRotation, &ms_headRot, sizeof(vr::HmdQuaternion_t));
-                        std::memcpy(m_pose.vecWorldFromDriverTranslation, ms_headPos, sizeof(double) * 3U);
-
-                        Leap::Vector position = l_hand.palmPosition();
-                        m_pose.vecPosition[0] = -0.001*position.x;
-                        m_pose.vecPosition[1] = -0.001*position.z;
-                        m_pose.vecPosition[2] = -0.001*position.y - 0.15; // ?
-
-                        Leap::Vector velocity = l_hand.palmVelocity();
-                        m_pose.vecVelocity[0] = -0.001*velocity.x;
-                        m_pose.vecVelocity[1] = -0.001*velocity.z;
-                        m_pose.vecVelocity[2] = -0.001*velocity.y;
-
-                        Leap::Vector l_handDirection = l_hand.direction();
-                        l_handDirection /= l_handDirection.magnitude();
-
-                        Leap::Vector l_palmNormal = l_hand.palmNormal();
-                        l_palmNormal /= l_palmNormal.magnitude();
-
-                        Leap::Vector l_leapCross = l_handDirection.cross(l_palmNormal);
-
-                        switch(m_handAssigment)
+                        case CConfigHelper::OM_HMD:
                         {
-                            case CHA_Left:
-                                l_palmNormal *= -1.f;
-                                break;
-                            case CHA_Right:
-                                l_leapCross *= -1.f;
-                                break;
-                        }
+                            std::memcpy(&m_pose.qWorldFromDriverRotation, &ms_headRot, sizeof(vr::HmdQuaternion_t));
+                            std::memcpy(m_pose.vecWorldFromDriverTranslation, ms_headPos, sizeof(double) * 3U);
 
-                        glm::mat3 l_rotMat(
-                            l_palmNormal.x, l_palmNormal.z, l_palmNormal.y,
-                            l_leapCross.x, l_leapCross.z, l_leapCross.y,
-                            l_handDirection.x, l_handDirection.z, l_handDirection.y
-                            );
-                        glm::quat l_finalRot = glm::quat_cast(l_rotMat);
-                        l_finalRot *= m_gripAngleOffset;
+                            Leap::Vector l_position = l_hand.palmPosition();
+                            m_pose.vecPosition[0] = -0.001*l_position.x;
+                            m_pose.vecPosition[1] = -0.001*l_position.z;
+                            m_pose.vecPosition[2] = -0.001*l_position.y - 0.15; // ?
 
-                        m_pose.qRotation.x = l_finalRot.x;
-                        m_pose.qRotation.y = l_finalRot.y;
-                        m_pose.qRotation.z = l_finalRot.z;
-                        m_pose.qRotation.w = l_finalRot.w;
-                    } break;
-                    case CConfigHelper::OM_Desktop:
-                    {
-                        // Head position and rotation are fixed
-                        m_pose.qWorldFromDriverRotation.x = .0;
-                        m_pose.qWorldFromDriverRotation.y = .0;
-                        m_pose.qWorldFromDriverRotation.z = .0;
-                        m_pose.qWorldFromDriverRotation.w = 1.0;
-                        m_pose.vecWorldFromDriverTranslation[0U] = CConfigHelper::GetDesktopRootX();
-                        m_pose.vecWorldFromDriverTranslation[1U] = CConfigHelper::GetDesktopRootY();
-                        m_pose.vecWorldFromDriverTranslation[2U] = CConfigHelper::GetDesktopRootZ();
+                            Leap::Vector l_velocity = l_hand.palmVelocity();
+                            m_pose.vecVelocity[0] = -0.001*l_velocity.x;
+                            m_pose.vecVelocity[1] = -0.001*l_velocity.z;
+                            m_pose.vecVelocity[2] = -0.001*l_velocity.y;
 
-                        Leap::Vector position = l_hand.palmPosition();
-                        m_pose.vecPosition[0] = 0.001*position.x;
-                        m_pose.vecPosition[1] = 0.001*position.y;
-                        m_pose.vecPosition[2] = 0.001*position.z;
+                            Leap::Vector l_handDirection = l_hand.direction();
+                            l_handDirection /= l_handDirection.magnitude();
 
-                        Leap::Vector velocity = l_hand.palmVelocity();
-                        m_pose.vecVelocity[0] = 0.001*velocity.x;
-                        m_pose.vecVelocity[1] = 0.001*velocity.y;
-                        m_pose.vecVelocity[2] = 0.001*velocity.z;
+                            Leap::Vector l_palmNormal = l_hand.palmNormal();
+                            l_palmNormal /= l_palmNormal.magnitude();
 
-                        Leap::Vector l_handDirection = -l_hand.direction();
-                        l_handDirection /= l_handDirection.magnitude();
+                            Leap::Vector l_leapCross = l_handDirection.cross(l_palmNormal);
+                            switch(m_handAssigment)
+                            {
+                                case CHA_Left:
+                                    l_palmNormal *= -1.f;
+                                    break;
+                                case CHA_Right:
+                                    l_leapCross *= -1.f;
+                                    break;
+                            }
 
-                        Leap::Vector l_palmNormal = -l_hand.palmNormal();
-                        l_palmNormal /= l_palmNormal.magnitude();
+                            glm::mat3 l_rotMat(
+                                l_palmNormal.x, l_palmNormal.z, l_palmNormal.y,
+                                l_leapCross.x, l_leapCross.z, l_leapCross.y,
+                                l_handDirection.x, l_handDirection.z, l_handDirection.y
+                                );
+                            glm::quat l_finalRot = glm::quat_cast(l_rotMat);
+                            l_finalRot *= m_gripAngleOffset;
 
-                        Leap::Vector l_leapCross = -l_handDirection.cross(l_palmNormal);
-
-                        switch(m_handAssigment)
+                            m_pose.qRotation.x = l_finalRot.x;
+                            m_pose.qRotation.y = l_finalRot.y;
+                            m_pose.qRotation.z = l_finalRot.z;
+                            m_pose.qRotation.w = l_finalRot.w;
+                        } break;
+                        case CConfigHelper::OM_Desktop:
                         {
-                            case CHA_Left:
-                                l_palmNormal *= -1.f;
-                                break;
-                            case CHA_Right:
-                                l_leapCross *= -1.f;
-                                break;
-                        }
+                            // Head position and rotation are fixed
+                            m_pose.qWorldFromDriverRotation.x = .0;
+                            m_pose.qWorldFromDriverRotation.y = .0;
+                            m_pose.qWorldFromDriverRotation.z = .0;
+                            m_pose.qWorldFromDriverRotation.w = 1.0;
+                            m_pose.vecWorldFromDriverTranslation[0U] = CConfigHelper::GetDesktopRootX();
+                            m_pose.vecWorldFromDriverTranslation[1U] = CConfigHelper::GetDesktopRootY();
+                            m_pose.vecWorldFromDriverTranslation[2U] = CConfigHelper::GetDesktopRootZ();
 
-                        glm::mat3 l_rotMat(
-                            l_palmNormal.x, l_palmNormal.y, l_palmNormal.z,
-                            l_leapCross.x, l_leapCross.y, l_leapCross.z,
-                            l_handDirection.x, l_handDirection.y, l_handDirection.z
-                            );
-                        glm::quat l_finalRot = glm::quat_cast(l_rotMat);
-                        l_finalRot *= m_gripAngleOffset;
+                            Leap::Vector l_position = l_hand.palmPosition();
+                            m_pose.vecPosition[0] = 0.001*l_position.x;
+                            m_pose.vecPosition[1] = 0.001*l_position.y;
+                            m_pose.vecPosition[2] = 0.001*l_position.z;
 
-                        m_pose.qRotation.x = l_finalRot.x;
-                        m_pose.qRotation.y = l_finalRot.y;
-                        m_pose.qRotation.z = l_finalRot.z;
-                        m_pose.qRotation.w = l_finalRot.w;
-                    } break;
+                            Leap::Vector l_velocity = l_hand.palmVelocity();
+                            m_pose.vecVelocity[0] = 0.001*l_velocity.x;
+                            m_pose.vecVelocity[1] = 0.001*l_velocity.y;
+                            m_pose.vecVelocity[2] = 0.001*l_velocity.z;
+
+                            Leap::Vector l_handDirection = -l_hand.direction();
+                            l_handDirection /= l_handDirection.magnitude();
+
+                            Leap::Vector l_palmNormal = -l_hand.palmNormal();
+                            l_palmNormal /= l_palmNormal.magnitude();
+
+                            Leap::Vector l_leapCross = -l_handDirection.cross(l_palmNormal);
+                            switch(m_handAssigment)
+                            {
+                                case CHA_Left:
+                                    l_palmNormal *= -1.f;
+                                    break;
+                                case CHA_Right:
+                                    l_leapCross *= -1.f;
+                                    break;
+                            }
+
+                            glm::mat3 l_rotMat(
+                                l_palmNormal.x, l_palmNormal.y, l_palmNormal.z,
+                                l_leapCross.x, l_leapCross.y, l_leapCross.z,
+                                l_handDirection.x, l_handDirection.y, l_handDirection.z
+                                );
+                            glm::quat l_finalRot = glm::quat_cast(l_rotMat);
+                            l_finalRot *= m_gripAngleOffset;
+
+                            m_pose.qRotation.x = l_finalRot.x;
+                            m_pose.qRotation.y = l_finalRot.y;
+                            m_pose.qRotation.z = l_finalRot.z;
+                            m_pose.qRotation.w = l_finalRot.w;
+                        } break;
+                    }
+
+                    l_handFound = true;
+                    m_pose.result = vr::TrackingResult_Running_OK;
+                    break;
                 }
-                m_pose.result = vr::TrackingResult_Running_OK;
-                break;
             }
         }
 
@@ -626,16 +628,16 @@ void CLeapHandController::UpdateTrasnformation(const Leap::Frame &f_frame)
 
 void CLeapHandController::UpdateGestures(const Leap::Frame& f_frame)
 {
-    std::vector<float> scores;
-    if(CGestureMatcher::MatchGestures(f_frame, ((m_handAssigment == CHA_Left) ? CGestureMatcher::LeftHand : CGestureMatcher::RightHand), scores))
+    std::vector<float> l_scores;
+    if(CGestureMatcher::GetGestures(f_frame, ((m_handAssigment == CHA_Left) ? CGestureMatcher::WH_LeftHand : CGestureMatcher::WH_RightHand), l_scores))
     {
         switch(CConfigHelper::GetEmulatedController())
         {
             case CConfigHelper::EC_Vive:
-                ProcessViveGestures(scores);
+                ProcessViveGestures(l_scores);
                 break;
             case CConfigHelper::EC_Index:
-                ProcessIndexGestures(f_frame, scores);
+                ProcessIndexGestures(f_frame, l_scores);
                 break;
         }
     }
@@ -649,26 +651,26 @@ void CLeapHandController::ProcessViveGestures(const std::vector<float> &f_scores
         {
             if(CConfigHelper::IsInputEnabled())
             {
-                if(CConfigHelper::IsMenuEnabled()) m_buttons[CB_SysClick].SetState(f_scores[CGestureMatcher::Timeout] >= 0.25f);
-                if(CConfigHelper::IsApplicationMenuEnabled()) m_buttons[CB_AppMenuClick].SetState(f_scores[CGestureMatcher::FlatHandPalmTowards] >= 0.8f);
+                if(CConfigHelper::IsMenuEnabled()) m_buttons[CB_SysClick].SetState(f_scores[CGestureMatcher::GT_Timeout] >= 0.25f);
+                if(CConfigHelper::IsApplicationMenuEnabled()) m_buttons[CB_AppMenuClick].SetState(f_scores[CGestureMatcher::GT_FlatHandPalmTowards] >= 0.8f);
 
                 if(CConfigHelper::IsTriggerEnabled())
                 {
-                    m_buttons[CB_TriggerClick].SetState(f_scores[CGestureMatcher::TriggerFinger] >= 0.75f);
-                    m_buttons[CB_TriggerValue].SetValue(f_scores[CGestureMatcher::TriggerFinger]);
+                    m_buttons[CB_TriggerClick].SetState(f_scores[CGestureMatcher::GT_TriggerFinger] >= 0.75f);
+                    m_buttons[CB_TriggerValue].SetValue(f_scores[CGestureMatcher::GT_TriggerFinger]);
                 }
 
-                if(CConfigHelper::IsGripEnabled()) m_buttons[CB_GripClick].SetState(f_scores[CGestureMatcher::LowerFist] >= 0.5f);
+                if(CConfigHelper::IsGripEnabled()) m_buttons[CB_GripClick].SetState(f_scores[CGestureMatcher::GT_LowerFist] >= 0.5f);
 
                 if(CConfigHelper::IsTouchpadEnabled())
                 {
                     if(CConfigHelper::IsTouchpadAxesEnabled())
                     {
-                        m_buttons[CB_TrackpadX].SetValue(f_scores[CGestureMatcher::TouchpadAxisX]);
-                        m_buttons[CB_TrackpadY].SetValue(f_scores[CGestureMatcher::TouchpadAxisY]);
+                        m_buttons[CB_TrackpadX].SetValue(f_scores[CGestureMatcher::GT_TouchpadAxisX]);
+                        m_buttons[CB_TrackpadY].SetValue(f_scores[CGestureMatcher::GT_TouchpadAxisY]);
                     }
-                    if(CConfigHelper::IsTouchpadTouchEnabled()) m_buttons[CB_TrackpadTouch].SetState(f_scores[CGestureMatcher::Thumbpress] <= 0.5f);
-                    if(CConfigHelper::IsTouchpadPressEnabled()) m_buttons[CB_TrackpadClick].SetState(f_scores[CGestureMatcher::Thumbpress] <= 0.1f);
+                    if(CConfigHelper::IsTouchpadTouchEnabled()) m_buttons[CB_TrackpadTouch].SetState(f_scores[CGestureMatcher::GT_Thumbpress] >= 0.5f);
+                    if(CConfigHelper::IsTouchpadPressEnabled()) m_buttons[CB_TrackpadClick].SetState(f_scores[CGestureMatcher::GT_Thumbpress] >= 0.1f);
                 }
             }
         } break;
@@ -679,30 +681,30 @@ void CLeapHandController::ProcessViveGestures(const std::vector<float> &f_scores
             {
                 if(!m_gameSpecialModes.m_vrchatDrawingMode)
                 {
-                    m_buttons[CB_AppMenuClick].SetState(f_scores[CGestureMatcher::Timeout] >= 0.75f);
+                    m_buttons[CB_AppMenuClick].SetState(f_scores[CGestureMatcher::GT_Timeout] >= 0.75f);
 
                     glm::vec2 l_trackpadAxis(0.f);
-                    if(f_scores[CGestureMatcher::VRChat_Point] >= 0.75f)
+                    if(f_scores[CGestureMatcher::GT_VRChatPoint] >= 0.75f)
                     {
                         l_trackpadAxis.x = 0.0f;
                         l_trackpadAxis.y = 1.0f;
                     }
-                    else if(f_scores[CGestureMatcher::VRChat_ThumbsUp] >= 0.75f)
+                    else if(f_scores[CGestureMatcher::GT_VRChatThumbsUp] >= 0.75f)
                     {
                         l_trackpadAxis.x = -0.95f;
                         l_trackpadAxis.y = 0.31f;
                     }
-                    else if(f_scores[CGestureMatcher::VRChat_Victory] >= 0.75f)
+                    else if(f_scores[CGestureMatcher::GT_VRChatVictory] >= 0.75f)
                     {
                         l_trackpadAxis.x = 0.95f;
                         l_trackpadAxis.y = 0.31f;
                     }
-                    else if(f_scores[CGestureMatcher::VRChat_Gun] >= 0.75f)
+                    else if(f_scores[CGestureMatcher::GT_VRChatGun] >= 0.75f)
                     {
                         l_trackpadAxis.x = -0.59f;
                         l_trackpadAxis.y = -0.81f;
                     }
-                    else if(f_scores[CGestureMatcher::VRChat_RockOut] >= 0.75f)
+                    else if(f_scores[CGestureMatcher::GT_VRChatRockOut] >= 0.75f)
                     {
                         l_trackpadAxis.x = 0.59f;
                         l_trackpadAxis.y = -0.81f;
@@ -712,9 +714,9 @@ void CLeapHandController::ProcessViveGestures(const std::vector<float> &f_scores
                     m_buttons[CB_TrackpadY].SetValue(l_trackpadAxis.y);
                     m_buttons[CB_TrackpadTouch].SetState((l_trackpadAxis.x != 0.f) || (l_trackpadAxis.y != 0.f));
 
-                    m_buttons[CB_TriggerValue].SetValue(f_scores[CGestureMatcher::LowerFist]);
-                    m_buttons[CB_TriggerClick].SetState(f_scores[CGestureMatcher::LowerFist] >= 0.5f);
-                    m_buttons[CB_GripClick].SetState(f_scores[CGestureMatcher::VRChat_SpreadHand] >= 0.75f);
+                    m_buttons[CB_TriggerValue].SetValue(f_scores[CGestureMatcher::GT_LowerFist]);
+                    m_buttons[CB_TriggerClick].SetState(f_scores[CGestureMatcher::GT_LowerFist] >= 0.5f);
+                    m_buttons[CB_GripClick].SetState(f_scores[CGestureMatcher::GT_VRChatSpreadHand] >= 0.75f);
                 }
                 else
                 {
@@ -722,8 +724,8 @@ void CLeapHandController::ProcessViveGestures(const std::vector<float> &f_scores
                     m_buttons[CB_TrackpadX].SetValue(0.f);
                     m_buttons[CB_TrackpadY].SetValue(0.f);
                     m_buttons[CB_TrackpadTouch].SetState(false);
-                    m_buttons[CB_TriggerValue].SetValue((f_scores[CGestureMatcher::LowerFist] >= 0.85f) ? 0.85f : 0.f);
-                    m_buttons[CB_TriggerClick].SetState(f_scores[CGestureMatcher::LowerFist] >= 0.85f);
+                    m_buttons[CB_TriggerValue].SetValue((f_scores[CGestureMatcher::GT_LowerFist] >= 0.85f) ? 0.85f : 0.f);
+                    m_buttons[CB_TriggerClick].SetState(f_scores[CGestureMatcher::GT_LowerFist] >= 0.85f);
                     m_buttons[CB_GripClick].SetState(false);
                 }
             }
@@ -741,28 +743,27 @@ void CLeapHandController::ProcessIndexGestures(const Leap::Frame &f_frame, const
             {
                 if(CConfigHelper::IsMenuEnabled())
                 {
-                    m_buttons[CB_SysClick].SetState(f_scores[CGestureMatcher::Timeout] >= 0.5f);
-                    m_buttons[CB_SysTouch].SetState(f_scores[CGestureMatcher::Timeout] >= 0.25f);
+                    m_buttons[CB_SysClick].SetState(f_scores[CGestureMatcher::GT_Timeout] >= 0.5f);
+                    m_buttons[CB_SysTouch].SetState(f_scores[CGestureMatcher::GT_Timeout] >= 0.25f);
                 }
                 if(CConfigHelper::IsGripEnabled())
                 {
-                    m_buttons[CB_GripTouch].SetState(f_scores[CGestureMatcher::LowerFist] >= 0.75f);
-                    m_buttons[CB_GripValue].SetValue(f_scores[CGestureMatcher::LowerFist]);
-                    m_buttons[CB_GripForce].SetValue(f_scores[CGestureMatcher::LowerFist] >= 0.75f ? (f_scores[CGestureMatcher::LowerFist] - 0.75f) / 0.25f : 0.f);
+                    m_buttons[CB_GripTouch].SetState(f_scores[CGestureMatcher::GT_LowerFist] >= 0.75f);
+                    m_buttons[CB_GripValue].SetValue(f_scores[CGestureMatcher::GT_LowerFist]);
+                    m_buttons[CB_GripForce].SetValue(f_scores[CGestureMatcher::GT_LowerFist] >= 0.75f ? (f_scores[CGestureMatcher::GT_LowerFist] - 0.75f) / 0.25f : 0.f);
                 }
                 if(CConfigHelper::IsTouchpadEnabled())
                 {
                     if(CConfigHelper::IsTouchpadTouchEnabled())
                     {
-                        float l_fixedThumbpress = 1.f - f_scores[CGestureMatcher::Thumbpress];
-                        if(l_fixedThumbpress >= 0.5f)
+                        if(f_scores[CGestureMatcher::GT_Thumbpress] >= 0.5f)
                         {
                             m_buttons[CB_TrackpadTouch].SetState(true);
-                            m_buttons[CB_TrackpadForce].SetValue(l_fixedThumbpress >= 0.75f ? (l_fixedThumbpress - 0.75f) / 0.25f : 0.f);
+                            m_buttons[CB_TrackpadForce].SetValue(f_scores[CGestureMatcher::GT_Thumbpress] >= 0.75f ? (f_scores[CGestureMatcher::GT_Thumbpress] - 0.75f) / 0.25f : 0.f);
                             if(CConfigHelper::IsTouchpadAxesEnabled())
                             {
-                                m_buttons[CB_TrackpadX].SetValue(f_scores[CGestureMatcher::TouchpadAxisX]);
-                                m_buttons[CB_TrackpadY].SetValue(f_scores[CGestureMatcher::TouchpadAxisY]);
+                                m_buttons[CB_TrackpadX].SetValue(f_scores[CGestureMatcher::GT_TouchpadAxisX]);
+                                m_buttons[CB_TrackpadY].SetValue(f_scores[CGestureMatcher::GT_TouchpadAxisY]);
                             }
                         }
                         else
@@ -774,23 +775,23 @@ void CLeapHandController::ProcessIndexGestures(const Leap::Frame &f_frame, const
                 }
                 if(CConfigHelper::IsTriggerEnabled())
                 {
-                    m_buttons[CB_TriggerClick].SetState(f_scores[CGestureMatcher::TriggerFinger] >= 0.75f);
-                    m_buttons[CB_TriggerValue].SetValue(f_scores[CGestureMatcher::TriggerFinger]);
+                    m_buttons[CB_TriggerClick].SetState(f_scores[CGestureMatcher::GT_TriggerFinger] >= 0.75f);
+                    m_buttons[CB_TriggerValue].SetValue(f_scores[CGestureMatcher::GT_TriggerFinger]);
                 }
                 if(CConfigHelper::IsThumbstickEnabled())
                 {
-                    m_buttons[CB_ThumbstickTouch].SetState(f_scores[CGestureMatcher::IndexThumbstick] >= 0.5f);
-                    m_buttons[CB_ThumbstickClick].SetState(f_scores[CGestureMatcher::IndexThumbstick] >= 0.75f);
+                    m_buttons[CB_ThumbstickTouch].SetState(f_scores[CGestureMatcher::GT_ThumbIndexCrossTouch] >= 0.5f);
+                    m_buttons[CB_ThumbstickClick].SetState(f_scores[CGestureMatcher::GT_ThumbIndexCrossTouch] >= 0.75f);
                 }
                 if(CConfigHelper::IsButtonAEnabled())
                 {
-                    m_buttons[CB_IndexATouch].SetState(f_scores[CGestureMatcher::IndexButtonA] >= 0.5f);
-                    m_buttons[CB_IndexAClick].SetState(f_scores[CGestureMatcher::IndexButtonA] >= 0.75f);
+                    m_buttons[CB_IndexATouch].SetState(f_scores[CGestureMatcher::GT_ThumbMiddleTouch] >= 0.5f);
+                    m_buttons[CB_IndexAClick].SetState(f_scores[CGestureMatcher::GT_ThumbMiddleTouch] >= 0.75f);
                 }
                 if(CConfigHelper::IsButtonBEnabled())
                 {
-                    m_buttons[CB_IndexBTouch].SetState(f_scores[CGestureMatcher::IndexButtonB] >= 0.5f);
-                    m_buttons[CB_IndexBClick].SetState(f_scores[CGestureMatcher::IndexButtonB] >= 0.75f);
+                    m_buttons[CB_IndexBTouch].SetState(f_scores[CGestureMatcher::GT_ThumbPinkyTouch] >= 0.5f);
+                    m_buttons[CB_IndexBClick].SetState(f_scores[CGestureMatcher::GT_ThumbPinkyTouch] >= 0.75f);
                 }
             }
         } break;
@@ -802,11 +803,10 @@ void CLeapHandController::ProcessIndexGestures(const Leap::Frame &f_frame, const
                 {
                     if(CConfigHelper::IsTouchpadTouchEnabled())
                     {
-                        float l_fixedThumbpress = 1.f - f_scores[CGestureMatcher::Thumbpress];
-                        if(l_fixedThumbpress >= 0.5f)
+                        if(f_scores[CGestureMatcher::GT_Thumbpress] >= 0.5f)
                         {
                             m_buttons[CB_TrackpadTouch].SetState(true);
-                            m_buttons[CB_TrackpadForce].SetValue(l_fixedThumbpress >= 0.75f ? (l_fixedThumbpress - 0.75f) / 0.25f : 0.f);
+                            m_buttons[CB_TrackpadForce].SetValue(f_scores[CGestureMatcher::GT_Thumbpress] >= 0.75f ? (f_scores[CGestureMatcher::GT_Thumbpress] - 0.75f) / 0.25f : 0.f);
                         }
                         else
                         {
@@ -816,19 +816,19 @@ void CLeapHandController::ProcessIndexGestures(const Leap::Frame &f_frame, const
                     }
                     if(CConfigHelper::IsTriggerEnabled())
                     {
-                        m_buttons[CB_TriggerClick].SetState(f_scores[CGestureMatcher::TriggerFinger] >= 0.75f);
-                        m_buttons[CB_TriggerValue].SetValue(f_scores[CGestureMatcher::TriggerFinger]);
+                        m_buttons[CB_TriggerClick].SetState(f_scores[CGestureMatcher::GT_TriggerFinger] >= 0.75f);
+                        m_buttons[CB_TriggerValue].SetValue(f_scores[CGestureMatcher::GT_TriggerFinger]);
                     }
                     if(CConfigHelper::IsGripEnabled())
                     {
-                        m_buttons[CB_GripTouch].SetState(f_scores[CGestureMatcher::LowerFist] >= 0.85f);
-                        m_buttons[CB_GripValue].SetValue(f_scores[CGestureMatcher::LowerFist]);
-                        m_buttons[CB_GripForce].SetValue(f_scores[CGestureMatcher::LowerFist] >= 0.85f ? (f_scores[CGestureMatcher::LowerFist] - 0.85f) / 0.15f : 0.f);
+                        m_buttons[CB_GripTouch].SetState(f_scores[CGestureMatcher::GT_LowerFist] >= 0.85f);
+                        m_buttons[CB_GripValue].SetValue(f_scores[CGestureMatcher::GT_LowerFist]);
+                        m_buttons[CB_GripForce].SetValue(f_scores[CGestureMatcher::GT_LowerFist] >= 0.85f ? (f_scores[CGestureMatcher::GT_LowerFist] - 0.85f) / 0.15f : 0.f);
                     }
                     if(CConfigHelper::IsButtonBEnabled())
                     {
-                        m_buttons[CB_IndexBTouch].SetState(f_scores[CGestureMatcher::Timeout] >= 0.5f);
-                        m_buttons[CB_IndexBClick].SetState(f_scores[CGestureMatcher::Timeout] >= 0.75f);
+                        m_buttons[CB_IndexBTouch].SetState(f_scores[CGestureMatcher::GT_Timeout] >= 0.5f);
+                        m_buttons[CB_IndexBClick].SetState(f_scores[CGestureMatcher::GT_Timeout] >= 0.75f);
                     }
                 }
             }
@@ -838,161 +838,164 @@ void CLeapHandController::ProcessIndexGestures(const Leap::Frame &f_frame, const
     // Update skeleton
     if(CConfigHelper::IsSkeletonEnabled())
     {
-        m_buttons[CB_FingerIndex].SetValue(f_scores[CGestureMatcher::IndexFinger_Index]);
-        m_buttons[CB_FingerMiddle].SetValue(f_scores[CGestureMatcher::IndexFinger_Middle]);
-        m_buttons[CB_FingerRing].SetValue(f_scores[CGestureMatcher::IndexFinger_Ring]);
-        m_buttons[CB_FingerPinky].SetValue(f_scores[CGestureMatcher::IndexFinger_Pinky]);
+        m_buttons[CB_FingerIndex].SetValue(f_scores[CGestureMatcher::GT_IndexFingerBend]);
+        m_buttons[CB_FingerMiddle].SetValue(f_scores[CGestureMatcher::GT_MiddleFingerBend]);
+        m_buttons[CB_FingerRing].SetValue(f_scores[CGestureMatcher::GT_RingFingerBend]);
+        m_buttons[CB_FingerPinky].SetValue(f_scores[CGestureMatcher::GT_PinkyFingerBend]);
 
         for(Leap::Hand l_hand : f_frame.hands())
         {
-            if(l_hand.isValid() && ((l_hand.isLeft() && (m_handAssigment == CHA_Left)) || (l_hand.isRight() && (m_handAssigment == CHA_Right))))
+            if(l_hand.isValid())
             {
-                // Update rotations
-                glm::mat4 l_handMat;
-                Leap::Matrix l_leapMat = l_hand.basis();
-                ConvertMatrix(l_leapMat, l_handMat);
-                glm::mat4 l_handMatInv = glm::inverse(l_handMat);
-
-                for(Leap::Finger l_finger : l_hand.fingers())
+                if((l_hand.isLeft() && (m_handAssigment == CHA_Left)) || (l_hand.isRight() && (m_handAssigment == CHA_Right)))
                 {
-                    if(l_finger.isValid())
+                    // Update rotations
+                    glm::mat4 l_handMat;
+                    Leap::Matrix l_leapMat = l_hand.basis();
+                    ConvertMatrix(l_leapMat, l_handMat);
+                    glm::mat4 l_handMatInv = glm::inverse(l_handMat);
+
+                    for(Leap::Finger l_finger : l_hand.fingers())
                     {
-                        size_t l_transformIndex = 0U;
-                        switch(l_finger.type())
+                        if(l_finger.isValid())
                         {
-                            case Leap::Finger::TYPE_INDEX:
-                                l_transformIndex = HSB_IndexFinger1;
-                                break;
-                            case Leap::Finger::TYPE_MIDDLE:
-                                l_transformIndex = HSB_MiddleFinger1;
-                                break;
-                            case Leap::Finger::TYPE_PINKY:
-                                l_transformIndex = HSB_PinkyFinger1;
-                                break;
-                            case Leap::Finger::TYPE_RING:
-                                l_transformIndex = HSB_RingFinger1;
-                                break;
-                            case Leap::Finger::TYPE_THUMB:
-                                l_transformIndex = HSB_Thumb0;
-                                break;
-                        }
-
-                        glm::mat4 l_boneMat;
-                        glm::quat l_result;
-
-                        // Segment 1
-                        l_leapMat = l_finger.bone(Leap::Bone::TYPE_PROXIMAL).basis();
-                        ConvertMatrix(l_leapMat, l_boneMat);
-                        l_result = l_boneMat*l_handMatInv;
-                        if(l_finger.type() == Leap::Finger::TYPE_THUMB)
-                        {
-                            if(m_handAssigment == CHA_Left) l_result = glm::rotate(l_result, glm::pi<float>(), g_axisX);
-                            else
+                            size_t l_transformIndex = 0U;
+                            switch(l_finger.type())
                             {
-                                l_result.w *= -1.f;
-                                l_result.z *= -1.f;
-                                l_result = glm::rotate(l_result, glm::pi<float>(), g_axisY);
+                                case Leap::Finger::TYPE_INDEX:
+                                    l_transformIndex = HSB_IndexFinger1;
+                                    break;
+                                case Leap::Finger::TYPE_MIDDLE:
+                                    l_transformIndex = HSB_MiddleFinger1;
+                                    break;
+                                case Leap::Finger::TYPE_PINKY:
+                                    l_transformIndex = HSB_PinkyFinger1;
+                                    break;
+                                case Leap::Finger::TYPE_RING:
+                                    l_transformIndex = HSB_RingFinger1;
+                                    break;
+                                case Leap::Finger::TYPE_THUMB:
+                                    l_transformIndex = HSB_Thumb0;
+                                    break;
                             }
+
+                            glm::mat4 l_boneMat;
+                            glm::quat l_result;
+
+                            // Segment 1
+                            l_leapMat = l_finger.bone(Leap::Bone::TYPE_PROXIMAL).basis();
+                            ConvertMatrix(l_leapMat, l_boneMat);
+                            l_result = l_boneMat*l_handMatInv;
+                            if(l_finger.type() == Leap::Finger::TYPE_THUMB)
+                            {
+                                if(m_handAssigment == CHA_Left) l_result = glm::rotate(l_result, glm::pi<float>(), g_axisX);
+                                else
+                                {
+                                    l_result.w *= -1.f;
+                                    l_result.z *= -1.f;
+                                    l_result = glm::rotate(l_result, glm::pi<float>(), g_axisY);
+                                }
+                            }
+                            SwitchBoneAxes(l_result);
+                            ConvertQuaternion(l_result, m_boneTransform[l_transformIndex].orientation);
+
+                            // Segment 2
+                            glm::mat4 l_inversedProximal = glm::inverse(l_boneMat);
+                            l_leapMat = l_finger.bone(Leap::Bone::TYPE_INTERMEDIATE).basis();
+                            ConvertMatrix(l_leapMat, l_boneMat);
+                            l_result = l_boneMat*l_inversedProximal;
+                            SwitchBoneAxes(l_result);
+                            ConvertQuaternion(l_result, m_boneTransform[l_transformIndex + 1U].orientation);
+
+                            // Segment 3
+                            glm::mat4 l_inversedIntermediate = glm::inverse(l_boneMat);
+                            l_leapMat = l_finger.bone(Leap::Bone::TYPE_DISTAL).basis();
+                            ConvertMatrix(l_leapMat, l_boneMat);
+                            l_result = l_boneMat*l_inversedIntermediate;
+                            SwitchBoneAxes(l_result);
+                            ConvertQuaternion(l_result, m_boneTransform[l_transformIndex + 2U].orientation);
                         }
-                        SwitchBoneAxes(l_result);
-                        ConvertQuaternion(l_result, m_boneTransform[l_transformIndex].orientation);
-
-                        // Segment 2
-                        glm::mat4 l_inversedProximal = glm::inverse(l_boneMat);
-                        l_leapMat = l_finger.bone(Leap::Bone::TYPE_INTERMEDIATE).basis();
-                        ConvertMatrix(l_leapMat, l_boneMat);
-                        l_result = l_boneMat*l_inversedProximal;
-                        SwitchBoneAxes(l_result);
-                        ConvertQuaternion(l_result, m_boneTransform[l_transformIndex + 1U].orientation);
-
-                        // Segment 3
-                        glm::mat4 l_inversedIntermediate = glm::inverse(l_boneMat);
-                        l_leapMat = l_finger.bone(Leap::Bone::TYPE_DISTAL).basis();
-                        ConvertMatrix(l_leapMat, l_boneMat);
-                        l_result = l_boneMat*l_inversedIntermediate;
-                        SwitchBoneAxes(l_result);
-                        ConvertQuaternion(l_result, m_boneTransform[l_transformIndex + 2U].orientation);
                     }
+
+                    // Update aux bones
+                    glm::vec3 l_position;
+                    glm::quat l_rotation;
+                    ConvertVector3(m_boneTransform[HSB_Wrist].position, l_position);
+                    ConvertQuaternion(m_boneTransform[HSB_Wrist].orientation, l_rotation);
+                    glm::mat4 l_wristMat = glm::translate(g_identityMatrix, l_position) * glm::mat4_cast(l_rotation);
+
+                    // Thumb aux
+                    glm::mat4 l_chainMat(l_wristMat);
+                    for(size_t i = HSB_Thumb0; i < HSB_Thumb3; i++)
+                    {
+                        ConvertVector3(m_boneTransform[i].position, l_position);
+                        ConvertQuaternion(m_boneTransform[i].orientation, l_rotation);
+                        l_chainMat = l_chainMat*(glm::translate(g_identityMatrix, l_position)*glm::mat4_cast(l_rotation));
+                    }
+                    l_position = l_chainMat*g_zeroPoint;
+                    l_rotation = glm::quat_cast(l_chainMat);
+                    if(m_handAssigment == CHA_Left) FixAuxBoneTransformation(l_position, l_rotation);
+                    ConvertVector3(l_position, m_boneTransform[HSB_Aux_Thumb].position);
+                    ConvertQuaternion(l_rotation, m_boneTransform[HSB_Aux_Thumb].orientation);
+
+                    // Index aux
+                    std::memcpy(&l_chainMat, &l_wristMat, sizeof(glm::mat4));
+                    for(size_t i = HSB_IndexFinger0; i < HSB_IndexFinger4; i++)
+                    {
+                        ConvertVector3(m_boneTransform[i].position, l_position);
+                        ConvertQuaternion(m_boneTransform[i].orientation, l_rotation);
+                        l_chainMat = l_chainMat*(glm::translate(g_identityMatrix, l_position)*glm::mat4_cast(l_rotation));
+                    }
+                    l_position = l_chainMat*g_zeroPoint;
+                    l_rotation = glm::quat_cast(l_chainMat);
+                    if(m_handAssigment == CHA_Left) FixAuxBoneTransformation(l_position, l_rotation);
+                    ConvertVector3(l_position, m_boneTransform[HSB_Aux_IndexFinger].position);
+                    ConvertQuaternion(l_rotation, m_boneTransform[HSB_Aux_IndexFinger].orientation);
+
+                    // Middle aux
+                    std::memcpy(&l_chainMat, &l_wristMat, sizeof(glm::mat4));
+                    for(size_t i = HSB_MiddleFinger0; i < HSB_MiddleFinger4; i++)
+                    {
+                        ConvertVector3(m_boneTransform[i].position, l_position);
+                        ConvertQuaternion(m_boneTransform[i].orientation, l_rotation);
+                        l_chainMat = l_chainMat*(glm::translate(g_identityMatrix, l_position)*glm::mat4_cast(l_rotation));
+                    }
+                    l_position = l_chainMat*g_zeroPoint;
+                    l_rotation = glm::quat_cast(l_chainMat);
+                    if(m_handAssigment == CHA_Left) FixAuxBoneTransformation(l_position, l_rotation);
+                    ConvertVector3(l_position, m_boneTransform[HSB_Aux_MiddleFinger].position);
+                    ConvertQuaternion(l_rotation, m_boneTransform[HSB_Aux_MiddleFinger].orientation);
+
+                    // Ring aux
+                    std::memcpy(&l_chainMat, &l_wristMat, sizeof(glm::mat4));
+                    for(size_t i = HSB_RingFinger0; i < HSB_RingFinger4; i++)
+                    {
+                        ConvertVector3(m_boneTransform[i].position, l_position);
+                        ConvertQuaternion(m_boneTransform[i].orientation, l_rotation);
+                        l_chainMat = l_chainMat*(glm::translate(g_identityMatrix, l_position)*glm::mat4_cast(l_rotation));
+                    }
+                    l_position = l_chainMat*g_zeroPoint;
+                    l_rotation = glm::quat_cast(l_chainMat);
+                    if(m_handAssigment == CHA_Left) FixAuxBoneTransformation(l_position, l_rotation);
+                    ConvertVector3(l_position, m_boneTransform[HSB_Aux_RingFinger].position);
+                    ConvertQuaternion(l_rotation, m_boneTransform[HSB_Aux_RingFinger].orientation);
+
+                    // Pinky aux
+                    std::memcpy(&l_chainMat, &l_wristMat, sizeof(glm::mat4));
+                    for(size_t i = HSB_PinkyFinger0; i < HSB_PinkyFinger4; i++)
+                    {
+                        ConvertVector3(m_boneTransform[i].position, l_position);
+                        ConvertQuaternion(m_boneTransform[i].orientation, l_rotation);
+                        l_chainMat = l_chainMat*(glm::translate(g_identityMatrix, l_position)*glm::mat4_cast(l_rotation));
+                    }
+                    l_position = l_chainMat*g_zeroPoint;
+                    l_rotation = glm::quat_cast(l_chainMat);
+                    if(m_handAssigment == CHA_Left) FixAuxBoneTransformation(l_position, l_rotation);
+                    ConvertVector3(l_position, m_boneTransform[HSB_Aux_PinkyFinger].position);
+                    ConvertQuaternion(l_rotation, m_boneTransform[HSB_Aux_PinkyFinger].orientation);
+
+                    break;
                 }
-
-                // Update aux bones
-                glm::vec3 l_position;
-                glm::quat l_rotation;
-                ConvertVector3(m_boneTransform[HSB_Wrist].position, l_position);
-                ConvertQuaternion(m_boneTransform[HSB_Wrist].orientation, l_rotation);
-                glm::mat4 l_wristMat = glm::translate(g_identityMatrix, l_position) * glm::mat4_cast(l_rotation);
-
-                // Thumb aux
-                glm::mat4 l_chainMat(l_wristMat);
-                for(size_t i = HSB_Thumb0; i < HSB_Thumb3; i++)
-                {
-                    ConvertVector3(m_boneTransform[i].position, l_position);
-                    ConvertQuaternion(m_boneTransform[i].orientation, l_rotation);
-                    l_chainMat = l_chainMat*(glm::translate(g_identityMatrix, l_position)*glm::mat4_cast(l_rotation));
-                }
-                l_position = l_chainMat*g_zeroPoint;
-                l_rotation = glm::quat_cast(l_chainMat);
-                if(m_handAssigment == CHA_Left) FixAuxBoneTransformation(l_position, l_rotation);
-                ConvertVector3(l_position, m_boneTransform[HSB_Aux_Thumb].position);
-                ConvertQuaternion(l_rotation, m_boneTransform[HSB_Aux_Thumb].orientation);
-
-                // Index aux
-                std::memcpy(&l_chainMat, &l_wristMat, sizeof(glm::mat4));
-                for(size_t i = HSB_IndexFinger0; i < HSB_IndexFinger4; i++)
-                {
-                    ConvertVector3(m_boneTransform[i].position, l_position);
-                    ConvertQuaternion(m_boneTransform[i].orientation, l_rotation);
-                    l_chainMat = l_chainMat*(glm::translate(g_identityMatrix, l_position)*glm::mat4_cast(l_rotation));
-                }
-                l_position = l_chainMat*g_zeroPoint;
-                l_rotation = glm::quat_cast(l_chainMat);
-                if(m_handAssigment == CHA_Left) FixAuxBoneTransformation(l_position, l_rotation);
-                ConvertVector3(l_position, m_boneTransform[HSB_Aux_IndexFinger].position);
-                ConvertQuaternion(l_rotation, m_boneTransform[HSB_Aux_IndexFinger].orientation);
-
-                // Middle aux
-                std::memcpy(&l_chainMat, &l_wristMat, sizeof(glm::mat4));
-                for(size_t i = HSB_MiddleFinger0; i < HSB_MiddleFinger4; i++)
-                {
-                    ConvertVector3(m_boneTransform[i].position, l_position);
-                    ConvertQuaternion(m_boneTransform[i].orientation, l_rotation);
-                    l_chainMat = l_chainMat*(glm::translate(g_identityMatrix, l_position)*glm::mat4_cast(l_rotation));
-                }
-                l_position = l_chainMat*g_zeroPoint;
-                l_rotation = glm::quat_cast(l_chainMat);
-                if(m_handAssigment == CHA_Left) FixAuxBoneTransformation(l_position, l_rotation);
-                ConvertVector3(l_position, m_boneTransform[HSB_Aux_MiddleFinger].position);
-                ConvertQuaternion(l_rotation, m_boneTransform[HSB_Aux_MiddleFinger].orientation);
-
-                // Ring aux
-                std::memcpy(&l_chainMat, &l_wristMat, sizeof(glm::mat4));
-                for(size_t i = HSB_RingFinger0; i < HSB_RingFinger4; i++)
-                {
-                    ConvertVector3(m_boneTransform[i].position, l_position);
-                    ConvertQuaternion(m_boneTransform[i].orientation, l_rotation);
-                    l_chainMat = l_chainMat*(glm::translate(g_identityMatrix, l_position)*glm::mat4_cast(l_rotation));
-                }
-                l_position = l_chainMat*g_zeroPoint;
-                l_rotation = glm::quat_cast(l_chainMat);
-                if(m_handAssigment == CHA_Left) FixAuxBoneTransformation(l_position, l_rotation);
-                ConvertVector3(l_position, m_boneTransform[HSB_Aux_RingFinger].position);
-                ConvertQuaternion(l_rotation, m_boneTransform[HSB_Aux_RingFinger].orientation);
-
-                // Pinky aux
-                std::memcpy(&l_chainMat, &l_wristMat, sizeof(glm::mat4));
-                for(size_t i = HSB_PinkyFinger0; i < HSB_PinkyFinger4; i++)
-                {
-                    ConvertVector3(m_boneTransform[i].position, l_position);
-                    ConvertQuaternion(m_boneTransform[i].orientation, l_rotation);
-                    l_chainMat = l_chainMat*(glm::translate(g_identityMatrix, l_position)*glm::mat4_cast(l_rotation));
-                }
-                l_position = l_chainMat*g_zeroPoint;
-                l_rotation = glm::quat_cast(l_chainMat);
-                if(m_handAssigment == CHA_Left) FixAuxBoneTransformation(l_position, l_rotation);
-                ConvertVector3(l_position, m_boneTransform[HSB_Aux_PinkyFinger].position);
-                ConvertQuaternion(l_rotation, m_boneTransform[HSB_Aux_PinkyFinger].orientation);
-
-                break;
             }
         }
     }

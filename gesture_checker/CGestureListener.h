@@ -15,5 +15,5 @@ public:
     virtual void onServiceDisconnect(const Leap::Controller&);
     virtual void onServiceChange(const Leap::Controller&);
     virtual void onDeviceFailure(const Leap::Controller&);
-    virtual void onLogMessage(const Leap::Controller&, Leap::MessageSeverity s, int64_t t, const char* msg);
+    virtual void onLogMessage(const Leap::Controller&, Leap::MessageSeverity severity, int64_t timestamp, const char* msg);
 };
