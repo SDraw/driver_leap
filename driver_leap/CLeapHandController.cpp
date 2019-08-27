@@ -93,8 +93,15 @@ CLeapHandController::CLeapHandController(vr::IVRServerDriverHost* f_driverHost, 
     m_handAssigment = f_hand;
     m_trackedDeviceID = vr::k_unTrackedDeviceIndexInvalid;
 
-    m_serialNumber.assign("leap_");
-    m_serialNumber.append((m_handAssigment == CHA_Left) ? "lefthand" : "righthand");
+    switch(CConfigHelper::GetEmulatedController())
+    {
+        case CConfigHelper::EC_Vive:
+            m_serialNumber.assign((m_handAssigment == CHA_Left) ? "LHR-F94B3BD8" : "LHR-F94B3BD9");
+            break;
+        case CConfigHelper::EC_Index:
+            m_serialNumber.assign((m_handAssigment == CHA_Left) ? "LHR-E217CD00" : "LHR-E217CD01");
+            break;
+    }
     m_propertyContainer = vr::k_ulInvalidPropertyContainer;
 
     glm::vec3 l_eulerOffsetRot(CConfigHelper::GetRotationOffsetX(), CConfigHelper::GetRotationOffsetY(), CConfigHelper::GetRotationOffsetZ());
@@ -163,6 +170,7 @@ vr::EVRInitError CLeapHandController::Activate(uint32_t unObjectId)
 
     // Shared properties
     l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_TrackingSystemName_String, "lighthouse");
+    l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_SerialNumber_String, m_serialNumber.c_str());
     l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_WillDriftInYaw_Bool, false);
     l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_DeviceIsWireless_Bool, true);
     l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_DeviceIsCharging_Bool, false);
@@ -195,7 +203,7 @@ vr::EVRInitError CLeapHandController::Activate(uint32_t unObjectId)
         case CConfigHelper::EC_Vive:
         {
             l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ModelNumber_String, "Vive. Controller MV");
-            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_SerialNumber_String, (m_handAssigment == CHA_Left) ? "LHR-F94B3BD8" : "LHR-F94B3BD9"); // Changed
+            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_SerialNumber_String, m_serialNumber.c_str()); // Changed
             l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_RenderModelName_String, "vr_controller_vive_1_5");
             l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ManufacturerName_String, "HTC");
             l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_TrackingFirmwareVersion_String, "1533720215 htcvrsoftware@firmware-win32 2018-08-08 FPGA 262(1.6/0/0) BL 0 VRC 1533720214 Radio 1532585738");
@@ -207,7 +215,6 @@ vr::EVRInitError CLeapHandController::Activate(uint32_t unObjectId)
             l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_VRCVersion_Uint64, 1533720214U);
             l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_RadioVersion_Uint64, 1532585738U);
             l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_DongleVersion_Uint64, 1461100729U);
-            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_Firmware_ProgrammingTarget_String, (m_handAssigment == CHA_Left) ? "LHR-F94B3BD8" : "LHR-F94B3BD9"); // Changed
             l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ResourceRoot_String, "htc");
             l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_RegisteredDeviceType_String, (m_handAssigment == CHA_Left) ? "htc/vive_controllerLHR-F94B3BD8" : "htc/vive_controllerLHR-F94B3BD9"); // Changed
             l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_InputProfilePath_String, "{htc}/input/vive_controller_profile.json");
@@ -225,7 +232,6 @@ vr::EVRInitError CLeapHandController::Activate(uint32_t unObjectId)
         case CConfigHelper::EC_Index:
         {
             l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ModelNumber_String, (m_handAssigment == CHA_Left) ? "Knuckles Left" : "Knuckles Right");
-            l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_SerialNumber_String, (m_handAssigment == CHA_Left) ? "LHR-E217CD00" : "LHR-E217CD01"); // Changed
             l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_RenderModelName_String, (m_handAssigment == CHA_Left) ? "{indexcontroller}valve_controller_knu_1_0_left" : "{indexcontroller}valve_controller_knu_1_0_right");
             l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ManufacturerName_String, "Valve");
             l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_TrackingFirmwareVersion_String, "1562916277 watchman@ValveBuilder02 2019-07-12 FPGA 538(2.26/10/2) BL 0 VRC 1562916277 Radio 1562882729");
@@ -490,12 +496,12 @@ void CLeapHandController::SetAsDisconnected()
 
 void CLeapHandController::Update(const Leap::Frame &f_frame)
 {
-    UpdateTrasnformation(f_frame);
+    UpdateTransformation(f_frame);
     UpdateGestures(f_frame);
     UpdateInput();
 }
 
-void CLeapHandController::UpdateTrasnformation(const Leap::Frame &f_frame)
+void CLeapHandController::UpdateTransformation(const Leap::Frame &f_frame)
 {
     if(m_trackedDeviceID != vr::k_unTrackedDeviceIndexInvalid)
     {

@@ -138,13 +138,13 @@ class CLeapHandController : public vr::ITrackedDeviceServerDriver
     static double ms_headPos[3];
     static vr::HmdQuaternion_t ms_headRot;
 
-    void UpdateTrasnformation(const Leap::Frame &f_frame);
-    void UpdateInput();
+    void UpdateTransformation(const Leap::Frame &f_frame);
 
     void UpdateGestures(const Leap::Frame &f_frame);
     void ProcessViveGestures(const std::vector<float> &f_scores);
     void ProcessIndexGestures(const Leap::Frame &f_frame, const std::vector<float> &f_scores);
 
+    void UpdateInput();
     void ResetControls();
 public:
     enum EControllerHandAssignment : unsigned char
