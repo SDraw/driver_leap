@@ -3,14 +3,14 @@
 
 #define HMD_DLL_EXPORT extern "C" __declspec( dllexport )
 
-char g_moduleFileName[2048];
+char g_moduleFilePath[2048U];
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID /* lpReserved */)
 {
     switch(ul_reason_for_call)
     {
         case DLL_PROCESS_ATTACH:
-            GetModuleFileNameA(hModule, g_moduleFileName, 2048);
+            GetModuleFileNameA(hModule, g_moduleFilePath, 2048U);
             break;
         case DLL_THREAD_ATTACH: case DLL_THREAD_DETACH: case DLL_PROCESS_DETACH:
             break;
@@ -22,9 +22,11 @@ CServerDriver g_serverDriver;
 
 HMD_DLL_EXPORT void* HmdDriverFactory(const char *pInterfaceName, int *pReturnCode)
 {
-    if(!strcmp(vr::IServerTrackedDeviceProvider_Version, pInterfaceName)) return &g_serverDriver;
-
-    if(pReturnCode) *pReturnCode = vr::VRInitError_Init_InterfaceNotFound;
-
-    return nullptr;
+    void *l_result = nullptr;
+    if(!strcmp(vr::IServerTrackedDeviceProvider_Version, pInterfaceName)) l_result = &g_serverDriver;
+    else
+    {
+        if(pReturnCode) *pReturnCode = vr::VRInitError_Init_InterfaceNotFound;
+    }
+    return l_result;
 }

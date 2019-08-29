@@ -163,9 +163,9 @@ public:
     virtual void DebugRequest(const char* pchRequest, char* pchResponseBuffer, uint32_t unResponseBufferSize);
     virtual vr::DriverPose_t GetPose();
     virtual void EnterStandby() {};
-    const char* GetSerialNumber() const;
 
-    void SetAsDisconnected();
+    inline const std::string& GetSerialNumber() const { return m_serialNumber; }
+    void SetConnectionState(bool f_state);
     void Update(const Leap::Frame& f_frame);
-    static void UpdateHMDCoordinates(vr::IVRServerDriverHost *f_host);
+    static void UpdateHMDCoordinates(const vr::TrackedDevicePose_t &f_pose);
 };

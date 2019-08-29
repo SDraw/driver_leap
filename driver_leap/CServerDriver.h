@@ -19,7 +19,7 @@ class CServerDriver : public vr::IServerTrackedDeviceProvider
     std::vector<CLeapHandController*> m_handControllers;
     Leap::Controller *m_leapController;
     CLeapListener m_leapListener;
-    bool m_updatedVRConnectivity;
+    bool m_controllerState;
 
     void LaunchLeapMonitor();
 public:

@@ -5,7 +5,7 @@
 #include "CLeapHandController.h"
 #include "Utils.h"
 
-extern char g_moduleFileName[];
+extern char g_moduleFilePath[];
 
 void CLeapListener::onInit(const Leap::Controller &controller)
 {
@@ -27,7 +27,7 @@ CServerDriver::CServerDriver()
     m_driverHost = nullptr;
     m_leapController = nullptr;
     memset(&m_processInfo, 0, sizeof(PROCESS_INFORMATION));
-    m_updatedVRConnectivity = false;
+    m_controllerState = false;
     m_leapMonitorLaunched = false;
 }
 
@@ -35,6 +35,7 @@ CServerDriver::~CServerDriver()
 {
 }
 
+// vr::IServerTrackedDeviceProvider
 vr::EVRInitError CServerDriver::Init(vr::IVRDriverContext *pDriverContext)
 {
     CConfigHelper::LoadConfig();
@@ -49,13 +50,13 @@ vr::EVRInitError CServerDriver::Init(vr::IVRDriverContext *pDriverContext)
     {
         CLeapHandController *l_leftHandController = new CLeapHandController(m_driverHost, CLeapHandController::CHA_Left);
         m_handControllers.push_back(l_leftHandController);
-        if(m_driverHost) m_driverHost->TrackedDeviceAdded(l_leftHandController->GetSerialNumber(), vr::ETrackedDeviceClass::TrackedDeviceClass_Controller, l_leftHandController);
+        if(m_driverHost) m_driverHost->TrackedDeviceAdded(l_leftHandController->GetSerialNumber().c_str(), vr::ETrackedDeviceClass::TrackedDeviceClass_Controller, l_leftHandController);
     }
     if(CConfigHelper::IsRightHandEnabled())
     {
         CLeapHandController *l_rightHandController = new CLeapHandController(m_driverHost, CLeapHandController::CHA_Right);
         m_handControllers.push_back(l_rightHandController);
-        if(m_driverHost) m_driverHost->TrackedDeviceAdded(l_rightHandController->GetSerialNumber(), vr::ETrackedDeviceClass::TrackedDeviceClass_Controller, l_rightHandController);
+        if(m_driverHost) m_driverHost->TrackedDeviceAdded(l_rightHandController->GetSerialNumber().c_str(), vr::ETrackedDeviceClass::TrackedDeviceClass_Controller, l_rightHandController);
     }
 
     m_leapController = new Leap::Controller();
@@ -73,11 +74,11 @@ void CServerDriver::Cleanup()
 
     if(m_leapMonitorLaunched)
     {
-        PostThreadMessage(m_processInfo.dwThreadId, WM_QUIT, 0, 0);
+        PostThreadMessageA(m_processInfo.dwThreadId, WM_QUIT, 0, 0);
         m_leapMonitorLaunched = false;
     }
 
-    for(auto iter : m_handControllers) delete iter;
+    for(auto l_handController : m_handControllers) delete l_handController;
     m_handControllers.clear();
 
     if(m_leapController)
@@ -88,6 +89,8 @@ void CServerDriver::Cleanup()
     }
 
     m_driverHost = nullptr;
+
+    VR_CLEANUP_SERVER_DRIVER_CONTEXT();
 }
 
 const char* const* CServerDriver::GetInterfaceVersions()
@@ -97,26 +100,24 @@ const char* const* CServerDriver::GetInterfaceVersions()
 
 void CServerDriver::RunFrame()
 {
-    CLeapHandController::UpdateHMDCoordinates(m_driverHost);
+    vr::TrackedDevicePose_t l_hmdPose;
+    m_driverHost->GetRawTrackedDevicePoses(0.f, &l_hmdPose, 1U); // HMD has device ID 0
+    CLeapHandController::UpdateHMDCoordinates(l_hmdPose);
 
     if(m_leapController)
     {
-        if(m_leapController->isConnected())
+        bool l_controllerState = m_leapController->isConnected();
+        if(m_controllerState != l_controllerState)
         {
-            m_updatedVRConnectivity = false;
-
+            m_controllerState = l_controllerState;
+            for(auto l_handController : m_handControllers) l_handController->SetConnectionState(m_controllerState);
+        }
+        if(m_controllerState)
+        {
             Leap::Frame l_frame = m_leapController->frame();
             if(l_frame.isValid())
             {
-                for(auto iter : m_handControllers) iter->Update(l_frame);
-            }
-        }
-        else
-        {
-            if(!m_updatedVRConnectivity)
-            {
-                for(auto iter : m_handControllers) iter->SetAsDisconnected();
-                m_updatedVRConnectivity = true;
+                for(auto l_handController : m_handControllers) l_handController->Update(l_frame);
             }
         }
     }
@@ -131,12 +132,14 @@ void CServerDriver::LaunchLeapMonitor()
 {
     if(!m_leapMonitorLaunched)
     {
-        std::string path(g_moduleFileName);
-        path.erase(path.begin() + path.rfind('\\'), path.end());
+        std::string l_path(g_moduleFilePath);
+        l_path.erase(l_path.begin() + l_path.rfind('\\'), l_path.end());
 
-        m_leapMonitorLaunched = true;
-        STARTUPINFOA sInfoProcess = { 0 };
-        sInfoProcess.cb = sizeof(STARTUPINFOW);
-        CreateProcessA((path + "\\leap_monitor.exe").c_str(), NULL, NULL, NULL, FALSE, 0, NULL, path.c_str(), &sInfoProcess, &m_processInfo);
+        std::string l_appPath(l_path);
+        l_appPath.append("\\leap_monitor.exe");
+
+        STARTUPINFOA l_infoProcess = { 0 };
+        l_infoProcess.cb = sizeof(STARTUPINFOA);
+        m_leapMonitorLaunched = CreateProcessA(l_appPath.c_str(), NULL, NULL, NULL, FALSE, 0, NULL, l_path.c_str(), &l_infoProcess, &m_processInfo);
     }
 }

@@ -2,7 +2,7 @@
 #include "CConfigHelper.h"
 #include "Utils.h"
 
-extern char g_moduleFileName[];
+extern char g_moduleFilePath[];
 
 unsigned char CConfigHelper::ms_emulatedController = CConfigHelper::EC_Vive;
 bool CConfigHelper::ms_leftHand = true;
@@ -76,7 +76,7 @@ const std::vector<std::string> g_trackingLevelsTable
 
 void CConfigHelper::LoadConfig()
 {
-    std::string l_path(g_moduleFileName);
+    std::string l_path(g_moduleFilePath);
     l_path.erase(l_path.begin() + l_path.rfind('\\'), l_path.end());
     l_path.append("\\..\\..\\cfg\\control_config.xml");
 

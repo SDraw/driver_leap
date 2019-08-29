@@ -2,7 +2,7 @@
     <param name="emulated_controller" value="vive"/> <!--"vive" or "index"-->
     <param name="rightHand" value="true"/>
     <param name="leftHand" value="true"/>
-    <param name="orientation" value="desktop"/> <!--"hmd" or "desktop"-->
+    <param name="orientation" value="hmd"/> <!--"hmd" or "desktop"-->
     <param name="desktopRoot" value="0.0 -0.5 -0.5"/> <!--Only in desktop orientation-->
     <param name="rotationOffset" value="0.0 0.0 0.0"/> <!--Euler angle in radians-->
     <param name="skeleton" value="true"/> <!--Only Index controller-->
