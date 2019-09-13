@@ -20,7 +20,7 @@ Fork with updated vendor libraries and extended features.
   ```
 
 ### Building (for developers)
-* Open solution in Visual Studio 2013/2015/2017
+* Open solution in Visual Studio 2013
 * Build your platform:
   * x64 - build output is in '<solution_folder>/x64'
   * x86 - build output is in '<solution_folder>/Win32'
