@@ -29,7 +29,7 @@ Fork with updated vendor libraries and extended features.
   * gesture_checker.exe
   * leap_monitor.exe
 * Copy additional shared libraries to '<base_project_installation_folder>/leap/bin/<your_platform>':
-  * vendor/LeapSDK/lib/<your_platform>/LeapC.dll
+  * vendor/LeapSDK/bin/<your_platform>/LeapC.dll
   * vendor/openvr/bin/<your_platform>/openvr_api.dll
 * Copy 'control_config.xml' from solution root to '<base_project_installation_folder>/leap/cfg'
   
