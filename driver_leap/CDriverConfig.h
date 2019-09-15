@@ -1,6 +1,6 @@
 #pragma once
 
-class CConfigHelper
+class CDriverConfig
 {
     static unsigned char ms_emulatedController;
     static bool ms_leftHand;

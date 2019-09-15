@@ -174,7 +174,7 @@ void CLeapMonitor::Run()
                 m_specialCombinationState = l_combinationState;
                 if(m_specialCombinationState)
                 {
-                    SendSpecialCommand("game vrchat drawing_mode");
+                    SendCommand("game vrchat drawing_mode");
                     std::string l_message("VRChat drawing mode toggled");
                     SendNotification(l_message);
                 }
@@ -271,7 +271,7 @@ void CLeapMonitor::UpdateGameProfile(const char *f_appKey)
     }
 }
 
-void CLeapMonitor::SendSpecialCommand(const char *f_char)
+void CLeapMonitor::SendCommand(const char *f_char)
 {
     char l_response[32U];
     for(auto l_device : m_leapDevices) m_vrDebug->DriverDebugRequest(l_device, f_char, l_response, 32U);

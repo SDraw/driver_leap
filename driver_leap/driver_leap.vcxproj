@@ -83,12 +83,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <GenerateManifest>false</GenerateManifest>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
-    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <GenerateManifest>false</GenerateManifest>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
-    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -115,7 +115,7 @@
       </Outputs>
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>copy /y "$(TargetPath)" "C:\Program Files\SteamVR Leap Motion driver\leap\bin\Win32\$(TargetFileName)"</Command>
+      <Command>copy /y "$(TargetPath)" "C:\Program Files (x86)\Steam\steamapps\common\SteamVR\drivers\leap\bin\win32\$(TargetFileName)"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Install Binary</Message>
@@ -147,7 +147,7 @@
       </Outputs>
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>copy /y "$(TargetPath)" "C:\Program Files\SteamVR Leap Motion driver\leap\bin\Win32\$(TargetFileName)"</Command>
+      <Command>copy /y "$(TargetPath)" "C:\Program Files (x86)\Steam\steamapps\common\SteamVR\drivers\leap\bin\win32\$(TargetFileName)"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Install Binary</Message>
@@ -194,7 +194,7 @@
       <Message />
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>copy /y "$(TargetPath)" "C:\Program Files\SteamVR Leap Motion driver\leap\bin\Win64\$(TargetFileName)"</Command>
+      <Command>copy /y "$(TargetPath)" "C:\Program Files (x86)\Steam\steamapps\common\SteamVR\drivers\leap\bin\win64\$(TargetFileName)"</Command>
       <Message>Install Binary</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -218,15 +218,15 @@
       <Message />
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>copy /y "$(TargetPath)" "C:\Program Files\SteamVR Leap Motion driver\leap\bin\Win64\$(TargetFileName)"</Command>
+      <Command>copy /y "$(TargetPath)" "C:\Program Files (x86)\Steam\steamapps\common\SteamVR\drivers\leap\bin\win64\$(TargetFileName)"</Command>
       <Message>Install Binary</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="CConfigHelper.h" />
+    <ClInclude Include="CDriverConfig.h" />
     <ClInclude Include="CLeapHandController.h" />
     <ClInclude Include="CServerDriver.h" />
-    <ClInclude Include="CDriverLogHelper.h" />
+    <ClInclude Include="CDriverLog.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
@@ -238,10 +238,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="CConfigHelper.cpp" />
+    <ClCompile Include="CDriverConfig.cpp" />
     <ClCompile Include="CLeapHandController.cpp" />
     <ClCompile Include="CServerDriver.cpp" />
-    <ClCompile Include="CDriverLogHelper.cpp" />
+    <ClCompile Include="CDriverLog.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "CServerDriver.h"
-#include "CDriverLogHelper.h"
-#include "CConfigHelper.h"
+#include "CDriverConfig.h"
+#include "CDriverLog.h"
 #include "CLeapHandController.h"
 #include "Utils.h"
 
@@ -12,7 +12,7 @@ void CLeapListener::onInit(const Leap::Controller &controller)
 }
 void CLeapListener::onLogMessage(const Leap::Controller &controller, Leap::MessageSeverity severity, int64_t timestamp, const char *msg)
 {
-    CDriverLogHelper::DriverLog("(%d) - %s\n", static_cast<int>(severity), msg);
+    CDriverLog::Log("(%d) - %s\n", static_cast<int>(severity), msg);
 }
 
 
@@ -38,21 +38,21 @@ CServerDriver::~CServerDriver()
 // vr::IServerTrackedDeviceProvider
 vr::EVRInitError CServerDriver::Init(vr::IVRDriverContext *pDriverContext)
 {
-    CConfigHelper::LoadConfig();
+    CDriverConfig::LoadConfig();
 
     VR_INIT_SERVER_DRIVER_CONTEXT(pDriverContext);
-    CDriverLogHelper::InitDriverLog(vr::VRDriverLog());
+    CDriverLog::Init(vr::VRDriverLog());
 
     m_driverHost = vr::VRServerDriverHost();
 
     // Generate VR controllers, serials are stored for whole VR session
-    if(CConfigHelper::IsLeftHandEnabled())
+    if(CDriverConfig::IsLeftHandEnabled())
     {
         CLeapHandController *l_leftHandController = new CLeapHandController(m_driverHost, CLeapHandController::CHA_Left);
         m_handControllers.push_back(l_leftHandController);
         if(m_driverHost) m_driverHost->TrackedDeviceAdded(l_leftHandController->GetSerialNumber().c_str(), vr::ETrackedDeviceClass::TrackedDeviceClass_Controller, l_leftHandController);
     }
-    if(CConfigHelper::IsRightHandEnabled())
+    if(CDriverConfig::IsRightHandEnabled())
     {
         CLeapHandController *l_rightHandController = new CLeapHandController(m_driverHost, CLeapHandController::CHA_Right);
         m_handControllers.push_back(l_rightHandController);
@@ -61,7 +61,7 @@ vr::EVRInitError CServerDriver::Init(vr::IVRDriverContext *pDriverContext)
 
     m_leapController = new Leap::Controller();
     m_leapController->addListener(m_leapListener);
-    if(CConfigHelper::GetOrientationMode() == CConfigHelper::OM_HMD) m_leapController->setPolicy(Leap::Controller::POLICY_OPTIMIZE_HMD);
+    if(CDriverConfig::GetOrientationMode() == CDriverConfig::OM_HMD) m_leapController->setPolicy(Leap::Controller::POLICY_OPTIMIZE_HMD);
 
     LaunchLeapMonitor();
 
@@ -70,7 +70,7 @@ vr::EVRInitError CServerDriver::Init(vr::IVRDriverContext *pDriverContext)
 
 void CServerDriver::Cleanup()
 {
-    CDriverLogHelper::CleanupDriverLog();
+    CDriverLog::Cleanup();
 
     if(m_leapMonitorLaunched)
     {

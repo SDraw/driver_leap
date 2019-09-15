@@ -11,5 +11,4 @@
 #include <atomic>
 
 #include "openvr.h"
-
 #include "LeapC++.h"

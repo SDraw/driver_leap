@@ -1,8 +1,7 @@
 #include "stdafx.h"
 #include "CLeapHandController.h"
-#include "CConfigHelper.h"
+#include "CDriverConfig.h"
 #include "CGestureMatcher.h"
-#include "CDriverLogHelper.h"
 #include "Utils.h"
 
 extern char g_moduleFileName[];
@@ -93,18 +92,18 @@ CLeapHandController::CLeapHandController(vr::IVRServerDriverHost* f_driverHost, 
     m_handAssigment = f_hand;
     m_trackedDeviceID = vr::k_unTrackedDeviceIndexInvalid;
 
-    switch(CConfigHelper::GetEmulatedController())
+    switch(CDriverConfig::GetEmulatedController())
     {
-        case CConfigHelper::EC_Vive:
+        case CDriverConfig::EC_Vive:
             m_serialNumber.assign((m_handAssigment == CHA_Left) ? "LHR-F94B3BD8" : "LHR-F94B3BD9");
             break;
-        case CConfigHelper::EC_Index:
+        case CDriverConfig::EC_Index:
             m_serialNumber.assign((m_handAssigment == CHA_Left) ? "LHR-E217CD00" : "LHR-E217CD01");
             break;
     }
     m_propertyContainer = vr::k_ulInvalidPropertyContainer;
 
-    glm::vec3 l_eulerOffsetRot(CConfigHelper::GetRotationOffsetX(), CConfigHelper::GetRotationOffsetY(), CConfigHelper::GetRotationOffsetZ());
+    glm::vec3 l_eulerOffsetRot(CDriverConfig::GetRotationOffsetX(), CDriverConfig::GetRotationOffsetY(), CDriverConfig::GetRotationOffsetZ());
     if(m_handAssigment == CHA_Right)
     {
         // Only X axis isn't inverted for right controller
@@ -202,9 +201,9 @@ vr::EVRInitError CLeapHandController::Activate(uint32_t unObjectId)
         l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_ControllerHandSelectionPriority_Int32, 0);
 
         // Specific properties
-        switch(CConfigHelper::GetEmulatedController())
+        switch(CDriverConfig::GetEmulatedController())
         {
-            case CConfigHelper::EC_Vive:
+            case CDriverConfig::EC_Vive:
             {
                 l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ModelNumber_String, "Vive. Controller MV");
                 l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_SerialNumber_String, m_serialNumber.c_str()); // Changed
@@ -233,7 +232,7 @@ vr::EVRInitError CLeapHandController::Activate(uint32_t unObjectId)
                 l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ControllerType_String, "vive_controller");
             } break;
 
-            case CConfigHelper::EC_Index:
+            case CDriverConfig::EC_Index:
             {
                 l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ModelNumber_String, (m_handAssigment == CHA_Left) ? "Knuckles Left" : "Knuckles Right");
                 l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_RenderModelName_String, (m_handAssigment == CHA_Left) ? "{indexcontroller}valve_controller_knu_1_0_left" : "{indexcontroller}valve_controller_knu_1_0_right");
@@ -269,9 +268,9 @@ vr::EVRInitError CLeapHandController::Activate(uint32_t unObjectId)
 
         // Inputs
         m_driverInput = vr::VRDriverInput();
-        switch(CConfigHelper::GetEmulatedController())
+        switch(CDriverConfig::GetEmulatedController())
         {
-            case CConfigHelper::EC_Vive:
+            case CDriverConfig::EC_Vive:
             {
                 m_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/system/click", &m_buttons[CB_SysClick].GetHandleRef());
                 m_buttons[CB_SysClick].SetInputType(ControllerButtonInputType::CBIT_Boolean);
@@ -300,7 +299,7 @@ vr::EVRInitError CLeapHandController::Activate(uint32_t unObjectId)
                 m_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/trackpad/touch", &m_buttons[CB_TrackpadTouch].GetHandleRef());
                 m_buttons[CB_TrackpadTouch].SetInputType(ControllerButtonInputType::CBIT_Boolean);
             } break;
-            case CConfigHelper::EC_Index:
+            case CDriverConfig::EC_Index:
             {
                 m_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/system/click", &m_buttons[CB_SysClick].GetHandleRef());
                 m_buttons[CB_SysClick].SetInputType(ControllerButtonInputType::CBIT_Boolean);
@@ -372,12 +371,12 @@ vr::EVRInitError CLeapHandController::Activate(uint32_t unObjectId)
                 m_buttons[CB_FingerPinky].SetInputType(ControllerButtonInputType::CBIT_Float);
 
                 vr::EVRSkeletalTrackingLevel l_trackingLevel = vr::VRSkeletalTracking_Partial;
-                switch(CConfigHelper::GetTrackingLevel())
+                switch(CDriverConfig::GetTrackingLevel())
                 {
-                    case CConfigHelper::TL_Partial:
+                    case CDriverConfig::TL_Partial:
                         l_trackingLevel = vr::VRSkeletalTracking_Partial;
                         break;
-                    case CConfigHelper::TL_Full:
+                    case CDriverConfig::TL_Full:
                         l_trackingLevel = vr::VRSkeletalTracking_Full;
                         break;
                 }
@@ -520,9 +519,9 @@ void CLeapHandController::UpdateTransformation(const Leap::Frame &f_frame)
         {
             if(((m_handAssigment == CHA_Left) && l_hand.isLeft()) || ((m_handAssigment == CHA_Right) && l_hand.isRight()))
             {
-                switch(CConfigHelper::GetOrientationMode())
+                switch(CDriverConfig::GetOrientationMode())
                 {
-                    case CConfigHelper::OM_HMD:
+                    case CDriverConfig::OM_HMD:
                     {
                         std::memcpy(&m_pose.qWorldFromDriverRotation, &ms_headRot, sizeof(vr::HmdQuaternion_t));
                         std::memcpy(m_pose.vecWorldFromDriverTranslation, ms_headPos, sizeof(double) * 3U);
@@ -567,16 +566,16 @@ void CLeapHandController::UpdateTransformation(const Leap::Frame &f_frame)
                         m_pose.qRotation.z = l_finalRot.z;
                         m_pose.qRotation.w = l_finalRot.w;
                     } break;
-                    case CConfigHelper::OM_Desktop:
+                    case CDriverConfig::OM_Desktop:
                     {
-                        // Head position and rotation are fixed
+                        // Controller follows HMD
                         m_pose.qWorldFromDriverRotation.x = .0;
                         m_pose.qWorldFromDriverRotation.y = .0;
                         m_pose.qWorldFromDriverRotation.z = .0;
                         m_pose.qWorldFromDriverRotation.w = 1.0;
-                        m_pose.vecWorldFromDriverTranslation[0U] = CConfigHelper::GetDesktopRootX();
-                        m_pose.vecWorldFromDriverTranslation[1U] = CConfigHelper::GetDesktopRootY();
-                        m_pose.vecWorldFromDriverTranslation[2U] = CConfigHelper::GetDesktopRootZ();
+                        m_pose.vecWorldFromDriverTranslation[0U] = CDriverConfig::GetDesktopRootX();
+                        m_pose.vecWorldFromDriverTranslation[1U] = CDriverConfig::GetDesktopRootY();
+                        m_pose.vecWorldFromDriverTranslation[2U] = CDriverConfig::GetDesktopRootZ();
 
                         Leap::Vector l_position = l_hand.palmPosition();
                         m_pose.vecPosition[0] = 0.001*l_position.x;
@@ -630,9 +629,9 @@ void CLeapHandController::UpdateTransformation(const Leap::Frame &f_frame)
     if(!l_handFound)
     {
         for(size_t i = 0U; i < 3U; i++) m_pose.vecVelocity[i] = .0;
-        m_pose.result = vr::TrackingResult_Calibrating_InProgress;
+        m_pose.result = vr::TrackingResult_Running_OutOfRange;
     }
-    m_pose.poseIsValid = ((m_gameProfile == GP_VRChat) ? true : l_handFound);
+    m_pose.poseIsValid = ((m_gameProfile == GP_VRChat) ? true : l_handFound); // VRChat changes controls if one of controllers isn't detected properly
 
     m_driverHost->TrackedDevicePoseUpdated(m_trackedDeviceID, m_pose, sizeof(vr::DriverPose_t));
 }
@@ -642,12 +641,12 @@ void CLeapHandController::UpdateGestures(const Leap::Frame& f_frame)
     std::vector<float> l_scores;
     if(CGestureMatcher::GetGestures(f_frame, ((m_handAssigment == CHA_Left) ? CGestureMatcher::WH_LeftHand : CGestureMatcher::WH_RightHand), l_scores))
     {
-        switch(CConfigHelper::GetEmulatedController())
+        switch(CDriverConfig::GetEmulatedController())
         {
-            case CConfigHelper::EC_Vive:
+            case CDriverConfig::EC_Vive:
                 ProcessViveGestures(l_scores);
                 break;
-            case CConfigHelper::EC_Index:
+            case CDriverConfig::EC_Index:
                 ProcessIndexGestures(f_frame, l_scores);
                 break;
         }
@@ -660,35 +659,35 @@ void CLeapHandController::ProcessViveGestures(const std::vector<float> &f_scores
     {
         case GP_Default:
         {
-            if(CConfigHelper::IsInputEnabled())
+            if(CDriverConfig::IsInputEnabled())
             {
-                if(CConfigHelper::IsMenuEnabled()) m_buttons[CB_SysClick].SetState(f_scores[CGestureMatcher::GT_Timeout] >= 0.25f);
-                if(CConfigHelper::IsApplicationMenuEnabled()) m_buttons[CB_AppMenuClick].SetState(f_scores[CGestureMatcher::GT_FlatHandPalmTowards] >= 0.8f);
+                if(CDriverConfig::IsMenuEnabled()) m_buttons[CB_SysClick].SetState(f_scores[CGestureMatcher::GT_Timeout] >= 0.25f);
+                if(CDriverConfig::IsApplicationMenuEnabled()) m_buttons[CB_AppMenuClick].SetState(f_scores[CGestureMatcher::GT_FlatHandPalmTowards] >= 0.8f);
 
-                if(CConfigHelper::IsTriggerEnabled())
+                if(CDriverConfig::IsTriggerEnabled())
                 {
                     m_buttons[CB_TriggerClick].SetState(f_scores[CGestureMatcher::GT_TriggerFinger] >= 0.75f);
                     m_buttons[CB_TriggerValue].SetValue(f_scores[CGestureMatcher::GT_TriggerFinger]);
                 }
 
-                if(CConfigHelper::IsGripEnabled()) m_buttons[CB_GripClick].SetState(f_scores[CGestureMatcher::GT_LowerFist] >= 0.5f);
+                if(CDriverConfig::IsGripEnabled()) m_buttons[CB_GripClick].SetState(f_scores[CGestureMatcher::GT_LowerFist] >= 0.5f);
 
-                if(CConfigHelper::IsTouchpadEnabled())
+                if(CDriverConfig::IsTouchpadEnabled())
                 {
-                    if(CConfigHelper::IsTouchpadAxesEnabled())
+                    if(CDriverConfig::IsTouchpadAxesEnabled())
                     {
                         m_buttons[CB_TrackpadX].SetValue(f_scores[CGestureMatcher::GT_TouchpadAxisX]);
                         m_buttons[CB_TrackpadY].SetValue(f_scores[CGestureMatcher::GT_TouchpadAxisY]);
                     }
-                    if(CConfigHelper::IsTouchpadTouchEnabled()) m_buttons[CB_TrackpadTouch].SetState(f_scores[CGestureMatcher::GT_Thumbpress] >= 0.5f);
-                    if(CConfigHelper::IsTouchpadPressEnabled()) m_buttons[CB_TrackpadClick].SetState(f_scores[CGestureMatcher::GT_Thumbpress] >= 0.1f);
+                    if(CDriverConfig::IsTouchpadTouchEnabled()) m_buttons[CB_TrackpadTouch].SetState(f_scores[CGestureMatcher::GT_Thumbpress] >= 0.5f);
+                    if(CDriverConfig::IsTouchpadPressEnabled()) m_buttons[CB_TrackpadClick].SetState(f_scores[CGestureMatcher::GT_Thumbpress] >= 0.1f);
                 }
             }
         } break;
 
         case GP_VRChat:
         {
-            if(CConfigHelper::IsInputEnabled())
+            if(CDriverConfig::IsInputEnabled())
             {
                 if(!m_gameSpecialModes.m_vrchatDrawingMode)
                 {
@@ -750,28 +749,28 @@ void CLeapHandController::ProcessIndexGestures(const Leap::Frame &f_frame, const
     {
         case GP_Default:
         {
-            if(CConfigHelper::IsInputEnabled())
+            if(CDriverConfig::IsInputEnabled())
             {
-                if(CConfigHelper::IsMenuEnabled())
+                if(CDriverConfig::IsMenuEnabled())
                 {
                     m_buttons[CB_SysClick].SetState(f_scores[CGestureMatcher::GT_Timeout] >= 0.5f);
                     m_buttons[CB_SysTouch].SetState(f_scores[CGestureMatcher::GT_Timeout] >= 0.25f);
                 }
-                if(CConfigHelper::IsGripEnabled())
+                if(CDriverConfig::IsGripEnabled())
                 {
                     m_buttons[CB_GripTouch].SetState(f_scores[CGestureMatcher::GT_LowerFist] >= 0.75f);
                     m_buttons[CB_GripValue].SetValue(f_scores[CGestureMatcher::GT_LowerFist]);
                     m_buttons[CB_GripForce].SetValue(f_scores[CGestureMatcher::GT_LowerFist] >= 0.75f ? (f_scores[CGestureMatcher::GT_LowerFist] - 0.75f) / 0.25f : 0.f);
                 }
-                if(CConfigHelper::IsTouchpadEnabled())
+                if(CDriverConfig::IsTouchpadEnabled())
                 {
-                    if(CConfigHelper::IsTouchpadTouchEnabled())
+                    if(CDriverConfig::IsTouchpadTouchEnabled())
                     {
                         if(f_scores[CGestureMatcher::GT_Thumbpress] >= 0.5f)
                         {
                             m_buttons[CB_TrackpadTouch].SetState(true);
                             m_buttons[CB_TrackpadForce].SetValue(f_scores[CGestureMatcher::GT_Thumbpress] >= 0.75f ? (f_scores[CGestureMatcher::GT_Thumbpress] - 0.75f) / 0.25f : 0.f);
-                            if(CConfigHelper::IsTouchpadAxesEnabled())
+                            if(CDriverConfig::IsTouchpadAxesEnabled())
                             {
                                 m_buttons[CB_TrackpadX].SetValue(f_scores[CGestureMatcher::GT_TouchpadAxisX]);
                                 m_buttons[CB_TrackpadY].SetValue(f_scores[CGestureMatcher::GT_TouchpadAxisY]);
@@ -784,22 +783,34 @@ void CLeapHandController::ProcessIndexGestures(const Leap::Frame &f_frame, const
                         }
                     }
                 }
-                if(CConfigHelper::IsTriggerEnabled())
+                if(CDriverConfig::IsTriggerEnabled())
                 {
                     m_buttons[CB_TriggerClick].SetState(f_scores[CGestureMatcher::GT_TriggerFinger] >= 0.75f);
                     m_buttons[CB_TriggerValue].SetValue(f_scores[CGestureMatcher::GT_TriggerFinger]);
                 }
-                if(CConfigHelper::IsThumbstickEnabled())
+                if(CDriverConfig::IsThumbstickEnabled())
                 {
                     m_buttons[CB_ThumbstickTouch].SetState(f_scores[CGestureMatcher::GT_ThumbIndexCrossTouch] >= 0.5f);
                     m_buttons[CB_ThumbstickClick].SetState(f_scores[CGestureMatcher::GT_ThumbIndexCrossTouch] >= 0.75f);
+
+                    // Keyboard thumbstick direction when NumLock is active
+                    if(GetKeyState(VK_NUMLOCK) & 0xFFFF != 0)
+                    {
+                        if(GetAsyncKeyState((m_handAssigment == CHA_Left) ? VK_RIGHT : VK_NUMPAD6) & 0x8000) m_buttons[CB_ThumbstickX].SetValue(1.f);
+                        else if(GetAsyncKeyState((m_handAssigment == CHA_Left) ? VK_LEFT : VK_NUMPAD4) & 0x8000) m_buttons[CB_ThumbstickX].SetValue(-1.f);
+                        else m_buttons[CB_ThumbstickX].SetValue(0.f);
+
+                        if(GetAsyncKeyState((m_handAssigment == CHA_Left) ? VK_UP : VK_NUMPAD8) & 0x8000) m_buttons[CB_ThumbstickY].SetValue(1.f);
+                        else if(GetAsyncKeyState((m_handAssigment == CHA_Left) ? VK_DOWN : VK_NUMPAD2) & 0x8000) m_buttons[CB_ThumbstickY].SetValue(-1.f);
+                        else m_buttons[CB_ThumbstickY].SetValue(0.f);
+                    }
                 }
-                if(CConfigHelper::IsButtonAEnabled())
+                if(CDriverConfig::IsButtonAEnabled())
                 {
                     m_buttons[CB_IndexATouch].SetState(f_scores[CGestureMatcher::GT_ThumbMiddleTouch] >= 0.5f);
                     m_buttons[CB_IndexAClick].SetState(f_scores[CGestureMatcher::GT_ThumbMiddleTouch] >= 0.75f);
                 }
-                if(CConfigHelper::IsButtonBEnabled())
+                if(CDriverConfig::IsButtonBEnabled())
                 {
                     m_buttons[CB_IndexBTouch].SetState(f_scores[CGestureMatcher::GT_ThumbPinkyTouch] >= 0.5f);
                     m_buttons[CB_IndexBClick].SetState(f_scores[CGestureMatcher::GT_ThumbPinkyTouch] >= 0.75f);
@@ -808,11 +819,11 @@ void CLeapHandController::ProcessIndexGestures(const Leap::Frame &f_frame, const
         } break;
         case GP_VRChat:
         {
-            if(CConfigHelper::IsInputEnabled())
+            if(CDriverConfig::IsInputEnabled())
             {
-                if(CConfigHelper::IsTouchpadEnabled())
+                if(CDriverConfig::IsTouchpadEnabled())
                 {
-                    if(CConfigHelper::IsTouchpadTouchEnabled())
+                    if(CDriverConfig::IsTouchpadTouchEnabled())
                     {
                         if(f_scores[CGestureMatcher::GT_Thumbpress] >= 0.5f)
                         {
@@ -825,18 +836,18 @@ void CLeapHandController::ProcessIndexGestures(const Leap::Frame &f_frame, const
                             m_buttons[CB_TrackpadForce].SetValue(0.f);
                         }
                     }
-                    if(CConfigHelper::IsTriggerEnabled())
+                    if(CDriverConfig::IsTriggerEnabled())
                     {
                         m_buttons[CB_TriggerClick].SetState(f_scores[CGestureMatcher::GT_TriggerFinger] >= 0.75f);
                         m_buttons[CB_TriggerValue].SetValue(f_scores[CGestureMatcher::GT_TriggerFinger]);
                     }
-                    if(CConfigHelper::IsGripEnabled())
+                    if(CDriverConfig::IsGripEnabled())
                     {
                         m_buttons[CB_GripTouch].SetState(f_scores[CGestureMatcher::GT_LowerFist] >= 0.85f);
                         m_buttons[CB_GripValue].SetValue(f_scores[CGestureMatcher::GT_LowerFist]);
                         m_buttons[CB_GripForce].SetValue(f_scores[CGestureMatcher::GT_LowerFist] >= 0.85f ? (f_scores[CGestureMatcher::GT_LowerFist] - 0.85f) / 0.15f : 0.f);
                     }
-                    if(CConfigHelper::IsButtonBEnabled())
+                    if(CDriverConfig::IsButtonBEnabled())
                     {
                         m_buttons[CB_IndexBTouch].SetState(f_scores[CGestureMatcher::GT_Timeout] >= 0.5f);
                         m_buttons[CB_IndexBClick].SetState(f_scores[CGestureMatcher::GT_Timeout] >= 0.75f);
@@ -847,7 +858,7 @@ void CLeapHandController::ProcessIndexGestures(const Leap::Frame &f_frame, const
     }
 
     // Update skeleton
-    if(CConfigHelper::IsSkeletonEnabled())
+    if(CDriverConfig::IsSkeletonEnabled())
     {
         m_buttons[CB_FingerIndex].SetValue(f_scores[CGestureMatcher::GT_IndexFingerBend]);
         m_buttons[CB_FingerMiddle].SetValue(f_scores[CGestureMatcher::GT_MiddleFingerBend]);
@@ -1031,7 +1042,7 @@ void CLeapHandController::UpdateInput()
             l_button.ResetUpdate();
         }
     }
-    if(CConfigHelper::GetEmulatedController() == CConfigHelper::EC_Index)
+    if(CDriverConfig::GetEmulatedController() == CDriverConfig::EC_Index)
     {
         m_driverInput->UpdateSkeletonComponent(m_skeletonHandle, vr::VRSkeletalMotionRange_WithController, m_boneTransform, HSB_Count);
         m_driverInput->UpdateSkeletonComponent(m_skeletonHandle, vr::VRSkeletalMotionRange_WithoutController, m_boneTransform, HSB_Count);

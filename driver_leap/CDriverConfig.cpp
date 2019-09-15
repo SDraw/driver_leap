@@ -1,33 +1,33 @@
 #include "stdafx.h"
-#include "CConfigHelper.h"
+#include "CDriverConfig.h"
 #include "Utils.h"
 
 extern char g_moduleFilePath[];
 
-unsigned char CConfigHelper::ms_emulatedController = CConfigHelper::EC_Vive;
-bool CConfigHelper::ms_leftHand = true;
-bool CConfigHelper::ms_rightHand = true;
-unsigned char CConfigHelper::ms_orientation = CConfigHelper::OM_HMD;
-float CConfigHelper::ms_desktopRootX = 0.f;
-float CConfigHelper::ms_desktopRootY = 0.f;
-float CConfigHelper::ms_desktopRootZ = 0.f;
-float CConfigHelper::ms_rotationOffsetX = 0.f;
-float CConfigHelper::ms_rotationOffsetY = 0.f;
-float CConfigHelper::ms_rotationOffsetZ = 0.f;
-bool CConfigHelper::ms_skeleton = true;
-unsigned char CConfigHelper::ms_trackingLevel = CConfigHelper::TL_Partial;
-bool CConfigHelper::ms_input = true;
-bool CConfigHelper::ms_menu = true;
-bool CConfigHelper::ms_applicationMenu = true;
-bool CConfigHelper::ms_trigger = true;
-bool CConfigHelper::ms_grip = true;
-bool CConfigHelper::ms_touchpad = true;
-bool CConfigHelper::ms_touchpadTouch = true;
-bool CConfigHelper::ms_touchpadPress = true;
-bool CConfigHelper::ms_touchpadAxes = true;
-bool CConfigHelper::ms_buttonA = true;
-bool CConfigHelper::ms_buttonB = true;
-bool CConfigHelper::ms_thumbstick = true;
+unsigned char CDriverConfig::ms_emulatedController = CDriverConfig::EC_Vive;
+bool CDriverConfig::ms_leftHand = true;
+bool CDriverConfig::ms_rightHand = true;
+unsigned char CDriverConfig::ms_orientation = CDriverConfig::OM_HMD;
+float CDriverConfig::ms_desktopRootX = 0.f;
+float CDriverConfig::ms_desktopRootY = 0.f;
+float CDriverConfig::ms_desktopRootZ = 0.f;
+float CDriverConfig::ms_rotationOffsetX = 0.f;
+float CDriverConfig::ms_rotationOffsetY = 0.f;
+float CDriverConfig::ms_rotationOffsetZ = 0.f;
+bool CDriverConfig::ms_skeleton = true;
+unsigned char CDriverConfig::ms_trackingLevel = CDriverConfig::TL_Partial;
+bool CDriverConfig::ms_input = true;
+bool CDriverConfig::ms_menu = true;
+bool CDriverConfig::ms_applicationMenu = true;
+bool CDriverConfig::ms_trigger = true;
+bool CDriverConfig::ms_grip = true;
+bool CDriverConfig::ms_touchpad = true;
+bool CDriverConfig::ms_touchpadTouch = true;
+bool CDriverConfig::ms_touchpadPress = true;
+bool CDriverConfig::ms_touchpadAxes = true;
+bool CDriverConfig::ms_buttonA = true;
+bool CDriverConfig::ms_buttonB = true;
+bool CDriverConfig::ms_thumbstick = true;
 
 const std::vector<std::string> g_configAttributeTable
 {
@@ -74,7 +74,7 @@ const std::vector<std::string> g_trackingLevelsTable
     "partial", "full"
 };
 
-void CConfigHelper::LoadConfig()
+void CDriverConfig::LoadConfig()
 {
     std::string l_path(g_moduleFilePath);
     l_path.erase(l_path.begin() + l_path.rfind('\\'), l_path.end());

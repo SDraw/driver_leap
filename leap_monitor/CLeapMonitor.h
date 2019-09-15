@@ -43,7 +43,7 @@ class CLeapMonitor
     void AddTrackedDevice(uint32_t unTrackedDeviceIndex);
     void RemoveTrackedDevice(uint32_t unTrackedDeviceIndex);
     void UpdateGameProfile(const char *f_appKey);
-    void SendSpecialCommand(const char *f_cmd);
+    void SendCommand(const char *f_cmd);
 public:
     CLeapMonitor();
     ~CLeapMonitor();

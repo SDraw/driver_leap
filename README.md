@@ -73,11 +73,10 @@ Game profiles:
     * Touchpad - thumb press
     * Touchpad circle - index finger of another hand directed to palm
     * Thumbstick press - touching of thumb finger tip and index finger tip of another hand
+    * Thumbstick direction - arrow keys for left hand, Num2/8/4/6 keys for right hand; available when NumLock is active
     * Button A - touching of thumb and middle finger tips
     * Button B - touching of thumb and pinky finger tips
     * System button - formed T-shape with two hands
-
-Currently, there are no free gestures that can simulate thumbstick direction.
 
 ### Troubleshooting
 Sometimes installation of [base project driver](https://github.com/cbuchner1/driver_leap) doesn't register driver folder for SteamVR. To manually add it:
