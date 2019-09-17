@@ -35,8 +35,8 @@ public:
 
 class CLeapHandController : public vr::ITrackedDeviceServerDriver
 {
-    vr::IVRServerDriverHost *m_driverHost;
-    vr::IVRDriverInput *m_driverInput;
+    static vr::IVRServerDriverHost *ms_driverHost;
+    static vr::IVRDriverInput *ms_driverInput;
 
     unsigned char m_handAssigment;
     std::string m_serialNumber;
@@ -52,7 +52,7 @@ class CLeapHandController : public vr::ITrackedDeviceServerDriver
         GP_VRChat
     };
     GameProfile m_gameProfile;
-    
+
     struct GameSpecialMode
     {
         bool m_vrchatDrawingMode = false;
@@ -98,39 +98,39 @@ class CLeapHandController : public vr::ITrackedDeviceServerDriver
     vr::VRInputComponentHandle_t m_skeletonHandle;
     enum HandSkeletonBone : size_t
     {
-	    HSB_Root = 0U,
-	    HSB_Wrist,
-	    HSB_Thumb0,
-	    HSB_Thumb1,
-	    HSB_Thumb2,
-	    HSB_Thumb3,
-	    HSB_IndexFinger0,
-	    HSB_IndexFinger1,
-	    HSB_IndexFinger2,
-	    HSB_IndexFinger3,
-	    HSB_IndexFinger4,
-	    HSB_MiddleFinger0,
-	    HSB_MiddleFinger1,
-	    HSB_MiddleFinger2,
-	    HSB_MiddleFinger3,
-	    HSB_MiddleFinger4,
-	    HSB_RingFinger0,
-	    HSB_RingFinger1,
-	    HSB_RingFinger2,
-	    HSB_RingFinger3,
-	    HSB_RingFinger4,
-	    HSB_PinkyFinger0,
-	    HSB_PinkyFinger1,
-	    HSB_PinkyFinger2,
-	    HSB_PinkyFinger3,
-	    HSB_PinkyFinger4,
-	    HSB_Aux_Thumb,
-	    HSB_Aux_IndexFinger,
-	    HSB_Aux_MiddleFinger,
-	    HSB_Aux_RingFinger,
-	    HSB_Aux_PinkyFinger,
+        HSB_Root = 0U,
+        HSB_Wrist,
+        HSB_Thumb0,
+        HSB_Thumb1,
+        HSB_Thumb2,
+        HSB_Thumb3,
+        HSB_IndexFinger0,
+        HSB_IndexFinger1,
+        HSB_IndexFinger2,
+        HSB_IndexFinger3,
+        HSB_IndexFinger4,
+        HSB_MiddleFinger0,
+        HSB_MiddleFinger1,
+        HSB_MiddleFinger2,
+        HSB_MiddleFinger3,
+        HSB_MiddleFinger4,
+        HSB_RingFinger0,
+        HSB_RingFinger1,
+        HSB_RingFinger2,
+        HSB_RingFinger3,
+        HSB_RingFinger4,
+        HSB_PinkyFinger0,
+        HSB_PinkyFinger1,
+        HSB_PinkyFinger2,
+        HSB_PinkyFinger3,
+        HSB_PinkyFinger4,
+        HSB_Aux_Thumb,
+        HSB_Aux_IndexFinger,
+        HSB_Aux_MiddleFinger,
+        HSB_Aux_RingFinger,
+        HSB_Aux_PinkyFinger,
 
-	    HSB_Count
+        HSB_Count
     };
     vr::VRBoneTransform_t m_boneTransform[HSB_Count];
 
@@ -153,7 +153,7 @@ public:
         CHA_Right
     };
 
-    CLeapHandController(vr::IVRServerDriverHost* f_driverHost, EControllerHandAssignment f_hand);
+    CLeapHandController(EControllerHandAssignment f_hand);
     virtual ~CLeapHandController();
 
     // vr::ITrackedDeviceServerDriver
@@ -167,5 +167,7 @@ public:
     inline const std::string& GetSerialNumber() const { return m_serialNumber; }
     void SetConnectionState(bool f_state);
     void Update(const Leap::Frame& f_frame);
-    static void UpdateHMDCoordinates(const vr::TrackedDevicePose_t &f_pose);
+
+    static void SetInterfaces(vr::IVRServerDriverHost *f_host, vr::IVRDriverInput *f_input);
+    static void UpdateHMDCoordinates();
 };

@@ -20,4 +20,6 @@
     <param name="buttonA" value="true"/> <!--Only Index controller-->
     <param name="buttonB" value="true"/> <!--Only Index controller-->
     <param name="thumbstick" value = "true"/> <!--Only Index controller-->
+    
+    <param name="vrchat_handsReset" value="false"/> <!--Hands animation reset with inactive controllers, only Index controller-->
 </config>

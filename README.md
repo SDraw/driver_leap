@@ -7,10 +7,6 @@ Fork with updated vendor libraries and extended features.
 ### Installation (for users)
 * Install [latest Orion Beta](https://developer.leapmotion.com/get-started)
 * **Method #1:**
-  * Install [base project driver](https://github.com/cbuchner1/driver_leap/releases/tag/alpha8)
-  * Grab [latest release archive](../../releases/latest) for your platform
-  * Extract archive to '<base_project_installation_folder>/leap'
-* **Method #2:**
   * Create 'leap' folder in '<SteamVR_folder>/drivers'
   * Grab [latest release archive](../../releases/latest) for your platform
   * Extract archive to '<SteamVR_folder>/drivers/leap'
@@ -18,6 +14,10 @@ Fork with updated vendor libraries and extended features.
   ```JSON
   "activateMultipleDrivers": true,
   ```
+* **Method #2:**
+  * Install [base project driver](https://github.com/cbuchner1/driver_leap/releases/tag/alpha8)
+  * Grab [latest release archive](../../releases/latest) for your platform
+  * Extract archive to '<base_project_installation_folder>/leap'
 
 ### Building (for developers)
 * Open solution in Visual Studio 2013
@@ -35,7 +35,7 @@ Fork with updated vendor libraries and extended features.
   
 ### Control configuration and inputs
 Driver can emulate HTC Vive controllers and Valve Index controllers with skeletal animation and work in desktop and HMD orientations. It's adjusted by editing control_config.xml in 'cfg' folder.  
-There are more configurable restrictions, such as global input, trackpad, trigger, grab and etc.  
+There are more configurable restrictions, such as global input, trackpad, trigger, grip and etc.  
 Controls are changed by game profiles that are enabled automatically when game is started from Steam.
 
 ### HTC Vive controllers emulation

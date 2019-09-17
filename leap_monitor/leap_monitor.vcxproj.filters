@@ -13,10 +13,9 @@
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="leap_monitor.ico" />
-    <Image Include="small.ico" />
+    <ResourceCompile Include="leap_monitor.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="leap_monitor.rc" />
+    <Image Include="icon.ico" />
   </ItemGroup>
 </Project>

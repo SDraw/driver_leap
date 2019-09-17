@@ -181,8 +181,7 @@
     <ResourceCompile Include="leap_monitor.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="leap_monitor.ico" />
-    <Image Include="small.ico" />
+    <Image Include="icon.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

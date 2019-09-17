@@ -168,15 +168,19 @@ void CLeapMonitor::Run()
                 if(l_quitEvent) break;
             }
 
-            bool l_combinationState = ((GetAsyncKeyState(VK_CONTROL) & 0x8000) && (GetAsyncKeyState(0x58) & 0x8000)); // Ctrl+X
-            if(m_specialCombinationState != l_combinationState)
+            // Process special combinations if NumLock is active
+            if((GetKeyState(VK_NUMLOCK) & 0xFFFF) != 0)
             {
-                m_specialCombinationState = l_combinationState;
-                if(m_specialCombinationState)
+                bool l_combinationState = ((GetAsyncKeyState(VK_CONTROL) & 0x8000) && (GetAsyncKeyState(0x58) & 0x8000)); // Ctrl+X
+                if(m_specialCombinationState != l_combinationState)
                 {
-                    SendCommand("game vrchat drawing_mode");
-                    std::string l_message("VRChat drawing mode toggled");
-                    SendNotification(l_message);
+                    m_specialCombinationState = l_combinationState;
+                    if(m_specialCombinationState)
+                    {
+                        SendCommand("game vrchat drawing_mode");
+                        std::string l_message("VRChat drawing mode toggled");
+                        SendNotification(l_message);
+                    }
                 }
             }
 

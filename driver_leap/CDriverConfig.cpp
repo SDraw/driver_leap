@@ -28,6 +28,7 @@ bool CDriverConfig::ms_touchpadAxes = true;
 bool CDriverConfig::ms_buttonA = true;
 bool CDriverConfig::ms_buttonB = true;
 bool CDriverConfig::ms_thumbstick = true;
+bool CDriverConfig::ms_vrchatHandsReset = false;
 
 const std::vector<std::string> g_configAttributeTable
 {
@@ -36,7 +37,8 @@ const std::vector<std::string> g_configAttributeTable
     "skeleton", "trackingLevel",
     "input", "menu", "appMenu", "trigger", "grip",
     "touchpad", "touchpadTouch", "touchpadPress", "touchpadAxes",
-    "buttonA", "buttonB", "thumbstick"
+    "buttonA", "buttonB", "thumbstick",
+    "vrchat_handsReset"
 };
 enum ConfigParamIndex : size_t
 {
@@ -59,7 +61,8 @@ enum ConfigParamIndex : size_t
     CPI_TouchpadAxes,
     CPI_ButtonA,
     CPI_ButtonB,
-    CPI_Thumbstick
+    CPI_Thumbstick,
+    CPI_VRChatHandsReset
 };
 const std::vector<std::string> g_orientationMode
 {
@@ -169,6 +172,9 @@ void CDriverConfig::LoadConfig()
                                 break;
                             case ConfigParamIndex::CPI_Thumbstick:
                                 ms_thumbstick = l_attribValue.as_bool(true);
+                                break;
+                            case ConfigParamIndex::CPI_VRChatHandsReset:
+                                ms_vrchatHandsReset = l_attribValue.as_bool(false);
                                 break;
                         }
                     }

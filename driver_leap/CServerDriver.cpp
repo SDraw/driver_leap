@@ -26,7 +26,7 @@ CServerDriver::CServerDriver()
 {
     m_driverHost = nullptr;
     m_leapController = nullptr;
-    memset(&m_processInfo, 0, sizeof(PROCESS_INFORMATION));
+    std::memset(&m_processInfo, 0, sizeof(PROCESS_INFORMATION));
     m_controllerState = false;
     m_leapMonitorLaunched = false;
 }
@@ -44,17 +44,18 @@ vr::EVRInitError CServerDriver::Init(vr::IVRDriverContext *pDriverContext)
     CDriverLog::Init(vr::VRDriverLog());
 
     m_driverHost = vr::VRServerDriverHost();
+    CLeapHandController::SetInterfaces(m_driverHost, vr::VRDriverInput());
 
     // Generate VR controllers, serials are stored for whole VR session
     if(CDriverConfig::IsLeftHandEnabled())
     {
-        CLeapHandController *l_leftHandController = new CLeapHandController(m_driverHost, CLeapHandController::CHA_Left);
+        CLeapHandController *l_leftHandController = new CLeapHandController(CLeapHandController::CHA_Left);
         m_handControllers.push_back(l_leftHandController);
         if(m_driverHost) m_driverHost->TrackedDeviceAdded(l_leftHandController->GetSerialNumber().c_str(), vr::ETrackedDeviceClass::TrackedDeviceClass_Controller, l_leftHandController);
     }
     if(CDriverConfig::IsRightHandEnabled())
     {
-        CLeapHandController *l_rightHandController = new CLeapHandController(m_driverHost, CLeapHandController::CHA_Right);
+        CLeapHandController *l_rightHandController = new CLeapHandController(CLeapHandController::CHA_Right);
         m_handControllers.push_back(l_rightHandController);
         if(m_driverHost) m_driverHost->TrackedDeviceAdded(l_rightHandController->GetSerialNumber().c_str(), vr::ETrackedDeviceClass::TrackedDeviceClass_Controller, l_rightHandController);
     }
@@ -80,6 +81,7 @@ void CServerDriver::Cleanup()
 
     for(auto l_handController : m_handControllers) delete l_handController;
     m_handControllers.clear();
+    CLeapHandController::SetInterfaces(nullptr, nullptr);
 
     if(m_leapController)
     {
@@ -100,10 +102,7 @@ const char* const* CServerDriver::GetInterfaceVersions()
 
 void CServerDriver::RunFrame()
 {
-    vr::TrackedDevicePose_t l_hmdPose;
-    m_driverHost->GetRawTrackedDevicePoses(0.f, &l_hmdPose, 1U); // HMD has device ID 0
-    CLeapHandController::UpdateHMDCoordinates(l_hmdPose);
-
+    CLeapHandController::UpdateHMDCoordinates();
     if(m_leapController)
     {
         bool l_controllerState = m_leapController->isConnected();

@@ -26,6 +26,7 @@ class CDriverConfig
     static bool ms_buttonA;
     static bool ms_buttonB;
     static bool ms_thumbstick;
+    static bool ms_vrchatHandsReset;
 public:
     enum EmulatedController : unsigned char
     {
@@ -69,4 +70,5 @@ public:
     static inline bool IsButtonAEnabled() { return ms_buttonA; }
     static inline bool IsButtonBEnabled() { return ms_buttonB; }
     static inline bool IsThumbstickEnabled() { return ms_thumbstick; }
+    static inline bool IsVRChatHandsResetEnabled() { return ms_vrchatHandsReset; }
 };
