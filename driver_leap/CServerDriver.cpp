@@ -2,8 +2,8 @@
 #include "CServerDriver.h"
 #include "CDriverConfig.h"
 #include "CDriverLog.h"
-#include "CLeapHandController.h"
-#include "Utils.h"
+#include "CLeapHandControllerVive.h"
+#include "CLeapHandControllerIndex.h"
 
 extern char g_moduleFilePath[];
 
@@ -44,20 +44,43 @@ vr::EVRInitError CServerDriver::Init(vr::IVRDriverContext *pDriverContext)
     CDriverLog::Init(vr::VRDriverLog());
 
     m_driverHost = vr::VRServerDriverHost();
-    CLeapHandController::SetInterfaces(m_driverHost, vr::VRDriverInput());
+    CLeapHandController::SetInterfaces(m_driverHost, vr::VRDriverInput(), vr::VRProperties());
 
-    // Generate VR controllers, serials are stored for whole VR session
     if(CDriverConfig::IsLeftHandEnabled())
     {
-        CLeapHandController *l_leftHandController = new CLeapHandController(CLeapHandController::CHA_Left);
-        m_handControllers.push_back(l_leftHandController);
-        if(m_driverHost) m_driverHost->TrackedDeviceAdded(l_leftHandController->GetSerialNumber().c_str(), vr::ETrackedDeviceClass::TrackedDeviceClass_Controller, l_leftHandController);
+        CLeapHandController *l_controller = nullptr;
+        switch(CDriverConfig::GetEmulatedController())
+        {
+            case CDriverConfig::EC_Vive:
+                l_controller = new CLeapHandControllerVive(CLeapHandController::CHA_Left);
+                break;
+            case CDriverConfig::EC_Index:
+                l_controller = new CLeapHandControllerIndex(CLeapHandController::CHA_Left);
+                break;
+        }
+        if(m_driverHost && l_controller)
+        {
+            m_handControllers.push_back(l_controller);
+            m_driverHost->TrackedDeviceAdded(l_controller->GetSerialNumber().c_str(), vr::ETrackedDeviceClass::TrackedDeviceClass_Controller, l_controller);
+        }
     }
     if(CDriverConfig::IsRightHandEnabled())
     {
-        CLeapHandController *l_rightHandController = new CLeapHandController(CLeapHandController::CHA_Right);
-        m_handControllers.push_back(l_rightHandController);
-        if(m_driverHost) m_driverHost->TrackedDeviceAdded(l_rightHandController->GetSerialNumber().c_str(), vr::ETrackedDeviceClass::TrackedDeviceClass_Controller, l_rightHandController);
+        CLeapHandController *l_controller = nullptr;
+        switch(CDriverConfig::GetEmulatedController())
+        {
+            case CDriverConfig::EC_Vive:
+                l_controller = new CLeapHandControllerVive(CLeapHandController::CHA_Right);
+                break;
+            case CDriverConfig::EC_Index:
+                l_controller = new CLeapHandControllerIndex(CLeapHandController::CHA_Right);
+                break;
+        }
+        if(m_driverHost && l_controller)
+        {
+            m_handControllers.push_back(l_controller);
+            m_driverHost->TrackedDeviceAdded(l_controller->GetSerialNumber().c_str(), vr::ETrackedDeviceClass::TrackedDeviceClass_Controller, l_controller);
+        }
     }
 
     m_leapController = new Leap::Controller();
@@ -79,9 +102,9 @@ void CServerDriver::Cleanup()
         m_leapMonitorLaunched = false;
     }
 
-    for(auto l_handController : m_handControllers) delete l_handController;
+    for(auto l_controller : m_handControllers) delete l_controller;
     m_handControllers.clear();
-    CLeapHandController::SetInterfaces(nullptr, nullptr);
+    CLeapHandController::SetInterfaces(nullptr, nullptr, nullptr);
 
     if(m_leapController)
     {

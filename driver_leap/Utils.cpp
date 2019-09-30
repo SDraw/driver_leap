@@ -1,7 +1,10 @@
 #include "stdafx.h"
 #include "Utils.h"
 
-const glm::vec3 g_axisX(1.f, 0.f, 0.f);
+extern const glm::vec3 g_axisX(1.f, 0.f, 0.f);
+extern const glm::vec3 g_axisY(0.f, 1.f, 0.f);
+extern const glm::mat4 g_identityMatrix(1.f);
+extern const glm::vec4 g_zeroPoint(0.f, 0.f, 0.f, 1.f);
 
 // Left hand open gesture transformation, thanks to https://github.com/spayne and his soft_knuckles repository
 extern const vr::VRBoneTransform_t g_openHandGesture[31U] = {

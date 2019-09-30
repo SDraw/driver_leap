@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "CLeapHandController.h"
+#include "CControllerButton.h"
 #include "CDriverConfig.h"
 #include "CGestureMatcher.h"
 #include "Utils.h"
@@ -39,68 +40,15 @@ enum GameCommand : size_t
     CC_DrawingMode = 0U // VRChat
 };
 
-extern const vr::VRBoneTransform_t g_openHandGesture[];
-const glm::vec3 g_axisX(1.f, 0.f, 0.f);
-const glm::vec3 g_axisY(0.f, 1.f, 0.f);
-const glm::mat4 g_identityMatrix(1.f);
-const glm::vec4 g_zeroPoint(0.f, 0.f, 0.f, 1.f);
-
-// ----
-CControllerButton::CControllerButton()
-{
-    m_handle = vr::k_ulInvalidInputComponentHandle;
-    m_state = false;
-    m_value = 0.f;
-    m_inputType = ControllerButtonInputType::CBIT_Boolean;
-    m_updated = false;
-}
-CControllerButton::~CControllerButton()
-{
-}
-
-void CControllerButton::SetValue(float f_value)
-{
-    if(m_inputType == ControllerButtonInputType::CBIT_Float)
-    {
-        if(m_value != f_value)
-        {
-            m_value = f_value;
-            m_updated = true;
-        }
-    }
-}
-void CControllerButton::SetState(bool f_state)
-{
-    if(m_inputType == ControllerButtonInputType::CBIT_Boolean)
-    {
-        if(m_state != f_state)
-        {
-            m_state = f_state;
-            m_updated = true;
-        }
-    }
-}
-// ----
-
 vr::IVRServerDriverHost *CLeapHandController::ms_driverHost = nullptr;
 vr::IVRDriverInput *CLeapHandController::ms_driverInput = nullptr;
+vr::CVRPropertyHelpers *CLeapHandController::ms_propertyHelpers = nullptr;
 double CLeapHandController::ms_headPos[] = { .0, .0, .0 };
 vr::HmdQuaternion_t CLeapHandController::ms_headRot = { 1.0, .0, .0, .0 };
 
-CLeapHandController::CLeapHandController(EControllerHandAssignment f_hand)
+CLeapHandController::CLeapHandController()
 {
-    m_handAssigment = f_hand;
     m_trackedDeviceID = vr::k_unTrackedDeviceIndexInvalid;
-
-    switch(CDriverConfig::GetEmulatedController())
-    {
-        case CDriverConfig::EC_Vive:
-            m_serialNumber.assign((m_handAssigment == CHA_Left) ? "LHR-F94B3BD8" : "LHR-F94B3BD9");
-            break;
-        case CDriverConfig::EC_Index:
-            m_serialNumber.assign((m_handAssigment == CHA_Left) ? "LHR-E217CD00" : "LHR-E217CD01");
-            break;
-    }
     m_propertyContainer = vr::k_ulInvalidPropertyContainer;
 
     glm::vec3 l_eulerOffsetRot(CDriverConfig::GetRotationOffsetX(), CDriverConfig::GetRotationOffsetY(), CDriverConfig::GetRotationOffsetZ());
@@ -126,252 +74,12 @@ CLeapHandController::CLeapHandController(EControllerHandAssignment f_hand)
     m_pose.shouldApplyHeadModel = false;
     m_pose.result = vr::TrackingResult_Uninitialized;
 
-    // Skeletal data
-    m_skeletonHandle = vr::k_ulInvalidInputComponentHandle;
-    for(size_t i = 0U; i < HSB_Count; i++) m_boneTransform[i] = g_openHandGesture[i];
-    if(m_handAssigment == CHA_Right)
-    {
-        // Transformation inversion along 0YZ plane
-        for(size_t i = 1U; i < HSB_Count; i++)
-        {
-            m_boneTransform[i].position.v[0] *= -1.f;
-
-            if(i == HSB_Wrist)
-            {
-                m_boneTransform[i].orientation.y *= -1.f;
-                m_boneTransform[i].orientation.z *= -1.f;
-            }
-            else if(i == HSB_Thumb0 || i == HSB_IndexFinger0 || i == HSB_MiddleFinger0 || i == HSB_RingFinger0 || i == HSB_PinkyFinger0)
-            {
-                m_boneTransform[i].orientation.y *= -1.f;
-                m_boneTransform[i].orientation.z *= -1.f;
-
-                glm::quat l_rot;
-                ConvertQuaternion(m_boneTransform[i].orientation, l_rot);
-                l_rot = glm::rotate(l_rot, glm::pi<float>(), g_axisX);
-                ConvertQuaternion(l_rot, m_boneTransform[i].orientation);
-            }
-        }
-    }
-
     m_gameProfile = GP_Default;
 }
 CLeapHandController::~CLeapHandController()
 {
-}
+    for(auto l_button : m_buttons) delete l_button;
 
-vr::EVRInitError CLeapHandController::Activate(uint32_t unObjectId)
-{
-    vr::EVRInitError l_resultError = vr::VRInitError_Driver_Failed;
-
-    if(m_trackedDeviceID == vr::k_unTrackedDeviceIndexInvalid)
-    {
-        m_trackedDeviceID = unObjectId;
-
-        vr::CVRPropertyHelpers *l_vrProperties = vr::VRProperties();
-        m_propertyContainer = l_vrProperties->TrackedDeviceToPropertyContainer(m_trackedDeviceID);
-
-        // Shared properties
-        l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_TrackingSystemName_String, "lighthouse");
-        l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_SerialNumber_String, m_serialNumber.c_str());
-        l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_WillDriftInYaw_Bool, false);
-        l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_DeviceIsWireless_Bool, true);
-        l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_DeviceIsCharging_Bool, false);
-        l_vrProperties->SetFloatProperty(m_propertyContainer, vr::Prop_DeviceBatteryPercentage_Float, 1.f); // Always charged
-
-        vr::HmdMatrix34_t l_matrix = { -1.f, 0.f, 0.f, 0.f, 0.f, 0.f, -1.f, 0.f, 0.f, -1.f, 0.f, 0.f };
-        l_vrProperties->SetProperty(m_propertyContainer, vr::Prop_StatusDisplayTransform_Matrix34, &l_matrix, sizeof(vr::HmdMatrix34_t), vr::k_unHmdMatrix34PropertyTag);
-
-        l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_Firmware_UpdateAvailable_Bool, false);
-        l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_Firmware_ManualUpdate_Bool, false);
-        l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_Firmware_ManualUpdateURL_String, "https://developer.valvesoftware.com/wiki/SteamVR/HowTo_Update_Firmware");
-        l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_DeviceProvidesBatteryStatus_Bool, true);
-        l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_DeviceCanPowerOff_Bool, true);
-        l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_DeviceClass_Int32, vr::TrackedDeviceClass_Controller);
-        l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_Firmware_ForceUpdateRequired_Bool, false);
-        l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_Identifiable_Bool, true);
-        l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_Firmware_RemindUpdate_Bool, false);
-        l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_Axis0Type_Int32, vr::k_eControllerAxis_TrackPad);
-        l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_Axis1Type_Int32, vr::k_eControllerAxis_Trigger);
-        l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_ControllerRoleHint_Int32, (m_handAssigment == CHA_Left) ? vr::TrackedControllerRole_LeftHand : vr::TrackedControllerRole_RightHand);
-        l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_HasDisplayComponent_Bool, false);
-        l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_HasCameraComponent_Bool, false);
-        l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_HasDriverDirectModeComponent_Bool, false);
-        l_vrProperties->SetBoolProperty(m_propertyContainer, vr::Prop_HasVirtualDisplayComponent_Bool, false);
-        l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_ControllerHandSelectionPriority_Int32, 0);
-
-        // Specific properties
-        switch(CDriverConfig::GetEmulatedController())
-        {
-            case CDriverConfig::EC_Vive:
-            {
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ModelNumber_String, "Vive. Controller MV");
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_SerialNumber_String, m_serialNumber.c_str()); // Changed
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_RenderModelName_String, "vr_controller_vive_1_5");
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ManufacturerName_String, "HTC");
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_TrackingFirmwareVersion_String, "1533720215 htcvrsoftware@firmware-win32 2018-08-08 FPGA 262(1.6/0/0) BL 0 VRC 1533720214 Radio 1532585738");
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_HardwareRevision_String, "product 129 rev 1.5.0 lot 2000/0/0 0");
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ConnectedWirelessDongle_String, "1E8092840E"); // Changed
-                l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_HardwareRevision_Uint64, 2164327680U);
-                l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_FirmwareVersion_Uint64, 1533720215U);
-                l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_FPGAVersion_Uint64, 262U);
-                l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_VRCVersion_Uint64, 1533720214U);
-                l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_RadioVersion_Uint64, 1532585738U);
-                l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_DongleVersion_Uint64, 1461100729U);
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ResourceRoot_String, "htc");
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_RegisteredDeviceType_String, (m_handAssigment == CHA_Left) ? "htc/vive_controllerLHR-F94B3BD8" : "htc/vive_controllerLHR-F94B3BD9"); // Changed
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_InputProfilePath_String, "{htc}/input/vive_controller_profile.json");
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceOff_String, "{htc}/icons/controller_status_off.png");
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceSearching_String, "{htc}/icons/controller_status_searching.gif");
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceSearchingAlert_String, "{htc}/icons/controller_status_searching_alert.gif");
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceReady_String, "{htc}/icons/controller_status_ready.png");
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceReadyAlert_String, "{htc}/icons/controller_status_ready_alert.png");
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceNotReady_String, "{htc}/icons/controller_status_error.png");
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceStandby_String, "{htc}/icons/controller_status_off.png");
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceAlertLow_String, "{htc}/icons/controller_status_ready_low.png");
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ControllerType_String, "vive_controller");
-            } break;
-
-            case CDriverConfig::EC_Index:
-            {
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ModelNumber_String, (m_handAssigment == CHA_Left) ? "Knuckles Left" : "Knuckles Right");
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_RenderModelName_String, (m_handAssigment == CHA_Left) ? "{indexcontroller}valve_controller_knu_1_0_left" : "{indexcontroller}valve_controller_knu_1_0_right");
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ManufacturerName_String, "Valve");
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_TrackingFirmwareVersion_String, "1562916277 watchman@ValveBuilder02 2019-07-12 FPGA 538(2.26/10/2) BL 0 VRC 1562916277 Radio 1562882729");
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_HardwareRevision_String, "product 17 rev 14.1.9 lot 2019/4/20 0");
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ConnectedWirelessDongle_String, "C2F75F5986-FYI"); // Changed
-                l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_HardwareRevision_Uint64, 286130441U);
-                l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_FirmwareVersion_Uint64, 1562916277U);
-                l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_FPGAVersion_Uint64, 538U);
-                l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_VRCVersion_Uint64, 1562916277U);
-                l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_RadioVersion_Uint64, 1562882729U);
-                l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_DongleVersion_Uint64, 1558748372U);
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_Firmware_ProgrammingTarget_String, (m_handAssigment == CHA_Left) ? "LHR-E217CD00" : "LHR-E217CD01"); // Changed
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ResourceRoot_String, "indexcontroller");
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_RegisteredDeviceType_String, (m_handAssigment == CHA_Left) ? "valve/index_controllerLHR-E217CD00" : "valve/index_controllerLHR-E217CD01"); // Changed
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_InputProfilePath_String, "{indexcontroller}/input/index_controller_profile.json");
-                l_vrProperties->SetInt32Property(m_propertyContainer, vr::Prop_Axis2Type_Int32, vr::k_eControllerAxis_Trigger);
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceOff_String, (m_handAssigment == CHA_Left) ? "{indexcontroller}/icons/left_controller_status_off.png" : "{indexcontroller}/icons/right_controller_status_off.png");
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceSearching_String, (m_handAssigment == CHA_Left) ? "{indexcontroller}/icons/left_controller_status_searching.gif" : "{indexcontroller}/icons/right_controller_status_searching.gif");
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceSearchingAlert_String, (m_handAssigment == CHA_Left) ? "{indexcontroller}/icons/left_controller_status_searching_alert.gif" : "{indexcontroller}/icons//right_controller_status_searching_alert.gif");
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceReady_String, (m_handAssigment == CHA_Left) ? "{indexcontroller}/icons/left_controller_status_ready.png" : "{indexcontroller}/icons//right_controller_status_ready.png");
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceReadyAlert_String, (m_handAssigment == CHA_Left) ? "{indexcontroller}/icons/left_controller_status_ready_alert.png" : "{indexcontroller}/icons//right_controller_status_ready_alert.png");
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceNotReady_String, (m_handAssigment == CHA_Left) ? "{indexcontroller}/icons/left_controller_status_error.png" : "{indexcontroller}/icons//right_controller_status_error.png");
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceStandby_String, (m_handAssigment == CHA_Left) ? "{indexcontroller}/icons/left_controller_status_off.png" : "{indexcontroller}/icons//right_controller_status_off.png");
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceAlertLow_String, (m_handAssigment == CHA_Left) ? "{indexcontroller}/icons/left_controller_status_ready_low.png" : "{indexcontroller}/icons//right_controller_status_ready_low.png");
-                l_vrProperties->SetStringProperty(m_propertyContainer, vr::Prop_ControllerType_String, "knuckles");
-            } break;
-        }
-
-        // Hidden property for leap_monitor
-        l_vrProperties->SetUint64Property(m_propertyContainer, vr::Prop_VendorSpecific_Reserved_Start, 0x1EA8U);
-
-        // Shared inputs
-        ms_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/system/click", &m_buttons[CB_SysClick].GetHandleRef());
-        m_buttons[CB_SysClick].SetInputType(ControllerButtonInputType::CBIT_Boolean);
-
-        ms_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/trigger/click", &m_buttons[CB_TriggerClick].GetHandleRef());
-        m_buttons[CB_TriggerClick].SetInputType(ControllerButtonInputType::CBIT_Boolean);
-
-        ms_driverInput->CreateScalarComponent(m_propertyContainer, "/input/trigger/value", &m_buttons[CB_TriggerValue].GetHandleRef(), vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedOneSided);
-        m_buttons[CB_TriggerValue].SetInputType(ControllerButtonInputType::CBIT_Float);
-
-        ms_driverInput->CreateScalarComponent(m_propertyContainer, "/input/trackpad/x", &m_buttons[CB_TrackpadX].GetHandleRef(), vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedTwoSided);
-        m_buttons[CB_TrackpadX].SetInputType(ControllerButtonInputType::CBIT_Float);
-
-        ms_driverInput->CreateScalarComponent(m_propertyContainer, "/input/trackpad/y", &m_buttons[CB_TrackpadY].GetHandleRef(), vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedTwoSided);
-        m_buttons[CB_TrackpadY].SetInputType(ControllerButtonInputType::CBIT_Float);
-
-        ms_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/trackpad/touch", &m_buttons[CB_TrackpadTouch].GetHandleRef());
-        m_buttons[CB_TrackpadTouch].SetInputType(ControllerButtonInputType::CBIT_Boolean);
-
-        // Specific inputs
-        switch(CDriverConfig::GetEmulatedController())
-        {
-            case CDriverConfig::EC_Vive:
-            {
-                ms_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/grip/click", &m_buttons[CB_GripClick].GetHandleRef());
-                m_buttons[CB_GripClick].SetInputType(ControllerButtonInputType::CBIT_Boolean);
-
-                ms_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/application_menu/click", &m_buttons[CB_AppMenuClick].GetHandleRef());
-                m_buttons[CB_AppMenuClick].SetInputType(ControllerButtonInputType::CBIT_Boolean);
-
-                ms_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/trackpad/click", &m_buttons[CB_TrackpadClick].GetHandleRef());
-                m_buttons[CB_TrackpadClick].SetInputType(ControllerButtonInputType::CBIT_Boolean);
-            } break;
-            case CDriverConfig::EC_Index:
-            {
-                ms_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/system/touch", &m_buttons[CB_SysTouch].GetHandleRef());
-                m_buttons[CB_SysTouch].SetInputType(ControllerButtonInputType::CBIT_Boolean);
-
-                ms_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/grip/touch", &m_buttons[CB_GripTouch].GetHandleRef());
-                m_buttons[CB_GripTouch].SetInputType(ControllerButtonInputType::CBIT_Boolean);
-
-                ms_driverInput->CreateScalarComponent(m_propertyContainer, "/input/grip/force", &m_buttons[CB_GripForce].GetHandleRef(), vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedOneSided);
-                m_buttons[CB_GripForce].SetInputType(ControllerButtonInputType::CBIT_Float);
-
-                ms_driverInput->CreateScalarComponent(m_propertyContainer, "/input/grip/value", &m_buttons[CB_GripValue].GetHandleRef(), vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedOneSided);
-                m_buttons[CB_GripValue].SetInputType(ControllerButtonInputType::CBIT_Float);
-
-                ms_driverInput->CreateScalarComponent(m_propertyContainer, "/input/trackpad/force", &m_buttons[CB_TrackpadForce].GetHandleRef(), vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedOneSided);
-                m_buttons[CB_TrackpadForce].SetInputType(ControllerButtonInputType::CBIT_Float);
-
-                ms_driverInput->CreateScalarComponent(m_propertyContainer, "/input/thumbstick/x", &m_buttons[CB_ThumbstickX].GetHandleRef(), vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedTwoSided);
-                m_buttons[CB_ThumbstickX].SetInputType(ControllerButtonInputType::CBIT_Float);
-
-                ms_driverInput->CreateScalarComponent(m_propertyContainer, "/input/thumbstick/y", &m_buttons[CB_ThumbstickY].GetHandleRef(), vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedTwoSided);
-                m_buttons[CB_ThumbstickY].SetInputType(ControllerButtonInputType::CBIT_Float);
-
-                ms_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/thumbstick/click", &m_buttons[CB_ThumbstickClick].GetHandleRef());
-                m_buttons[CB_ThumbstickClick].SetInputType(ControllerButtonInputType::CBIT_Boolean);
-
-                ms_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/thumbstick/touch", &m_buttons[CB_ThumbstickTouch].GetHandleRef());
-                m_buttons[CB_ThumbstickTouch].SetInputType(ControllerButtonInputType::CBIT_Boolean);
-
-                ms_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/a/click", &m_buttons[CB_IndexAClick].GetHandleRef());
-                m_buttons[CB_IndexAClick].SetInputType(ControllerButtonInputType::CBIT_Boolean);
-
-                ms_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/a/touch", &m_buttons[CB_IndexATouch].GetHandleRef());
-                m_buttons[CB_IndexATouch].SetInputType(ControllerButtonInputType::CBIT_Boolean);
-
-                ms_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/b/click", &m_buttons[CB_IndexBClick].GetHandleRef());
-                m_buttons[CB_IndexBClick].SetInputType(ControllerButtonInputType::CBIT_Boolean);
-
-                ms_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/b/touch", &m_buttons[CB_IndexBTouch].GetHandleRef());
-                m_buttons[CB_IndexBTouch].SetInputType(ControllerButtonInputType::CBIT_Boolean);
-
-                ms_driverInput->CreateScalarComponent(m_propertyContainer, "/input/finger/index", &m_buttons[CB_FingerIndex].GetHandleRef(), vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedOneSided);
-                m_buttons[CB_FingerIndex].SetInputType(ControllerButtonInputType::CBIT_Float);
-
-                ms_driverInput->CreateScalarComponent(m_propertyContainer, "/input/finger/middle", &m_buttons[CB_FingerMiddle].GetHandleRef(), vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedOneSided);
-                m_buttons[CB_FingerMiddle].SetInputType(ControllerButtonInputType::CBIT_Float);
-
-                ms_driverInput->CreateScalarComponent(m_propertyContainer, "/input/finger/ring", &m_buttons[CB_FingerRing].GetHandleRef(), vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedOneSided);
-                m_buttons[CB_FingerRing].SetInputType(ControllerButtonInputType::CBIT_Float);
-
-                ms_driverInput->CreateScalarComponent(m_propertyContainer, "/input/finger/pinky", &m_buttons[CB_FingerPinky].GetHandleRef(), vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedOneSided);
-                m_buttons[CB_FingerPinky].SetInputType(ControllerButtonInputType::CBIT_Float);
-
-                vr::EVRSkeletalTrackingLevel l_trackingLevel = ((CDriverConfig::GetTrackingLevel() == CDriverConfig::TL_Partial) ? vr::VRSkeletalTracking_Partial : vr::VRSkeletalTracking_Full);
-                switch(m_handAssigment)
-                {
-                    case CHA_Left:
-                        ms_driverInput->CreateSkeletonComponent(m_propertyContainer, "/input/skeleton/left", "/skeleton/hand/left", "/pose/raw", l_trackingLevel, nullptr, 0U, &m_skeletonHandle);
-                        break;
-                    case CHA_Right:
-                        ms_driverInput->CreateSkeletonComponent(m_propertyContainer, "/input/skeleton/right", "/skeleton/hand/right", "/pose/raw", l_trackingLevel, nullptr, 0U, &m_skeletonHandle);
-                        break;
-                }
-            } break;
-        }
-
-        // Fake haptic output to remove errors in vrserver log
-        ms_driverInput->CreateHapticComponent(m_propertyContainer, "/output/haptic", &m_haptic);
-
-        l_resultError = vr::VRInitError_None;
-    }
-
-    return l_resultError;
 }
 
 void CLeapHandController::Deactivate()
@@ -604,450 +312,51 @@ void CLeapHandController::UpdateTransformation(const Leap::Frame &f_frame)
         for(size_t i = 0U; i < 3U; i++) m_pose.vecVelocity[i] = .0;
         m_pose.result = vr::TrackingResult_Running_OutOfRange;
     }
-    if(m_gameProfile == GP_VRChat)
-    {
-        switch(CDriverConfig::GetEmulatedController())
-        {
-            case CDriverConfig::EC_Vive:
-                m_pose.poseIsValid = true;
-                break;
-            case CDriverConfig::EC_Index:
-                m_pose.poseIsValid = (CDriverConfig::IsVRChatHandsResetEnabled() ? l_handFound : true);
-                break;
-        }
-    }
-    else m_pose.poseIsValid = l_handFound;
+    m_pose.poseIsValid = MixHandState(l_handFound);
 
     ms_driverHost->TrackedDevicePoseUpdated(m_trackedDeviceID, m_pose, sizeof(vr::DriverPose_t));
 }
 
-void CLeapHandController::UpdateGestures(const Leap::Frame& f_frame)
+bool CLeapHandController::MixHandState(bool f_state)
 {
-    std::vector<float> l_scores;
-    if(CGestureMatcher::GetGestures(f_frame, ((m_handAssigment == CHA_Left) ? CGestureMatcher::WH_LeftHand : CGestureMatcher::WH_RightHand), l_scores))
-    {
-        switch(CDriverConfig::GetEmulatedController())
-        {
-            case CDriverConfig::EC_Vive:
-                ProcessViveGestures(l_scores);
-                break;
-            case CDriverConfig::EC_Index:
-                ProcessIndexGestures(f_frame, l_scores);
-                break;
-        }
-    }
-}
-
-void CLeapHandController::ProcessViveGestures(const std::vector<float> &f_scores)
-{
-    switch(m_gameProfile)
-    {
-        case GP_Default:
-        {
-            if(CDriverConfig::IsInputEnabled())
-            {
-                if(CDriverConfig::IsMenuEnabled()) m_buttons[CB_SysClick].SetState(f_scores[CGestureMatcher::GT_Timeout] >= 0.25f);
-                if(CDriverConfig::IsApplicationMenuEnabled()) m_buttons[CB_AppMenuClick].SetState(f_scores[CGestureMatcher::GT_FlatHandPalmTowards] >= 0.8f);
-
-                if(CDriverConfig::IsTriggerEnabled())
-                {
-                    m_buttons[CB_TriggerClick].SetState(f_scores[CGestureMatcher::GT_TriggerFinger] >= 0.75f);
-                    m_buttons[CB_TriggerValue].SetValue(f_scores[CGestureMatcher::GT_TriggerFinger]);
-                }
-
-                if(CDriverConfig::IsGripEnabled()) m_buttons[CB_GripClick].SetState(f_scores[CGestureMatcher::GT_LowerFist] >= 0.5f);
-
-                if(CDriverConfig::IsTouchpadEnabled())
-                {
-                    if(CDriverConfig::IsTouchpadAxesEnabled())
-                    {
-                        m_buttons[CB_TrackpadX].SetValue(f_scores[CGestureMatcher::GT_TouchpadAxisX]);
-                        m_buttons[CB_TrackpadY].SetValue(f_scores[CGestureMatcher::GT_TouchpadAxisY]);
-                    }
-                    if(CDriverConfig::IsTouchpadTouchEnabled()) m_buttons[CB_TrackpadTouch].SetState(f_scores[CGestureMatcher::GT_Thumbpress] >= 0.5f);
-                    if(CDriverConfig::IsTouchpadPressEnabled()) m_buttons[CB_TrackpadClick].SetState(f_scores[CGestureMatcher::GT_Thumbpress] >= 0.1f);
-                }
-            }
-        } break;
-
-        case GP_VRChat:
-        {
-            if(CDriverConfig::IsInputEnabled())
-            {
-                if(!m_gameSpecialModes.m_vrchatDrawingMode)
-                {
-                    m_buttons[CB_AppMenuClick].SetState(f_scores[CGestureMatcher::GT_Timeout] >= 0.75f);
-
-                    glm::vec2 l_trackpadAxis(0.f);
-                    if(f_scores[CGestureMatcher::GT_VRChatPoint] >= 0.75f)
-                    {
-                        l_trackpadAxis.x = 0.0f;
-                        l_trackpadAxis.y = 1.0f;
-                    }
-                    else if(f_scores[CGestureMatcher::GT_VRChatThumbsUp] >= 0.75f)
-                    {
-                        l_trackpadAxis.x = -0.95f;
-                        l_trackpadAxis.y = 0.31f;
-                    }
-                    else if(f_scores[CGestureMatcher::GT_VRChatVictory] >= 0.75f)
-                    {
-                        l_trackpadAxis.x = 0.95f;
-                        l_trackpadAxis.y = 0.31f;
-                    }
-                    else if(f_scores[CGestureMatcher::GT_VRChatGun] >= 0.75f)
-                    {
-                        l_trackpadAxis.x = -0.59f;
-                        l_trackpadAxis.y = -0.81f;
-                    }
-                    else if(f_scores[CGestureMatcher::GT_VRChatRockOut] >= 0.75f)
-                    {
-                        l_trackpadAxis.x = 0.59f;
-                        l_trackpadAxis.y = -0.81f;
-                    }
-                    if(m_handAssigment == CHA_Left) l_trackpadAxis.x *= -1.f;
-                    m_buttons[CB_TrackpadX].SetValue(l_trackpadAxis.x);
-                    m_buttons[CB_TrackpadY].SetValue(l_trackpadAxis.y);
-                    m_buttons[CB_TrackpadTouch].SetState((l_trackpadAxis.x != 0.f) || (l_trackpadAxis.y != 0.f));
-
-                    m_buttons[CB_TriggerValue].SetValue(f_scores[CGestureMatcher::GT_LowerFist]);
-                    m_buttons[CB_TriggerClick].SetState(f_scores[CGestureMatcher::GT_LowerFist] >= 0.5f);
-                    m_buttons[CB_GripClick].SetState(f_scores[CGestureMatcher::GT_VRChatSpreadHand] >= 0.75f);
-                }
-                else
-                {
-                    m_buttons[CB_AppMenuClick].SetState(false);
-                    m_buttons[CB_TrackpadX].SetValue(0.f);
-                    m_buttons[CB_TrackpadY].SetValue(0.f);
-                    m_buttons[CB_TrackpadTouch].SetState(false);
-                    m_buttons[CB_TriggerValue].SetValue((f_scores[CGestureMatcher::GT_LowerFist] >= 0.85f) ? 0.85f : 0.f);
-                    m_buttons[CB_TriggerClick].SetState(f_scores[CGestureMatcher::GT_LowerFist] >= 0.85f);
-                    m_buttons[CB_GripClick].SetState(false);
-                }
-            }
-        } break;
-    }
-}
-
-void CLeapHandController::ProcessIndexGestures(const Leap::Frame &f_frame, const std::vector<float> &f_scores)
-{
-    switch(m_gameProfile)
-    {
-        case GP_Default:
-        {
-            if(CDriverConfig::IsInputEnabled())
-            {
-                if(CDriverConfig::IsMenuEnabled())
-                {
-                    m_buttons[CB_SysClick].SetState(f_scores[CGestureMatcher::GT_Timeout] >= 0.5f);
-                    m_buttons[CB_SysTouch].SetState(f_scores[CGestureMatcher::GT_Timeout] >= 0.25f);
-                }
-                if(CDriverConfig::IsGripEnabled())
-                {
-                    m_buttons[CB_GripTouch].SetState(f_scores[CGestureMatcher::GT_LowerFist] >= 0.75f);
-                    m_buttons[CB_GripValue].SetValue(f_scores[CGestureMatcher::GT_LowerFist]);
-                    m_buttons[CB_GripForce].SetValue(f_scores[CGestureMatcher::GT_LowerFist] >= 0.75f ? (f_scores[CGestureMatcher::GT_LowerFist] - 0.75f) / 0.25f : 0.f);
-                }
-                if(CDriverConfig::IsTouchpadEnabled())
-                {
-                    if(CDriverConfig::IsTouchpadTouchEnabled())
-                    {
-                        if(f_scores[CGestureMatcher::GT_Thumbpress] >= 0.5f)
-                        {
-                            m_buttons[CB_TrackpadTouch].SetState(true);
-                            m_buttons[CB_TrackpadForce].SetValue(f_scores[CGestureMatcher::GT_Thumbpress] >= 0.75f ? (f_scores[CGestureMatcher::GT_Thumbpress] - 0.75f) / 0.25f : 0.f);
-                            if(CDriverConfig::IsTouchpadAxesEnabled())
-                            {
-                                m_buttons[CB_TrackpadX].SetValue(f_scores[CGestureMatcher::GT_TouchpadAxisX]);
-                                m_buttons[CB_TrackpadY].SetValue(f_scores[CGestureMatcher::GT_TouchpadAxisY]);
-                            }
-                        }
-                        else
-                        {
-                            m_buttons[CB_TrackpadTouch].SetState(false);
-                            m_buttons[CB_TrackpadForce].SetValue(0.f);
-                        }
-                    }
-                }
-                if(CDriverConfig::IsTriggerEnabled())
-                {
-                    m_buttons[CB_TriggerClick].SetState(f_scores[CGestureMatcher::GT_TriggerFinger] >= 0.75f);
-                    m_buttons[CB_TriggerValue].SetValue(f_scores[CGestureMatcher::GT_TriggerFinger]);
-                }
-                if(CDriverConfig::IsThumbstickEnabled())
-                {
-                    m_buttons[CB_ThumbstickTouch].SetState(f_scores[CGestureMatcher::GT_ThumbIndexCrossTouch] >= 0.5f);
-                    m_buttons[CB_ThumbstickClick].SetState(f_scores[CGestureMatcher::GT_ThumbIndexCrossTouch] >= 0.75f);
-
-                    // Keyboard thumbstick direction when NumLock is active
-                    if((GetKeyState(VK_NUMLOCK) & 0xFFFF) != 0)
-                    {
-                        if(GetAsyncKeyState((m_handAssigment == CHA_Left) ? VK_RIGHT : VK_NUMPAD6) & 0x8000) m_buttons[CB_ThumbstickX].SetValue(1.f);
-                        else if(GetAsyncKeyState((m_handAssigment == CHA_Left) ? VK_LEFT : VK_NUMPAD4) & 0x8000) m_buttons[CB_ThumbstickX].SetValue(-1.f);
-                        else m_buttons[CB_ThumbstickX].SetValue(0.f);
-
-                        if(GetAsyncKeyState((m_handAssigment == CHA_Left) ? VK_UP : VK_NUMPAD8) & 0x8000) m_buttons[CB_ThumbstickY].SetValue(1.f);
-                        else if(GetAsyncKeyState((m_handAssigment == CHA_Left) ? VK_DOWN : VK_NUMPAD2) & 0x8000) m_buttons[CB_ThumbstickY].SetValue(-1.f);
-                        else m_buttons[CB_ThumbstickY].SetValue(0.f);
-                    }
-                }
-                if(CDriverConfig::IsButtonAEnabled())
-                {
-                    m_buttons[CB_IndexATouch].SetState(f_scores[CGestureMatcher::GT_ThumbMiddleTouch] >= 0.5f);
-                    m_buttons[CB_IndexAClick].SetState(f_scores[CGestureMatcher::GT_ThumbMiddleTouch] >= 0.75f);
-                }
-                if(CDriverConfig::IsButtonBEnabled())
-                {
-                    m_buttons[CB_IndexBTouch].SetState(f_scores[CGestureMatcher::GT_ThumbPinkyTouch] >= 0.5f);
-                    m_buttons[CB_IndexBClick].SetState(f_scores[CGestureMatcher::GT_ThumbPinkyTouch] >= 0.75f);
-                }
-            }
-        } break;
-        case GP_VRChat:
-        {
-            if(CDriverConfig::IsInputEnabled())
-            {
-                if(CDriverConfig::IsTouchpadEnabled())
-                {
-                    if(CDriverConfig::IsTouchpadTouchEnabled())
-                    {
-                        if(f_scores[CGestureMatcher::GT_Thumbpress] >= 0.5f)
-                        {
-                            m_buttons[CB_TrackpadTouch].SetState(true);
-                            m_buttons[CB_TrackpadForce].SetValue(f_scores[CGestureMatcher::GT_Thumbpress] >= 0.75f ? (f_scores[CGestureMatcher::GT_Thumbpress] - 0.75f) / 0.25f : 0.f);
-                        }
-                        else
-                        {
-                            m_buttons[CB_TrackpadTouch].SetState(false);
-                            m_buttons[CB_TrackpadForce].SetValue(0.f);
-                        }
-                    }
-                    if(CDriverConfig::IsTriggerEnabled())
-                    {
-                        m_buttons[CB_TriggerClick].SetState(f_scores[CGestureMatcher::GT_TriggerFinger] >= 0.75f);
-                        m_buttons[CB_TriggerValue].SetValue(f_scores[CGestureMatcher::GT_TriggerFinger]);
-                    }
-                    if(CDriverConfig::IsGripEnabled())
-                    {
-                        m_buttons[CB_GripTouch].SetState(f_scores[CGestureMatcher::GT_LowerFist] >= 0.85f);
-                        m_buttons[CB_GripValue].SetValue(f_scores[CGestureMatcher::GT_LowerFist]);
-                        m_buttons[CB_GripForce].SetValue(f_scores[CGestureMatcher::GT_LowerFist] >= 0.85f ? (f_scores[CGestureMatcher::GT_LowerFist] - 0.85f) / 0.15f : 0.f);
-                    }
-                    if(CDriverConfig::IsButtonBEnabled())
-                    {
-                        m_buttons[CB_IndexBTouch].SetState(f_scores[CGestureMatcher::GT_Timeout] >= 0.5f);
-                        m_buttons[CB_IndexBClick].SetState(f_scores[CGestureMatcher::GT_Timeout] >= 0.75f);
-                    }
-                }
-            }
-        } break;
-    }
-
-    // Update skeleton
-    if(CDriverConfig::IsSkeletonEnabled())
-    {
-        m_buttons[CB_FingerIndex].SetValue(f_scores[CGestureMatcher::GT_IndexFingerBend]);
-        m_buttons[CB_FingerMiddle].SetValue(f_scores[CGestureMatcher::GT_MiddleFingerBend]);
-        m_buttons[CB_FingerRing].SetValue(f_scores[CGestureMatcher::GT_RingFingerBend]);
-        m_buttons[CB_FingerPinky].SetValue(f_scores[CGestureMatcher::GT_PinkyFingerBend]);
-
-        for(Leap::Hand l_hand : f_frame.hands())
-        {
-            if(l_hand.isValid())
-            {
-                if((l_hand.isLeft() && (m_handAssigment == CHA_Left)) || (l_hand.isRight() && (m_handAssigment == CHA_Right)))
-                {
-                    // Update rotations
-                    glm::mat4 l_handMat;
-                    Leap::Matrix l_leapMat = l_hand.basis();
-                    ConvertMatrix(l_leapMat, l_handMat);
-                    glm::mat4 l_handMatInv = glm::inverse(l_handMat);
-
-                    for(Leap::Finger l_finger : l_hand.fingers())
-                    {
-                        if(l_finger.isValid())
-                        {
-                            size_t l_transformIndex = 0U;
-                            switch(l_finger.type())
-                            {
-                                case Leap::Finger::TYPE_INDEX:
-                                    l_transformIndex = HSB_IndexFinger1;
-                                    break;
-                                case Leap::Finger::TYPE_MIDDLE:
-                                    l_transformIndex = HSB_MiddleFinger1;
-                                    break;
-                                case Leap::Finger::TYPE_PINKY:
-                                    l_transformIndex = HSB_PinkyFinger1;
-                                    break;
-                                case Leap::Finger::TYPE_RING:
-                                    l_transformIndex = HSB_RingFinger1;
-                                    break;
-                                case Leap::Finger::TYPE_THUMB:
-                                    l_transformIndex = HSB_Thumb0;
-                                    break;
-                            }
-
-                            glm::mat4 l_boneMat;
-                            glm::quat l_result;
-
-                            // Segment 1
-                            l_leapMat = l_finger.bone(Leap::Bone::TYPE_PROXIMAL).basis();
-                            ConvertMatrix(l_leapMat, l_boneMat);
-                            l_result = l_boneMat*l_handMatInv;
-                            if(l_finger.type() == Leap::Finger::TYPE_THUMB)
-                            {
-                                if(m_handAssigment == CHA_Left) l_result = glm::rotate(l_result, glm::pi<float>(), g_axisX);
-                                else
-                                {
-                                    l_result.w *= -1.f;
-                                    l_result.z *= -1.f;
-                                    l_result = glm::rotate(l_result, glm::pi<float>(), g_axisY);
-                                }
-                            }
-                            SwitchBoneAxes(l_result);
-                            ConvertQuaternion(l_result, m_boneTransform[l_transformIndex].orientation);
-
-                            // Segment 2
-                            glm::mat4 l_inversedProximal = glm::inverse(l_boneMat);
-                            l_leapMat = l_finger.bone(Leap::Bone::TYPE_INTERMEDIATE).basis();
-                            ConvertMatrix(l_leapMat, l_boneMat);
-                            l_result = l_boneMat*l_inversedProximal;
-                            SwitchBoneAxes(l_result);
-                            ConvertQuaternion(l_result, m_boneTransform[l_transformIndex + 1U].orientation);
-
-                            // Segment 3
-                            glm::mat4 l_inversedIntermediate = glm::inverse(l_boneMat);
-                            l_leapMat = l_finger.bone(Leap::Bone::TYPE_DISTAL).basis();
-                            ConvertMatrix(l_leapMat, l_boneMat);
-                            l_result = l_boneMat*l_inversedIntermediate;
-                            SwitchBoneAxes(l_result);
-                            ConvertQuaternion(l_result, m_boneTransform[l_transformIndex + 2U].orientation);
-                        }
-                    }
-
-                    // Update aux bones
-                    glm::vec3 l_position;
-                    glm::quat l_rotation;
-                    ConvertVector3(m_boneTransform[HSB_Wrist].position, l_position);
-                    ConvertQuaternion(m_boneTransform[HSB_Wrist].orientation, l_rotation);
-                    glm::mat4 l_wristMat = glm::translate(g_identityMatrix, l_position) * glm::mat4_cast(l_rotation);
-
-                    // Thumb aux
-                    glm::mat4 l_chainMat(l_wristMat);
-                    for(size_t i = HSB_Thumb0; i < HSB_Thumb3; i++)
-                    {
-                        ConvertVector3(m_boneTransform[i].position, l_position);
-                        ConvertQuaternion(m_boneTransform[i].orientation, l_rotation);
-                        l_chainMat = l_chainMat*(glm::translate(g_identityMatrix, l_position)*glm::mat4_cast(l_rotation));
-                    }
-                    l_position = l_chainMat*g_zeroPoint;
-                    l_rotation = glm::quat_cast(l_chainMat);
-                    if(m_handAssigment == CHA_Left) FixAuxBoneTransformation(l_position, l_rotation);
-                    ConvertVector3(l_position, m_boneTransform[HSB_Aux_Thumb].position);
-                    ConvertQuaternion(l_rotation, m_boneTransform[HSB_Aux_Thumb].orientation);
-
-                    // Index aux
-                    std::memcpy(&l_chainMat, &l_wristMat, sizeof(glm::mat4));
-                    for(size_t i = HSB_IndexFinger0; i < HSB_IndexFinger4; i++)
-                    {
-                        ConvertVector3(m_boneTransform[i].position, l_position);
-                        ConvertQuaternion(m_boneTransform[i].orientation, l_rotation);
-                        l_chainMat = l_chainMat*(glm::translate(g_identityMatrix, l_position)*glm::mat4_cast(l_rotation));
-                    }
-                    l_position = l_chainMat*g_zeroPoint;
-                    l_rotation = glm::quat_cast(l_chainMat);
-                    if(m_handAssigment == CHA_Left) FixAuxBoneTransformation(l_position, l_rotation);
-                    ConvertVector3(l_position, m_boneTransform[HSB_Aux_IndexFinger].position);
-                    ConvertQuaternion(l_rotation, m_boneTransform[HSB_Aux_IndexFinger].orientation);
-
-                    // Middle aux
-                    std::memcpy(&l_chainMat, &l_wristMat, sizeof(glm::mat4));
-                    for(size_t i = HSB_MiddleFinger0; i < HSB_MiddleFinger4; i++)
-                    {
-                        ConvertVector3(m_boneTransform[i].position, l_position);
-                        ConvertQuaternion(m_boneTransform[i].orientation, l_rotation);
-                        l_chainMat = l_chainMat*(glm::translate(g_identityMatrix, l_position)*glm::mat4_cast(l_rotation));
-                    }
-                    l_position = l_chainMat*g_zeroPoint;
-                    l_rotation = glm::quat_cast(l_chainMat);
-                    if(m_handAssigment == CHA_Left) FixAuxBoneTransformation(l_position, l_rotation);
-                    ConvertVector3(l_position, m_boneTransform[HSB_Aux_MiddleFinger].position);
-                    ConvertQuaternion(l_rotation, m_boneTransform[HSB_Aux_MiddleFinger].orientation);
-
-                    // Ring aux
-                    std::memcpy(&l_chainMat, &l_wristMat, sizeof(glm::mat4));
-                    for(size_t i = HSB_RingFinger0; i < HSB_RingFinger4; i++)
-                    {
-                        ConvertVector3(m_boneTransform[i].position, l_position);
-                        ConvertQuaternion(m_boneTransform[i].orientation, l_rotation);
-                        l_chainMat = l_chainMat*(glm::translate(g_identityMatrix, l_position)*glm::mat4_cast(l_rotation));
-                    }
-                    l_position = l_chainMat*g_zeroPoint;
-                    l_rotation = glm::quat_cast(l_chainMat);
-                    if(m_handAssigment == CHA_Left) FixAuxBoneTransformation(l_position, l_rotation);
-                    ConvertVector3(l_position, m_boneTransform[HSB_Aux_RingFinger].position);
-                    ConvertQuaternion(l_rotation, m_boneTransform[HSB_Aux_RingFinger].orientation);
-
-                    // Pinky aux
-                    std::memcpy(&l_chainMat, &l_wristMat, sizeof(glm::mat4));
-                    for(size_t i = HSB_PinkyFinger0; i < HSB_PinkyFinger4; i++)
-                    {
-                        ConvertVector3(m_boneTransform[i].position, l_position);
-                        ConvertQuaternion(m_boneTransform[i].orientation, l_rotation);
-                        l_chainMat = l_chainMat*(glm::translate(g_identityMatrix, l_position)*glm::mat4_cast(l_rotation));
-                    }
-                    l_position = l_chainMat*g_zeroPoint;
-                    l_rotation = glm::quat_cast(l_chainMat);
-                    if(m_handAssigment == CHA_Left) FixAuxBoneTransformation(l_position, l_rotation);
-                    ConvertVector3(l_position, m_boneTransform[HSB_Aux_PinkyFinger].position);
-                    ConvertQuaternion(l_rotation, m_boneTransform[HSB_Aux_PinkyFinger].orientation);
-
-                    break;
-                }
-            }
-        }
-    }
+    return f_state;
 }
 
 void CLeapHandController::UpdateInput()
 {
-    for(size_t i = 0U; i < CB_Count; i++)
+    for(auto l_button : m_buttons)
     {
-        CControllerButton &l_button = m_buttons[i];
-        if(l_button.IsUpdated())
+        if(l_button->IsUpdated())
         {
-            switch(l_button.GetInputType())
+            switch(l_button->GetInputType())
             {
-                case ControllerButtonInputType::CBIT_Boolean:
-                    ms_driverInput->UpdateBooleanComponent(l_button.GetHandle(), l_button.GetState(), .0);
+                case CControllerButton::CBIT_Boolean:
+                    ms_driverInput->UpdateBooleanComponent(l_button->GetHandle(), l_button->GetState(), .0);
                     break;
-                case ControllerButtonInputType::CBIT_Float:
-                    ms_driverInput->UpdateScalarComponent(l_button.GetHandle(), l_button.GetValue(), .0);
+                case CControllerButton::CBIT_Float:
+                    ms_driverInput->UpdateScalarComponent(l_button->GetHandle(), l_button->GetValue(), .0);
                     break;
             }
-            l_button.ResetUpdate();
+            l_button->ResetUpdate();
         }
     }
-    if(CDriverConfig::GetEmulatedController() == CDriverConfig::EC_Index)
-    {
-        ms_driverInput->UpdateSkeletonComponent(m_skeletonHandle, vr::VRSkeletalMotionRange_WithController, m_boneTransform, HSB_Count);
-        ms_driverInput->UpdateSkeletonComponent(m_skeletonHandle, vr::VRSkeletalMotionRange_WithoutController, m_boneTransform, HSB_Count);
-    }
+    UpdateInputInternal();
 }
 
 void CLeapHandController::ResetControls()
 {
-    for(size_t i = 0U; i < CB_Count; i++)
+    for(auto l_button : m_buttons)
     {
-        CControllerButton &l_button = m_buttons[i];
-        l_button.SetValue(0.f);
-        l_button.SetState(false);
+        l_button->SetValue(0.f);
+        l_button->SetState(false);
     }
 }
 
-void CLeapHandController::SetInterfaces(vr::IVRServerDriverHost *f_host, vr::IVRDriverInput *f_input)
+void CLeapHandController::SetInterfaces(vr::IVRServerDriverHost *f_host, vr::IVRDriverInput *f_input, vr::CVRPropertyHelpers *f_helpers)
 {
     ms_driverHost = f_host;
     ms_driverInput = f_input;
+    ms_propertyHelpers = f_helpers;
 }
 void CLeapHandController::UpdateHMDCoordinates()
 {

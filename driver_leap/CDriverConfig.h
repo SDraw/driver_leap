@@ -1,6 +1,6 @@
 #pragma once
 
-class CDriverConfig
+class CDriverConfig final
 {
     static unsigned char ms_emulatedController;
     static bool ms_leftHand;
@@ -27,6 +27,11 @@ class CDriverConfig
     static bool ms_buttonB;
     static bool ms_thumbstick;
     static bool ms_vrchatHandsReset;
+
+    CDriverConfig() = delete;
+    ~CDriverConfig() = delete;
+    CDriverConfig(const CDriverConfig &that) = delete;
+    CDriverConfig& operator=(const CDriverConfig &that) = delete;
 public:
     enum EmulatedController : unsigned char
     {
@@ -46,7 +51,7 @@ public:
 
     static void LoadConfig();
 
-    static inline bool GetEmulatedController() { return ms_emulatedController; }
+    static inline unsigned char GetEmulatedController() { return ms_emulatedController; }
     static inline bool IsLeftHandEnabled() { return ms_leftHand; }
     static inline bool IsRightHandEnabled() { return ms_rightHand; }
     static inline unsigned char GetOrientationMode() { return ms_orientation; }
