@@ -51,7 +51,7 @@ class CLeapHandControllerIndex final : public CLeapHandController
     CLeapHandControllerIndex(const CLeapHandControllerIndex &that) = delete;
     CLeapHandControllerIndex& operator=(const CLeapHandControllerIndex &that) = delete;
 public:
-    CLeapHandControllerIndex(unsigned char f_hand);
+    explicit CLeapHandControllerIndex(unsigned char f_hand);
     ~CLeapHandControllerIndex();
 };
 

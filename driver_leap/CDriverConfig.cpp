@@ -4,6 +4,7 @@
 
 extern char g_moduleFilePath[];
 
+bool CDriverConfig::ms_enabled = true;
 unsigned char CDriverConfig::ms_emulatedController = CDriverConfig::EC_Vive;
 bool CDriverConfig::ms_leftHand = true;
 bool CDriverConfig::ms_rightHand = true;
@@ -32,7 +33,7 @@ bool CDriverConfig::ms_vrchatHandsReset = false;
 
 const std::vector<std::string> g_configAttributeTable
 {
-    "emulated_controller", "leftHand", "rightHand",
+    "enabled", "emulated_controller", "leftHand", "rightHand",
     "orientation", "desktopRoot", "rotationOffset",
     "skeleton", "trackingLevel",
     "input", "menu", "appMenu", "trigger", "grip",
@@ -42,7 +43,8 @@ const std::vector<std::string> g_configAttributeTable
 };
 enum ConfigParamIndex : size_t
 {
-    CPI_EmulatedController = 0U,
+    CPI_Enabled = 0U,
+    CPI_EmulatedController,
     CPI_LeftHand,
     CPI_RightHand,
     CPI_Orientation,
@@ -100,6 +102,9 @@ void CDriverConfig::LoadConfig()
                     {
                         switch(ReadEnumVector(l_param, g_configAttributeTable))
                         {
+                            case ConfigParamIndex::CPI_Enabled:
+                                ms_enabled = l_attribValue.as_bool(true);
+                                break;
                             case ConfigParamIndex::CPI_EmulatedController:
                             {
                                 std::string l_emulated = l_attribValue.as_string();

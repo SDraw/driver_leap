@@ -11,7 +11,7 @@ class CLeapHandControllerVive final : public CLeapHandController
     CLeapHandControllerVive(const CLeapHandControllerVive &that) = delete;
     CLeapHandControllerVive& operator=(const CLeapHandControllerVive &that) = delete;
 public:
-    CLeapHandControllerVive(unsigned char f_hand);
+    explicit CLeapHandControllerVive(unsigned char f_hand);
     ~CLeapHandControllerVive();
 };
 

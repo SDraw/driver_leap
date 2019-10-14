@@ -1,4 +1,5 @@
 <config>
+    <param name="enabled" value="true"/> <!--Driver won't be loaded if set to 'false'-->
     <param name="emulated_controller" value="vive"/> <!--"vive" or "index"-->
     <param name="rightHand" value="true"/>
     <param name="leftHand" value="true"/>

@@ -38,58 +38,63 @@ CServerDriver::~CServerDriver()
 // vr::IServerTrackedDeviceProvider
 vr::EVRInitError CServerDriver::Init(vr::IVRDriverContext *pDriverContext)
 {
+    vr::EVRInitError l_vrError = vr::VRInitError_None;
     CDriverConfig::LoadConfig();
 
-    VR_INIT_SERVER_DRIVER_CONTEXT(pDriverContext);
-    CDriverLog::Init(vr::VRDriverLog());
-
-    m_driverHost = vr::VRServerDriverHost();
-    CLeapHandController::SetInterfaces(m_driverHost, vr::VRDriverInput(), vr::VRProperties());
-
-    if(CDriverConfig::IsLeftHandEnabled())
+    if(CDriverConfig::IsEnabled())
     {
-        CLeapHandController *l_controller = nullptr;
-        switch(CDriverConfig::GetEmulatedController())
+        VR_INIT_SERVER_DRIVER_CONTEXT(pDriverContext);
+        CDriverLog::Init(vr::VRDriverLog());
+
+        m_driverHost = vr::VRServerDriverHost();
+        CLeapHandController::SetInterfaces(m_driverHost, vr::VRDriverInput(), vr::VRProperties());
+
+        if(CDriverConfig::IsLeftHandEnabled())
         {
-            case CDriverConfig::EC_Vive:
-                l_controller = new CLeapHandControllerVive(CLeapHandController::CHA_Left);
-                break;
-            case CDriverConfig::EC_Index:
-                l_controller = new CLeapHandControllerIndex(CLeapHandController::CHA_Left);
-                break;
+            CLeapHandController *l_controller = nullptr;
+            switch(CDriverConfig::GetEmulatedController())
+            {
+                case CDriverConfig::EC_Vive:
+                    l_controller = new CLeapHandControllerVive(CLeapHandController::CHA_Left);
+                    break;
+                case CDriverConfig::EC_Index:
+                    l_controller = new CLeapHandControllerIndex(CLeapHandController::CHA_Left);
+                    break;
+            }
+            if(m_driverHost && l_controller)
+            {
+                m_handControllers.push_back(l_controller);
+                m_driverHost->TrackedDeviceAdded(l_controller->GetSerialNumber().c_str(), vr::ETrackedDeviceClass::TrackedDeviceClass_Controller, l_controller);
+            }
         }
-        if(m_driverHost && l_controller)
+        if(CDriverConfig::IsRightHandEnabled())
         {
-            m_handControllers.push_back(l_controller);
-            m_driverHost->TrackedDeviceAdded(l_controller->GetSerialNumber().c_str(), vr::ETrackedDeviceClass::TrackedDeviceClass_Controller, l_controller);
+            CLeapHandController *l_controller = nullptr;
+            switch(CDriverConfig::GetEmulatedController())
+            {
+                case CDriverConfig::EC_Vive:
+                    l_controller = new CLeapHandControllerVive(CLeapHandController::CHA_Right);
+                    break;
+                case CDriverConfig::EC_Index:
+                    l_controller = new CLeapHandControllerIndex(CLeapHandController::CHA_Right);
+                    break;
+            }
+            if(m_driverHost && l_controller)
+            {
+                m_handControllers.push_back(l_controller);
+                m_driverHost->TrackedDeviceAdded(l_controller->GetSerialNumber().c_str(), vr::ETrackedDeviceClass::TrackedDeviceClass_Controller, l_controller);
+            }
         }
+
+        m_leapController = new Leap::Controller();
+        m_leapController->addListener(m_leapListener);
+        if(CDriverConfig::GetOrientationMode() == CDriverConfig::OM_HMD) m_leapController->setPolicy(Leap::Controller::POLICY_OPTIMIZE_HMD);
+
+        LaunchLeapMonitor();
     }
-    if(CDriverConfig::IsRightHandEnabled())
-    {
-        CLeapHandController *l_controller = nullptr;
-        switch(CDriverConfig::GetEmulatedController())
-        {
-            case CDriverConfig::EC_Vive:
-                l_controller = new CLeapHandControllerVive(CLeapHandController::CHA_Right);
-                break;
-            case CDriverConfig::EC_Index:
-                l_controller = new CLeapHandControllerIndex(CLeapHandController::CHA_Right);
-                break;
-        }
-        if(m_driverHost && l_controller)
-        {
-            m_handControllers.push_back(l_controller);
-            m_driverHost->TrackedDeviceAdded(l_controller->GetSerialNumber().c_str(), vr::ETrackedDeviceClass::TrackedDeviceClass_Controller, l_controller);
-        }
-    }
+    else l_vrError = vr::VRInitError_Driver_NotLoaded;
 
-    m_leapController = new Leap::Controller();
-    m_leapController->addListener(m_leapListener);
-    if(CDriverConfig::GetOrientationMode() == CDriverConfig::OM_HMD) m_leapController->setPolicy(Leap::Controller::POLICY_OPTIMIZE_HMD);
-
-    LaunchLeapMonitor();
-
-    return vr::VRInitError_None;
+    return l_vrError;
 }
 
 void CServerDriver::Cleanup()

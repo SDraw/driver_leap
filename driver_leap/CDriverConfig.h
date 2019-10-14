@@ -2,6 +2,7 @@
 
 class CDriverConfig final
 {
+    static bool ms_enabled;
     static unsigned char ms_emulatedController;
     static bool ms_leftHand;
     static bool ms_rightHand;
@@ -51,6 +52,7 @@ public:
 
     static void LoadConfig();
 
+    static inline bool IsEnabled() { return ms_enabled; }
     static inline unsigned char GetEmulatedController() { return ms_emulatedController; }
     static inline bool IsLeftHandEnabled() { return ms_leftHand; }
     static inline bool IsRightHandEnabled() { return ms_rightHand; }
