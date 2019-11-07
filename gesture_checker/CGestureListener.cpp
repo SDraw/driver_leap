@@ -52,6 +52,13 @@ void CGestureListener::onFrame(const Leap::Controller& controller)
     std::vector<float> l_scoresLeft, l_scoresRight;
     CGestureMatcher::GetGestures(l_frame, CGestureMatcher::WH_LeftHand, l_scoresLeft);
     CGestureMatcher::GetGestures(l_frame, CGestureMatcher::WH_RightHand, l_scoresRight);
+    
+    Leap::HeadPose l_headPose = controller.headPose(0U);
+    Leap::Vector l_headPos = l_headPose.position();
+    Leap::Quaternion l_headRot = l_headPose.orientation();
+
+    fprintf(stderr, "Head orientation: P(%.4f,%.4f,%.4f) R(%.4f,%.4f,%.4f,%.4f)\n", l_headPos.x, l_headPos.y, l_headPos.z, l_headRot.x, l_headRot.y, l_headRot.z, l_headRot.w);
+    fprintf(stderr, "<-- CGestureMatcher data -->\n");
     for(size_t i = 0U; i < CGestureMatcher::GT_GesturesCount; i++)
     {
         std::string l_gestureName;

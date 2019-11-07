@@ -1,8 +1,7 @@
 #pragma once
 
-class CGestureListener : public Leap::Listener
+class CGestureListener final : public Leap::Listener
 {
-public:
     virtual void onInit(const Leap::Controller&);
     virtual void onConnect(const Leap::Controller&);
     virtual void onDisconnect(const Leap::Controller&);

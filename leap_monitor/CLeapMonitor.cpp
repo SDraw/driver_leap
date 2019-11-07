@@ -158,11 +158,21 @@ void CLeapMonitor::Run()
                     case vr::VREvent_TrackedDeviceDeactivated:
                         RemoveTrackedDevice(l_event.trackedDeviceIndex);
                         break;
-                    case vr::VREvent_ApplicationTransitionNewAppLaunchComplete:
+                    case vr::VREvent_SceneApplicationStateChanged:
                     {
-                        char l_appKey[vr::k_unMaxApplicationKeyLength];
-                        m_vrApplications->GetApplicationKeyByProcessId(l_event.data.process.pid, l_appKey, vr::k_unMaxApplicationKeyLength);
-                        UpdateGameProfile(l_appKey);
+                        vr::EVRSceneApplicationState l_appState = m_vrApplications->GetSceneApplicationState();
+                        switch(l_appState)
+                        {
+                            case vr::EVRSceneApplicationState_Starting:
+                            {
+                                char l_appKey[vr::k_unMaxApplicationKeyLength];
+                                vr::EVRApplicationError l_appError = m_vrApplications->GetStartingApplication(l_appKey, vr::k_unMaxApplicationKeyLength);
+                                if(l_appError == vr::VRApplicationError_None) UpdateGameProfile(l_appKey);
+                            } break;
+                            case vr::EVRSceneApplicationState_None:
+                                UpdateGameProfile(""); // Revert to default
+                                break;
+                        }
                     } break;
                 }
                 if(l_quitEvent) break;
@@ -213,8 +223,6 @@ void CLeapMonitor::Terminate()
         m_leapController = nullptr;
         m_gameProfile = GP_Default;
         m_specialCombinationState = false;
-
-        vr::VR_Shutdown();
     }
 }
 

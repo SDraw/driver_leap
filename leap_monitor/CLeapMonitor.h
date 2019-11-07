@@ -2,7 +2,7 @@
 
 class CLeapMonitor;
 
-class CLeapListener : public Leap::Listener
+class CLeapListener final : public Leap::Listener
 {
     CLeapMonitor* m_monitor = nullptr;
     std::mutex m_monitorMutex;
@@ -17,7 +17,7 @@ public:
     void SetMonitor(CLeapMonitor *f_monitor); // Async method
 };
 
-class CLeapMonitor
+class CLeapMonitor final
 {
     std::atomic<bool> m_initialized;
     vr::IVRSystem *m_vrSystem;
@@ -44,6 +44,9 @@ class CLeapMonitor
     void RemoveTrackedDevice(uint32_t unTrackedDeviceIndex);
     void UpdateGameProfile(const char *f_appKey);
     void SendCommand(const char *f_cmd);
+
+    CLeapMonitor(const CLeapMonitor &that) = delete;
+    CLeapMonitor& operator=(const CLeapMonitor &that) = delete;
 public:
     CLeapMonitor();
     ~CLeapMonitor();
