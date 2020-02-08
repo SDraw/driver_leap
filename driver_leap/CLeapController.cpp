@@ -202,6 +202,10 @@ void CLeapController::UpdateTransformation(const Leap::Frame &f_frame)
                     {
                         // Controller follows HMD position only
                         std::memcpy(m_pose.vecWorldFromDriverTranslation, ms_headPosition, sizeof(double) * 3U);
+                        m_pose.qWorldFromDriverRotation.x = .0;
+                        m_pose.qWorldFromDriverRotation.y = .0;
+                        m_pose.qWorldFromDriverRotation.z = .0;
+                        m_pose.qWorldFromDriverRotation.w = 1.0;
 
                         Leap::Vector l_position = l_hand.palmPosition();
                         m_pose.vecPosition[0] = 0.001*l_position.x + CDriverConfig::GetDesktopRootX();
