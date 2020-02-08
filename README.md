@@ -20,23 +20,27 @@ Fork with updated vendor libraries and extended features.
   * Extract archive to '<base_project_installation_folder>/leap'
 
 ### Building (for developers)
-* Open solution in Visual Studio 2013
+* Open 'driver_leap.sln' solution in Visual Studio 2013
 * Build your platform:
-  * x64 - build output is in '<solution_folder>/x64'
-  * x86 - build output is in '<solution_folder>/Win32'
-* Copy build files to '<base_project_installation_folder>/leap/bin/<your_platform>':
+  * x64 - build output is in 'bin/win64'
+  * x86 - build output is in 'bin/win32'
+* Copy build files to 'leap/bin/<your_platform>':
   * driver_leap.dll
   * gesture_checker.exe
-  * leap_monitor.exe
-* Copy additional shared libraries to '<base_project_installation_folder>/leap/bin/<your_platform>':
+  * leap_monitor.exe  
+**Note:** There are post-build events for projects to copy build files directly to SteamVR driver folder that can be enabled manually.
+* Copy additional shared libraries to 'leap/bin/<your_platform>':
   * vendor/LeapSDK/bin/<your_platform>/LeapC.dll
   * vendor/openvr/bin/<your_platform>/openvr_api.dll
-* Copy 'control_config.xml' from solution root to '<base_project_installation_folder>/leap/cfg'
+* Copy 'resources' folder from solution root to driver's 'leap' folder. 
   
 ### Control configuration and inputs
-Driver can emulate HTC Vive controllers and Valve Index controllers with skeletal animation and work in desktop and HMD orientations. It's adjusted by editing control_config.xml in 'cfg' folder.  
+Driver can emulate HTC Vive controllers and Valve Index controllers with skeletal animation and work in desktop and HMD orientations. It's adjusted by editing settings.xml in 'resources' folder.  
 There are more configurable restrictions, such as global input, trackpad, trigger, grip and etc.  
-Controls are changed by game profiles that are enabled automatically when game is started from Steam.
+Controls are changed by game profiles that are enabled automatically when game is started from Steam.  
+Available hotkeys:
+* **Ctrl-P:** Disable right hand controller.
+* **Ctrl-O:** Disable left hand controller.
 
 ### HTC Vive controllers emulation
 Game profiles:
