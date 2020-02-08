@@ -3,11 +3,10 @@
 class CGestureMatcher
 {
 public:
-
-    enum WhichHand : size_t
+    enum GestureHand : size_t
     {
-        WH_LeftHand = 0U,
-        WH_RightHand
+        GH_LeftHand = 0U,
+        GH_RightHand
     };
 
     enum GestureType : size_t
@@ -53,7 +52,7 @@ public:
         GT_Invalid = 0xFFU
     };
 
-    static bool GetGestures(const Leap::Frame &f_frame, WhichHand f_which, std::vector<float> &f_result);
+    static bool GetGestures(const Leap::Frame &f_frame, GestureHand f_which, std::vector<float> &f_result);
     static void GetGestureName(GestureType f_gesture, std::string &f_name);
 protected:
     static float MapRange(float input, float minimum, float maximum);

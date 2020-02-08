@@ -1,8 +1,10 @@
-#include "stdafx.h"
+#include "LeapC++.h"
+#include "glm/glm.hpp"
+
 #include "CGestureMatcher.h"
 
-const Leap::Vector g_RightVector = Leap::Vector(-1, 0, 0);
 const Leap::Vector g_InVector = Leap::Vector(0, 1, 0);
+const Leap::Vector g_RightVector = Leap::Vector(-1, 0, 0);
 const Leap::Vector g_UpVector = Leap::Vector(0, 0, -1);
 
 struct FingerData
@@ -20,7 +22,7 @@ struct FingerData
     }
 };
 
-bool CGestureMatcher::GetGestures(const Leap::Frame &f_frame, WhichHand f_which, std::vector<float> &f_result)
+bool CGestureMatcher::GetGestures(const Leap::Frame &f_frame, GestureHand f_which, std::vector<float> &f_result)
 {
     bool l_result = false;
     f_result.resize(GT_GesturesCount, 0.f);
@@ -30,7 +32,7 @@ bool CGestureMatcher::GetGestures(const Leap::Frame &f_frame, WhichHand f_which,
     {
         if(l_hand.isValid())
         {
-            if((l_hand.isLeft() == (f_which == WH_LeftHand)) || (l_hand.isRight() == (f_which == WH_RightHand)))
+            if((l_hand.isLeft() == (f_which == GH_LeftHand)) || (l_hand.isRight() == (f_which == GH_RightHand)))
             {
                 FingerData l_fingerData[5U];
                 const Leap::FingerList l_fingers = l_hand.fingers();
@@ -77,7 +79,7 @@ bool CGestureMatcher::GetGestures(const Leap::Frame &f_frame, WhichHand f_which,
                 Leap::Vector l_palmNormal = l_hand.palmNormal();
                 Leap::Vector l_direction = l_hand.direction();
                 Leap::Vector l_pinkyside;
-                if(f_which == WH_RightHand) l_pinkyside = l_palmNormal.cross(l_direction);
+                if(f_which == GH_RightHand) l_pinkyside = l_palmNormal.cross(l_direction);
                 else l_pinkyside = l_direction.cross(l_palmNormal);
                 Merge(f_result[GT_Thumbpress], 1.f - MapRange(l_pinkyside.dot(l_fingerData[Leap::Finger::TYPE_THUMB].m_direction), 0.0f, 0.6f));
 
@@ -94,7 +96,7 @@ bool CGestureMatcher::GetGestures(const Leap::Frame &f_frame, WhichHand f_which,
                 Merge(f_result[GT_FlatHandPalmTowards], std::min(l_flatHand, MapRange((-g_InVector).dot(l_palmNormal), 0.8f, 0.95f)));
 
                 // ThumbsUp/Inward gestures (seems broken in new LeapSDK)
-                Leap::Vector l_inward = ((f_which == WH_LeftHand) ? g_RightVector : -g_RightVector);
+                Leap::Vector l_inward = ((f_which == GH_LeftHand) ? g_RightVector : -g_RightVector);
                 float l_fistHand = MapRange((l_fingerData[Leap::Finger::TYPE_INDEX].m_bend + l_fingerData[Leap::Finger::TYPE_MIDDLE].m_bend + l_fingerData[Leap::Finger::TYPE_RING].m_bend + l_fingerData[Leap::Finger::TYPE_PINKY].m_bend) / 5.f, 120.f, 150.f);
                 float l_straightThumb = MapRange(l_fingerData[Leap::Finger::TYPE_THUMB].m_bend, 50.f, 40.f);
                 Merge(f_result[GT_ThumbUp], std::min(l_fistHand, std::min(l_straightThumb, MapRange((g_UpVector).dot(l_fingerData[Leap::Finger::TYPE_THUMB].m_direction), 0.8f, 0.95f))));
@@ -124,7 +126,7 @@ bool CGestureMatcher::GetGestures(const Leap::Frame &f_frame, WhichHand f_which,
                 {
                     if(l_otherHand.isValid())
                     {
-                        if(((f_which == WH_LeftHand) && l_otherHand.isRight()) || ((f_which == WH_RightHand) && l_otherHand.isLeft()))
+                        if(((f_which == GH_LeftHand) && l_otherHand.isRight()) || ((f_which == GH_RightHand) && l_otherHand.isLeft()))
                         {
                             Merge(f_result[GT_Timeout], std::min(l_flatHand,  // I reuse the flatHand metric from above
                                 std::min(MapRange(l_direction.dot(-l_otherHand.palmNormal()), 0.8f, 0.95f),
