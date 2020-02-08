@@ -3,19 +3,20 @@
 class CControllerButton final
 {
     vr::VRInputComponentHandle_t m_handle;
-    float m_value;
-    bool m_state;
+
     unsigned char m_inputType;
+    bool m_state;
+    float m_value;
     bool m_updated;
 
     CControllerButton(const CControllerButton &that) = delete;
     CControllerButton& operator=(const CControllerButton &that) = delete;
 public:
-    enum ControllerButtonInputType : unsigned char
+    enum InputType : unsigned char
     {
-        CBIT_None = 0U,
-        CBIT_Boolean,
-        CBIT_Float
+        IT_None = 0U,
+        IT_Boolean,
+        IT_Float
     };
 
     CControllerButton();
@@ -27,13 +28,12 @@ public:
     inline void SetInputType(unsigned char f_type) { m_inputType = f_type; }
     inline unsigned char GetInputType() const { return m_inputType; }
 
-    void SetValue(float f_value);
-    inline float GetValue() const { return m_value; }
-
     void SetState(bool f_state);
     inline bool GetState() const { return m_state; }
+
+    void SetValue(float f_value);
+    inline float GetValue() const { return m_value; }
 
     inline bool IsUpdated() const { return m_updated; }
     inline void ResetUpdate() { m_updated = false; }
 };
-

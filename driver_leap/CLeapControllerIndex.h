@@ -1,9 +1,8 @@
 #pragma once
-#include "CLeapHandController.h"
+#include "CLeapController.h"
 
-class CLeapHandControllerIndex final : public CLeapHandController
+class CLeapControllerIndex final : public CLeapController
 {
-    vr::VRInputComponentHandle_t m_skeletonHandle;
     enum HandSkeletonBone : size_t
     {
         HSB_Root = 0U,
@@ -40,18 +39,19 @@ class CLeapHandControllerIndex final : public CLeapHandController
 
         HSB_Count
     };
+
     vr::VRBoneTransform_t m_boneTransform[HSB_Count];
+    vr::VRInputComponentHandle_t m_skeletonHandle;
 
-    // CLeapHandController
+    CLeapControllerIndex(const CLeapControllerIndex &that) = delete;
+    CLeapControllerIndex& operator=(const CLeapControllerIndex &that) = delete;
+
+    // CLeapController
     vr::EVRInitError Activate(uint32_t unObjectId);
+    bool MixHandState(bool f_state) override;
     void UpdateGestures(const Leap::Frame &f_frame);
-    void UpdateInputInternal();
-    bool MixHandState(bool f_state);
-
-    CLeapHandControllerIndex(const CLeapHandControllerIndex &that) = delete;
-    CLeapHandControllerIndex& operator=(const CLeapHandControllerIndex &that) = delete;
+    void UpdateInputInternal() override;
 public:
-    explicit CLeapHandControllerIndex(unsigned char f_hand);
-    ~CLeapHandControllerIndex();
+    explicit CLeapControllerIndex(unsigned char f_hand);
+    ~CLeapControllerIndex();
 };
-

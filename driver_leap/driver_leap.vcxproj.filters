@@ -8,26 +8,28 @@
     <ClCompile Include="..\vendor\pugixml\src\pugixml.cpp">
       <Filter>vendor\pugixml</Filter>
     </ClCompile>
-    <ClCompile Include="CLeapHandController.cpp" />
     <ClCompile Include="..\shared\CGestureMatcher.cpp">
       <Filter>shared</Filter>
     </ClCompile>
     <ClCompile Include="CDriverLog.cpp" />
     <ClCompile Include="CDriverConfig.cpp" />
     <ClCompile Include="CControllerButton.cpp" />
-    <ClCompile Include="CLeapHandControllerVive.cpp" />
-    <ClCompile Include="CLeapHandControllerIndex.cpp" />
+    <ClCompile Include="CRelayDevice.cpp" />
+    <ClCompile Include="CLeapController.cpp" />
+    <ClCompile Include="CLeapControllerIndex.cpp" />
+    <ClCompile Include="CLeapControllerVive.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Utils.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="CServerDriver.h" />
-    <ClInclude Include="CLeapHandController.h" />
     <ClInclude Include="CDriverLog.h" />
     <ClInclude Include="CDriverConfig.h" />
     <ClInclude Include="CControllerButton.h" />
-    <ClInclude Include="CLeapHandControllerVive.h" />
-    <ClInclude Include="CLeapHandControllerIndex.h" />
+    <ClInclude Include="CRelayDevice.h" />
+    <ClInclude Include="CLeapController.h" />
+    <ClInclude Include="CLeapControllerIndex.h" />
+    <ClInclude Include="CLeapControllerVive.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="vendor">

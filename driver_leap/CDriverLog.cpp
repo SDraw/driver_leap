@@ -1,9 +1,10 @@
 #include "stdafx.h"
+
 #include "CDriverLog.h"
 
 vr::IVRDriverLog* CDriverLog::ms_pLogFile = nullptr;
 
-bool CDriverLog::Init(vr::IVRDriverLog* pDriverLog)
+bool CDriverLog::Initialize(vr::IVRDriverLog* pDriverLog)
 {
     if(!ms_pLogFile) ms_pLogFile = pDriverLog;
     return (ms_pLogFile != nullptr);
@@ -12,6 +13,16 @@ bool CDriverLog::Init(vr::IVRDriverLog* pDriverLog)
 void CDriverLog::Cleanup()
 {
     ms_pLogFile = nullptr;
+}
+
+void CDriverLog::Log(const char *pMsgFormat, ...)
+{
+    va_list args;
+    va_start(args, pMsgFormat);
+
+    LogVarArgs(pMsgFormat, args);
+
+    va_end(args);
 }
 
 void CDriverLog::LogVarArgs(const char *pMsgFormat, va_list args)
@@ -24,14 +35,4 @@ void CDriverLog::LogVarArgs(const char *pMsgFormat, va_list args)
 #endif
 
     if(ms_pLogFile) ms_pLogFile->Log(buf);
-}
-
-void CDriverLog::Log(const char *pMsgFormat, ...)
-{
-    va_list args;
-    va_start(args, pMsgFormat);
-
-    LogVarArgs(pMsgFormat, args);
-
-    va_end(args);
 }

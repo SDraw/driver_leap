@@ -65,9 +65,9 @@
     </CustomBuildAfterTargets>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+    <OutDir>$(SolutionDir)bin\win32\</OutDir>
+    <IntDir>$(SolutionDir)objs\$(ProjectName)\$(PlatformName)\$(Configuration)\</IntDir>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <GenerateManifest>false</GenerateManifest>
@@ -76,19 +76,23 @@
     </CustomBuildAfterTargets>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+    <OutDir>$(SolutionDir)bin\win32\</OutDir>
+    <IntDir>$(SolutionDir)objs\$(ProjectName)\$(PlatformName)\$(Configuration)\</IntDir>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <GenerateManifest>false</GenerateManifest>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
-    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+    <OutDir>$(SolutionDir)bin\win64\</OutDir>
+    <IntDir>$(SolutionDir)objs\$(ProjectName)\$(PlatformName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <GenerateManifest>false</GenerateManifest>
     <IgnoreImportLibrary>false</IgnoreImportLibrary>
-    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+    <OutDir>$(SolutionDir)bin\win64\</OutDir>
+    <IntDir>$(SolutionDir)objs\$(ProjectName)\$(PlatformName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -225,16 +229,22 @@
   <ItemGroup>
     <ClInclude Include="CControllerButton.h" />
     <ClInclude Include="CDriverConfig.h" />
-    <ClInclude Include="CLeapHandController.h" />
-    <ClInclude Include="CLeapHandControllerIndex.h" />
-    <ClInclude Include="CLeapHandControllerVive.h" />
+    <ClInclude Include="CLeapController.h" />
+    <ClInclude Include="CLeapControllerIndex.h" />
+    <ClInclude Include="CLeapControllerVive.h" />
+    <ClInclude Include="CRelayDevice.h" />
     <ClInclude Include="CServerDriver.h" />
     <ClInclude Include="CDriverLog.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\shared\CGestureMatcher.cpp" />
+    <ClCompile Include="..\shared\CGestureMatcher.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\vendor\pugixml\src\pugixml.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
@@ -243,9 +253,10 @@
     </ClCompile>
     <ClCompile Include="CControllerButton.cpp" />
     <ClCompile Include="CDriverConfig.cpp" />
-    <ClCompile Include="CLeapHandController.cpp" />
-    <ClCompile Include="CLeapHandControllerIndex.cpp" />
-    <ClCompile Include="CLeapHandControllerVive.cpp" />
+    <ClCompile Include="CLeapController.cpp" />
+    <ClCompile Include="CLeapControllerIndex.cpp" />
+    <ClCompile Include="CLeapControllerVive.cpp" />
+    <ClCompile Include="CRelayDevice.cpp" />
     <ClCompile Include="CServerDriver.cpp" />
     <ClCompile Include="CDriverLog.cpp" />
     <ClCompile Include="dllmain.cpp" />

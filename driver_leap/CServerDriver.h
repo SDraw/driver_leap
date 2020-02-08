@@ -1,6 +1,7 @@
 #pragma once
 
-class CLeapHandController;
+class CLeapController;
+class CRelayDevice;
 
 class CLeapListener final : public Leap::Listener
 {
@@ -13,28 +14,32 @@ class CServerDriver final : public vr::IServerTrackedDeviceProvider
     vr::IVRServerDriverHost* m_driverHost;
     static const char* const ms_interfaces[];
 
-    bool m_leapMonitorLaunched;
-    PROCESS_INFORMATION m_processInfo;
-
-    std::vector<CLeapHandController*> m_handControllers;
     Leap::Controller *m_leapController;
     CLeapListener m_leapListener;
-    bool m_controllerState;
 
-    void LaunchLeapMonitor();
+    bool m_connectionState;
+    std::vector<CLeapController*> m_controllers;
+    CRelayDevice *m_relayDevice;
 
-    // vr::IServerTrackedDeviceProvider
-    vr::EVRInitError Init(vr::IVRDriverContext *pDriverContext);
-    void Cleanup();
-    const char* const* GetInterfaceVersions();
-    void RunFrame();
-    bool ShouldBlockStandbyMode();
-    void EnterStandby() {};
-    void LeaveStandby() {};
+    bool m_monitorLaunched;
+    PROCESS_INFORMATION m_monitorInfo;
 
     CServerDriver(const CServerDriver &that) = delete;
     CServerDriver& operator=(const CServerDriver &that) = delete;
+
+    void ProcessLeapControllerPause();
+
+    // vr::IServerTrackedDeviceProvider
+    void Cleanup();
+    void EnterStandby() {};
+    const char* const* GetInterfaceVersions();
+    vr::EVRInitError Init(vr::IVRDriverContext *pDriverContext);
+    void LeaveStandby() {};
+    void RunFrame();
+    bool ShouldBlockStandbyMode();
 public:
     CServerDriver();
     ~CServerDriver();
+
+    void ProcessExternalMessage(const char *f_message);
 };

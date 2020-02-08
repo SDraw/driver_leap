@@ -1,0 +1,26 @@
+<settings>
+  <setting name="enabled" value="true"/>
+  <setting name="emulated_controller" value="vive"/> <!--"vive" or "index"-->
+  <setting name="rightHand" value="true"/>
+  <setting name="leftHand" value="true"/>
+  <setting name="orientation" value="hmd"/> <!--"hmd" or "desktop"-->
+  <setting name="desktopRoot" value="0.0 -0.5 -0.5"/> <!--Only in desktop orientation-->
+  <setting name="rotationOffset" value="0.0 0.0 0.0"/> <!--Euler angle in radians-->
+  <setting name="skeleton" value="true"/> <!--Only Index controller-->
+  <setting name="trackingLevel" value="partial"/> <!--"partial" or "full", only Index controller-->
+
+  <setting name="input" value="true"/>
+  <setting name="menu" value="true"/>
+  <setting name="appMenu" value="true"/> <!--Only Vive controller-->
+  <setting name="trigger" value="true"/>
+  <setting name="grip" value="true"/>
+  <setting name="touchpad" value="true"/>
+  <setting name="touchpadTouch" value="true"/>
+  <setting name="touchpadPress" value="true"/>
+  <setting name="touchpadAxes" value="true"/>
+  <setting name="buttonA" value="true"/> <!--Only Index controller-->
+  <setting name="buttonB" value="true"/> <!--Only Index controller-->
+  <setting name="thumbstick" value = "true"/> <!--Only Index controller-->
+
+  <setting name="vrchat_handsReset" value="false"/> <!--Hands animation reset with inactive controllers, only Index controller-->
+</settings>

@@ -22,7 +22,7 @@
     <ProjectGuid>{BC06AF9C-36D6-455A-B421-00A9635684AD}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>leap_monitor</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -59,23 +59,27 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+    <OutDir>$(SolutionDir)bin\win32\</OutDir>
+    <IntDir>$(SolutionDir)objs\$(ProjectName)\$(PlatformName)\$(Configuration)\</IntDir>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+    <OutDir>$(SolutionDir)bin\win64\</OutDir>
+    <IntDir>$(SolutionDir)objs\$(ProjectName)\$(PlatformName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(Platform)\$(Configuration)\</IntDir>
-    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+    <OutDir>$(SolutionDir)bin\win32\</OutDir>
+    <IntDir>$(SolutionDir)objs\$(ProjectName)\$(PlatformName)\$(Configuration)\</IntDir>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+    <OutDir>$(SolutionDir)bin\win64\</OutDir>
+    <IntDir>$(SolutionDir)objs\$(ProjectName)\$(PlatformName)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -86,7 +90,7 @@
       <AdditionalIncludeDirectories>../vendor/openvr/headers;../vendor/LeapCxx/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>../vendor/openvr/lib/win32;../vendor/LeapCxx/lib/win32;../vendor/LeapSDK/lib/x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>openvr_api.lib;LeapC++_d.lib;LeapC.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -104,7 +108,7 @@
       <AdditionalIncludeDirectories>../vendor/openvr/headers;../vendor/LeapCxx/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>openvr_api.lib;LeapC++_d.lib;LeapC.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>../vendor/openvr/lib/win64;../vendor/LeapCxx/lib/win64;../vendor/LeapSDK/lib/x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -134,6 +138,7 @@
     </Link>
     <PostBuildEvent>
       <Command>copy /y "$(TargetPath)" "C:\Program Files (x86)\Steam\steamapps\common\SteamVR\drivers\leap\bin\win32\$(TargetFileName)"</Command>
+      <Message>Install Binary</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -158,6 +163,7 @@
     </Link>
     <PostBuildEvent>
       <Command>copy /y "$(TargetPath)" "C:\Program Files (x86)\Steam\steamapps\common\SteamVR\drivers\leap\bin\win64\$(TargetFileName)"</Command>
+      <Message>Install Binary</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

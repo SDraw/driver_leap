@@ -1,10 +1,12 @@
 #include "stdafx.h"
-#include "CLeapHandControllerVive.h"
+
+#include "CLeapControllerVive.h"
+
 #include "CControllerButton.h"
 #include "CDriverConfig.h"
 #include "CGestureMatcher.h"
 
-enum EViveButton : size_t
+enum ViveButton : size_t
 {
     VB_SysClick = 0U,
     VB_TriggerClick,
@@ -19,23 +21,23 @@ enum EViveButton : size_t
     VB_Count
 };
 
-CLeapHandControllerVive::CLeapHandControllerVive(unsigned char f_hand)
+CLeapControllerVive::CLeapControllerVive(unsigned char f_hand)
 {
-    m_handAssigment = f_hand % 2U;
-    m_serialNumber.assign((m_handAssigment == CHA_Left) ? "LHR-F94B3BD8" : "LHR-F94B3BD9");
+    m_controllerHand = f_hand % CH_Count;
+    m_serialNumber.assign((m_controllerHand == CH_Left) ? "LHR-F94B3BD8" : "LHR-F94B3BD9");
 }
-CLeapHandControllerVive::~CLeapHandControllerVive()
+CLeapControllerVive::~CLeapControllerVive()
 {
 }
 
-vr::EVRInitError CLeapHandControllerVive::Activate(uint32_t unObjectId)
+vr::EVRInitError CLeapControllerVive::Activate(uint32_t unObjectId)
 {
     vr::EVRInitError l_resultError = vr::VRInitError_Driver_Failed;
 
-    if(m_trackedDeviceID == vr::k_unTrackedDeviceIndexInvalid)
+    if(m_trackedDevice == vr::k_unTrackedDeviceIndexInvalid)
     {
-        m_trackedDeviceID = unObjectId;
-        m_propertyContainer = ms_propertyHelpers->TrackedDeviceToPropertyContainer(m_trackedDeviceID);
+        m_trackedDevice = unObjectId;
+        m_propertyContainer = ms_propertyHelpers->TrackedDeviceToPropertyContainer(m_trackedDevice);
 
         // Properties
         ms_propertyHelpers->SetStringProperty(m_propertyContainer, vr::Prop_TrackingSystemName_String, "lighthouse");
@@ -59,7 +61,7 @@ vr::EVRInitError CLeapHandControllerVive::Activate(uint32_t unObjectId)
         ms_propertyHelpers->SetBoolProperty(m_propertyContainer, vr::Prop_Firmware_RemindUpdate_Bool, false);
         ms_propertyHelpers->SetInt32Property(m_propertyContainer, vr::Prop_Axis0Type_Int32, vr::k_eControllerAxis_TrackPad);
         ms_propertyHelpers->SetInt32Property(m_propertyContainer, vr::Prop_Axis1Type_Int32, vr::k_eControllerAxis_Trigger);
-        ms_propertyHelpers->SetInt32Property(m_propertyContainer, vr::Prop_ControllerRoleHint_Int32, (m_handAssigment == CHA_Left) ? vr::TrackedControllerRole_LeftHand : vr::TrackedControllerRole_RightHand);
+        ms_propertyHelpers->SetInt32Property(m_propertyContainer, vr::Prop_ControllerRoleHint_Int32, (m_controllerHand == CH_Left) ? vr::TrackedControllerRole_LeftHand : vr::TrackedControllerRole_RightHand);
         ms_propertyHelpers->SetBoolProperty(m_propertyContainer, vr::Prop_HasDisplayComponent_Bool, false);
         ms_propertyHelpers->SetBoolProperty(m_propertyContainer, vr::Prop_HasCameraComponent_Bool, false);
         ms_propertyHelpers->SetBoolProperty(m_propertyContainer, vr::Prop_HasDriverDirectModeComponent_Bool, false);
@@ -79,7 +81,7 @@ vr::EVRInitError CLeapHandControllerVive::Activate(uint32_t unObjectId)
         ms_propertyHelpers->SetUint64Property(m_propertyContainer, vr::Prop_RadioVersion_Uint64, 1532585738U);
         ms_propertyHelpers->SetUint64Property(m_propertyContainer, vr::Prop_DongleVersion_Uint64, 1461100729U);
         ms_propertyHelpers->SetStringProperty(m_propertyContainer, vr::Prop_ResourceRoot_String, "htc");
-        ms_propertyHelpers->SetStringProperty(m_propertyContainer, vr::Prop_RegisteredDeviceType_String, (m_handAssigment == CHA_Left) ? "htc/vive_controllerLHR-F94B3BD8" : "htc/vive_controllerLHR-F94B3BD9"); // Changed
+        ms_propertyHelpers->SetStringProperty(m_propertyContainer, vr::Prop_RegisteredDeviceType_String, (m_controllerHand == CH_Left) ? "htc/vive_controllerLHR-F94B3BD8" : "htc/vive_controllerLHR-F94B3BD9"); // Changed
         ms_propertyHelpers->SetStringProperty(m_propertyContainer, vr::Prop_InputProfilePath_String, "{htc}/input/vive_controller_profile.json");
         ms_propertyHelpers->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceOff_String, "{htc}/icons/controller_status_off.png");
         ms_propertyHelpers->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceSearching_String, "{htc}/icons/controller_status_searching.gif");
@@ -90,7 +92,6 @@ vr::EVRInitError CLeapHandControllerVive::Activate(uint32_t unObjectId)
         ms_propertyHelpers->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceStandby_String, "{htc}/icons/controller_status_off.png");
         ms_propertyHelpers->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceAlertLow_String, "{htc}/icons/controller_status_ready_low.png");
         ms_propertyHelpers->SetStringProperty(m_propertyContainer, vr::Prop_ControllerType_String, "vive_controller");
-        ms_propertyHelpers->SetUint64Property(m_propertyContainer, vr::Prop_VendorSpecific_Reserved_Start, 0x1EA8U); // Hidden property for leap_monitor
 
         // Input
         if(m_buttons.empty())
@@ -99,31 +100,31 @@ vr::EVRInitError CLeapHandControllerVive::Activate(uint32_t unObjectId)
         }
 
         ms_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/system/click", &m_buttons[VB_SysClick]->GetHandleRef());
-        m_buttons[VB_SysClick]->SetInputType(CControllerButton::CBIT_Boolean);
+        m_buttons[VB_SysClick]->SetInputType(CControllerButton::IT_Boolean);
 
         ms_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/trigger/click", &m_buttons[VB_TriggerClick]->GetHandleRef());
-        m_buttons[VB_TriggerClick]->SetInputType(CControllerButton::CBIT_Boolean);
+        m_buttons[VB_TriggerClick]->SetInputType(CControllerButton::IT_Boolean);
 
         ms_driverInput->CreateScalarComponent(m_propertyContainer, "/input/trigger/value", &m_buttons[VB_TriggerValue]->GetHandleRef(), vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedOneSided);
-        m_buttons[VB_TriggerValue]->SetInputType(CControllerButton::CBIT_Float);
+        m_buttons[VB_TriggerValue]->SetInputType(CControllerButton::IT_Float);
 
         ms_driverInput->CreateScalarComponent(m_propertyContainer, "/input/trackpad/x", &m_buttons[VB_TrackpadX]->GetHandleRef(), vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedTwoSided);
-        m_buttons[VB_TrackpadX]->SetInputType(CControllerButton::CBIT_Float);
+        m_buttons[VB_TrackpadX]->SetInputType(CControllerButton::IT_Float);
 
         ms_driverInput->CreateScalarComponent(m_propertyContainer, "/input/trackpad/y", &m_buttons[VB_TrackpadY]->GetHandleRef(), vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedTwoSided);
-        m_buttons[VB_TrackpadY]->SetInputType(CControllerButton::CBIT_Float);
+        m_buttons[VB_TrackpadY]->SetInputType(CControllerButton::IT_Float);
 
         ms_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/trackpad/touch", &m_buttons[VB_TrackpadTouch]->GetHandleRef());
-        m_buttons[VB_TrackpadTouch]->SetInputType(CControllerButton::CBIT_Boolean);
+        m_buttons[VB_TrackpadTouch]->SetInputType(CControllerButton::IT_Boolean);
 
         ms_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/trackpad/click", &m_buttons[VB_TrackpadClick]->GetHandleRef());
-        m_buttons[VB_TrackpadClick]->SetInputType(CControllerButton::CBIT_Boolean);
+        m_buttons[VB_TrackpadClick]->SetInputType(CControllerButton::IT_Boolean);
 
         ms_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/grip/click", &m_buttons[VB_GripClick]->GetHandleRef());
-        m_buttons[VB_GripClick]->SetInputType(CControllerButton::CBIT_Boolean);
+        m_buttons[VB_GripClick]->SetInputType(CControllerButton::IT_Boolean);
 
         ms_driverInput->CreateBooleanComponent(m_propertyContainer, "/input/application_menu/click", &m_buttons[VB_AppMenuClick]->GetHandleRef());
-        m_buttons[VB_AppMenuClick]->SetInputType(CControllerButton::CBIT_Boolean);
+        m_buttons[VB_AppMenuClick]->SetInputType(CControllerButton::IT_Boolean);
 
         ms_driverInput->CreateHapticComponent(m_propertyContainer, "/output/haptic", &m_haptic);
 
@@ -133,10 +134,17 @@ vr::EVRInitError CLeapHandControllerVive::Activate(uint32_t unObjectId)
     return l_resultError;
 }
 
-void CLeapHandControllerVive::UpdateGestures(const Leap::Frame &f_frame)
+bool CLeapControllerVive::MixHandState(bool f_state)
+{
+    bool l_result = f_state;
+    if(m_gameProfile == GP_VRChat) l_result = true;
+    return l_result;
+}
+
+void CLeapControllerVive::UpdateGestures(const Leap::Frame &f_frame)
 {
     std::vector<float> l_scores;
-    if(CGestureMatcher::GetGestures(f_frame, ((m_handAssigment == CHA_Left) ? CGestureMatcher::WH_LeftHand : CGestureMatcher::WH_RightHand), l_scores))
+    if(CGestureMatcher::GetGestures(f_frame, ((m_controllerHand == CH_Left) ? CGestureMatcher::GH_LeftHand : CGestureMatcher::GH_RightHand), l_scores))
     {
         switch(m_gameProfile)
         {
@@ -172,7 +180,7 @@ void CLeapHandControllerVive::UpdateGestures(const Leap::Frame &f_frame)
             {
                 if(CDriverConfig::IsInputEnabled())
                 {
-                    if(!m_gameSpecialModes.m_vrchatDrawingMode)
+                    if(m_specialMode)
                     {
                         m_buttons[VB_AppMenuClick]->SetState(l_scores[CGestureMatcher::GT_Timeout] >= 0.75f);
 
@@ -202,7 +210,7 @@ void CLeapHandControllerVive::UpdateGestures(const Leap::Frame &f_frame)
                             l_trackpadAxis.x = 0.59f;
                             l_trackpadAxis.y = -0.81f;
                         }
-                        if(m_handAssigment == CHA_Left) l_trackpadAxis.x *= -1.f;
+                        if(m_controllerHand == CH_Left) l_trackpadAxis.x *= -1.f;
                         m_buttons[VB_TrackpadX]->SetValue(l_trackpadAxis.x);
                         m_buttons[VB_TrackpadY]->SetValue(l_trackpadAxis.y);
                         m_buttons[VB_TrackpadTouch]->SetState((l_trackpadAxis.x != 0.f) || (l_trackpadAxis.y != 0.f));
@@ -225,11 +233,4 @@ void CLeapHandControllerVive::UpdateGestures(const Leap::Frame &f_frame)
             } break;
         }
     }
-}
-
-bool CLeapHandControllerVive::MixHandState(bool f_state)
-{
-    bool l_result = f_state;
-    if(m_gameProfile == GP_VRChat) l_result = true;
-    return l_result;
 }

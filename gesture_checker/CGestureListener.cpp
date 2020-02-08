@@ -15,10 +15,7 @@ void ClearConsole()
     DWORD l_charsWritten;
     DWORD l_conSize = l_csbi.dwSize.X * l_csbi.dwSize.Y;
     if(!FillConsoleOutputCharacter(l_console, (TCHAR) ' ', l_conSize, l_coordScreen, &l_charsWritten)) return;
-    if(!GetConsoleScreenBufferInfo(l_console, &l_csbi))
-    {
-        return;
-    }
+    if(!GetConsoleScreenBufferInfo(l_console, &l_csbi)) return;
     if(!FillConsoleOutputAttribute(l_console, l_csbi.wAttributes, l_conSize, l_coordScreen, &l_charsWritten)) return;
     SetConsoleCursorPosition(l_console, l_coordScreen);
 }
@@ -50,9 +47,9 @@ void CGestureListener::onFrame(const Leap::Controller& controller)
 
     Leap::Frame l_frame = controller.frame();
     std::vector<float> l_scoresLeft, l_scoresRight;
-    CGestureMatcher::GetGestures(l_frame, CGestureMatcher::WH_LeftHand, l_scoresLeft);
-    CGestureMatcher::GetGestures(l_frame, CGestureMatcher::WH_RightHand, l_scoresRight);
-    
+    CGestureMatcher::GetGestures(l_frame, CGestureMatcher::GH_LeftHand, l_scoresLeft);
+    CGestureMatcher::GetGestures(l_frame, CGestureMatcher::GH_RightHand, l_scoresRight);
+
     Leap::HeadPose l_headPose = controller.headPose(0U);
     Leap::Vector l_headPos = l_headPose.position();
     Leap::Quaternion l_headRot = l_headPose.orientation();
@@ -62,8 +59,8 @@ void CGestureListener::onFrame(const Leap::Controller& controller)
     for(size_t i = 0U; i < CGestureMatcher::GT_GesturesCount; i++)
     {
         std::string l_gestureName;
-        CGestureMatcher::GetGestureName(static_cast<CGestureMatcher::GestureType>(i),l_gestureName);
-        if(!l_gestureName.empty()) fprintf(stderr, "%-24s -> %.4f\t%.4f\n", l_gestureName.c_str(), l_scoresLeft[i],l_scoresRight[i]);
+        CGestureMatcher::GetGestureName(static_cast<CGestureMatcher::GestureType>(i), l_gestureName);
+        if(!l_gestureName.empty()) fprintf(stderr, "%-24s -> %.4f\t%.4f\n", l_gestureName.c_str(), l_scoresLeft[i], l_scoresRight[i]);
     }
 }
 

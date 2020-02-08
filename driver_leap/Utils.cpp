@@ -4,7 +4,6 @@
 extern const glm::vec3 g_axisX(1.f, 0.f, 0.f);
 extern const glm::vec3 g_axisY(0.f, 1.f, 0.f);
 extern const glm::mat4 g_identityMatrix(1.f);
-extern const glm::vec4 g_zeroPoint(0.f, 0.f, 0.f, 1.f);
 
 // Left hand open gesture transformation, thanks to https://github.com/spayne and his soft_knuckles repository
 extern const vr::VRBoneTransform_t g_openHandGesture[31U] = {
@@ -41,19 +40,7 @@ extern const vr::VRBoneTransform_t g_openHandGesture[31U] = {
     { { -0.031806f, -0.087214f, 0.121015f, 1.000000f }, { -0.003659f, 0.758407f, -0.639342f, -0.126678f } }
 };
 
-size_t ReadEnumVector(const std::string &f_val, const std::vector<std::string> &f_vec)
-{
-    size_t l_result = std::numeric_limits<size_t>::max();
-    for(auto iter = f_vec.begin(), iterEnd = f_vec.end(); iter != iterEnd; ++iter)
-    {
-        if(!iter->compare(f_val))
-        {
-            l_result = std::distance(f_vec.begin(), iter);
-            break;
-        }
-    }
-    return l_result;
-}
+extern const glm::vec4 g_zeroPoint(0.f, 0.f, 0.f, 1.f);
 
 void ConvertMatrix(const vr::HmdMatrix34_t &f_matVR, glm::mat4 &f_mat)
 {
@@ -94,11 +81,6 @@ void ConvertVector3(const glm::vec3 &f_glmVec, vr::HmdVector4_t &f_vrVec)
     for(size_t i = 0U; i < 3U; i++) f_vrVec.v[i] = f_glmVec[i];
 }
 
-void SwitchBoneAxes(glm::quat &f_rot)
-{
-    std::swap(f_rot.x, f_rot.z);
-    f_rot.y *= -1.f;
-}
 void FixAuxBoneTransformation(glm::vec3 &f_pos, glm::quat &f_rot)
 {
     f_pos.y *= -1.f;
@@ -106,4 +88,38 @@ void FixAuxBoneTransformation(glm::vec3 &f_pos, glm::quat &f_rot)
     f_rot.y *= -1.f;
     f_rot.z *= -1.f;
     f_rot = glm::rotate(f_rot, glm::pi<float>(), g_axisX);
+}
+
+void SwitchBoneAxes(glm::quat &f_rot)
+{
+    std::swap(f_rot.x, f_rot.z);
+    f_rot.y *= -1.f;
+}
+
+size_t ReadEnumVector(const std::string &f_val, const std::vector<std::string> &f_vec)
+{
+    size_t l_result = std::numeric_limits<size_t>::max();
+    for(auto iter = f_vec.begin(), iterEnd = f_vec.end(); iter != iterEnd; ++iter)
+    {
+        if(!iter->compare(f_val))
+        {
+            l_result = std::distance(f_vec.begin(), iter);
+            break;
+        }
+    }
+    return l_result;
+}
+
+size_t ReadEnumVector(const char *f_val, const std::vector<std::string> &f_vec)
+{
+    size_t l_result = std::numeric_limits<size_t>::max();
+    for(auto iter = f_vec.begin(), iterEnd = f_vec.end(); iter != iterEnd; ++iter)
+    {
+        if(!iter->compare(f_val))
+        {
+            l_result = std::distance(f_vec.begin(), iter);
+            break;
+        }
+    }
+    return l_result;
 }
