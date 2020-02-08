@@ -39,8 +39,8 @@ Driver can emulate HTC Vive controllers and Valve Index controllers with skeleta
 There are more configurable restrictions, such as global input, trackpad, trigger, grip and etc.  
 Controls are changed by game profiles that are enabled automatically when game is started from Steam.  
 Available hotkeys in NumLock active state:
-* **Ctrl-P:** Disable right hand controller.
-* **Ctrl-O:** Disable left hand controller.
+* **Ctrl-P:** Enable/disable right hand controller.
+* **Ctrl-O:** Enable/disable left hand controller.
 
 ### HTC Vive controllers emulation
 Game profiles:
