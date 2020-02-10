@@ -23,8 +23,8 @@ enum ViveButton : size_t
 
 CLeapControllerVive::CLeapControllerVive(unsigned char f_hand)
 {
-    m_controllerHand = f_hand % CH_Count;
-    m_serialNumber.assign((m_controllerHand == CH_Left) ? "LHR-F94B3BD8" : "LHR-F94B3BD9");
+    m_hand = f_hand % CH_Count;
+    m_serialNumber.assign((m_hand == CH_Left) ? "LHR-F94B3BD8" : "LHR-F94B3BD9");
 }
 CLeapControllerVive::~CLeapControllerVive()
 {
@@ -61,7 +61,7 @@ vr::EVRInitError CLeapControllerVive::Activate(uint32_t unObjectId)
         ms_propertyHelpers->SetBoolProperty(m_propertyContainer, vr::Prop_Firmware_RemindUpdate_Bool, false);
         ms_propertyHelpers->SetInt32Property(m_propertyContainer, vr::Prop_Axis0Type_Int32, vr::k_eControllerAxis_TrackPad);
         ms_propertyHelpers->SetInt32Property(m_propertyContainer, vr::Prop_Axis1Type_Int32, vr::k_eControllerAxis_Trigger);
-        ms_propertyHelpers->SetInt32Property(m_propertyContainer, vr::Prop_ControllerRoleHint_Int32, (m_controllerHand == CH_Left) ? vr::TrackedControllerRole_LeftHand : vr::TrackedControllerRole_RightHand);
+        ms_propertyHelpers->SetInt32Property(m_propertyContainer, vr::Prop_ControllerRoleHint_Int32, (m_hand == CH_Left) ? vr::TrackedControllerRole_LeftHand : vr::TrackedControllerRole_RightHand);
         ms_propertyHelpers->SetBoolProperty(m_propertyContainer, vr::Prop_HasDisplayComponent_Bool, false);
         ms_propertyHelpers->SetBoolProperty(m_propertyContainer, vr::Prop_HasCameraComponent_Bool, false);
         ms_propertyHelpers->SetBoolProperty(m_propertyContainer, vr::Prop_HasDriverDirectModeComponent_Bool, false);
@@ -81,7 +81,7 @@ vr::EVRInitError CLeapControllerVive::Activate(uint32_t unObjectId)
         ms_propertyHelpers->SetUint64Property(m_propertyContainer, vr::Prop_RadioVersion_Uint64, 1532585738U);
         ms_propertyHelpers->SetUint64Property(m_propertyContainer, vr::Prop_DongleVersion_Uint64, 1461100729U);
         ms_propertyHelpers->SetStringProperty(m_propertyContainer, vr::Prop_ResourceRoot_String, "htc");
-        ms_propertyHelpers->SetStringProperty(m_propertyContainer, vr::Prop_RegisteredDeviceType_String, (m_controllerHand == CH_Left) ? "htc/vive_controllerLHR-F94B3BD8" : "htc/vive_controllerLHR-F94B3BD9"); // Changed
+        ms_propertyHelpers->SetStringProperty(m_propertyContainer, vr::Prop_RegisteredDeviceType_String, (m_hand == CH_Left) ? "htc/vive_controllerLHR-F94B3BD8" : "htc/vive_controllerLHR-F94B3BD9"); // Changed
         ms_propertyHelpers->SetStringProperty(m_propertyContainer, vr::Prop_InputProfilePath_String, "{htc}/input/vive_controller_profile.json");
         ms_propertyHelpers->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceOff_String, "{htc}/icons/controller_status_off.png");
         ms_propertyHelpers->SetStringProperty(m_propertyContainer, vr::Prop_NamedIconPathDeviceSearching_String, "{htc}/icons/controller_status_searching.gif");
@@ -144,7 +144,7 @@ bool CLeapControllerVive::MixHandState(bool f_state)
 void CLeapControllerVive::UpdateGestures(const Leap::Frame &f_frame)
 {
     std::vector<float> l_scores;
-    if(CGestureMatcher::GetGestures(f_frame, ((m_controllerHand == CH_Left) ? CGestureMatcher::GH_LeftHand : CGestureMatcher::GH_RightHand), l_scores))
+    if(CGestureMatcher::GetGestures(f_frame, ((m_hand == CH_Left) ? CGestureMatcher::GH_LeftHand : CGestureMatcher::GH_RightHand), l_scores))
     {
         switch(m_gameProfile)
         {
@@ -182,6 +182,16 @@ void CLeapControllerVive::UpdateGestures(const Leap::Frame &f_frame)
                 {
                     if(m_specialMode)
                     {
+                        m_buttons[VB_AppMenuClick]->SetState(false);
+                        m_buttons[VB_TrackpadX]->SetValue(0.f);
+                        m_buttons[VB_TrackpadY]->SetValue(0.f);
+                        m_buttons[VB_TrackpadTouch]->SetState(false);
+                        m_buttons[VB_TriggerValue]->SetValue((l_scores[CGestureMatcher::GT_LowerFist] >= 0.85f) ? 0.85f : 0.f);
+                        m_buttons[VB_TriggerClick]->SetState(l_scores[CGestureMatcher::GT_LowerFist] >= 0.85f);
+                        m_buttons[VB_GripClick]->SetState(false);
+                    }
+                    else
+                    {
                         m_buttons[VB_AppMenuClick]->SetState(l_scores[CGestureMatcher::GT_Timeout] >= 0.75f);
 
                         glm::vec2 l_trackpadAxis(0.f);
@@ -210,7 +220,7 @@ void CLeapControllerVive::UpdateGestures(const Leap::Frame &f_frame)
                             l_trackpadAxis.x = 0.59f;
                             l_trackpadAxis.y = -0.81f;
                         }
-                        if(m_controllerHand == CH_Left) l_trackpadAxis.x *= -1.f;
+                        if(m_hand == CH_Left) l_trackpadAxis.x *= -1.f;
                         m_buttons[VB_TrackpadX]->SetValue(l_trackpadAxis.x);
                         m_buttons[VB_TrackpadY]->SetValue(l_trackpadAxis.y);
                         m_buttons[VB_TrackpadTouch]->SetState((l_trackpadAxis.x != 0.f) || (l_trackpadAxis.y != 0.f));
@@ -218,16 +228,6 @@ void CLeapControllerVive::UpdateGestures(const Leap::Frame &f_frame)
                         m_buttons[VB_TriggerValue]->SetValue(l_scores[CGestureMatcher::GT_LowerFist]);
                         m_buttons[VB_TriggerClick]->SetState(l_scores[CGestureMatcher::GT_LowerFist] >= 0.5f);
                         m_buttons[VB_GripClick]->SetState(l_scores[CGestureMatcher::GT_VRChatSpreadHand] >= 0.75f);
-                    }
-                    else
-                    {
-                        m_buttons[VB_AppMenuClick]->SetState(false);
-                        m_buttons[VB_TrackpadX]->SetValue(0.f);
-                        m_buttons[VB_TrackpadY]->SetValue(0.f);
-                        m_buttons[VB_TrackpadTouch]->SetState(false);
-                        m_buttons[VB_TriggerValue]->SetValue((l_scores[CGestureMatcher::GT_LowerFist] >= 0.85f) ? 0.85f : 0.f);
-                        m_buttons[VB_TriggerClick]->SetState(l_scores[CGestureMatcher::GT_LowerFist] >= 0.85f);
-                        m_buttons[VB_GripClick]->SetState(false);
                     }
                 }
             } break;

@@ -30,11 +30,13 @@ CLeapController::CLeapController()
     }
     m_pose.poseTimeOffset = -0.016;
     m_pose.qDriverFromHeadRotation = { 1.0, .0, .0, .0 };
+    m_pose.qRotation = { 1.0, .0, .0, .0 };
+    m_pose.qWorldFromDriverRotation = { 1.0, .0, .0, .0 };
     m_pose.result = vr::TrackingResult_Uninitialized;
     m_pose.shouldApplyHeadModel = false;
     m_pose.willDriftInYaw = false;
 
-    m_controllerHand = CH_Left;
+    m_hand = CH_Left;
     m_gameProfile = GP_Default;
     m_gripOffset = glm::quat(1.f, 0.f, 0.f, 0.f);
     m_specialMode = false;
@@ -149,7 +151,7 @@ void CLeapController::UpdateTransformation(const Leap::Frame &f_frame)
     {
         if(l_hand.isValid())
         {
-            if(((m_controllerHand == CH_Left) && l_hand.isLeft()) || ((m_controllerHand == CH_Right) && l_hand.isRight()))
+            if(((m_hand == CH_Left) && l_hand.isLeft()) || ((m_hand == CH_Right) && l_hand.isRight()))
             {
                 switch(CDriverConfig::GetOrientationMode())
                 {
@@ -175,7 +177,7 @@ void CLeapController::UpdateTransformation(const Leap::Frame &f_frame)
                         l_palmNormal /= l_palmNormal.magnitude();
 
                         Leap::Vector l_leapCross = l_handDirection.cross(l_palmNormal);
-                        switch(m_controllerHand)
+                        switch(m_hand)
                         {
                             case CH_Left:
                                 l_palmNormal *= -1.f;
@@ -202,10 +204,6 @@ void CLeapController::UpdateTransformation(const Leap::Frame &f_frame)
                     {
                         // Controller follows HMD position only
                         std::memcpy(m_pose.vecWorldFromDriverTranslation, ms_headPosition, sizeof(double) * 3U);
-                        m_pose.qWorldFromDriverRotation.x = .0;
-                        m_pose.qWorldFromDriverRotation.y = .0;
-                        m_pose.qWorldFromDriverRotation.z = .0;
-                        m_pose.qWorldFromDriverRotation.w = 1.0;
 
                         Leap::Vector l_position = l_hand.palmPosition();
                         m_pose.vecPosition[0] = 0.001*l_position.x + CDriverConfig::GetDesktopRootX();
@@ -224,7 +222,7 @@ void CLeapController::UpdateTransformation(const Leap::Frame &f_frame)
                         l_palmNormal /= l_palmNormal.magnitude();
 
                         Leap::Vector l_leapCross = -l_handDirection.cross(l_palmNormal);
-                        switch(m_controllerHand)
+                        switch(m_hand)
                         {
                             case CH_Left:
                                 l_palmNormal *= -1.f;

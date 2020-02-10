@@ -18,6 +18,7 @@ class CServerDriver final : public vr::IServerTrackedDeviceProvider
     CLeapListener m_leapListener;
 
     bool m_connectionState;
+    bool m_firstConnection;
     std::vector<CLeapController*> m_controllers;
     CRelayDevice *m_relayDevice;
 

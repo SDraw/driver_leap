@@ -44,7 +44,7 @@ public:
     bool GetEnabled() const;
     void SetEnabled(bool f_state);
 
-    inline unsigned char GetHand() const { return m_controllerHand; }
+    inline unsigned char GetHand() const { return m_hand; }
     inline const std::string& GetSerialNumber() const { return m_serialNumber; }
 
     void SetGameProfile(GameProfile f_profile);
@@ -63,7 +63,7 @@ protected:
     uint32_t m_trackedDevice;
 
     std::vector<CControllerButton*> m_buttons;
-    unsigned char m_controllerHand;
+    unsigned char m_hand;
     GameProfile m_gameProfile;
     std::string m_serialNumber;
     bool m_specialMode;
