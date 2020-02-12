@@ -65,9 +65,10 @@ const char* const CServerDriver::ms_interfaces[] = {
 CServerDriver::CServerDriver()
 {
     m_driverHost = nullptr;
+    m_leapController = nullptr;
     m_connectionState = false;
     m_firstConnection = true;
-    m_leapController = nullptr;
+    for(size_t i = 0U; i < LCH_Count; i++) m_controllers[i] = nullptr;
     m_relayDevice = nullptr;
     m_monitorLaunched = false;
     m_monitorInfo = { 0 };
@@ -87,9 +88,12 @@ void CServerDriver::Cleanup()
         m_monitorLaunched = false;
     }
 
-    for(auto l_controller : m_controllers) delete l_controller;
+    for(size_t i = 0U; i < LCH_Count; i++)
+    {
+        delete m_controllers[i];
+        m_controllers[i] = nullptr;
+    }
     delete m_relayDevice;
-    m_controllers.clear();
     CLeapController::SetInterfaces(nullptr, nullptr, nullptr);
 
     if(m_leapController)
@@ -130,17 +134,17 @@ vr::EVRInitError CServerDriver::Init(vr::IVRDriverContext *pDriverContext)
         {
             case CDriverConfig::EC_Vive:
             {
-                m_controllers.push_back(new CLeapControllerVive(CLeapController::CH_Left));
-                m_controllers.push_back(new CLeapControllerVive(CLeapController::CH_Right));
+                m_controllers[LCH_Left] = new CLeapControllerVive(CLeapController::CH_Left);
+                m_controllers[LCH_Right] = new CLeapControllerVive(CLeapController::CH_Right);
             } break;
             case CDriverConfig::EC_Index:
             {
-                m_controllers.push_back(new CLeapControllerIndex(CLeapController::CH_Left));
-                m_controllers.push_back(new CLeapControllerIndex(CLeapController::CH_Right));
+                m_controllers[LCH_Left] = new CLeapControllerIndex(CLeapController::CH_Left);
+                m_controllers[LCH_Right] = new CLeapControllerIndex(CLeapController::CH_Right);
             } break;
         }
 
-        for(auto l_controller : m_controllers) m_driverHost->TrackedDeviceAdded(l_controller->GetSerialNumber().c_str(), vr::TrackedDeviceClass_Controller, l_controller);
+        for(size_t i = 0U; i < LCH_Count; i++) m_driverHost->TrackedDeviceAdded(m_controllers[i]->GetSerialNumber().c_str(), vr::TrackedDeviceClass_Controller, m_controllers[i]);
 
         m_leapController = new Leap::Controller();
         m_leapController->addListener(m_leapListener);
@@ -175,13 +179,15 @@ void CServerDriver::RunFrame()
         if(m_connectionState != l_connectionState)
         {
             m_connectionState = l_connectionState;
-            for(auto l_handController : m_controllers) l_handController->SetEnabled(m_connectionState);
+            for(size_t i = 0U; i < LCH_Count; i++) m_controllers[i]->SetEnabled(m_connectionState);
         }
         if(m_connectionState)
         {
             if(m_firstConnection)
             {
                 m_leapController->setPaused(!CDriverConfig::IsLeftHandEnabled() && !CDriverConfig::IsRightHandEnabled());
+                m_controllers[LCH_Left]->SetEnabled(CDriverConfig::IsLeftHandEnabled());
+                m_controllers[LCH_Right]->SetEnabled(CDriverConfig::IsRightHandEnabled());
                 m_firstConnection = false;
             }
             else
@@ -189,7 +195,7 @@ void CServerDriver::RunFrame()
                 Leap::Frame l_frame = m_leapController->frame();
                 if(l_frame.isValid())
                 {
-                    for(auto l_handController : m_controllers) l_handController->Update(l_frame);
+                    for(size_t i = 0U; i < LCH_Count; i++) m_controllers[i]->Update(l_frame);
                 }
             }
         }
@@ -207,17 +213,7 @@ void CServerDriver::ProcessLeapControllerPause()
 {
     if(m_leapController)
     {
-        bool l_pause = true;
-
-        for(auto l_controller : m_controllers)
-        {
-            if(l_controller->GetEnabled())
-            {
-                l_pause = false;
-                break;
-            }
-        }
-
+        bool l_pause = (!m_controllers[LCH_Left]->GetEnabled() && !m_controllers[LCH_Right]->GetEnabled());
         m_leapController->setPaused(l_pause);
     }
 }
@@ -253,7 +249,7 @@ void CServerDriver::ProcessExternalMessage(const char *f_message)
                             break;
                     }
 
-                    for(auto l_controller : m_controllers) l_controller->SetGameProfile(l_newProfile);
+                    for(size_t i = 0U; i < LCH_Count; i++) m_controllers[i]->SetGameProfile(l_newProfile);
                 }
             } break;
 
@@ -267,7 +263,7 @@ void CServerDriver::ProcessExternalMessage(const char *f_message)
                     {
                         case CC_SpecialMode:
                         {
-                            for(auto l_controller : m_controllers) l_controller->SwitchSpecialMode();
+                            for(size_t i = 0U; i < LCH_Count; i++) m_controllers[i]->SwitchSpecialMode();
                         } break;
                     }
                 }
@@ -285,30 +281,18 @@ void CServerDriver::ProcessExternalMessage(const char *f_message)
                         {
                             if(m_connectionState)
                             {
-                                for(auto l_controller : m_controllers)
-                                {
-                                    if(l_controller->GetHand() == CLeapController::CH_Left)
-                                    {
-                                        l_controller->SetEnabled(!l_controller->GetEnabled());
-                                        ProcessLeapControllerPause();
-                                        break;
-                                    }
-                                }
+                                bool l_enabled = m_controllers[LCH_Left]->GetEnabled();
+                                m_controllers[LCH_Left]->SetEnabled(!l_enabled);
+                                ProcessLeapControllerPause();
                             }
                         } break;
                         case SC_RightHand:
                         {
                             if(m_connectionState)
                             {
-                                for(auto l_controller : m_controllers)
-                                {
-                                    if(l_controller->GetHand() == CLeapController::CH_Right)
-                                    {
-                                        l_controller->SetEnabled(!l_controller->GetEnabled());
-                                        ProcessLeapControllerPause();
-                                        break;
-                                    }
-                                }
+                                bool l_enabled = m_controllers[LCH_Right]->GetEnabled();
+                                m_controllers[LCH_Right]->SetEnabled(!l_enabled);
+                                ProcessLeapControllerPause();
                             }
                         } break;
                     }

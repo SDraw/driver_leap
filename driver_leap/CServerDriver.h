@@ -11,6 +11,14 @@ class CLeapListener final : public Leap::Listener
 
 class CServerDriver final : public vr::IServerTrackedDeviceProvider
 {
+    enum LeapControllerHand : size_t
+    {
+        LCH_Left = 0U,
+        LCH_Right = 1U,
+
+        LCH_Count
+    };
+
     vr::IVRServerDriverHost* m_driverHost;
     static const char* const ms_interfaces[];
 
@@ -19,7 +27,7 @@ class CServerDriver final : public vr::IServerTrackedDeviceProvider
 
     bool m_connectionState;
     bool m_firstConnection;
-    std::vector<CLeapController*> m_controllers;
+    CLeapController *m_controllers[LCH_Count];
     CRelayDevice *m_relayDevice;
 
     bool m_monitorLaunched;
