@@ -192,7 +192,7 @@ void CServerDriver::RunFrame()
             }
             else
             {
-                Leap::Frame l_frame = m_leapController->frame();
+                const Leap::Frame l_frame = m_leapController->frame();
                 if(l_frame.isValid())
                 {
                     for(size_t i = 0U; i < LCH_Count; i++) m_controllers[i]->Update(l_frame);
@@ -213,7 +213,7 @@ void CServerDriver::ProcessLeapControllerPause()
 {
     if(m_leapController)
     {
-        bool l_pause = (!m_controllers[LCH_Left]->GetEnabled() && !m_controllers[LCH_Right]->GetEnabled());
+        const bool l_pause = (!m_controllers[LCH_Left]->GetEnabled() && !m_controllers[LCH_Right]->GetEnabled());
         m_leapController->setPaused(l_pause);
     }
 }

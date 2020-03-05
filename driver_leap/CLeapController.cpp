@@ -7,6 +7,11 @@
 #include "CGestureMatcher.h"
 #include "Utils.h"
 
+extern const float g_piHalf;
+extern const float g_piHalfN;
+extern const glm::vec3 g_axisZ;
+const glm::quat g_reverseRotation(0.f, 0.f, 0.70106769f, -0.70106769f);
+
 vr::IVRServerDriverHost *CLeapController::ms_driverHost = nullptr;
 vr::IVRDriverInput *CLeapController::ms_driverInput = nullptr;
 double CLeapController::ms_headPosition[] = { .0, .0, .0 };
@@ -44,10 +49,25 @@ CLeapController::CLeapController()
 CLeapController::~CLeapController()
 {
     for(auto l_button : m_buttons) delete l_button;
-
 }
 
 // vr::ITrackedDeviceServerDriver
+vr::EVRInitError CLeapController::Activate(uint32_t unObjectId)
+{
+    vr::EVRInitError l_resultError = vr::VRInitError_Driver_Failed;
+
+    if(m_trackedDevice == vr::k_unTrackedDeviceIndexInvalid)
+    {
+        m_trackedDevice = unObjectId;
+        m_propertyContainer = ms_propertyHelpers->TrackedDeviceToPropertyContainer(m_trackedDevice);
+
+        ActivateInternal();
+
+        l_resultError = vr::VRInitError_None;
+    }
+
+    return l_resultError;
+}
 void CLeapController::Deactivate()
 {
     ResetControls();
@@ -146,8 +166,8 @@ void CLeapController::UpdateInput()
 void CLeapController::UpdateTransformation(const Leap::Frame &f_frame)
 {
     bool l_handFound = false;
-    const Leap::HandList &l_hands = f_frame.hands();
-    for(auto l_hand : l_hands)
+    const Leap::HandList l_hands = f_frame.hands();
+    for(const auto l_hand : l_hands)
     {
         if(l_hand.isValid())
         {
@@ -160,39 +180,22 @@ void CLeapController::UpdateTransformation(const Leap::Frame &f_frame)
                         std::memcpy(&m_pose.qWorldFromDriverRotation, &ms_headRotation, sizeof(vr::HmdQuaternion_t));
                         std::memcpy(m_pose.vecWorldFromDriverTranslation, ms_headPosition, sizeof(double) * 3U);
 
-                        Leap::Vector l_position = l_hand.palmPosition();
+                        const Leap::Vector l_position = l_hand.palmPosition();
                         m_pose.vecPosition[0] = -0.001*l_position.x;
                         m_pose.vecPosition[1] = -0.001*l_position.z;
-                        m_pose.vecPosition[2] = -0.001*l_position.y - 0.15; // ?
+                        m_pose.vecPosition[2] = -0.001*l_position.y - 0.15f; // Why?
 
-                        Leap::Vector l_velocity = l_hand.palmVelocity();
+                        const Leap::Vector l_velocity = l_hand.palmVelocity();
                         m_pose.vecVelocity[0] = -0.001*l_velocity.x;
                         m_pose.vecVelocity[1] = -0.001*l_velocity.z;
                         m_pose.vecVelocity[2] = -0.001*l_velocity.y;
 
-                        Leap::Vector l_handDirection = l_hand.direction();
-                        l_handDirection /= l_handDirection.magnitude();
-
-                        Leap::Vector l_palmNormal = l_hand.palmNormal();
-                        l_palmNormal /= l_palmNormal.magnitude();
-
-                        Leap::Vector l_leapCross = l_handDirection.cross(l_palmNormal);
-                        switch(m_hand)
-                        {
-                            case CH_Left:
-                                l_palmNormal *= -1.f;
-                                break;
-                            case CH_Right:
-                                l_leapCross *= -1.f;
-                                break;
-                        }
-
-                        glm::mat3 l_rotMat(
-                            l_palmNormal.x, l_palmNormal.z, l_palmNormal.y,
-                            l_leapCross.x, l_leapCross.z, l_leapCross.y,
-                            l_handDirection.x, l_handDirection.z, l_handDirection.y
-                            );
+                        Leap::Matrix l_leapMat = l_hand.basis();
+                        if(m_hand == CH_Left) l_leapMat.xBasis *= -1.f;
+                        const glm::mat3 l_rotMat = l_leapMat.toMatrix3x3<glm::mat3>();
                         glm::quat l_finalRot = glm::quat_cast(l_rotMat);
+                        l_finalRot = g_reverseRotation*l_finalRot;
+                        l_finalRot = glm::rotate(l_finalRot, (m_hand == CH_Left) ? g_piHalfN : g_piHalf, g_axisZ);
                         l_finalRot *= m_gripOffset;
 
                         m_pose.qRotation.x = l_finalRot.x;
@@ -205,39 +208,21 @@ void CLeapController::UpdateTransformation(const Leap::Frame &f_frame)
                         // Controller follows HMD position only
                         std::memcpy(m_pose.vecWorldFromDriverTranslation, ms_headPosition, sizeof(double) * 3U);
 
-                        Leap::Vector l_position = l_hand.palmPosition();
+                        const Leap::Vector l_position = l_hand.palmPosition();
                         m_pose.vecPosition[0] = 0.001*l_position.x + CDriverConfig::GetDesktopRootX();
                         m_pose.vecPosition[1] = 0.001*l_position.y + CDriverConfig::GetDesktopRootY();
                         m_pose.vecPosition[2] = 0.001*l_position.z + CDriverConfig::GetDesktopRootZ();
 
-                        Leap::Vector l_velocity = l_hand.palmVelocity();
+                        const Leap::Vector l_velocity = l_hand.palmVelocity();
                         m_pose.vecVelocity[0] = 0.001*l_velocity.x;
                         m_pose.vecVelocity[1] = 0.001*l_velocity.y;
                         m_pose.vecVelocity[2] = 0.001*l_velocity.z;
 
-                        Leap::Vector l_handDirection = -l_hand.direction();
-                        l_handDirection /= l_handDirection.magnitude();
-
-                        Leap::Vector l_palmNormal = -l_hand.palmNormal();
-                        l_palmNormal /= l_palmNormal.magnitude();
-
-                        Leap::Vector l_leapCross = -l_handDirection.cross(l_palmNormal);
-                        switch(m_hand)
-                        {
-                            case CH_Left:
-                                l_palmNormal *= -1.f;
-                                break;
-                            case CH_Right:
-                                l_leapCross *= -1.f;
-                                break;
-                        }
-
-                        glm::mat3 l_rotMat(
-                            l_palmNormal.x, l_palmNormal.y, l_palmNormal.z,
-                            l_leapCross.x, l_leapCross.y, l_leapCross.z,
-                            l_handDirection.x, l_handDirection.y, l_handDirection.z
-                            );
+                        Leap::Matrix l_leapMat = l_hand.basis();
+                        if(m_hand == CH_Left) l_leapMat.xBasis *= -1.f;
+                        const glm::mat3 l_rotMat = l_leapMat.toMatrix3x3<glm::mat3>();
                         glm::quat l_finalRot = glm::quat_cast(l_rotMat);
+                        l_finalRot = glm::rotate(l_finalRot, (m_hand == CH_Left) ? g_piHalfN : g_piHalf, g_axisZ);
                         l_finalRot *= m_gripOffset;
 
                         m_pose.qRotation.x = l_finalRot.x;
@@ -277,7 +262,8 @@ void CLeapController::UpdateHMDCoordinates()
     {
         glm::mat4 l_rotMat(1.f);
         ConvertMatrix(l_hmdPose.mDeviceToAbsoluteTracking, l_rotMat);
-        glm::quat l_headRot = glm::quat_cast(l_rotMat);
+
+        const glm::quat l_headRot = glm::quat_cast(l_rotMat);
         ms_headRotation.x = l_headRot.x;
         ms_headRotation.y = l_headRot.y;
         ms_headRotation.z = l_headRot.z;

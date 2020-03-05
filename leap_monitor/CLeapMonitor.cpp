@@ -9,7 +9,7 @@ void CLeapListener::onConnect(const Leap::Controller &controller)
 {
     if(m_monitor.load())
     {
-        std::string l_message("Controller connected");
+        const std::string l_message("Controller connected");
         m_monitor.load()->SendNotification(l_message);
     }
 }
@@ -18,7 +18,7 @@ void CLeapListener::onDisconnect(const Leap::Controller &controller)
 {
     if(m_monitor.load())
     {
-        std::string l_message("Controller disconnected");
+        const std::string l_message("Controller disconnected");
         m_monitor.load()->SendNotification(l_message);
     }
 }
@@ -33,7 +33,7 @@ void CLeapListener::onLogMessage(const Leap::Controller &controller, Leap::Messa
     {
         if(m_monitor.load())
         {
-            std::string l_message(msg);
+            const std::string l_message(msg);
             m_monitor.load()->SendNotification(l_message);
         }
     }
@@ -43,7 +43,7 @@ void CLeapListener::onServiceConnect(const Leap::Controller &controller)
 {
     if(m_monitor.load())
     {
-        std::string l_message("Service connected");
+        const std::string l_message("Service connected");
         m_monitor.load()->SendNotification(l_message);
     }
 }
@@ -52,7 +52,7 @@ void CLeapListener::onServiceDisconnect(const Leap::Controller &controller)
 {
     if(m_monitor.load())
     {
-        std::string l_message("Service disconnected");
+        const std::string l_message("Service disconnected");
         m_monitor.load()->SendNotification(l_message);
     }
 }
@@ -220,7 +220,7 @@ void CLeapMonitor::Run()
                     if(m_specialHotkey)
                     {
                         SendCommand("game special_mode");
-                        std::string l_message("Special mode toggled");
+                        const std::string l_message("Special mode toggled");
                         SendNotification(l_message);
                     }
                 }
@@ -233,7 +233,7 @@ void CLeapMonitor::Run()
                         if(m_leftHotkey)
                         {
                             SendCommand("setting left_hand");
-                            std::string l_message("Left hand toggled");
+                            const std::string l_message("Left hand toggled");
                             SendNotification(l_message);
                         }
                     }
@@ -247,7 +247,7 @@ void CLeapMonitor::Run()
                         if(m_rightHotkey)
                         {
                             SendCommand("setting right_hand");
-                            std::string l_message("Right hand toggled");
+                            const std::string l_message("Right hand toggled");
                             SendNotification(l_message);
                         }
                     }

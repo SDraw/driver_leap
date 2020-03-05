@@ -5,7 +5,7 @@ class CControllerButton;
 class CLeapController : public vr::ITrackedDeviceServerDriver
 {
     static vr::IVRServerDriverHost *ms_driverHost;
-    static double ms_headPosition[3];
+    static double ms_headPosition[3U];
     static vr::HmdQuaternion_t ms_headRotation;
     vr::DriverPose_t m_pose;
 
@@ -19,6 +19,7 @@ class CLeapController : public vr::ITrackedDeviceServerDriver
     void UpdateTransformation(const Leap::Frame &f_frame);
 
     // vr::ITrackedDeviceServerDriver
+    vr::EVRInitError Activate(uint32_t unObjectId);
     void Deactivate();
     void DebugRequest(const char* pchRequest, char* pchResponseBuffer, uint32_t unResponseBufferSize) {}
     void EnterStandby() {}
@@ -67,10 +68,8 @@ protected:
     std::string m_serialNumber;
     bool m_specialMode;
 
+    virtual void ActivateInternal() {}
     virtual bool MixHandState(bool f_state);
     virtual void UpdateGestures(const Leap::Frame &f_frame) = 0;
     virtual void UpdateInputInternal() {}
-
-    // vr::ITrackedDeviceServerDriver
-    virtual vr::EVRInitError Activate(uint32_t unObjectId) = 0;
 };

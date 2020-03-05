@@ -47,7 +47,7 @@ class CLeapControllerIndex final : public CLeapController
     CLeapControllerIndex& operator=(const CLeapControllerIndex &that) = delete;
 
     // CLeapController
-    vr::EVRInitError Activate(uint32_t unObjectId);
+    void ActivateInternal() override;
     bool MixHandState(bool f_state) override;
     void UpdateGestures(const Leap::Frame &f_frame);
     void UpdateInputInternal() override;

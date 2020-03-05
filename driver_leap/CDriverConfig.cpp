@@ -88,13 +88,13 @@ void CDriverConfig::LoadConfig()
     pugi::xml_document *l_config = new pugi::xml_document();
     if(l_config->load_file(l_path.c_str()))
     {
-        pugi::xml_node l_root = l_config->child("settings");
+        const pugi::xml_node l_root = l_config->child("settings");
         if(l_root)
         {
             for(pugi::xml_node l_node = l_root.child("setting"); l_node; l_node = l_node.next_sibling("setting"))
             {
-                pugi::xml_attribute l_attribName = l_node.attribute("name");
-                pugi::xml_attribute l_attribValue = l_node.attribute("value");
+                const pugi::xml_attribute l_attribName = l_node.attribute("name");
+                const pugi::xml_attribute l_attribValue = l_node.attribute("value");
                 if(l_attribName && l_attribValue)
                 {
                     switch(ReadEnumVector(l_attribName.as_string(), g_configAttributes))
@@ -133,7 +133,7 @@ void CDriverConfig::LoadConfig()
                             break;
                         case ConfigParamIndex::CPI_TrackingLevel:
                         {
-                            size_t l_tableIndex = ReadEnumVector(l_attribValue.as_string(), g_trackingLevels);
+                            const size_t l_tableIndex = ReadEnumVector(l_attribValue.as_string(), g_trackingLevels);
                             if(l_tableIndex != std::numeric_limits<size_t>::max()) ms_trackingLevel = static_cast<unsigned char>(l_tableIndex);
                         } break;
                         case ConfigParamIndex::CPI_Input:

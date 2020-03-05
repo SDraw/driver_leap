@@ -3,7 +3,12 @@
 
 extern const glm::vec3 g_axisX(1.f, 0.f, 0.f);
 extern const glm::vec3 g_axisY(0.f, 1.f, 0.f);
+extern const glm::vec3 g_axisZ(0.f, 0.f, 1.f);
+extern const glm::vec3 g_axisZN(0.f, 0.f, -1.f);
 extern const glm::mat4 g_identityMatrix(1.f);
+extern const float g_pi = glm::pi<float>();
+extern const float g_piHalf = g_pi / 2.f;
+extern const float g_piHalfN = -g_piHalf;
 
 // Left hand open gesture transformation, thanks to https://github.com/spayne and his soft_knuckles repository
 extern const vr::VRBoneTransform_t g_openHandGesture[31U] = {
@@ -53,7 +58,7 @@ void ConvertMatrix(const vr::HmdMatrix34_t &f_matVR, glm::mat4 &f_mat)
 }
 void ConvertMatrix(const Leap::Matrix &f_leapMat, glm::mat4 &f_mat)
 {
-    Leap::FloatArray l_array = f_leapMat.rigidInverse().toArray4x4();
+    const Leap::FloatArray l_array = f_leapMat.rigidInverse().toArray4x4();
     std::memcpy(&f_mat, l_array.m_array, sizeof(glm::mat4));
 }
 
@@ -81,13 +86,13 @@ void ConvertVector3(const glm::vec3 &f_glmVec, vr::HmdVector4_t &f_vrVec)
     for(size_t i = 0U; i < 3U; i++) f_vrVec.v[i] = f_glmVec[i];
 }
 
-void FixAuxBoneTransformation(glm::vec3 &f_pos, glm::quat &f_rot)
+void FixAuxTransformation(glm::vec3 &f_pos, glm::quat &f_rot)
 {
     f_pos.y *= -1.f;
     f_pos.z *= -1.f;
     f_rot.y *= -1.f;
     f_rot.z *= -1.f;
-    f_rot = glm::rotate(f_rot, glm::pi<float>(), g_axisX);
+    f_rot = glm::rotate(f_rot, g_pi, g_axisX);
 }
 
 void SwitchBoneAxes(glm::quat &f_rot)

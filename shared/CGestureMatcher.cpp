@@ -27,7 +27,7 @@ bool CGestureMatcher::GetGestures(const Leap::Frame &f_frame, GestureHand f_whic
     bool l_result = false;
     f_result.resize(GT_GesturesCount, 0.f);
 
-    Leap::HandList l_hands = f_frame.hands();
+    const Leap::HandList l_hands = f_frame.hands();
     for(auto l_hand : l_hands)
     {
         if(l_hand.isValid())
@@ -36,7 +36,7 @@ bool CGestureMatcher::GetGestures(const Leap::Frame &f_frame, GestureHand f_whic
             {
                 FingerData l_fingerData[5U];
                 const Leap::FingerList l_fingers = l_hand.fingers();
-                for(auto l_finger : l_fingers)
+                for(const auto l_finger : l_fingers)
                 {
                     if(l_finger.isValid())
                     {
@@ -48,8 +48,8 @@ bool CGestureMatcher::GetGestures(const Leap::Frame &f_frame, GestureHand f_whic
                         Leap::Vector l_prevDirection;
                         for(int i = 0; i < 4; i++)
                         {
-                            Leap::Bone l_bone = l_finger.bone(static_cast<Leap::Bone::Type>(i));
-                            Leap::Vector l_direction = -l_bone.direction();
+                            const Leap::Bone l_bone = l_finger.bone(static_cast<Leap::Bone::Type>(i));
+                            const Leap::Vector l_direction = -l_bone.direction();
 
                             if(i == Leap::Bone::TYPE_DISTAL) l_fingerData[l_index].m_direction = l_direction;
                             if(i > 0)
@@ -63,25 +63,25 @@ bool CGestureMatcher::GetGestures(const Leap::Frame &f_frame, GestureHand f_whic
                 }
 
                 // Trigger
-                float l_triggerBend = l_fingerData[Leap::Finger::TYPE_INDEX].m_bends[1U] + l_fingerData[Leap::Finger::TYPE_INDEX].m_bends[2U];
-                float l_trigger = MapRange(l_triggerBend, 70.f, 100.f);
+                const float l_triggerBend = l_fingerData[Leap::Finger::TYPE_INDEX].m_bends[1U] + l_fingerData[Leap::Finger::TYPE_INDEX].m_bends[2U];
+                const float l_trigger = MapRange(l_triggerBend, 70.f, 100.f);
                 Merge(f_result[GT_TriggerFinger], l_trigger);
 
                 // Lower fist / grip
-                float l_grip = MapRange((l_fingerData[Leap::Finger::TYPE_MIDDLE].m_bend + l_fingerData[Leap::Finger::TYPE_RING].m_bend + l_fingerData[Leap::Finger::TYPE_PINKY].m_bend) / 3.f, 90.f, 180.f);
+                const float l_grip = MapRange((l_fingerData[Leap::Finger::TYPE_MIDDLE].m_bend + l_fingerData[Leap::Finger::TYPE_RING].m_bend + l_fingerData[Leap::Finger::TYPE_PINKY].m_bend) / 3.f, 90.f, 180.f);
                 Merge(f_result[GT_LowerFist], l_grip);
 
                 // Pinch
-                float l_pinch = MapRange(l_hand.pinchDistance(), 40.f, 30.f);
+                const float l_pinch = MapRange(l_hand.pinchDistance(), 40.f, 30.f);
                 Merge(f_result[GT_Pinch], l_pinch);
 
                 // Thumb press
-                Leap::Vector l_palmNormal = l_hand.palmNormal();
-                Leap::Vector l_direction = l_hand.direction();
-                Leap::Vector l_pinkyside;
-                if(f_which == GH_RightHand) l_pinkyside = l_palmNormal.cross(l_direction);
-                else l_pinkyside = l_direction.cross(l_palmNormal);
-                Merge(f_result[GT_Thumbpress], 1.f - MapRange(l_pinkyside.dot(l_fingerData[Leap::Finger::TYPE_THUMB].m_direction), 0.0f, 0.6f));
+                const Leap::Vector l_palmNormal = l_hand.palmNormal();
+                const Leap::Vector l_direction = l_hand.direction();
+                Leap::Vector l_pinkySide;
+                if(f_which == GH_RightHand) l_pinkySide = l_palmNormal.cross(l_direction);
+                else l_pinkySide = l_direction.cross(l_palmNormal);
+                Merge(f_result[GT_Thumbpress], 1.f - MapRange(l_pinkySide.dot(l_fingerData[Leap::Finger::TYPE_THUMB].m_direction), 0.0f, 0.6f));
 
                 // Victory
                 Merge(f_result[GT_Victory], std::min(std::min(MapRange((l_fingerData[Leap::Finger::TYPE_INDEX].m_bend + l_fingerData[Leap::Finger::TYPE_MIDDLE].m_bend) / 2.f, 50.f, 40.f),
@@ -89,16 +89,16 @@ bool CGestureMatcher::GetGestures(const Leap::Frame &f_frame, GestureHand f_whic
                     MapRange(57.2957795f * l_fingerData[Leap::Finger::TYPE_INDEX].m_direction.angleTo(l_fingerData[Leap::Finger::TYPE_MIDDLE].m_direction), 10.f, 20.f)));
 
                 // Flat hand gestures
-                float l_flatHand = MapRange((l_fingerData[Leap::Finger::TYPE_THUMB].m_bend + l_fingerData[Leap::Finger::TYPE_INDEX].m_bend + l_fingerData[Leap::Finger::TYPE_MIDDLE].m_bend + l_fingerData[Leap::Finger::TYPE_RING].m_bend + l_fingerData[Leap::Finger::TYPE_PINKY].m_bend) / 5.f, 50.f, 40.f);
+                const float l_flatHand = MapRange((l_fingerData[Leap::Finger::TYPE_THUMB].m_bend + l_fingerData[Leap::Finger::TYPE_INDEX].m_bend + l_fingerData[Leap::Finger::TYPE_MIDDLE].m_bend + l_fingerData[Leap::Finger::TYPE_RING].m_bend + l_fingerData[Leap::Finger::TYPE_PINKY].m_bend) / 5.f, 50.f, 40.f);
                 Merge(f_result[GT_FlatHandPalmUp], std::min(l_flatHand, MapRange((g_UpVector).dot(l_palmNormal), 0.8f, 0.95f)));
                 Merge(f_result[GT_FlatHandPalmDown], std::min(l_flatHand, MapRange((-g_UpVector).dot(l_palmNormal), 0.8f, 0.95f)));
                 Merge(f_result[GT_FlatHandPalmAway], std::min(l_flatHand, MapRange((g_InVector).dot(l_palmNormal), 0.8f, 0.95f)));
                 Merge(f_result[GT_FlatHandPalmTowards], std::min(l_flatHand, MapRange((-g_InVector).dot(l_palmNormal), 0.8f, 0.95f)));
 
                 // ThumbsUp/Inward gestures (seems broken in new LeapSDK)
-                Leap::Vector l_inward = ((f_which == GH_LeftHand) ? g_RightVector : -g_RightVector);
-                float l_fistHand = MapRange((l_fingerData[Leap::Finger::TYPE_INDEX].m_bend + l_fingerData[Leap::Finger::TYPE_MIDDLE].m_bend + l_fingerData[Leap::Finger::TYPE_RING].m_bend + l_fingerData[Leap::Finger::TYPE_PINKY].m_bend) / 5.f, 120.f, 150.f);
-                float l_straightThumb = MapRange(l_fingerData[Leap::Finger::TYPE_THUMB].m_bend, 50.f, 40.f);
+                const Leap::Vector l_inward = ((f_which == GH_LeftHand) ? g_RightVector : -g_RightVector);
+                const float l_fistHand = MapRange((l_fingerData[Leap::Finger::TYPE_INDEX].m_bend + l_fingerData[Leap::Finger::TYPE_MIDDLE].m_bend + l_fingerData[Leap::Finger::TYPE_RING].m_bend + l_fingerData[Leap::Finger::TYPE_PINKY].m_bend) / 5.f, 120.f, 150.f);
+                const float l_straightThumb = MapRange(l_fingerData[Leap::Finger::TYPE_THUMB].m_bend, 50.f, 40.f);
                 Merge(f_result[GT_ThumbUp], std::min(l_fistHand, std::min(l_straightThumb, MapRange((g_UpVector).dot(l_fingerData[Leap::Finger::TYPE_THUMB].m_direction), 0.8f, 0.95f))));
                 Merge(f_result[GT_ThumbInward], std::min(l_fistHand, std::min(l_straightThumb, MapRange((l_inward).dot(l_fingerData[Leap::Finger::TYPE_THUMB].m_direction), 0.8f, 0.95f))));
 
@@ -122,7 +122,7 @@ bool CGestureMatcher::GetGestures(const Leap::Frame &f_frame, GestureHand f_whic
                 f_result[GT_ThumbPinkyTouch] = (l_length <= 35.f) ? std::min((35.f - l_length) / 20.f, 1.f) : 0.f;
 
                 // Two-handed gestures
-                for(auto l_otherHand : l_hands)
+                for(const auto l_otherHand : l_hands)
                 {
                     if(l_otherHand.isValid())
                     {
@@ -133,8 +133,8 @@ bool CGestureMatcher::GetGestures(const Leap::Frame &f_frame, GestureHand f_whic
                                 MapRange(l_fingerData[Leap::Finger::TYPE_INDEX].m_tipPosition.distanceTo(l_otherHand.palmPosition()), 80.0f, 60.0f))
                                 ));
 
-                            Leap::FingerList l_otherFingers = l_otherHand.fingers();
-                            for(auto l_otherFinger : l_otherFingers)
+                            const Leap::FingerList l_otherFingers = l_otherHand.fingers();
+                            for(const auto l_otherFinger : l_otherFingers)
                             {
                                 if(l_otherFinger.isValid())
                                 {
@@ -143,12 +143,12 @@ bool CGestureMatcher::GetGestures(const Leap::Frame &f_frame, GestureHand f_whic
                                     {
                                         if(l_otherFinger.direction().dot(l_palmNormal) < 0)
                                         {
-                                            Leap::Vector l_uVec = l_direction.cross(l_palmNormal) * (l_hand.palmWidth() / 2.f);
-                                            Leap::Vector l_vVec = l_direction * (l_hand.palmWidth() / 2.f);
-                                            Leap::Vector l_path = l_otherFinger.tipPosition() - l_hand.palmPosition();
-                                            Leap::Vector l_otherFingerDir = l_otherFinger.direction();
+                                            const Leap::Vector l_uVec = l_direction.cross(l_palmNormal) * (l_hand.palmWidth() / 2.f);
+                                            const Leap::Vector l_vVec = l_direction * (l_hand.palmWidth() / 2.f);
+                                            const Leap::Vector l_path = l_otherFinger.tipPosition() - l_hand.palmPosition();
+                                            const Leap::Vector l_otherFingerDir = l_otherFinger.direction();
 
-                                            glm::mat3 l_matrix(l_uVec.x, l_vVec.x, l_otherFingerDir.x,
+                                            const glm::mat3 l_matrix(l_uVec.x, l_vVec.x, l_otherFingerDir.x,
                                                 l_uVec.y, l_vVec.y, l_otherFingerDir.y,
                                                 l_uVec.z, l_vVec.z, l_otherFingerDir.z);
                                             glm::vec2 l_uv = l_path.toVector3<glm::vec3>()*glm::inverse(l_matrix);
@@ -184,7 +184,7 @@ bool CGestureMatcher::GetGestures(const Leap::Frame &f_frame, GestureHand f_whic
 
 float CGestureMatcher::MapRange(float input, float minimum, float maximum)
 {
-    float mapped = (input - minimum) / (maximum - minimum);
+    const float mapped = (input - minimum) / (maximum - minimum);
     return std::max(std::min(mapped, 1.0f), 0.0f);
 }
 void CGestureMatcher::Merge(float &result, float value)

@@ -44,9 +44,16 @@ vr::EVRInitError CRelayDevice::Activate(uint32_t unObjectId)
         m_trackedDevice = unObjectId;
         m_propertyHandle = vr::VRProperties()->TrackedDeviceToPropertyContainer(m_trackedDevice);
 
+        vr::VRProperties()->SetStringProperty(m_propertyHandle, vr::Prop_ResourceRoot_String, "leap");
+        vr::VRProperties()->SetStringProperty(m_propertyHandle, vr::Prop_RenderModelName_String, "{leap}leap_motion_1_0");
+
         vr::VRProperties()->SetStringProperty(m_propertyHandle, vr::Prop_SerialNumber_String, m_serialNumber.c_str());
         vr::VRProperties()->SetBoolProperty(m_propertyHandle, vr::Prop_WillDriftInYaw_Bool, false);
         vr::VRProperties()->SetUint64Property(m_propertyHandle, vr::Prop_VendorSpecific_Reserved_Start, 0x4C4D6F74696F6E); // "LMotion", hidden property for leap_monitor
+
+        vr::VRProperties()->SetStringProperty(m_propertyHandle, vr::Prop_NamedIconPathDeviceReady_String, "{leap}/icons/base_status_ready.png");
+
+        m_pose.vecWorldFromDriverTranslation[0U] = 0.1f; // Slightly move to avoid base stations
 
         l_resultError = vr::VRInitError_None;
     }
