@@ -7,10 +7,9 @@
 #include "CGestureMatcher.h"
 #include "Utils.h"
 
-extern const float g_piHalf;
-extern const float g_piHalfN;
-extern const glm::vec3 g_axisZ;
 const glm::quat g_reverseRotation(0.f, 0.f, 0.70106769f, -0.70106769f);
+const glm::quat g_rotateHalfPiZ(0.70106769f, 0.f, 0.f, 0.70106769f);
+const glm::quat g_rotateHalfPiZN(0.70106769f, 0.f, 0.f, -0.70106769f);
 
 vr::IVRServerDriverHost *CLeapController::ms_driverHost = nullptr;
 vr::IVRDriverInput *CLeapController::ms_driverInput = nullptr;
@@ -181,27 +180,28 @@ void CLeapController::UpdateTransformation(const Leap::Frame &f_frame)
                         std::memcpy(m_pose.vecWorldFromDriverTranslation, ms_headPosition, sizeof(double) * 3U);
 
                         const Leap::Vector l_position = l_hand.palmPosition();
-                        m_pose.vecPosition[0] = -0.001*l_position.x;
-                        m_pose.vecPosition[1] = -0.001*l_position.z;
-                        m_pose.vecPosition[2] = -0.001*l_position.y - 0.15f; // Why?
+                        m_pose.vecPosition[0] = -0.001f*l_position.x;
+                        m_pose.vecPosition[1] = -0.001f*l_position.z;
+                        m_pose.vecPosition[2] = -0.001f*l_position.y - 0.15f; // Why?
 
                         const Leap::Vector l_velocity = l_hand.palmVelocity();
-                        m_pose.vecVelocity[0] = -0.001*l_velocity.x;
-                        m_pose.vecVelocity[1] = -0.001*l_velocity.z;
-                        m_pose.vecVelocity[2] = -0.001*l_velocity.y;
+                        glm::vec3 l_resultVelocity(-0.001f*l_velocity.x, -0.001f*l_velocity.z, -0.001f*l_velocity.y);
+                        const glm::quat l_headRotation(ms_headRotation.w, ms_headRotation.x, ms_headRotation.y, ms_headRotation.z);
+                        l_resultVelocity = l_headRotation*l_resultVelocity;
+                        m_pose.vecVelocity[0] = l_resultVelocity.x;
+                        m_pose.vecVelocity[1] = l_resultVelocity.y;
+                        m_pose.vecVelocity[2] = l_resultVelocity.z;
 
-                        Leap::Matrix l_leapMat = l_hand.basis();
-                        if(m_hand == CH_Left) l_leapMat.xBasis *= -1.f;
-                        const glm::mat3 l_rotMat = l_leapMat.toMatrix3x3<glm::mat3>();
-                        glm::quat l_finalRot = glm::quat_cast(l_rotMat);
-                        l_finalRot = g_reverseRotation*l_finalRot;
-                        l_finalRot = glm::rotate(l_finalRot, (m_hand == CH_Left) ? g_piHalfN : g_piHalf, g_axisZ);
-                        l_finalRot *= m_gripOffset;
+                        const Leap::Quaternion l_handOrientation = l_hand.orientation();
+                        glm::quat l_rotation(l_handOrientation.w, l_handOrientation.x, l_handOrientation.y, l_handOrientation.z);
+                        l_rotation = g_reverseRotation*l_rotation;
+                        l_rotation *= ((m_hand == CH_Left) ? g_rotateHalfPiZN : g_rotateHalfPiZ);
+                        l_rotation *= m_gripOffset;
 
-                        m_pose.qRotation.x = l_finalRot.x;
-                        m_pose.qRotation.y = l_finalRot.y;
-                        m_pose.qRotation.z = l_finalRot.z;
-                        m_pose.qRotation.w = l_finalRot.w;
+                        m_pose.qRotation.x = l_rotation.x;
+                        m_pose.qRotation.y = l_rotation.y;
+                        m_pose.qRotation.z = l_rotation.z;
+                        m_pose.qRotation.w = l_rotation.w;
                     } break;
                     case CDriverConfig::OM_Desktop:
                     {
@@ -209,26 +209,24 @@ void CLeapController::UpdateTransformation(const Leap::Frame &f_frame)
                         std::memcpy(m_pose.vecWorldFromDriverTranslation, ms_headPosition, sizeof(double) * 3U);
 
                         const Leap::Vector l_position = l_hand.palmPosition();
-                        m_pose.vecPosition[0] = 0.001*l_position.x + CDriverConfig::GetDesktopRootX();
-                        m_pose.vecPosition[1] = 0.001*l_position.y + CDriverConfig::GetDesktopRootY();
-                        m_pose.vecPosition[2] = 0.001*l_position.z + CDriverConfig::GetDesktopRootZ();
+                        m_pose.vecPosition[0] = 0.001f*l_position.x + CDriverConfig::GetDesktopRootX();
+                        m_pose.vecPosition[1] = 0.001f*l_position.y + CDriverConfig::GetDesktopRootY();
+                        m_pose.vecPosition[2] = 0.001f*l_position.z + CDriverConfig::GetDesktopRootZ();
 
                         const Leap::Vector l_velocity = l_hand.palmVelocity();
-                        m_pose.vecVelocity[0] = 0.001*l_velocity.x;
-                        m_pose.vecVelocity[1] = 0.001*l_velocity.y;
-                        m_pose.vecVelocity[2] = 0.001*l_velocity.z;
+                        m_pose.vecVelocity[0] = 0.001f*l_velocity.x;
+                        m_pose.vecVelocity[1] = 0.001f*l_velocity.y;
+                        m_pose.vecVelocity[2] = 0.001f*l_velocity.z;
 
-                        Leap::Matrix l_leapMat = l_hand.basis();
-                        if(m_hand == CH_Left) l_leapMat.xBasis *= -1.f;
-                        const glm::mat3 l_rotMat = l_leapMat.toMatrix3x3<glm::mat3>();
-                        glm::quat l_finalRot = glm::quat_cast(l_rotMat);
-                        l_finalRot = glm::rotate(l_finalRot, (m_hand == CH_Left) ? g_piHalfN : g_piHalf, g_axisZ);
-                        l_finalRot *= m_gripOffset;
+                        const Leap::Quaternion l_handOrientation = l_hand.orientation();
+                        glm::quat l_rotation(l_handOrientation.w, l_handOrientation.x, l_handOrientation.y, l_handOrientation.z);
+                        l_rotation *= ((m_hand == CH_Left) ? g_rotateHalfPiZN : g_rotateHalfPiZ);
+                        l_rotation *= m_gripOffset;
 
-                        m_pose.qRotation.x = l_finalRot.x;
-                        m_pose.qRotation.y = l_finalRot.y;
-                        m_pose.qRotation.z = l_finalRot.z;
-                        m_pose.qRotation.w = l_finalRot.w;
+                        m_pose.qRotation.x = l_rotation.x;
+                        m_pose.qRotation.y = l_rotation.y;
+                        m_pose.qRotation.z = l_rotation.z;
+                        m_pose.qRotation.w = l_rotation.w;
                     } break;
                 }
 

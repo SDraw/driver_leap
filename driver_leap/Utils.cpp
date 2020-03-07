@@ -1,14 +1,7 @@
 #include "stdafx.h"
 #include "Utils.h"
 
-extern const glm::vec3 g_axisX(1.f, 0.f, 0.f);
-extern const glm::vec3 g_axisY(0.f, 1.f, 0.f);
-extern const glm::vec3 g_axisZ(0.f, 0.f, 1.f);
-extern const glm::vec3 g_axisZN(0.f, 0.f, -1.f);
 extern const glm::mat4 g_identityMatrix(1.f);
-extern const float g_pi = glm::pi<float>();
-extern const float g_piHalf = g_pi / 2.f;
-extern const float g_piHalfN = -g_piHalf;
 
 // Left hand open gesture transformation, thanks to https://github.com/spayne and his soft_knuckles repository
 extern const vr::VRBoneTransform_t g_openHandGesture[31U] = {
@@ -56,26 +49,6 @@ void ConvertMatrix(const vr::HmdMatrix34_t &f_matVR, glm::mat4 &f_mat)
     for(int i = 0; i < 3; i++) f_mat[i][3] = 0.f;
     f_mat[3][3] = 1.f;
 }
-void ConvertMatrix(const Leap::Matrix &f_leapMat, glm::mat4 &f_mat)
-{
-    const Leap::FloatArray l_array = f_leapMat.rigidInverse().toArray4x4();
-    std::memcpy(&f_mat, l_array.m_array, sizeof(glm::mat4));
-}
-
-void ConvertQuaternion(const glm::quat& f_glmQuat, vr::HmdQuaternionf_t &f_vrQuat)
-{
-    f_vrQuat.x = f_glmQuat.x;
-    f_vrQuat.y = f_glmQuat.y;
-    f_vrQuat.z = f_glmQuat.z;
-    f_vrQuat.w = f_glmQuat.w;
-}
-void ConvertQuaternion(const vr::HmdQuaternionf_t &f_vrQuat, glm::quat& f_glmQuat)
-{
-    f_glmQuat.x = f_vrQuat.x;
-    f_glmQuat.y = f_vrQuat.y;
-    f_glmQuat.z = f_vrQuat.z;
-    f_glmQuat.w = f_vrQuat.w;
-}
 
 void ConvertVector3(const vr::HmdVector4_t &f_vrVec, glm::vec3 &f_glmVec)
 {
@@ -84,21 +57,6 @@ void ConvertVector3(const vr::HmdVector4_t &f_vrVec, glm::vec3 &f_glmVec)
 void ConvertVector3(const glm::vec3 &f_glmVec, vr::HmdVector4_t &f_vrVec)
 {
     for(size_t i = 0U; i < 3U; i++) f_vrVec.v[i] = f_glmVec[i];
-}
-
-void FixAuxTransformation(glm::vec3 &f_pos, glm::quat &f_rot)
-{
-    f_pos.y *= -1.f;
-    f_pos.z *= -1.f;
-    f_rot.y *= -1.f;
-    f_rot.z *= -1.f;
-    f_rot = glm::rotate(f_rot, g_pi, g_axisX);
-}
-
-void SwitchBoneAxes(glm::quat &f_rot)
-{
-    std::swap(f_rot.x, f_rot.z);
-    f_rot.y *= -1.f;
 }
 
 size_t ReadEnumVector(const std::string &f_val, const std::vector<std::string> &f_vec)

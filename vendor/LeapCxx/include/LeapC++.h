@@ -352,6 +352,8 @@ namespace Leap {
      */
     LEAP_EXPORT Vector direction() const;
 
+    LEAP_EXPORT Quaternion rotation() const;
+
     /**
      * The estimated length of the bone in millimeters.
      *
@@ -918,6 +920,8 @@ namespace Leap {
      * @since 1.0
      */
     LEAP_EXPORT Vector direction() const;
+
+    LEAP_EXPORT Quaternion orientation() const;
 
     /**
      * The orientation of the hand as a basis matrix.

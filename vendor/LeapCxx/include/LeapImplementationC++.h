@@ -158,6 +158,10 @@ public:
   Vector nextJoint() const { return m_bone.next_joint.v; }
   Vector center() const { return (Vector(m_bone.prev_joint.v) + Vector(m_bone.next_joint.v))*0.5f; }
   Vector direction() const { return (Vector(m_bone.next_joint.v) - Vector(m_bone.prev_joint.v)).normalized(); }
+  Quaternion rotation() const {
+      if(!isValid()) return Quaternion::zero();
+      return Quaternion(m_bone.rotation.x,m_bone.rotation.y,m_bone.rotation.z,m_bone.rotation.w);
+  }
   float length() const { return (Vector(m_bone.next_joint.v) - Vector(m_bone.prev_joint.v)).magnitude(); }
   float width() const { return m_bone.width; }
   Bone::Type type() const { return m_type; }
@@ -324,6 +328,13 @@ public:
   Vector palmNormal() const { return m_hand.palm.normal.v; }
   float palmWidth() const { return m_hand.palm.width; }
   Vector direction() const { return Vector(m_hand.palm.direction.v).normalized(); }
+  Quaternion orientation() const {
+      if(!isValid())
+          return Quaternion::zero();
+
+      const LEAP_QUATERNION orientation = m_hand.palm.orientation;
+      return Quaternion(orientation.x, orientation.y, orientation.z, orientation.w);
+  }
   Matrix basis() const {
     if (!isValid())
       return Leap::Matrix::identity();

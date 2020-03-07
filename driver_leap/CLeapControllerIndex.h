@@ -46,6 +46,9 @@ class CLeapControllerIndex final : public CLeapController
     CLeapControllerIndex(const CLeapControllerIndex &that) = delete;
     CLeapControllerIndex& operator=(const CLeapControllerIndex &that) = delete;
 
+    void ChangeQuaternionOrientation(glm::quat &f_rot);
+    static void ChangeAuxTransformation(glm::vec3 &f_pos, glm::quat &f_rot);
+
     // CLeapController
     void ActivateInternal() override;
     bool MixHandState(bool f_state) override;
