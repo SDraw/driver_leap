@@ -39,6 +39,16 @@ enum IndexButton : size_t
 
     IB_Count
 };
+enum HandFinger : size_t
+{
+    HF_Thumb = 0U,
+    HF_Index,
+    HF_Middle,
+    HF_Ring,
+    HF_Pinky,
+
+    HF_Count
+};
 
 CLeapControllerIndex::CLeapControllerIndex(unsigned char f_hand)
 {
@@ -75,7 +85,7 @@ CLeapControllerIndex::~CLeapControllerIndex()
 {
 }
 
-void CLeapControllerIndex::ChangeQuaternionOrientation(glm::quat &f_rot)
+void CLeapControllerIndex::ChangeBoneOrientation(glm::quat &f_rot)
 {
     std::swap(f_rot.x, f_rot.z);
     f_rot.z *= -1.f;
@@ -85,6 +95,7 @@ void CLeapControllerIndex::ChangeQuaternionOrientation(glm::quat &f_rot)
         f_rot.y *= -1.f;
     }
 }
+
 void CLeapControllerIndex::ChangeAuxTransformation(glm::vec3 &f_pos, glm::quat &f_rot)
 {
     f_pos.y *= -1.f;
@@ -94,6 +105,30 @@ void CLeapControllerIndex::ChangeAuxTransformation(glm::vec3 &f_pos, glm::quat &
     f_rot.w *= -1.f;
     std::swap(f_rot.y, f_rot.z);
     f_rot.y *= -1.f;
+}
+
+size_t CLeapControllerIndex::GetFingerBoneIndex(size_t f_id)
+{
+    size_t l_result = 0U;
+    switch(f_id)
+    {
+        case HF_Thumb:
+            l_result = HSB_Thumb0;
+            break;
+        case HF_Index:
+            l_result = HSB_IndexFinger0;
+            break;
+        case HF_Middle:
+            l_result = HSB_MiddleFinger0;
+            break;
+        case HF_Ring:
+            l_result = HSB_RingFinger0;
+            break;
+        case HF_Pinky:
+            l_result = HSB_PinkyFinger0;
+            break;
+    }
+    return l_result;
 }
 
 void CLeapControllerIndex::ActivateInternal()
@@ -375,78 +410,47 @@ void CLeapControllerIndex::UpdateGestures(const Leap::Frame &f_frame)
             m_buttons[IB_FingerRing]->SetValue(l_scores[CGestureMatcher::GT_RingFingerBend]);
             m_buttons[IB_FingerPinky]->SetValue(l_scores[CGestureMatcher::GT_PinkyFingerBend]);
 
-            for(Leap::Hand l_hand : f_frame.hands())
+            for(const Leap::Hand l_hand : f_frame.hands())
             {
                 if(l_hand.isValid())
                 {
                     if((l_hand.isLeft() && (m_hand == CH_Left)) || (l_hand.isRight() && (m_hand == CH_Right)))
                     {
                         // Update rotations
-                        Leap::Quaternion l_leapRotation = l_hand.orientation();
-                        const glm::quat l_handRotation(l_leapRotation.w, l_leapRotation.x, l_leapRotation.y, l_leapRotation.z);
-                        const glm::quat l_handRotationInv = glm::inverse(l_handRotation);
-
                         for(const auto l_finger : l_hand.fingers())
                         {
                             if(l_finger.isValid())
                             {
-                                size_t l_transformIndex = 0U;
-                                switch(l_finger.type())
-                                {
-                                    case Leap::Finger::TYPE_INDEX:
-                                        l_transformIndex = HSB_IndexFinger1;
-                                        break;
-                                    case Leap::Finger::TYPE_MIDDLE:
-                                        l_transformIndex = HSB_MiddleFinger1;
-                                        break;
-                                    case Leap::Finger::TYPE_PINKY:
-                                        l_transformIndex = HSB_PinkyFinger1;
-                                        break;
-                                    case Leap::Finger::TYPE_RING:
-                                        l_transformIndex = HSB_RingFinger1;
-                                        break;
-                                    case Leap::Finger::TYPE_THUMB:
-                                        l_transformIndex = HSB_Thumb0;
-                                        break;
-                                }
+                                size_t l_transformIndex = GetFingerBoneIndex(static_cast<size_t>(l_finger.type()));
+                                if(l_transformIndex != HSB_Thumb0) l_transformIndex++;
 
+                                Leap::Quaternion l_leapRotation = l_hand.orientation();
                                 glm::quat l_segmentRotation;
-                                glm::quat l_segmentResult;
-
-                                // Segment 1
-                                l_leapRotation = l_finger.bone(Leap::Bone::TYPE_PROXIMAL).rotation();
                                 ConvertQuaternion(l_leapRotation, l_segmentRotation);
-                                l_segmentResult = l_handRotationInv*l_segmentRotation;
-                                ChangeQuaternionOrientation(l_segmentResult);
-                                if(l_finger.type() == Leap::Finger::TYPE_THUMB)
+
+                                for(int i = Leap::Bone::TYPE_PROXIMAL; i <= Leap::Bone::TYPE_DISTAL; i++)
                                 {
-                                    std::swap(l_segmentResult.z, l_segmentResult.w);
-                                    l_segmentResult.w *= -1.f;
-                                    if(m_hand == CH_Right)
+                                    const glm::quat l_prevSegmentRotationInv = glm::inverse(l_segmentRotation);
+                                    l_leapRotation = l_finger.bone(static_cast<Leap::Bone::Type>(i)).rotation();
+                                    ConvertQuaternion(l_leapRotation, l_segmentRotation);
+
+                                    glm::quat l_segmentResult = l_prevSegmentRotationInv*l_segmentRotation;
+                                    ChangeBoneOrientation(l_segmentResult);
+                                    if(l_transformIndex == HSB_Thumb0)
                                     {
-                                        std::swap(l_segmentResult.x, l_segmentResult.w);
+                                        std::swap(l_segmentResult.z, l_segmentResult.w);
                                         l_segmentResult.w *= -1.f;
-                                        std::swap(l_segmentResult.y, l_segmentResult.z);
-                                        l_segmentResult.y *= -1.f;
+                                        if(m_hand == CH_Right)
+                                        {
+                                            std::swap(l_segmentResult.x, l_segmentResult.w);
+                                            l_segmentResult.w *= -1.f;
+                                            std::swap(l_segmentResult.y, l_segmentResult.z);
+                                            l_segmentResult.y *= -1.f;
+                                        }
                                     }
+                                    ConvertQuaternion(l_segmentResult, m_boneTransform[l_transformIndex].orientation);
+                                    l_transformIndex++;
                                 }
-                                ConvertQuaternion(l_segmentResult, m_boneTransform[l_transformIndex].orientation);
-
-                                // Segment 2
-                                const glm::quat l_proximalInv = glm::inverse(l_segmentRotation);
-                                l_leapRotation = l_finger.bone(Leap::Bone::TYPE_INTERMEDIATE).rotation();
-                                ConvertQuaternion(l_leapRotation, l_segmentRotation);
-                                l_segmentResult = l_proximalInv*l_segmentRotation;
-                                ChangeQuaternionOrientation(l_segmentResult);
-                                ConvertQuaternion(l_segmentResult, m_boneTransform[l_transformIndex + 1U].orientation);
-
-                                // Segment 3
-                                const glm::quat l_intermediateInv = glm::inverse(l_segmentRotation);
-                                l_leapRotation = l_finger.bone(Leap::Bone::TYPE_DISTAL).rotation();
-                                ConvertQuaternion(l_leapRotation, l_segmentRotation);
-                                l_segmentResult = l_intermediateInv*l_segmentRotation;
-                                ChangeQuaternionOrientation(l_segmentResult);
-                                ConvertQuaternion(l_segmentResult, m_boneTransform[l_transformIndex + 2U].orientation);
                             }
                         }
 
@@ -457,75 +461,22 @@ void CLeapControllerIndex::UpdateGestures(const Leap::Frame &f_frame)
                         ConvertQuaternion(m_boneTransform[HSB_Wrist].orientation, l_rotation);
                         const glm::mat4 l_wristMat = glm::translate(g_identityMatrix, l_position) * glm::mat4_cast(l_rotation);
 
-                        // Thumb aux
-                        glm::mat4 l_chainMat(l_wristMat);
-                        for(size_t i = HSB_Thumb0; i < HSB_Thumb3; i++)
+                        for(size_t i = HF_Thumb; i < HF_Count; i++)
                         {
-                            ConvertVector3(m_boneTransform[i].position, l_position);
-                            ConvertQuaternion(m_boneTransform[i].orientation, l_rotation);
-                            l_chainMat = l_chainMat*(glm::translate(g_identityMatrix, l_position)*glm::mat4_cast(l_rotation));
+                            glm::mat4 l_chainMat(l_wristMat);
+                            const size_t l_chainIndex = GetFingerBoneIndex(i);
+                            for(size_t j = 0U, k = ((i == HF_Thumb) ? 3U : 4U); j < k; j++)
+                            {
+                                ConvertVector3(m_boneTransform[l_chainIndex + j].position, l_position);
+                                ConvertQuaternion(m_boneTransform[l_chainIndex + j].orientation, l_rotation);
+                                l_chainMat = l_chainMat*(glm::translate(g_identityMatrix, l_position)*glm::mat4_cast(l_rotation));
+                            }
+                            l_position = l_chainMat*g_zeroPoint;
+                            l_rotation = glm::quat_cast(l_chainMat);
+                            if(m_hand == CH_Left) ChangeAuxTransformation(l_position, l_rotation);
+                            ConvertVector3(l_position, m_boneTransform[HSB_Aux_Thumb + i].position);
+                            ConvertQuaternion(l_rotation, m_boneTransform[HSB_Aux_Thumb + i].orientation);
                         }
-                        l_position = l_chainMat*g_zeroPoint;
-                        l_rotation = glm::quat_cast(l_chainMat);
-                        if(m_hand == CH_Left) ChangeAuxTransformation(l_position, l_rotation);
-                        ConvertVector3(l_position, m_boneTransform[HSB_Aux_Thumb].position);
-                        ConvertQuaternion(l_rotation, m_boneTransform[HSB_Aux_Thumb].orientation);
-
-                        // Index aux
-                        std::memcpy(&l_chainMat, &l_wristMat, sizeof(glm::mat4));
-                        for(size_t i = HSB_IndexFinger0; i < HSB_IndexFinger4; i++)
-                        {
-                            ConvertVector3(m_boneTransform[i].position, l_position);
-                            ConvertQuaternion(m_boneTransform[i].orientation, l_rotation);
-                            l_chainMat = l_chainMat*(glm::translate(g_identityMatrix, l_position)*glm::mat4_cast(l_rotation));
-                        }
-                        l_position = l_chainMat*g_zeroPoint;
-                        l_rotation = glm::quat_cast(l_chainMat);
-                        if(m_hand == CH_Left) ChangeAuxTransformation(l_position, l_rotation);
-                        ConvertVector3(l_position, m_boneTransform[HSB_Aux_IndexFinger].position);
-                        ConvertQuaternion(l_rotation, m_boneTransform[HSB_Aux_IndexFinger].orientation);
-
-                        // Middle aux
-                        std::memcpy(&l_chainMat, &l_wristMat, sizeof(glm::mat4));
-                        for(size_t i = HSB_MiddleFinger0; i < HSB_MiddleFinger4; i++)
-                        {
-                            ConvertVector3(m_boneTransform[i].position, l_position);
-                            ConvertQuaternion(m_boneTransform[i].orientation, l_rotation);
-                            l_chainMat = l_chainMat*(glm::translate(g_identityMatrix, l_position)*glm::mat4_cast(l_rotation));
-                        }
-                        l_position = l_chainMat*g_zeroPoint;
-                        l_rotation = glm::quat_cast(l_chainMat);
-                        if(m_hand == CH_Left) ChangeAuxTransformation(l_position, l_rotation);
-                        ConvertVector3(l_position, m_boneTransform[HSB_Aux_MiddleFinger].position);
-                        ConvertQuaternion(l_rotation, m_boneTransform[HSB_Aux_MiddleFinger].orientation);
-
-                        // Ring aux
-                        std::memcpy(&l_chainMat, &l_wristMat, sizeof(glm::mat4));
-                        for(size_t i = HSB_RingFinger0; i < HSB_RingFinger4; i++)
-                        {
-                            ConvertVector3(m_boneTransform[i].position, l_position);
-                            ConvertQuaternion(m_boneTransform[i].orientation, l_rotation);
-                            l_chainMat = l_chainMat*(glm::translate(g_identityMatrix, l_position)*glm::mat4_cast(l_rotation));
-                        }
-                        l_position = l_chainMat*g_zeroPoint;
-                        l_rotation = glm::quat_cast(l_chainMat);
-                        if(m_hand == CH_Left) ChangeAuxTransformation(l_position, l_rotation);
-                        ConvertVector3(l_position, m_boneTransform[HSB_Aux_RingFinger].position);
-                        ConvertQuaternion(l_rotation, m_boneTransform[HSB_Aux_RingFinger].orientation);
-
-                        // Pinky aux
-                        std::memcpy(&l_chainMat, &l_wristMat, sizeof(glm::mat4));
-                        for(size_t i = HSB_PinkyFinger0; i < HSB_PinkyFinger4; i++)
-                        {
-                            ConvertVector3(m_boneTransform[i].position, l_position);
-                            ConvertQuaternion(m_boneTransform[i].orientation, l_rotation);
-                            l_chainMat = l_chainMat*(glm::translate(g_identityMatrix, l_position)*glm::mat4_cast(l_rotation));
-                        }
-                        l_position = l_chainMat*g_zeroPoint;
-                        l_rotation = glm::quat_cast(l_chainMat);
-                        if(m_hand == CH_Left) ChangeAuxTransformation(l_position, l_rotation);
-                        ConvertVector3(l_position, m_boneTransform[HSB_Aux_PinkyFinger].position);
-                        ConvertQuaternion(l_rotation, m_boneTransform[HSB_Aux_PinkyFinger].orientation);
 
                         break;
                     }
