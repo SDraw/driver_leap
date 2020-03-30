@@ -4,6 +4,3 @@
 [submodule "vendor/pugixml"]
 	path = vendor/pugixml
 	url = https://github.com/zeux/pugixml.git
-[submodule "vendor/openvr"]
-	path = vendor/openvr
-	url = https://github.com/SDraw/openvr.git
