@@ -122,13 +122,6 @@ void CLeapControllerVive::ActivateInternal()
     ms_driverInput->CreateHapticComponent(m_propertyContainer, "/output/haptic", &m_haptic);
 }
 
-bool CLeapControllerVive::MixHandState(bool f_state)
-{
-    bool l_result = f_state;
-    if(m_gameProfile == GP_VRChat) l_result = true; // VRChat changes controls if one controller is out of range or disconnected
-    return l_result;
-}
-
 void CLeapControllerVive::UpdateGestures(const Leap::Frame &f_frame)
 {
     std::vector<float> l_scores;

@@ -2,19 +2,17 @@
 
 class CDriverConfig final
 {
-    static bool ms_enabled;
     static unsigned char ms_emulatedController;
     static bool ms_leftHand;
     static bool ms_rightHand;
     static unsigned char ms_orientation;
-    static float ms_desktopRootX;
-    static float ms_desktopRootY;
-    static float ms_desktopRootZ;
-    static float ms_rotationOffsetX;
-    static float ms_rotationOffsetY;
-    static float ms_rotationOffsetZ;
     static bool ms_skeleton;
     static unsigned char ms_trackingLevel;
+    static glm::vec3 ms_desktopOffset;
+    static glm::vec3 ms_leftHandOffset;
+    static glm::quat ms_leftHandOffsetRotation;
+    static glm::vec3 ms_rightHandOffset;
+    static glm::quat ms_rightHandOffsetRotation;
     static bool ms_input;
     static bool ms_menu;
     static bool ms_applicationMenu;
@@ -27,7 +25,7 @@ class CDriverConfig final
     static bool ms_buttonA;
     static bool ms_buttonB;
     static bool ms_thumbstick;
-    static bool ms_vrchatHandsReset;
+    static bool ms_handsReset;
 
     CDriverConfig() = delete;
     ~CDriverConfig() = delete;
@@ -52,19 +50,19 @@ public:
 
     static void LoadConfig();
 
-    static inline bool IsEnabled() { return ms_enabled; }
     static inline unsigned char GetEmulatedController() { return ms_emulatedController; }
     static inline bool IsLeftHandEnabled() { return ms_leftHand; }
     static inline bool IsRightHandEnabled() { return ms_rightHand; }
     static inline unsigned char GetOrientationMode() { return ms_orientation; }
-    static inline float GetDesktopRootX() { return ms_desktopRootX; }
-    static inline float GetDesktopRootY() { return ms_desktopRootY; }
-    static inline float GetDesktopRootZ() { return ms_desktopRootZ; }
-    static inline float GetRotationOffsetX() { return ms_rotationOffsetX; }
-    static inline float GetRotationOffsetY() { return ms_rotationOffsetY; }
-    static inline float GetRotationOffsetZ() { return ms_rotationOffsetZ; }
     static inline bool IsSkeletonEnabled() { return ms_skeleton; }
     static inline unsigned char GetTrackingLevel() { return ms_trackingLevel; }
+
+    static inline const glm::vec3& GetDesktopOffset() { return ms_desktopOffset; }
+    static inline const glm::vec3& GetLeftHandOffset() { return ms_leftHandOffset; }
+    static inline const glm::quat& GetLeftHandOffsetRotation() { return ms_leftHandOffsetRotation; }
+    static inline const glm::vec3& GetRightHandOffset() { return ms_rightHandOffset; }
+    static inline const glm::quat& GetRightHandOffsetRotation() { return ms_rightHandOffsetRotation; }
+
     static inline bool IsInputEnabled() { return ms_input; }
     static inline bool IsMenuEnabled() { return ms_menu; }
     static inline bool IsApplicationMenuEnabled() { return ms_applicationMenu; }
@@ -77,5 +75,5 @@ public:
     static inline bool IsButtonAEnabled() { return ms_buttonA; }
     static inline bool IsButtonBEnabled() { return ms_buttonB; }
     static inline bool IsThumbstickEnabled() { return ms_thumbstick; }
-    static inline bool IsVRChatHandsResetEnabled() { return ms_vrchatHandsReset; }
+    static inline bool IsHandsResetEnabled() { return ms_handsReset; }
 };

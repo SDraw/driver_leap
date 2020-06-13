@@ -56,7 +56,8 @@ enum SettingCommand : size_t
     SC_RightHand
 };
 
-const char* const CServerDriver::ms_interfaces[] = {
+const char* const CServerDriver::ms_interfaces[]
+{
     vr::ITrackedDeviceServerDriver_Version,
     vr::IServerTrackedDeviceProvider_Version,
     nullptr
@@ -115,59 +116,53 @@ const char* const* CServerDriver::GetInterfaceVersions()
 
 vr::EVRInitError CServerDriver::Init(vr::IVRDriverContext *pDriverContext)
 {
-    vr::EVRInitError l_vrError = vr::VRInitError_None;
+    VR_INIT_SERVER_DRIVER_CONTEXT(pDriverContext);
     CDriverConfig::LoadConfig();
+    CDriverLog::Initialize(vr::VRDriverLog());
 
-    if(CDriverConfig::IsEnabled())
+    m_driverHost = vr::VRServerDriverHost();
+    CLeapController::SetInterfaces(m_driverHost, vr::VRDriverInput(), vr::VRProperties());
+
+    // Relay device for events from leap_monitor
+    m_relayDevice = new CRelayDevice(this);
+    m_driverHost->TrackedDeviceAdded(m_relayDevice->GetSerialNumber().c_str(), vr::TrackedDeviceClass_TrackingReference, m_relayDevice);
+
+    switch(CDriverConfig::GetEmulatedController())
     {
-        VR_INIT_SERVER_DRIVER_CONTEXT(pDriverContext);
-        CDriverLog::Initialize(vr::VRDriverLog());
-
-        m_driverHost = vr::VRServerDriverHost();
-        CLeapController::SetInterfaces(m_driverHost, vr::VRDriverInput(), vr::VRProperties());
-
-        // Relay device for events from leap_monitor
-        m_relayDevice = new CRelayDevice(this);
-        m_driverHost->TrackedDeviceAdded(m_relayDevice->GetSerialNumber().c_str(), vr::TrackedDeviceClass_TrackingReference, m_relayDevice);
-
-        switch(CDriverConfig::GetEmulatedController())
+        case CDriverConfig::EC_Vive:
         {
-            case CDriverConfig::EC_Vive:
-            {
-                m_controllers[LCH_Left] = new CLeapControllerVive(CLeapController::CH_Left);
-                m_controllers[LCH_Right] = new CLeapControllerVive(CLeapController::CH_Right);
-            } break;
-            case CDriverConfig::EC_Index:
-            {
-                m_controllers[LCH_Left] = new CLeapControllerIndex(CLeapController::CH_Left);
-                m_controllers[LCH_Right] = new CLeapControllerIndex(CLeapController::CH_Right);
-            } break;
-        }
-
-        for(size_t i = 0U; i < LCH_Count; i++) m_driverHost->TrackedDeviceAdded(m_controllers[i]->GetSerialNumber().c_str(), vr::TrackedDeviceClass_Controller, m_controllers[i]);
-
-        m_leapController = new Leap::Controller();
-        m_leapController->addListener(m_leapListener);
-        m_leapController->setPolicy(Leap::Controller::POLICY_ALLOW_PAUSE_RESUME);
-        if(CDriverConfig::GetOrientationMode() == CDriverConfig::OM_HMD) m_leapController->setPolicy(Leap::Controller::POLICY_OPTIMIZE_HMD);
-        m_connectionState = true;
-
-        if(!m_monitorLaunched)
+            m_controllers[LCH_Left] = new CLeapControllerVive(CLeapController::CH_Left);
+            m_controllers[LCH_Right] = new CLeapControllerVive(CLeapController::CH_Right);
+        } break;
+        case CDriverConfig::EC_Index:
         {
-            std::string l_path(g_modulePath);
-            l_path.erase(l_path.begin() + l_path.rfind('\\'), l_path.end());
-
-            std::string l_appPath(l_path);
-            l_appPath.append("\\leap_monitor.exe");
-
-            STARTUPINFOA l_infoProcess = { 0 };
-            l_infoProcess.cb = sizeof(STARTUPINFOA);
-            m_monitorLaunched = CreateProcessA(l_appPath.c_str(), NULL, NULL, NULL, FALSE, 0, NULL, l_path.c_str(), &l_infoProcess, &m_monitorInfo);
-        }
+            m_controllers[LCH_Left] = new CLeapControllerIndex(CLeapController::CH_Left);
+            m_controllers[LCH_Right] = new CLeapControllerIndex(CLeapController::CH_Right);
+        } break;
     }
-    else l_vrError = vr::VRInitError_Driver_NotLoaded;
 
-    return l_vrError;
+    for(size_t i = 0U; i < LCH_Count; i++) m_driverHost->TrackedDeviceAdded(m_controllers[i]->GetSerialNumber().c_str(), vr::TrackedDeviceClass_Controller, m_controllers[i]);
+
+    m_leapController = new Leap::Controller();
+    m_leapController->addListener(m_leapListener);
+    m_leapController->setPolicy(Leap::Controller::POLICY_ALLOW_PAUSE_RESUME);
+    if(CDriverConfig::GetOrientationMode() == CDriverConfig::OM_HMD) m_leapController->setPolicy(Leap::Controller::POLICY_OPTIMIZE_HMD);
+    m_connectionState = true;
+
+    if(!m_monitorLaunched)
+    {
+        std::string l_path(g_modulePath);
+        l_path.erase(l_path.begin() + l_path.rfind('\\'), l_path.end());
+
+        std::string l_appPath(l_path);
+        l_appPath.append("\\leap_monitor.exe");
+
+        STARTUPINFOA l_infoProcess = { 0 };
+        l_infoProcess.cb = sizeof(STARTUPINFOA);
+        m_monitorLaunched = CreateProcessA(l_appPath.c_str(), NULL, NULL, NULL, FALSE, 0, NULL, l_path.c_str(), &l_infoProcess, &m_monitorInfo);
+    }
+
+    return vr::VRInitError_None;
 }
 
 void CServerDriver::RunFrame()

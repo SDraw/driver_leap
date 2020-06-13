@@ -42,7 +42,6 @@ CLeapController::CLeapController()
 
     m_hand = CH_Left;
     m_gameProfile = GP_Default;
-    m_gripOffset = glm::quat(1.f, 0.f, 0.f, 0.f);
     m_specialMode = false;
 }
 CLeapController::~CLeapController()
@@ -95,11 +94,6 @@ void CLeapController::SetEnabled(bool f_state)
 {
     m_pose.deviceIsConnected = f_state;
     if(m_trackedDevice != vr::k_unTrackedDeviceIndexInvalid) ms_driverHost->TrackedDevicePoseUpdated(m_trackedDevice, m_pose, sizeof(vr::DriverPose_t));
-}
-
-bool CLeapController::MixHandState(bool f_state)
-{
-    return f_state;
 }
 
 void CLeapController::ResetControls()
@@ -180,9 +174,10 @@ void CLeapController::UpdateTransformation(const Leap::Frame &f_frame)
                         std::memcpy(m_pose.vecWorldFromDriverTranslation, ms_headPosition, sizeof(double) * 3U);
 
                         const Leap::Vector l_position = l_hand.palmPosition();
-                        m_pose.vecPosition[0] = -0.001f*l_position.x;
-                        m_pose.vecPosition[1] = -0.001f*l_position.z;
-                        m_pose.vecPosition[2] = -0.001f*l_position.y - 0.15f; // Why?
+                        const glm::vec3 &l_handOffset = ((m_hand == CH_Left) ? CDriverConfig::GetLeftHandOffset() : CDriverConfig::GetRightHandOffset());
+                        m_pose.vecPosition[0] = -0.001f*l_position.x + l_handOffset.x;
+                        m_pose.vecPosition[1] = -0.001f*l_position.z + l_handOffset.y;
+                        m_pose.vecPosition[2] = -0.001f*l_position.y + l_handOffset.z;
 
                         const Leap::Vector l_velocity = l_hand.palmVelocity();
                         glm::vec3 l_resultVelocity(-0.001f*l_velocity.x, -0.001f*l_velocity.z, -0.001f*l_velocity.y);
@@ -196,7 +191,7 @@ void CLeapController::UpdateTransformation(const Leap::Frame &f_frame)
                         glm::quat l_rotation(l_handOrientation.w, l_handOrientation.x, l_handOrientation.y, l_handOrientation.z);
                         l_rotation = g_reverseRotation*l_rotation;
                         l_rotation *= ((m_hand == CH_Left) ? g_rotateHalfPiZN : g_rotateHalfPiZ);
-                        l_rotation *= m_gripOffset;
+                        l_rotation *= ((m_hand == CH_Left) ? CDriverConfig::GetLeftHandOffsetRotation() : CDriverConfig::GetRightHandOffsetRotation());
 
                         m_pose.qRotation.x = l_rotation.x;
                         m_pose.qRotation.y = l_rotation.y;
@@ -208,10 +203,16 @@ void CLeapController::UpdateTransformation(const Leap::Frame &f_frame)
                         // Controller follows HMD position only
                         std::memcpy(m_pose.vecWorldFromDriverTranslation, ms_headPosition, sizeof(double) * 3U);
 
+                        const glm::vec3 &l_offset = CDriverConfig::GetDesktopOffset();
+                        m_pose.vecWorldFromDriverTranslation[0U] += l_offset.x;
+                        m_pose.vecWorldFromDriverTranslation[1U] += l_offset.y;
+                        m_pose.vecWorldFromDriverTranslation[2U] += l_offset.z;
+
                         const Leap::Vector l_position = l_hand.palmPosition();
-                        m_pose.vecPosition[0] = 0.001f*l_position.x + CDriverConfig::GetDesktopRootX();
-                        m_pose.vecPosition[1] = 0.001f*l_position.y + CDriverConfig::GetDesktopRootY();
-                        m_pose.vecPosition[2] = 0.001f*l_position.z + CDriverConfig::GetDesktopRootZ();
+                        const glm::vec3 &l_handOffset = ((m_hand == CH_Left) ? CDriverConfig::GetLeftHandOffset() : CDriverConfig::GetRightHandOffset());
+                        m_pose.vecPosition[0] = 0.001f*l_position.x + l_handOffset.x;
+                        m_pose.vecPosition[1] = 0.001f*l_position.y + l_handOffset.y;
+                        m_pose.vecPosition[2] = 0.001f*l_position.z + l_handOffset.z;
 
                         const Leap::Vector l_velocity = l_hand.palmVelocity();
                         m_pose.vecVelocity[0] = 0.001f*l_velocity.x;
@@ -221,7 +222,7 @@ void CLeapController::UpdateTransformation(const Leap::Frame &f_frame)
                         const Leap::Quaternion l_handOrientation = l_hand.orientation();
                         glm::quat l_rotation(l_handOrientation.w, l_handOrientation.x, l_handOrientation.y, l_handOrientation.z);
                         l_rotation *= ((m_hand == CH_Left) ? g_rotateHalfPiZN : g_rotateHalfPiZ);
-                        l_rotation *= m_gripOffset;
+                        l_rotation *= ((m_hand == CH_Left) ? CDriverConfig::GetLeftHandOffsetRotation() : CDriverConfig::GetRightHandOffsetRotation());
 
                         m_pose.qRotation.x = l_rotation.x;
                         m_pose.qRotation.y = l_rotation.y;
@@ -242,7 +243,9 @@ void CLeapController::UpdateTransformation(const Leap::Frame &f_frame)
         for(size_t i = 0U; i < 3U; i++) m_pose.vecVelocity[i] = .0;
         m_pose.result = vr::TrackingResult_Running_OutOfRange;
     }
-    m_pose.poseIsValid = MixHandState(l_handFound);
+
+    if((m_gameProfile == GP_VRChat) || !CDriverConfig::IsHandsResetEnabled()) l_handFound = true;
+    m_pose.poseIsValid = l_handFound;
 }
 
 void CLeapController::SetInterfaces(vr::IVRServerDriverHost *f_host, vr::IVRDriverInput *f_input, vr::CVRPropertyHelpers *f_helpers)

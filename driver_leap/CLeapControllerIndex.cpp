@@ -277,13 +277,6 @@ void CLeapControllerIndex::ActivateInternal()
     ms_driverInput->CreateHapticComponent(m_propertyContainer, "/output/haptic", &m_haptic);
 }
 
-bool CLeapControllerIndex::MixHandState(bool f_state)
-{
-    bool l_result = f_state;
-    if((m_gameProfile == GP_VRChat) && !CDriverConfig::IsVRChatHandsResetEnabled()) l_result = true;
-    return l_result;
-}
-
 void CLeapControllerIndex::UpdateGestures(const Leap::Frame &f_frame)
 {
     std::vector<float> l_scores;

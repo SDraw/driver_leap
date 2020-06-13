@@ -4,19 +4,17 @@
 
 extern char g_modulePath[];
 
-bool CDriverConfig::ms_enabled = true;
 unsigned char CDriverConfig::ms_emulatedController = CDriverConfig::EC_Vive;
 bool CDriverConfig::ms_leftHand = true;
 bool CDriverConfig::ms_rightHand = true;
 unsigned char CDriverConfig::ms_orientation = CDriverConfig::OM_HMD;
-float CDriverConfig::ms_desktopRootX = 0.f;
-float CDriverConfig::ms_desktopRootY = 0.f;
-float CDriverConfig::ms_desktopRootZ = 0.f;
-float CDriverConfig::ms_rotationOffsetX = 0.f;
-float CDriverConfig::ms_rotationOffsetY = 0.f;
-float CDriverConfig::ms_rotationOffsetZ = 0.f;
 bool CDriverConfig::ms_skeleton = true;
 unsigned char CDriverConfig::ms_trackingLevel = CDriverConfig::TL_Partial;
+glm::vec3 CDriverConfig::ms_desktopOffset(0.f, -0.5f, -0.5f);
+glm::vec3 CDriverConfig::ms_leftHandOffset(0.f);
+glm::quat CDriverConfig::ms_leftHandOffsetRotation(1.f, 0.f, 0.f, 0.f);
+glm::vec3 CDriverConfig::ms_rightHandOffset(0.f);
+glm::quat CDriverConfig::ms_rightHandOffsetRotation(1.f, 0.f, 0.f, 0.f);
 bool CDriverConfig::ms_input = true;
 bool CDriverConfig::ms_menu = true;
 bool CDriverConfig::ms_applicationMenu = true;
@@ -29,29 +27,30 @@ bool CDriverConfig::ms_touchpadAxes = true;
 bool CDriverConfig::ms_buttonA = true;
 bool CDriverConfig::ms_buttonB = true;
 bool CDriverConfig::ms_thumbstick = true;
-bool CDriverConfig::ms_vrchatHandsReset = false;
+bool CDriverConfig::ms_handsReset = false;
 
 const std::vector<std::string> g_configAttributes
 {
-    "enabled", "emulated_controller", "leftHand", "rightHand",
-    "orientation", "desktopRoot", "rotationOffset",
-    "skeleton", "trackingLevel",
+    "emulatedController", "leftHand", "rightHand", "orientation", "skeleton", "trackingLevel",
+    "desktopOffset", "leftHandOffset", "leftHandOffsetRoation", "rightHandOffset", "rightHandOffsetRoation",
     "input", "menu", "appMenu", "trigger", "grip",
     "touchpad", "touchpadTouch", "touchpadPress", "touchpadAxes",
     "buttonA", "buttonB", "thumbstick",
-    "vrchat_handsReset"
+    "handsReset"
 };
 enum ConfigParamIndex : size_t
 {
-    CPI_Enabled = 0U,
-    CPI_EmulatedController,
+    CPI_EmulatedController = 0U,
     CPI_LeftHand,
     CPI_RightHand,
     CPI_Orientation,
-    CPI_DesktopRoot,
-    CPI_RotationOffset,
     CPI_Skeleton,
     CPI_TrackingLevel,
+    CPI_DesktopOffset,
+    CPI_LeftHandOffset,
+    CPI_LeftHandOffsetRotation,
+    CPI_RightHandOffset,
+    CPI_RightHandOffsetRotation,
     CPI_Input,
     CPI_Menu,
     CPI_ApplicationMenu,
@@ -64,7 +63,7 @@ enum ConfigParamIndex : size_t
     CPI_ButtonA,
     CPI_ButtonB,
     CPI_Thumbstick,
-    CPI_VRChatHandsReset
+    CPI_HandsReset
 };
 const std::vector<std::string> g_orientationModes
 {
@@ -99,9 +98,6 @@ void CDriverConfig::LoadConfig()
                 {
                     switch(ReadEnumVector(l_attribName.as_string(), g_configAttributes))
                     {
-                        case ConfigParamIndex::CPI_Enabled:
-                            ms_enabled = l_attribValue.as_bool(true);
-                            break;
                         case ConfigParamIndex::CPI_EmulatedController:
                         {
                             size_t l_tableIndex = ReadEnumVector(l_attribValue.as_string(), g_emulatedControllers);
@@ -118,16 +114,6 @@ void CDriverConfig::LoadConfig()
                             size_t l_tableIndex = ReadEnumVector(l_attribValue.as_string(), g_orientationModes);
                             if(l_tableIndex != std::numeric_limits<size_t>::max()) ms_orientation = static_cast<unsigned char>(l_tableIndex);
                         } break;
-                        case ConfigParamIndex::CPI_DesktopRoot:
-                        {
-                            std::stringstream l_desktopRoot(l_attribValue.as_string());
-                            l_desktopRoot >> ms_desktopRootX >> ms_desktopRootY >> ms_desktopRootZ;
-                        } break;
-                        case ConfigParamIndex::CPI_RotationOffset:
-                        {
-                            std::stringstream l_offset(l_attribValue.as_string());
-                            l_offset >> ms_rotationOffsetX >> ms_rotationOffsetY >> ms_rotationOffsetZ;
-                        } break;
                         case ConfigParamIndex::CPI_Skeleton:
                             ms_skeleton = l_attribValue.as_bool(true);
                             break;
@@ -136,6 +122,33 @@ void CDriverConfig::LoadConfig()
                             const size_t l_tableIndex = ReadEnumVector(l_attribValue.as_string(), g_trackingLevels);
                             if(l_tableIndex != std::numeric_limits<size_t>::max()) ms_trackingLevel = static_cast<unsigned char>(l_tableIndex);
                         } break;
+
+                        case ConfigParamIndex::CPI_DesktopOffset:
+                        {
+                            std::stringstream l_hmdOffset(l_attribValue.as_string());
+                            l_hmdOffset >> ms_desktopOffset.x >> ms_desktopOffset.y >> ms_desktopOffset.z;
+                        } break;
+                        case ConfigParamIndex::CPI_LeftHandOffset:
+                        {
+                            std::stringstream l_handOffset(l_attribValue.as_string());
+                            l_handOffset >> ms_leftHandOffset.x >> ms_leftHandOffset.y >> ms_leftHandOffset.z;
+                        } break;
+                        case ConfigParamIndex::CPI_LeftHandOffsetRotation:
+                        {
+                            std::stringstream l_handOffsetRotation(l_attribValue.as_string());
+                            l_handOffsetRotation >> ms_leftHandOffsetRotation.x >> ms_leftHandOffsetRotation.y >> ms_leftHandOffsetRotation.z >> ms_leftHandOffsetRotation.w;
+                        } break;
+                        case ConfigParamIndex::CPI_RightHandOffset:
+                        {
+                            std::stringstream l_handOffset(l_attribValue.as_string());
+                            l_handOffset >> ms_rightHandOffset.x >> ms_rightHandOffset.y >> ms_rightHandOffset.z;
+                        } break;
+                        case ConfigParamIndex::CPI_RightHandOffsetRotation:
+                        {
+                            std::stringstream l_handOffsetRotation(l_attribValue.as_string());
+                            l_handOffsetRotation >> ms_rightHandOffsetRotation.x >> ms_rightHandOffsetRotation.y >> ms_rightHandOffsetRotation.z >> ms_rightHandOffsetRotation.w;
+                        } break;
+
                         case ConfigParamIndex::CPI_Input:
                             ms_input = l_attribValue.as_bool(true);
                             break;
@@ -172,8 +185,8 @@ void CDriverConfig::LoadConfig()
                         case ConfigParamIndex::CPI_Thumbstick:
                             ms_thumbstick = l_attribValue.as_bool(true);
                             break;
-                        case ConfigParamIndex::CPI_VRChatHandsReset:
-                            ms_vrchatHandsReset = l_attribValue.as_bool(false);
+                        case ConfigParamIndex::CPI_HandsReset:
+                            ms_handsReset = l_attribValue.as_bool(false);
                             break;
                     }
                 }

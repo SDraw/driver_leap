@@ -1,15 +1,19 @@
 <settings>
-  <setting name="enabled" value="true"/>
-  <setting name="emulated_controller" value="vive"/> <!--"vive" or "index"-->
+  <!--General settings-->
+  <setting name="emulatedController" value="index"/> <!--"vive" or "index"-->
   <setting name="rightHand" value="true"/>
   <setting name="leftHand" value="true"/>
   <setting name="orientation" value="hmd"/> <!--"hmd" or "desktop"-->
-  <setting name="desktopRoot" value="0.0 -0.5 -0.5"/> <!--Only in desktop orientation-->
-  <setting name="rotationOffset" value="0.0 0.0 0.0"/> <!--Euler angle in radians-->
   <setting name="skeleton" value="true"/> <!--Only Index controller-->
   <setting name="trackingLevel" value="partial"/> <!--"partial" or "full", only Index controller-->
-
-  <setting name="input" value="true"/>
+  <!--Offsets settings-->
+  <setting name="desktopOffset" value="0.0 -0.5 -0.5"/> <!--Global offset in desktop orientation, XYZ-->
+  <setting name="leftHandOffset" value="0.0 0.0 -0.15"/> <!--Local offset, XYZ-->
+  <setting name="leftHandOffsetRotation" value="0.0 0.0 0.0 1.0"/> <!--Local offset, XYZW-->
+  <setting name="rightHandOffset" value="0.0 0.0 -0.15"/> <!--Local offset, XYZ-->
+  <setting name="rightHandOffsetRotation" value="0.0 0.0 0.0 1.0"/> <!--Local offset, XYZW-->
+  <!--Input settings-->
+  <setting name="input" value="true"/> <!--All input-->
   <setting name="menu" value="true"/>
   <setting name="appMenu" value="true"/> <!--Only Vive controller-->
   <setting name="trigger" value="true"/>
@@ -21,6 +25,6 @@
   <setting name="buttonA" value="true"/> <!--Only Index controller-->
   <setting name="buttonB" value="true"/> <!--Only Index controller-->
   <setting name="thumbstick" value = "true"/> <!--Only Index controller-->
-
-  <setting name="vrchat_handsReset" value="false"/> <!--Hands animation reset with inactive controllers, only Index controller-->
+  <!--Arbitrary settings-->
+  <setting name="handsReset" value="false"/> <!--Mark controllers as out of range if hands aren't detected-->
 </settings>

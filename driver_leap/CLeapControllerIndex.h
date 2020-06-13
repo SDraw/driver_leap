@@ -52,7 +52,6 @@ class CLeapControllerIndex final : public CLeapController
 
     // CLeapController
     void ActivateInternal() override;
-    bool MixHandState(bool f_state) override;
     void UpdateGestures(const Leap::Frame &f_frame);
     void UpdateInputInternal() override;
 public:
