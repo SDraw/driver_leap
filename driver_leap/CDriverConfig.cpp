@@ -32,7 +32,7 @@ bool CDriverConfig::ms_handsReset = false;
 const std::vector<std::string> g_configAttributes
 {
     "emulatedController", "leftHand", "rightHand", "orientation", "skeleton", "trackingLevel",
-    "desktopOffset", "leftHandOffset", "leftHandOffsetRoation", "rightHandOffset", "rightHandOffsetRoation",
+    "desktopOffset", "leftHandOffset", "leftHandOffsetRotation", "rightHandOffset", "rightHandOffsetRotation",
     "input", "menu", "appMenu", "trigger", "grip",
     "touchpad", "touchpadTouch", "touchpadPress", "touchpadAxes",
     "buttonA", "buttonB", "thumbstick",
