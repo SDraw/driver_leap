@@ -41,6 +41,7 @@ Controls are changed by game profiles that are enabled automatically when game i
 Available hotkeys in NumLock active state:
 * **Ctrl-P:** Enable/disable right hand controller.
 * **Ctrl-O:** Enable/disable left hand controller.
+* **Ctrl-§:** Reload configuration.
 
 ### HTC Vive controllers emulation
 Game profiles:

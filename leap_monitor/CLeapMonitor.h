@@ -43,6 +43,7 @@ class CLeapMonitor final
     bool m_specialHotkey;
     bool m_leftHotkey;
     bool m_rightHotkey;
+    bool m_reloadHotkey;
 
     CLeapMonitor(const CLeapMonitor &that) = delete;
     CLeapMonitor& operator=(const CLeapMonitor &that) = delete;
