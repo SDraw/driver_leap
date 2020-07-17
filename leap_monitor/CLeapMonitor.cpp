@@ -97,6 +97,7 @@ CLeapMonitor::CLeapMonitor()
     m_specialHotkey = false;
     m_leftHotkey = false;
     m_rightHotkey = false;
+    m_reloadHotkey = false;
 }
 CLeapMonitor::~CLeapMonitor()
 {
@@ -248,6 +249,20 @@ void CLeapMonitor::Run()
                         {
                             SendCommand("setting right_hand");
                             const std::string l_message("Right hand toggled");
+                            SendNotification(l_message);
+                        }
+                    }
+                }
+
+                l_hotkeyState = ((GetAsyncKeyState(VK_CONTROL) & 0x8000) && (GetAsyncKeyState(0xDC) & 0x8000)); // Ctrl+§
+                {
+                    if(m_reloadHotkey != l_hotkeyState)
+                    {
+                        m_reloadHotkey = l_hotkeyState;
+                        if(m_reloadHotkey)
+                        {
+                            SendCommand("setting reload_config");
+                            const std::string l_message("Configuration reloaded");
                             SendNotification(l_message);
                         }
                     }

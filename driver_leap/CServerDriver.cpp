@@ -48,12 +48,13 @@ enum GameCommand : size_t
 
 const std::vector<std::string> g_settingCommands
 {
-    "left_hand", "right_hand"
+    "left_hand", "right_hand", "reload_config"
 };
 enum SettingCommand : size_t
 {
     SC_LeftHand = 0U,
-    SC_RightHand
+    SC_RightHand,
+    SC_ReloadConfig
 };
 
 const char* const CServerDriver::ms_interfaces[]
@@ -288,6 +289,13 @@ void CServerDriver::ProcessExternalMessage(const char *f_message)
                                 bool l_enabled = m_controllers[LCH_Right]->GetEnabled();
                                 m_controllers[LCH_Right]->SetEnabled(!l_enabled);
                                 ProcessLeapControllerPause();
+                            }
+                        } break;
+                        case SC_ReloadConfig:
+                        {
+                            if(m_connectionState)
+                            {
+                                CDriverConfig::LoadConfig();
                             }
                         } break;
                     }
