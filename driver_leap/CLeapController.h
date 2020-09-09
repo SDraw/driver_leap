@@ -4,7 +4,6 @@ class CControllerButton;
 
 class CLeapController : public vr::ITrackedDeviceServerDriver
 {
-    static vr::IVRServerDriverHost *ms_driverHost;
     static double ms_headPosition[3U];
     static vr::HmdQuaternion_t ms_headRotation;
     vr::DriverPose_t m_pose;
@@ -47,15 +46,10 @@ public:
 
     void SetGameProfile(GameProfile f_profile);
 
-    void SwitchSpecialMode();
-
     void Update(const Leap::Frame& f_frame);
 
-    static void SetInterfaces(vr::IVRServerDriverHost *f_host, vr::IVRDriverInput *f_input, vr::CVRPropertyHelpers *f_helpers);
     static void UpdateHMDCoordinates();
 protected:
-    static vr::IVRDriverInput *ms_driverInput;
-    static vr::CVRPropertyHelpers *ms_propertyHelpers;
     vr::VRInputComponentHandle_t m_haptic;
     vr::PropertyContainerHandle_t m_propertyContainer;
     uint32_t m_trackedDevice;
@@ -64,7 +58,6 @@ protected:
     unsigned char m_hand;
     GameProfile m_gameProfile;
     std::string m_serialNumber;
-    bool m_specialMode;
 
     virtual void ActivateInternal() {}
     virtual void UpdateGestures(const Leap::Frame &f_frame) = 0;

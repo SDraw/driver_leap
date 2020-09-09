@@ -77,7 +77,7 @@ void CRelayDevice::DebugRequest(const char* pchRequest, char* pchResponseBuffer,
 void* CRelayDevice::GetComponent(const char* pchComponentNameAndVersion)
 {
     void *l_result = nullptr;
-    if(!strcmp(pchComponentNameAndVersion, vr::ITrackedDeviceServerDriver_Version)) l_result = this;
+    if(!strcmp(pchComponentNameAndVersion, vr::ITrackedDeviceServerDriver_Version)) l_result = dynamic_cast<vr::ITrackedDeviceServerDriver*>(this);
     return l_result;
 }
 

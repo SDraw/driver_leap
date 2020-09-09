@@ -7,61 +7,39 @@
 // CLeapListener
 void CLeapListener::onConnect(const Leap::Controller &controller)
 {
-    if(m_monitor.load())
-    {
-        const std::string l_message("Controller connected");
-        m_monitor.load()->SendNotification(l_message);
-    }
+    if(m_monitor) m_monitor->SendNotification("Controller connected");
 }
 
 void CLeapListener::onDisconnect(const Leap::Controller &controller)
 {
-    if(m_monitor.load())
-    {
-        const std::string l_message("Controller disconnected");
-        m_monitor.load()->SendNotification(l_message);
-    }
-}
-
-void CLeapListener::onInit(const Leap::Controller &controller)
-{
+    if(m_monitor) m_monitor->SendNotification("Controller disconnected");
 }
 
 void CLeapListener::onLogMessage(const Leap::Controller &controller, Leap::MessageSeverity severity, int64_t timestamp, const char *msg)
 {
     if(severity <= Leap::MESSAGE_CRITICAL)
     {
-        if(m_monitor.load())
-        {
-            const std::string l_message(msg);
-            m_monitor.load()->SendNotification(l_message);
-        }
+        if(m_monitor) m_monitor->SendNotification(msg);
     }
 }
 
 void CLeapListener::onServiceConnect(const Leap::Controller &controller)
 {
-    if(m_monitor.load())
-    {
-        const std::string l_message("Service connected");
-        m_monitor.load()->SendNotification(l_message);
-    }
+    if(m_monitor) m_monitor->SendNotification("Service connected");
 }
 
 void CLeapListener::onServiceDisconnect(const Leap::Controller &controller)
 {
-    if(m_monitor.load())
-    {
-        const std::string l_message("Service disconnected");
-        m_monitor.load()->SendNotification(l_message);
-    }
+    if(m_monitor) m_monitor->SendNotification("Service disconnected");
 }
 
 void CLeapListener::SetMonitor(CLeapMonitor *f_monitor)
 {
-    m_monitor.store(f_monitor);
+    m_monitor = f_monitor;
 }
 // ----
+
+const std::chrono::milliseconds g_threadDelay(11U);
 
 const std::vector<std::string> g_steamAppKeys
 {
@@ -80,21 +58,17 @@ const std::string g_profileName[2U]
 
 CLeapMonitor::CLeapMonitor()
 {
-    m_initialized = false;
+    m_active = false;
 
-    m_vrApplications = nullptr;
-    m_vrDebug = nullptr;
-    m_vrOverlay = nullptr;
-    m_vrNotifications = nullptr;
     m_vrSystem = nullptr;
     m_notificationID = 0U;
     m_overlayHandle = vr::k_ulOverlayHandleInvalid;
 
     m_leapController = nullptr;
+    m_leapListener = nullptr;
 
     m_gameProfile = GP_Default;
     m_relayDevice = vr::k_unTrackedDeviceIndexInvalid;
-    m_specialHotkey = false;
     m_leftHotkey = false;
     m_rightHotkey = false;
     m_reloadHotkey = false;
@@ -105,183 +79,148 @@ CLeapMonitor::~CLeapMonitor()
 
 bool CLeapMonitor::Initialize()
 {
-    if(!m_initialized)
+    if(!m_active)
     {
         vr::EVRInitError eVRInitError;
         m_vrSystem = vr::VR_Init(&eVRInitError, vr::VRApplication_Background);
         if(eVRInitError == vr::VRInitError_None)
         {
-            m_vrDebug = vr::VRDebug();
-            m_vrApplications = vr::VRApplications();
-            m_vrOverlay = vr::VROverlay();
-            m_vrOverlay->CreateOverlay("leap_monitor_overlay", "Leap Motion Monitor", &m_overlayHandle);
-            m_vrNotifications = vr::VRNotifications();
+            vr::VROverlay()->CreateOverlay("leap_monitor_overlay", "Leap Motion Monitor", &m_overlayHandle);
 
-            for(uint32_t i = 0U; i < vr::k_unMaxTrackedDeviceCount; i++) AddTrackedDevice(i);
+            for(uint32_t i = 0U; i < vr::k_unMaxTrackedDeviceCount; i++)
+            {
+                if(m_vrSystem->GetUint64TrackedDeviceProperty(i, vr::Prop_VendorSpecific_Reserved_Start) == 0x4C4D6F74696F6E)
+                {
+                    m_relayDevice = m_event.trackedDeviceIndex;
+                    break;
+                }
+            }
+
+            m_leapListener = new CLeapListener();
+            m_leapListener->SetMonitor(this);
 
             m_leapController = new Leap::Controller();
-            m_leapController->addListener(m_leapListener);
-            m_leapListener.SetMonitor(this);
+            m_leapController->addListener(*m_leapListener);
 
-            m_initialized = true;
+            m_active = true;
         }
     }
-    return m_initialized;
+    return m_active;
 }
 
 void CLeapMonitor::Terminate()
 {
-    if(m_initialized)
+    if(m_active)
     {
-        m_initialized = false;
+        m_active = false;
 
-        m_leapListener.SetMonitor(nullptr);
-        m_leapController->removeListener(m_leapListener);
+        m_leapController->removeListener(*m_leapListener);
+        m_leapListener->SetMonitor(nullptr);
+
         delete m_leapController;
+        m_leapController = nullptr;
 
-        if(m_notificationID) m_vrNotifications->RemoveNotification(m_notificationID);
-        m_vrOverlay->DestroyOverlay(m_overlayHandle);
+        delete m_leapListener;
+        m_leapListener = nullptr;
+
+        if(m_notificationID) vr::VRNotifications()->RemoveNotification(m_notificationID);
+        vr::VROverlay()->DestroyOverlay(m_overlayHandle);
         m_overlayHandle = vr::k_ulOverlayHandleInvalid;
+        m_notificationID = 0U;
 
         vr::VR_Shutdown();
 
         m_vrSystem = nullptr;
-        m_vrDebug = nullptr;
-        m_vrApplications = nullptr;
-        m_vrOverlay = nullptr;
-        m_vrNotifications = nullptr;
-        m_notificationID = 0U;
-
-        m_leapController = nullptr;
 
         m_gameProfile = GP_Default;
-        m_specialHotkey = false;
     }
+
+    m_active = false;
 }
 
-void CLeapMonitor::Run()
+bool CLeapMonitor::DoPulse()
 {
-    if(m_initialized)
+    while(m_vrSystem->PollNextEvent(&m_event, sizeof(vr::VREvent_t)))
     {
-        const std::chrono::milliseconds l_monitorInterval(11U); // ~90 FPS
-        bool l_quitEvent = false;
-
-        while(!l_quitEvent)
+        switch(m_event.eventType)
         {
-            // System messages
-            MSG msg = { 0 };
-            while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+            case vr::VREvent_Quit:
+                m_active = false;
+                break;
+            case vr::VREvent_TrackedDeviceActivated:
             {
-                TranslateMessage(&msg);
-                DispatchMessage(&msg);
-            }
-            if(msg.message == WM_QUIT) break;
-
-            // VR messages
-            vr::VREvent_t l_event;
-            while(m_vrSystem->PollNextEvent(&l_event, sizeof(vr::VREvent_t)))
+                if(m_vrSystem->GetUint64TrackedDeviceProperty(m_event.trackedDeviceIndex, vr::Prop_VendorSpecific_Reserved_Start) == 0x4C4D6F74696F6E) m_relayDevice = m_event.trackedDeviceIndex;
+            } break;
+            case vr::VREvent_TrackedDeviceDeactivated:
             {
-                switch(l_event.eventType)
+                if(m_relayDevice == m_event.trackedDeviceIndex) m_relayDevice = vr::k_unTrackedDeviceIndexInvalid;
+            } break;
+            case vr::VREvent_SceneApplicationStateChanged:
+            {
+                vr::EVRSceneApplicationState l_appState = vr::VRApplications()->GetSceneApplicationState();
+                switch(l_appState)
                 {
-                    case vr::VREvent_Quit:
-                        l_quitEvent = true;
-                        break;
-                    case vr::VREvent_TrackedDeviceActivated:
-                        AddTrackedDevice(l_event.trackedDeviceIndex);
-                        break;
-                    case vr::VREvent_TrackedDeviceDeactivated:
-                        RemoveTrackedDevice(l_event.trackedDeviceIndex);
-                        break;
-                    case vr::VREvent_SceneApplicationStateChanged:
+                    case vr::EVRSceneApplicationState_Starting:
                     {
-                        vr::EVRSceneApplicationState l_appState = m_vrApplications->GetSceneApplicationState();
-                        switch(l_appState)
-                        {
-                            case vr::EVRSceneApplicationState_Starting:
-                            {
-                                char l_appKey[vr::k_unMaxApplicationKeyLength];
-                                if(m_vrApplications->GetStartingApplication(l_appKey, vr::k_unMaxApplicationKeyLength) == vr::VRApplicationError_None) UpdateGameProfile(l_appKey);
-                            } break;
-                            case vr::EVRSceneApplicationState_None:
-                                UpdateGameProfile(""); // Revert to default
-                                break;
-                        }
+                        char l_appKey[vr::k_unMaxApplicationKeyLength];
+                        if(vr::VRApplications()->GetStartingApplication(l_appKey, vr::k_unMaxApplicationKeyLength) == vr::VRApplicationError_None) UpdateGameProfile(l_appKey);
                     } break;
+                    case vr::EVRSceneApplicationState_None:
+                        UpdateGameProfile(""); // Revert to default
+                        break;
                 }
-                if(l_quitEvent) break;
-            }
-
-            // Process special combinations if NumLock is active
-            if((GetKeyState(VK_NUMLOCK) & 0xFFFF) != 0)
-            {
-                bool l_hotkeyState = ((GetAsyncKeyState(VK_CONTROL) & 0x8000) && (GetAsyncKeyState(0x58) & 0x8000)); // Ctrl+X 
-                if(m_specialHotkey != l_hotkeyState)
-                {
-                    m_specialHotkey = l_hotkeyState;
-                    if(m_specialHotkey)
-                    {
-                        SendCommand("game special_mode");
-                        const std::string l_message("Special mode toggled");
-                        SendNotification(l_message);
-                    }
-                }
-
-                l_hotkeyState = ((GetAsyncKeyState(VK_CONTROL) & 0x8000) && (GetAsyncKeyState(0x4F) & 0x8000)); // Ctrl+O
-                {
-                    if(m_leftHotkey != l_hotkeyState)
-                    {
-                        m_leftHotkey = l_hotkeyState;
-                        if(m_leftHotkey)
-                        {
-                            SendCommand("setting left_hand");
-                            const std::string l_message("Left hand toggled");
-                            SendNotification(l_message);
-                        }
-                    }
-                }
-
-                l_hotkeyState = ((GetAsyncKeyState(VK_CONTROL) & 0x8000) && (GetAsyncKeyState(0x50) & 0x8000)); // Ctrl+P
-                {
-                    if(m_rightHotkey != l_hotkeyState)
-                    {
-                        m_rightHotkey = l_hotkeyState;
-                        if(m_rightHotkey)
-                        {
-                            SendCommand("setting right_hand");
-                            const std::string l_message("Right hand toggled");
-                            SendNotification(l_message);
-                        }
-                    }
-                }
-
-                l_hotkeyState = ((GetAsyncKeyState(VK_CONTROL) & 0x8000) && (GetAsyncKeyState(0xDC) & 0x8000)); // Ctrl+§
-                {
-                    if(m_reloadHotkey != l_hotkeyState)
-                    {
-                        m_reloadHotkey = l_hotkeyState;
-                        if(m_reloadHotkey)
-                        {
-                            SendCommand("setting reload_config");
-                            const std::string l_message("Configuration reloaded");
-                            SendNotification(l_message);
-                        }
-                    }
-                }
-            }
-
-            std::this_thread::sleep_for(l_monitorInterval);
+            } break;
         }
     }
-}
 
-void CLeapMonitor::AddTrackedDevice(uint32_t unTrackedDeviceIndex)
-{
-    if(m_vrSystem->GetUint64TrackedDeviceProperty(unTrackedDeviceIndex, vr::Prop_VendorSpecific_Reserved_Start) == 0x4C4D6F74696F6E) m_relayDevice = unTrackedDeviceIndex;
-}
+    // Process special combinations if NumLock is active
+    if((GetKeyState(VK_NUMLOCK) & 0xFFFF) != 0)
+    {
+        if(GetAsyncKeyState(VK_CONTROL) & 0x8000)
+        {
+            bool l_hotkeyState = (GetAsyncKeyState(0x4F) & 0x8000); // Ctrl+O
+            {
+                if(m_leftHotkey != l_hotkeyState)
+                {
+                    m_leftHotkey = l_hotkeyState;
+                    if(m_leftHotkey)
+                    {
+                        SendCommand("setting left_hand");
+                        SendNotification("Left hand toggled");
+                    }
+                }
+            }
 
-void CLeapMonitor::RemoveTrackedDevice(uint32_t unTrackedDeviceIndex)
-{
-    if(m_relayDevice == unTrackedDeviceIndex) m_relayDevice = vr::k_unTrackedDeviceIndexInvalid;
+            l_hotkeyState = (GetAsyncKeyState(0x50) & 0x8000); // Ctrl+P
+            {
+                if(m_rightHotkey != l_hotkeyState)
+                {
+                    m_rightHotkey = l_hotkeyState;
+                    if(m_rightHotkey)
+                    {
+                        SendCommand("setting right_hand");
+                        SendNotification("Right hand toggled");
+                    }
+                }
+            }
+
+            l_hotkeyState = ((GetAsyncKeyState(VK_CONTROL) & 0x8000) && (GetAsyncKeyState(0xDC) & 0x8000)); // Ctrl+§
+            {
+                if(m_reloadHotkey != l_hotkeyState)
+                {
+                    m_reloadHotkey = l_hotkeyState;
+                    if(m_reloadHotkey)
+                    {
+                        SendCommand("setting reload_config");
+                        SendNotification("Configuration reloaded");
+                    }
+                }
+            }
+        }
+    }
+
+    std::this_thread::sleep_for(g_threadDelay);
+    return m_active;
 }
 
 void CLeapMonitor::SendCommand(const char *f_char)
@@ -289,19 +228,19 @@ void CLeapMonitor::SendCommand(const char *f_char)
     if(m_relayDevice != vr::k_unTrackedDeviceIndexInvalid)
     {
         char l_response[32U];
-        m_vrDebug->DriverDebugRequest(m_relayDevice, f_char, l_response, 32U);
+        vr::VRDebug()->DriverDebugRequest(m_relayDevice, f_char, l_response, 32U);
     }
 }
 
-void CLeapMonitor::SendNotification(const std::string &f_text)
+void CLeapMonitor::SendNotification(const char *f_text)
 {
-    if(m_initialized)
+    if(m_active)
     {
-        if(!f_text.empty())
+        if(std::strlen(f_text) != 0U)
         {
             m_notificationLock.lock();
-            if(m_notificationID) m_vrNotifications->RemoveNotification(m_notificationID);
-            m_vrNotifications->CreateNotification(m_overlayHandle, 500U, vr::EVRNotificationType_Transient, f_text.c_str(), vr::EVRNotificationStyle_None, nullptr, &m_notificationID);
+            if(m_notificationID) vr::VRNotifications()->RemoveNotification(m_notificationID);
+            vr::VRNotifications()->CreateNotification(m_overlayHandle, 500U, vr::EVRNotificationType_Transient, f_text, vr::EVRNotificationStyle_None, nullptr, &m_notificationID);
             m_notificationLock.unlock();
         }
     }
@@ -330,6 +269,6 @@ void CLeapMonitor::UpdateGameProfile(const char *f_appKey)
         std::string l_notifyText("Game profile has been changed to '");
         l_notifyText.append(g_profileName[m_gameProfile]);
         l_notifyText.push_back('\'');
-        SendNotification(l_notifyText);
+        SendNotification(l_notifyText.c_str());
     }
 }

@@ -11,11 +11,8 @@ const glm::quat g_reverseRotation(0.f, 0.f, 0.70106769f, -0.70106769f);
 const glm::quat g_rotateHalfPiZ(0.70106769f, 0.f, 0.f, 0.70106769f);
 const glm::quat g_rotateHalfPiZN(0.70106769f, 0.f, 0.f, -0.70106769f);
 
-vr::IVRServerDriverHost *CLeapController::ms_driverHost = nullptr;
-vr::IVRDriverInput *CLeapController::ms_driverInput = nullptr;
 double CLeapController::ms_headPosition[] = { .0, .0, .0 };
 vr::HmdQuaternion_t CLeapController::ms_headRotation = { 1.0, .0, .0, .0 };
-vr::CVRPropertyHelpers *CLeapController::ms_propertyHelpers = nullptr;
 
 CLeapController::CLeapController()
 {
@@ -42,7 +39,6 @@ CLeapController::CLeapController()
 
     m_hand = CH_Left;
     m_gameProfile = GP_Default;
-    m_specialMode = false;
 }
 CLeapController::~CLeapController()
 {
@@ -57,7 +53,7 @@ vr::EVRInitError CLeapController::Activate(uint32_t unObjectId)
     if(m_trackedDevice == vr::k_unTrackedDeviceIndexInvalid)
     {
         m_trackedDevice = unObjectId;
-        m_propertyContainer = ms_propertyHelpers->TrackedDeviceToPropertyContainer(m_trackedDevice);
+        m_propertyContainer = vr::VRProperties()->TrackedDeviceToPropertyContainer(m_trackedDevice);
 
         ActivateInternal();
 
@@ -75,7 +71,7 @@ void CLeapController::Deactivate()
 void* CLeapController::GetComponent(const char* pchComponentNameAndVersion)
 {
     void *l_result = nullptr;
-    if(!strcmp(pchComponentNameAndVersion, vr::ITrackedDeviceServerDriver_Version)) l_result = this;
+    if(!strcmp(pchComponentNameAndVersion, vr::ITrackedDeviceServerDriver_Version)) l_result = dynamic_cast<vr::ITrackedDeviceServerDriver*>(this);
     return l_result;
 }
 
@@ -93,7 +89,7 @@ bool CLeapController::GetEnabled() const
 void CLeapController::SetEnabled(bool f_state)
 {
     m_pose.deviceIsConnected = f_state;
-    if(m_trackedDevice != vr::k_unTrackedDeviceIndexInvalid) ms_driverHost->TrackedDevicePoseUpdated(m_trackedDevice, m_pose, sizeof(vr::DriverPose_t));
+    if(m_trackedDevice != vr::k_unTrackedDeviceIndexInvalid) vr::VRServerDriverHost()->TrackedDevicePoseUpdated(m_trackedDevice, m_pose, sizeof(vr::DriverPose_t));
 }
 
 void CLeapController::ResetControls()
@@ -114,11 +110,6 @@ void CLeapController::SetGameProfile(GameProfile f_profile)
     }
 }
 
-void CLeapController::SwitchSpecialMode()
-{
-    m_specialMode = !m_specialMode;
-}
-
 void CLeapController::Update(const Leap::Frame &f_frame)
 {
     if(m_trackedDevice != vr::k_unTrackedDeviceIndexInvalid)
@@ -126,12 +117,12 @@ void CLeapController::Update(const Leap::Frame &f_frame)
         if(m_pose.deviceIsConnected)
         {
             UpdateTransformation(f_frame);
-            ms_driverHost->TrackedDevicePoseUpdated(m_trackedDevice, m_pose, sizeof(vr::DriverPose_t));
+            vr::VRServerDriverHost()->TrackedDevicePoseUpdated(m_trackedDevice, m_pose, sizeof(vr::DriverPose_t));
 
             UpdateGestures(f_frame);
             UpdateInput();
         }
-        else ms_driverHost->TrackedDevicePoseUpdated(m_trackedDevice, m_pose, sizeof(vr::DriverPose_t));
+        else vr::VRServerDriverHost()->TrackedDevicePoseUpdated(m_trackedDevice, m_pose, sizeof(vr::DriverPose_t));
     }
 }
 
@@ -144,10 +135,10 @@ void CLeapController::UpdateInput()
             switch(l_button->GetInputType())
             {
                 case CControllerButton::IT_Boolean:
-                    ms_driverInput->UpdateBooleanComponent(l_button->GetHandle(), l_button->GetState(), .0);
+                    vr::VRDriverInput()->UpdateBooleanComponent(l_button->GetHandle(), l_button->GetState(), .0);
                     break;
                 case CControllerButton::IT_Float:
-                    ms_driverInput->UpdateScalarComponent(l_button->GetHandle(), l_button->GetValue(), .0);
+                    vr::VRDriverInput()->UpdateScalarComponent(l_button->GetHandle(), l_button->GetValue(), .0);
                     break;
             }
             l_button->ResetUpdate();
@@ -244,21 +235,14 @@ void CLeapController::UpdateTransformation(const Leap::Frame &f_frame)
         m_pose.result = vr::TrackingResult_Running_OutOfRange;
     }
 
-    if((m_gameProfile == GP_VRChat) || !CDriverConfig::IsHandsResetEnabled()) l_handFound = true;
+    if(!CDriverConfig::IsHandsResetEnabled()) l_handFound = true;
     m_pose.poseIsValid = l_handFound;
-}
-
-void CLeapController::SetInterfaces(vr::IVRServerDriverHost *f_host, vr::IVRDriverInput *f_input, vr::CVRPropertyHelpers *f_helpers)
-{
-    ms_driverHost = f_host;
-    ms_driverInput = f_input;
-    ms_propertyHelpers = f_helpers;
 }
 
 void CLeapController::UpdateHMDCoordinates()
 {
     vr::TrackedDevicePose_t l_hmdPose;
-    ms_driverHost->GetRawTrackedDevicePoses(0.f, &l_hmdPose, 1U); // HMD has device ID 0
+    vr::VRServerDriverHost()->GetRawTrackedDevicePoses(0.f, &l_hmdPose, 1U); // HMD has device ID 0
     if(l_hmdPose.bPoseIsValid)
     {
         glm::mat4 l_rotMat(1.f);
