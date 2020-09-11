@@ -3,24 +3,13 @@
 #include "CServerDriver.h"
 #include "CLeapControllerVive.h"
 #include "CLeapControllerIndex.h"
-#include "CRelayDevice.h"
+#include "CLeapStation.h"
 
 #include "CDriverConfig.h"
-#include "CDriverLog.h"
 #include "Utils.h"
 
 extern char g_modulePath[];
 
-// CLeapListener
-void CLeapListener::onInit(const Leap::Controller &controller)
-{
-}
-void CLeapListener::onLogMessage(const Leap::Controller &controller, Leap::MessageSeverity severity, int64_t timestamp, const char *msg)
-{
-    CDriverLog::Log("(%d) - %s\n", static_cast<int>(severity), msg);
-}
-
-// CServerDriver
 const std::vector<std::string> g_debugRequests
 {
     "profile", "setting"
@@ -57,11 +46,10 @@ const char* const CServerDriver::ms_interfaces[]
 CServerDriver::CServerDriver()
 {
     m_leapController = nullptr;
-    m_leapListener = nullptr;
     m_connectionState = false;
     m_firstConnection = true;
     for(size_t i = 0U; i < LCH_Count; i++) m_controllers[i] = nullptr;
-    m_relayDevice = nullptr;
+    m_leapStation = nullptr;
 }
 CServerDriver::~CServerDriver()
 {
@@ -70,24 +58,18 @@ CServerDriver::~CServerDriver()
 // vr::IServerTrackedDeviceProvider
 void CServerDriver::Cleanup()
 {
-    CDriverLog::Cleanup();
-
     for(size_t i = 0U; i < LCH_Count; i++)
     {
         delete m_controllers[i];
         m_controllers[i] = nullptr;
     }
-    delete m_relayDevice;
-    m_relayDevice = nullptr;
+    delete m_leapStation;
+    m_leapStation = nullptr;
 
     if(m_leapController)
     {
-        m_leapController->removeListener(*m_leapListener);
         delete m_leapController;
         m_leapController = nullptr;
-
-        delete m_leapListener;
-        m_leapListener = nullptr;
     }
 
     VR_CLEANUP_SERVER_DRIVER_CONTEXT();
@@ -102,11 +84,10 @@ vr::EVRInitError CServerDriver::Init(vr::IVRDriverContext *pDriverContext)
 {
     VR_INIT_SERVER_DRIVER_CONTEXT(pDriverContext);
     CDriverConfig::LoadConfig();
-    CDriverLog::Initialize(vr::VRDriverLog());
 
     // Relay device for events from leap_monitor
-    m_relayDevice = new CRelayDevice(this);
-    vr::VRServerDriverHost()->TrackedDeviceAdded(m_relayDevice->GetSerialNumber().c_str(), vr::TrackedDeviceClass_TrackingReference, m_relayDevice);
+    m_leapStation = new CLeapStation(this);
+    vr::VRServerDriverHost()->TrackedDeviceAdded(m_leapStation->GetSerialNumber().c_str(), vr::TrackedDeviceClass_TrackingReference, m_leapStation);
 
     switch(CDriverConfig::GetEmulatedController())
     {
@@ -125,8 +106,6 @@ vr::EVRInitError CServerDriver::Init(vr::IVRDriverContext *pDriverContext)
     for(size_t i = 0U; i < LCH_Count; i++) vr::VRServerDriverHost()->TrackedDeviceAdded(m_controllers[i]->GetSerialNumber().c_str(), vr::TrackedDeviceClass_Controller, m_controllers[i]);
 
     m_leapController = new Leap::Controller();
-    m_leapListener = new CLeapListener();
-    m_leapController->addListener(*m_leapListener);
     m_leapController->setPolicy(Leap::Controller::POLICY_ALLOW_PAUSE_RESUME);
     if(CDriverConfig::GetOrientationMode() == CDriverConfig::OM_HMD) m_leapController->setPolicy(Leap::Controller::POLICY_OPTIMIZE_HMD);
     m_connectionState = true;
@@ -171,12 +150,12 @@ void CServerDriver::RunFrame()
                 const Leap::Frame l_frame = m_leapController->frame();
                 if(l_frame.isValid())
                 {
-                    for(size_t i = 0U; i < LCH_Count; i++) m_controllers[i]->Update(l_frame);
+                    for(size_t i = 0U; i < LCH_Count; i++) m_controllers[i]->RunFrame(l_frame);
                 }
             }
         }
     }
-    m_relayDevice->Update();
+    m_leapStation->RunFrame();
 }
 
 bool CServerDriver::ShouldBlockStandbyMode()
@@ -257,10 +236,11 @@ void CServerDriver::ProcessExternalMessage(const char *f_message)
                         } break;
                         case SC_ReloadConfig:
                         {
-                            if(m_connectionState)
-                            {
-                                CDriverConfig::LoadConfig();
-                            }
+                            CDriverConfig::LoadConfig();
+
+                            // Change orientation mode
+                            if(CDriverConfig::GetOrientationMode() == CDriverConfig::OM_HMD) m_leapController->setPolicy(Leap::Controller::POLICY_OPTIMIZE_HMD);
+                            else m_leapController->clearPolicy(Leap::Controller::POLICY_OPTIMIZE_HMD);
                         } break;
                     }
                 }

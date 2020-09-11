@@ -232,9 +232,8 @@
     <ClInclude Include="CLeapController.h" />
     <ClInclude Include="CLeapControllerIndex.h" />
     <ClInclude Include="CLeapControllerVive.h" />
-    <ClInclude Include="CRelayDevice.h" />
+    <ClInclude Include="CLeapStation.h" />
     <ClInclude Include="CServerDriver.h" />
-    <ClInclude Include="CDriverLog.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
@@ -256,9 +255,8 @@
     <ClCompile Include="CLeapController.cpp" />
     <ClCompile Include="CLeapControllerIndex.cpp" />
     <ClCompile Include="CLeapControllerVive.cpp" />
-    <ClCompile Include="CRelayDevice.cpp" />
+    <ClCompile Include="CLeapStation.cpp" />
     <ClCompile Include="CServerDriver.cpp" />
-    <ClCompile Include="CDriverLog.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

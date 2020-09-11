@@ -29,7 +29,7 @@ bool CDriverConfig::ms_buttonB = true;
 bool CDriverConfig::ms_thumbstick = true;
 bool CDriverConfig::ms_handsReset = false;
 
-const std::vector<std::string> g_configAttributes
+const std::vector<std::string> g_settingNames
 {
     "emulatedController", "leftHand", "rightHand", "orientation", "skeleton", "trackingLevel",
     "desktopOffset", "leftHandOffset", "leftHandOffsetRotation", "rightHandOffset", "rightHandOffsetRotation",
@@ -84,10 +84,10 @@ void CDriverConfig::LoadConfig()
     l_path.erase(l_path.begin() + l_path.rfind('\\'), l_path.end());
     l_path.append("\\..\\..\\resources\\settings.xml");
 
-    pugi::xml_document *l_config = new pugi::xml_document();
-    if(l_config->load_file(l_path.c_str()))
+    pugi::xml_document *l_document = new pugi::xml_document();
+    if(l_document->load_file(l_path.c_str()))
     {
-        const pugi::xml_node l_root = l_config->child("settings");
+        const pugi::xml_node l_root = l_document->child("settings");
         if(l_root)
         {
             for(pugi::xml_node l_node = l_root.child("setting"); l_node; l_node = l_node.next_sibling("setting"))
@@ -96,7 +96,7 @@ void CDriverConfig::LoadConfig()
                 const pugi::xml_attribute l_attribValue = l_node.attribute("value");
                 if(l_attribName && l_attribValue)
                 {
-                    switch(ReadEnumVector(l_attribName.as_string(), g_configAttributes))
+                    switch(ReadEnumVector(l_attribName.as_string(), g_settingNames))
                     {
                         case ConfigParamIndex::CPI_EmulatedController:
                         {
@@ -193,5 +193,5 @@ void CDriverConfig::LoadConfig()
             }
         }
     }
-    delete l_config;
+    delete l_document;
 }

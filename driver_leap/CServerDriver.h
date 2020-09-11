@@ -1,13 +1,7 @@
 #pragma once
 
 class CLeapController;
-class CRelayDevice;
-
-class CLeapListener final : public Leap::Listener
-{
-    virtual void onInit(const Leap::Controller &controller);
-    virtual void onLogMessage(const Leap::Controller &controller, Leap::MessageSeverity severity, int64_t timestamp, const char *msg);
-};
+class CLeapStation;
 
 class CServerDriver final : public vr::IServerTrackedDeviceProvider
 {
@@ -22,12 +16,11 @@ class CServerDriver final : public vr::IServerTrackedDeviceProvider
     static const char* const ms_interfaces[];
 
     Leap::Controller *m_leapController;
-    CLeapListener *m_leapListener;
 
     bool m_connectionState;
     bool m_firstConnection;
     CLeapController *m_controllers[LCH_Count];
-    CRelayDevice *m_relayDevice;
+    CLeapStation *m_leapStation;
 
     CServerDriver(const CServerDriver &that) = delete;
     CServerDriver& operator=(const CServerDriver &that) = delete;

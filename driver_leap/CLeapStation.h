@@ -2,7 +2,7 @@
 
 class CServerDriver;
 
-class CRelayDevice : public vr::ITrackedDeviceServerDriver
+class CLeapStation final : public vr::ITrackedDeviceServerDriver
 {
     vr::DriverPose_t m_pose;
     vr::PropertyContainerHandle_t m_propertyHandle;
@@ -11,8 +11,8 @@ class CRelayDevice : public vr::ITrackedDeviceServerDriver
     CServerDriver *m_serverDriver;
     std::string m_serialNumber;
 
-    CRelayDevice(const CRelayDevice &that) = delete;
-    CRelayDevice& operator=(const CRelayDevice &that) = delete;
+    CLeapStation(const CLeapStation &that) = delete;
+    CLeapStation& operator=(const CLeapStation &that) = delete;
 
     // vr::ITrackedDeviceServerDriver
     vr::EVRInitError Activate(uint32_t unObjectId);
@@ -22,12 +22,12 @@ class CRelayDevice : public vr::ITrackedDeviceServerDriver
     void* GetComponent(const char* pchComponentNameAndVersion);
     vr::DriverPose_t GetPose();
 protected:
-    explicit CRelayDevice(CServerDriver *f_server);
-    ~CRelayDevice();
+    explicit CLeapStation(CServerDriver *f_server);
+    ~CLeapStation();
 
     inline const std::string& GetSerialNumber() const { return m_serialNumber; }
 
-    void Update();
+    void RunFrame();
 
     friend CServerDriver;
 };

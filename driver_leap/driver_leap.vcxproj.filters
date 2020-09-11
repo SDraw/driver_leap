@@ -11,25 +11,23 @@
     <ClCompile Include="..\shared\CGestureMatcher.cpp">
       <Filter>shared</Filter>
     </ClCompile>
-    <ClCompile Include="CDriverLog.cpp" />
     <ClCompile Include="CDriverConfig.cpp" />
     <ClCompile Include="CControllerButton.cpp" />
-    <ClCompile Include="CRelayDevice.cpp" />
     <ClCompile Include="CLeapController.cpp" />
     <ClCompile Include="CLeapControllerIndex.cpp" />
     <ClCompile Include="CLeapControllerVive.cpp" />
+    <ClCompile Include="CLeapStation.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Utils.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="CServerDriver.h" />
-    <ClInclude Include="CDriverLog.h" />
     <ClInclude Include="CDriverConfig.h" />
     <ClInclude Include="CControllerButton.h" />
-    <ClInclude Include="CRelayDevice.h" />
     <ClInclude Include="CLeapController.h" />
     <ClInclude Include="CLeapControllerIndex.h" />
     <ClInclude Include="CLeapControllerVive.h" />
+    <ClInclude Include="CLeapStation.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="vendor">

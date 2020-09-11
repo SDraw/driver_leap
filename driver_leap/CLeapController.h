@@ -46,7 +46,7 @@ public:
 
     void SetGameProfile(GameProfile f_profile);
 
-    void Update(const Leap::Frame& f_frame);
+    void RunFrame(const Leap::Frame& f_frame);
 
     static void UpdateHMDCoordinates();
 protected:
