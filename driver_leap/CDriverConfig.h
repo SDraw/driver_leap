@@ -50,30 +50,31 @@ public:
 
     static void LoadConfig();
 
-    static inline unsigned char GetEmulatedController() { return ms_emulatedController; }
-    static inline bool IsLeftHandEnabled() { return ms_leftHand; }
-    static inline bool IsRightHandEnabled() { return ms_rightHand; }
-    static inline unsigned char GetOrientationMode() { return ms_orientation; }
-    static inline bool IsSkeletonEnabled() { return ms_skeleton; }
-    static inline unsigned char GetTrackingLevel() { return ms_trackingLevel; }
+    static unsigned char GetEmulatedController();
+    static bool IsLeftHandEnabled();
+    static bool IsRightHandEnabled();
+    static unsigned char GetOrientationMode();
+    static bool IsSkeletonEnabled();
+    static unsigned char GetTrackingLevel();
 
-    static inline const glm::vec3& GetDesktopOffset() { return ms_desktopOffset; }
-    static inline const glm::vec3& GetLeftHandOffset() { return ms_leftHandOffset; }
-    static inline const glm::quat& GetLeftHandOffsetRotation() { return ms_leftHandOffsetRotation; }
-    static inline const glm::vec3& GetRightHandOffset() { return ms_rightHandOffset; }
-    static inline const glm::quat& GetRightHandOffsetRotation() { return ms_rightHandOffsetRotation; }
+    static const glm::vec3& GetDesktopOffset();
+    static const glm::vec3& GetLeftHandOffset();
+    static const glm::quat& GetLeftHandOffsetRotation();
+    static const glm::vec3& GetRightHandOffset();
+    static const glm::quat& GetRightHandOffsetRotation();
 
-    static inline bool IsInputEnabled() { return ms_input; }
-    static inline bool IsMenuEnabled() { return ms_menu; }
-    static inline bool IsApplicationMenuEnabled() { return ms_applicationMenu; }
-    static inline bool IsTriggerEnabled() { return ms_trigger; }
-    static inline bool IsGripEnabled() { return ms_grip; }
-    static inline bool IsTouchpadEnabled() { return ms_touchpad; }
-    static inline bool IsTouchpadTouchEnabled() { return ms_touchpadTouch; }
-    static inline bool IsTouchpadPressEnabled() { return ms_touchpadPress; }
-    static inline bool IsTouchpadAxesEnabled() { return ms_touchpadAxes; }
-    static inline bool IsButtonAEnabled() { return ms_buttonA; }
-    static inline bool IsButtonBEnabled() { return ms_buttonB; }
-    static inline bool IsThumbstickEnabled() { return ms_thumbstick; }
-    static inline bool IsHandsResetEnabled() { return ms_handsReset; }
+    static bool IsInputEnabled();
+    static bool IsMenuEnabled();
+    static bool IsApplicationMenuEnabled();
+    static bool IsTriggerEnabled();
+    static bool IsGripEnabled();
+    static bool IsTouchpadEnabled();
+    static bool IsTouchpadTouchEnabled();
+    static bool IsTouchpadPressEnabled();
+    static bool IsTouchpadAxesEnabled();
+    static bool IsButtonAEnabled();
+    static bool IsButtonBEnabled();
+    static bool IsThumbstickEnabled();
+
+    static bool IsHandsResetEnabled();
 };

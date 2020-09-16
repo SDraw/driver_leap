@@ -1,33 +1,10 @@
 #include "stdafx.h"
+
 #include "CDriverConfig.h"
+
 #include "Utils.h"
 
 extern char g_modulePath[];
-
-unsigned char CDriverConfig::ms_emulatedController = CDriverConfig::EC_Vive;
-bool CDriverConfig::ms_leftHand = true;
-bool CDriverConfig::ms_rightHand = true;
-unsigned char CDriverConfig::ms_orientation = CDriverConfig::OM_HMD;
-bool CDriverConfig::ms_skeleton = true;
-unsigned char CDriverConfig::ms_trackingLevel = CDriverConfig::TL_Partial;
-glm::vec3 CDriverConfig::ms_desktopOffset(0.f, -0.5f, -0.5f);
-glm::vec3 CDriverConfig::ms_leftHandOffset(0.f);
-glm::quat CDriverConfig::ms_leftHandOffsetRotation(1.f, 0.f, 0.f, 0.f);
-glm::vec3 CDriverConfig::ms_rightHandOffset(0.f);
-glm::quat CDriverConfig::ms_rightHandOffsetRotation(1.f, 0.f, 0.f, 0.f);
-bool CDriverConfig::ms_input = true;
-bool CDriverConfig::ms_menu = true;
-bool CDriverConfig::ms_applicationMenu = true;
-bool CDriverConfig::ms_trigger = true;
-bool CDriverConfig::ms_grip = true;
-bool CDriverConfig::ms_touchpad = true;
-bool CDriverConfig::ms_touchpadTouch = true;
-bool CDriverConfig::ms_touchpadPress = true;
-bool CDriverConfig::ms_touchpadAxes = true;
-bool CDriverConfig::ms_buttonA = true;
-bool CDriverConfig::ms_buttonB = true;
-bool CDriverConfig::ms_thumbstick = true;
-bool CDriverConfig::ms_handsReset = false;
 
 const std::vector<std::string> g_settingNames
 {
@@ -38,6 +15,7 @@ const std::vector<std::string> g_settingNames
     "buttonA", "buttonB", "thumbstick",
     "handsReset"
 };
+
 enum ConfigParamIndex : size_t
 {
     CPI_EmulatedController = 0U,
@@ -65,18 +43,46 @@ enum ConfigParamIndex : size_t
     CPI_Thumbstick,
     CPI_HandsReset
 };
+
 const std::vector<std::string> g_orientationModes
 {
     "hmd", "desktop"
 };
+
 const std::vector<std::string> g_emulatedControllers
 {
     "vive", "index"
 };
+
 const std::vector<std::string> g_trackingLevels
 {
     "partial", "full"
 };
+
+unsigned char CDriverConfig::ms_emulatedController = CDriverConfig::EC_Vive;
+bool CDriverConfig::ms_leftHand = true;
+bool CDriverConfig::ms_rightHand = true;
+unsigned char CDriverConfig::ms_orientation = CDriverConfig::OM_HMD;
+bool CDriverConfig::ms_skeleton = true;
+unsigned char CDriverConfig::ms_trackingLevel = CDriverConfig::TL_Partial;
+glm::vec3 CDriverConfig::ms_desktopOffset(0.f, -0.5f, -0.5f);
+glm::vec3 CDriverConfig::ms_leftHandOffset(0.f);
+glm::quat CDriverConfig::ms_leftHandOffsetRotation(1.f, 0.f, 0.f, 0.f);
+glm::vec3 CDriverConfig::ms_rightHandOffset(0.f);
+glm::quat CDriverConfig::ms_rightHandOffsetRotation(1.f, 0.f, 0.f, 0.f);
+bool CDriverConfig::ms_input = true;
+bool CDriverConfig::ms_menu = true;
+bool CDriverConfig::ms_applicationMenu = true;
+bool CDriverConfig::ms_trigger = true;
+bool CDriverConfig::ms_grip = true;
+bool CDriverConfig::ms_touchpad = true;
+bool CDriverConfig::ms_touchpadTouch = true;
+bool CDriverConfig::ms_touchpadPress = true;
+bool CDriverConfig::ms_touchpadAxes = true;
+bool CDriverConfig::ms_buttonA = true;
+bool CDriverConfig::ms_buttonB = true;
+bool CDriverConfig::ms_thumbstick = true;
+bool CDriverConfig::ms_handsReset = false;
 
 void CDriverConfig::LoadConfig()
 {
@@ -194,4 +200,124 @@ void CDriverConfig::LoadConfig()
         }
     }
     delete l_document;
+}
+
+unsigned char CDriverConfig::GetEmulatedController()
+{
+    return ms_emulatedController;
+}
+
+bool CDriverConfig::IsLeftHandEnabled()
+{
+    return ms_leftHand;
+}
+
+bool CDriverConfig::IsRightHandEnabled()
+{
+    return ms_rightHand;
+}
+
+unsigned char CDriverConfig::GetOrientationMode()
+{
+    return ms_orientation;
+}
+
+bool CDriverConfig::IsSkeletonEnabled()
+{
+    return ms_skeleton;
+}
+
+unsigned char CDriverConfig::GetTrackingLevel()
+{
+    return ms_trackingLevel;
+}
+
+const glm::vec3& CDriverConfig::GetDesktopOffset()
+{
+    return ms_desktopOffset;
+}
+
+const glm::vec3& CDriverConfig::GetLeftHandOffset()
+{
+    return ms_leftHandOffset;
+}
+
+const glm::quat& CDriverConfig::GetLeftHandOffsetRotation()
+{
+    return ms_leftHandOffsetRotation;
+}
+
+const glm::vec3& CDriverConfig::GetRightHandOffset()
+{
+    return ms_rightHandOffset;
+}
+
+const glm::quat& CDriverConfig::GetRightHandOffsetRotation()
+{
+    return ms_rightHandOffsetRotation;
+}
+
+bool CDriverConfig::IsInputEnabled()
+{
+    return ms_input;
+}
+
+bool CDriverConfig::IsMenuEnabled()
+{
+    return ms_menu;
+}
+
+bool CDriverConfig::IsApplicationMenuEnabled()
+{
+    return ms_applicationMenu;
+}
+
+bool CDriverConfig::IsTriggerEnabled()
+{
+    return ms_trigger;
+}
+
+bool CDriverConfig::IsGripEnabled()
+{
+    return ms_grip;
+}
+
+bool CDriverConfig::IsTouchpadEnabled()
+{
+    return ms_touchpad;
+}
+
+bool CDriverConfig::IsTouchpadTouchEnabled()
+{
+    return ms_touchpadTouch;
+}
+
+bool CDriverConfig::IsTouchpadPressEnabled()
+{
+    return ms_touchpadPress;
+}
+
+bool CDriverConfig::IsTouchpadAxesEnabled()
+{
+    return ms_touchpadAxes;
+}
+
+bool CDriverConfig::IsButtonAEnabled()
+{
+    return ms_buttonA;
+}
+
+bool CDriverConfig::IsButtonBEnabled()
+{
+    return ms_buttonB;
+}
+
+bool CDriverConfig::IsThumbstickEnabled()
+{
+    return ms_thumbstick;
+}
+
+bool CDriverConfig::IsHandsResetEnabled()
+{
+    return ms_handsReset;
 }

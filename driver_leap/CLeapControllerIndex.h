@@ -1,4 +1,5 @@
 #pragma once
+
 #include "CLeapController.h"
 
 class CLeapControllerIndex final : public CLeapController
@@ -52,7 +53,7 @@ class CLeapControllerIndex final : public CLeapController
 
     // CLeapController
     void ActivateInternal() override;
-    void UpdateGestures(const Leap::Frame &f_frame);
+    void UpdateGestures(const Leap::Frame &f_frame) override;
     void UpdateInputInternal() override;
 public:
     explicit CLeapControllerIndex(unsigned char f_hand);

@@ -51,35 +51,12 @@ CServerDriver::CServerDriver()
     for(size_t i = 0U; i < LCH_Count; i++) m_controllers[i] = nullptr;
     m_leapStation = nullptr;
 }
+
 CServerDriver::~CServerDriver()
 {
 }
 
 // vr::IServerTrackedDeviceProvider
-void CServerDriver::Cleanup()
-{
-    for(size_t i = 0U; i < LCH_Count; i++)
-    {
-        delete m_controllers[i];
-        m_controllers[i] = nullptr;
-    }
-    delete m_leapStation;
-    m_leapStation = nullptr;
-
-    if(m_leapController)
-    {
-        delete m_leapController;
-        m_leapController = nullptr;
-    }
-
-    VR_CLEANUP_SERVER_DRIVER_CONTEXT();
-}
-
-const char* const* CServerDriver::GetInterfaceVersions()
-{
-    return ms_interfaces;
-}
-
 vr::EVRInitError CServerDriver::Init(vr::IVRDriverContext *pDriverContext)
 {
     VR_INIT_SERVER_DRIVER_CONTEXT(pDriverContext);
@@ -125,6 +102,30 @@ vr::EVRInitError CServerDriver::Init(vr::IVRDriverContext *pDriverContext)
     return vr::VRInitError_None;
 }
 
+void CServerDriver::Cleanup()
+{
+    for(size_t i = 0U; i < LCH_Count; i++)
+    {
+        delete m_controllers[i];
+        m_controllers[i] = nullptr;
+    }
+    delete m_leapStation;
+    m_leapStation = nullptr;
+
+    if(m_leapController)
+    {
+        delete m_leapController;
+        m_leapController = nullptr;
+    }
+
+    VR_CLEANUP_SERVER_DRIVER_CONTEXT();
+}
+
+const char* const* CServerDriver::GetInterfaceVersions()
+{
+    return ms_interfaces;
+}
+
 void CServerDriver::RunFrame()
 {
     CLeapController::UpdateHMDCoordinates();
@@ -161,6 +162,14 @@ void CServerDriver::RunFrame()
 bool CServerDriver::ShouldBlockStandbyMode()
 {
     return false;
+}
+
+void CServerDriver::EnterStandby()
+{
+}
+
+void CServerDriver::LeaveStandby()
+{
 }
 
 // CServerDriver

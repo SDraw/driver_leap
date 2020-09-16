@@ -31,10 +31,12 @@ CLeapStation::CLeapStation(CServerDriver *f_server)
     m_serialNumber.assign("leap_motion_station");
     m_serverDriver = f_server;
 }
+
 CLeapStation::~CLeapStation()
 {
 }
 
+// vr::ITrackedDeviceServerDriver
 vr::EVRInitError CLeapStation::Activate(uint32_t unObjectId)
 {
     vr::EVRInitError l_resultError = vr::VRInitError_Driver_CalibrationInvalid;
@@ -88,12 +90,8 @@ void CLeapStation::Deactivate()
     m_trackedDevice = vr::k_unTrackedDeviceIndexInvalid;
 }
 
-void CLeapStation::DebugRequest(const char* pchRequest, char* pchResponseBuffer, uint32_t unResponseBufferSize)
+void CLeapStation::EnterStandby()
 {
-    if(m_trackedDevice != vr::k_unTrackedDeviceIndexInvalid)
-    {
-        if(m_serverDriver) m_serverDriver->ProcessExternalMessage(pchRequest);
-    }
 }
 
 void* CLeapStation::GetComponent(const char* pchComponentNameAndVersion)
@@ -103,9 +101,23 @@ void* CLeapStation::GetComponent(const char* pchComponentNameAndVersion)
     return l_result;
 }
 
+void CLeapStation::DebugRequest(const char* pchRequest, char* pchResponseBuffer, uint32_t unResponseBufferSize)
+{
+    if(m_trackedDevice != vr::k_unTrackedDeviceIndexInvalid)
+    {
+        if(m_serverDriver) m_serverDriver->ProcessExternalMessage(pchRequest);
+    }
+}
+
 vr::DriverPose_t CLeapStation::GetPose()
 {
     return m_pose;
+}
+
+// CLeapStation
+const std::string& CLeapStation::GetSerialNumber() const
+{
+    return m_serialNumber;
 }
 
 void CLeapStation::RunFrame()

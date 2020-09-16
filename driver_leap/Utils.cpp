@@ -1,4 +1,5 @@
 #include "stdafx.h"
+
 #include "Utils.h"
 
 extern const glm::mat4 g_identityMatrix(1.f);
@@ -55,6 +56,7 @@ void ConvertVector3(const vr::HmdVector4_t &f_vrVec, glm::vec3 &f_glmVec)
 {
     for(size_t i = 0U; i < 3U; i++) f_glmVec[i] = f_vrVec.v[i];
 }
+
 void ConvertVector3(const glm::vec3 &f_glmVec, vr::HmdVector4_t &f_vrVec)
 {
     for(size_t i = 0U; i < 3U; i++) f_vrVec.v[i] = f_glmVec[i];

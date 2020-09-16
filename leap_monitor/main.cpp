@@ -1,4 +1,5 @@
 #include "stdafx.h"
+
 #include "CLeapMonitor.h"
 
 #ifdef _DEBUG

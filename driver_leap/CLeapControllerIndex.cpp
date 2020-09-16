@@ -81,6 +81,7 @@ CLeapControllerIndex::CLeapControllerIndex(unsigned char f_hand)
     }
 
 }
+
 CLeapControllerIndex::~CLeapControllerIndex()
 {
 }

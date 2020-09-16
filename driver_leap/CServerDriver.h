@@ -28,13 +28,13 @@ class CServerDriver final : public vr::IServerTrackedDeviceProvider
     void ProcessLeapControllerPause();
 
     // vr::IServerTrackedDeviceProvider
-    void Cleanup();
-    void EnterStandby() {};
-    const char* const* GetInterfaceVersions();
     vr::EVRInitError Init(vr::IVRDriverContext *pDriverContext);
-    void LeaveStandby() {};
+    void Cleanup();
+    const char* const* GetInterfaceVersions();
     void RunFrame();
     bool ShouldBlockStandbyMode();
+    void EnterStandby();
+    void LeaveStandby();
 public:
     CServerDriver();
     ~CServerDriver();

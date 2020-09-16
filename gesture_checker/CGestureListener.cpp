@@ -62,56 +62,6 @@ void CGestureListener::onFrame(const Leap::Controller& controller)
         CGestureMatcher::GetGestureName(static_cast<CGestureMatcher::GestureType>(i), l_gestureName);
         if(!l_gestureName.empty()) fprintf(stderr, "%-24s -> %.4f\t%.4f\n", l_gestureName.c_str(), l_scoresLeft[i], l_scoresRight[i]);
     }
-
-    //for(auto l_hand : frame.hands())
-    //{
-    //    if(l_hand.isValid())
-    //    {
-    //        glm::vec3 l_handPosition = l_hand.wristPosition().toVector3<glm::vec3>();
-    //        glm::quat l_handRotation = glm::quat_cast(l_hand.basis().toMatrix4x4<glm::mat4>());
-
-    //        fprintf(stdout, "> %s hand: [%.4f,%.4f,%.4f] - [%.4f,%.4f,%.4f,%.4f]\n", l_hand.isLeft() ? "Left" : "Right",
-    //            l_handPosition.x, l_handPosition.y, l_handPosition.z,
-    //            l_handRotation.x, l_handRotation.y, l_handRotation.z, l_handRotation.w
-    //            );
-
-    //        for(auto l_finger : l_hand.fingers())
-    //        {
-    //            if(l_finger.isValid())
-    //            {
-    //                fprintf(stdout, ">> %s finger:\n", g_fingerNames[l_finger.type()].c_str());
-
-    //                Leap::Bone l_bones[4U];
-    //                for(size_t i = 0U; i < 4U; i++) l_bones[i] = l_finger.bone(static_cast<Leap::Bone::Type>(i));
-    //                // basis() - global rotation
-    //                // prevJoint() - global translation
-
-    //                // Local position = Inv([ParentPos,ParentRot])*Pos
-    //                glm::mat4 l_identity(1.f);
-    //                glm::vec3 l_boneLocalPos[4U];
-    //                l_boneLocalPos[0U] = glm::inverse(glm::translate(l_identity, l_handPosition)*glm::mat4_cast(l_handRotation))*l_bones[0U].prevJoint().toVector4<glm::vec4>(1.f);
-    //                l_boneLocalPos[1U] = glm::inverse(glm::translate(l_identity, l_bones[0U].prevJoint().toVector3<glm::vec3>())*l_bones[0U].basis().toMatrix4x4<glm::mat4>())*l_bones[1U].prevJoint().toVector4<glm::vec4>(1.f);
-    //                l_boneLocalPos[2U] = glm::inverse(glm::translate(l_identity, l_bones[1U].prevJoint().toVector3<glm::vec3>())*l_bones[1U].basis().toMatrix4x4<glm::mat4>())*l_bones[2U].prevJoint().toVector4<glm::vec4>(1.f);
-    //                l_boneLocalPos[3U] = glm::inverse(glm::translate(l_identity, l_bones[2U].prevJoint().toVector3<glm::vec3>())*l_bones[2U].basis().toMatrix4x4<glm::mat4>())*l_bones[3U].prevJoint().toVector4<glm::vec4>(1.f);
-
-    //                // Local rotation = Inv(ParentRot)*Rot
-    //                glm::quat l_boneLocalRot[4U];
-    //                l_boneLocalRot[0U] = glm::quat_cast((l_hand.basis().rigidInverse()*l_bones[0U].basis()).toMatrix4x4<glm::mat4>());
-    //                l_boneLocalRot[1U] = glm::quat_cast((l_bones[0U].basis().rigidInverse()*l_bones[1U].basis()).toMatrix4x4<glm::mat4>());
-    //                l_boneLocalRot[2U] = glm::quat_cast((l_bones[1U].basis().rigidInverse()*l_bones[2U].basis()).toMatrix4x4<glm::mat4>());
-    //                l_boneLocalRot[3U] = glm::quat_cast((l_bones[2U].basis().rigidInverse()*l_bones[3U].basis()).toMatrix4x4<glm::mat4>());
-
-    //                for(size_t i = 0U; i < 4U; i++)
-    //                {
-    //                    fprintf(stdout, ">>> Bone %u: [%.4f,%.4f,%.4f] - [%.4f,%.4f,%.4f,%.4f]\n", i,
-    //                        l_boneLocalPos[i].x, l_boneLocalPos[i].y, l_boneLocalPos[i].z,
-    //                        l_boneLocalRot[i].x, l_boneLocalRot[i].y, l_boneLocalRot[i].z, l_boneLocalRot[i].w
-    //                        );
-    //                }
-    //            }
-    //        }
-    //    }
-    //}
 }
 
 void CGestureListener::onFocusGained(const Leap::Controller&)

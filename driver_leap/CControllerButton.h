@@ -22,18 +22,18 @@ public:
     CControllerButton();
     ~CControllerButton();
 
-    inline vr::VRInputComponentHandle_t GetHandle() const { return m_handle; }
-    inline vr::VRInputComponentHandle_t& GetHandleRef() { return m_handle; }
+    vr::VRInputComponentHandle_t GetHandle() const;
+    vr::VRInputComponentHandle_t& GetHandleRef();
 
-    inline void SetInputType(unsigned char f_type) { m_inputType = f_type; }
-    inline unsigned char GetInputType() const { return m_inputType; }
+    void SetInputType(unsigned char f_type);
+    unsigned char GetInputType() const;
 
     void SetState(bool f_state);
-    inline bool GetState() const { return m_state; }
+    bool GetState() const;
 
     void SetValue(float f_value);
-    inline float GetValue() const { return m_value; }
+    float GetValue() const;
 
-    inline bool IsUpdated() const { return m_updated; }
-    inline void ResetUpdate() { m_updated = false; }
+    bool IsUpdated() const;
+    void ResetUpdate();
 };

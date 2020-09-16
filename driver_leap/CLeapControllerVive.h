@@ -1,4 +1,5 @@
 #pragma once
+
 #include "CLeapController.h"
 
 class CLeapControllerVive final : public CLeapController
@@ -8,7 +9,7 @@ class CLeapControllerVive final : public CLeapController
 
     // CLeapController
     void ActivateInternal() override;
-    void UpdateGestures(const Leap::Frame &f_frame);
+    void UpdateGestures(const Leap::Frame &f_frame) override;
 public:
     explicit CLeapControllerVive(unsigned char f_hand);
     ~CLeapControllerVive();

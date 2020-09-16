@@ -41,6 +41,7 @@ CLeapController::CLeapController()
     m_hand = CH_Left;
     m_gameProfile = GP_Default;
 }
+
 CLeapController::~CLeapController()
 {
     for(auto l_button : m_buttons) delete l_button;
@@ -63,10 +64,15 @@ vr::EVRInitError CLeapController::Activate(uint32_t unObjectId)
 
     return l_resultError;
 }
+
 void CLeapController::Deactivate()
 {
     ResetControls();
     m_trackedDevice = vr::k_unTrackedDeviceIndexInvalid;
+}
+
+void CLeapController::EnterStandby()
+{
 }
 
 void* CLeapController::GetComponent(const char* pchComponentNameAndVersion)
@@ -74,6 +80,10 @@ void* CLeapController::GetComponent(const char* pchComponentNameAndVersion)
     void *l_result = nullptr;
     if(!strcmp(pchComponentNameAndVersion, vr::ITrackedDeviceServerDriver_Version)) l_result = dynamic_cast<vr::ITrackedDeviceServerDriver*>(this);
     return l_result;
+}
+
+void CLeapController::DebugRequest(const char* pchRequest, char* pchResponseBuffer, uint32_t unResponseBufferSize)
+{
 }
 
 vr::DriverPose_t CLeapController::GetPose()
@@ -91,6 +101,11 @@ void CLeapController::SetEnabled(bool f_state)
 {
     m_pose.deviceIsConnected = f_state;
     if(m_trackedDevice != vr::k_unTrackedDeviceIndexInvalid) vr::VRServerDriverHost()->TrackedDevicePoseUpdated(m_trackedDevice, m_pose, sizeof(vr::DriverPose_t));
+}
+
+const std::string& CLeapController::GetSerialNumber() const
+{
+    return m_serialNumber;
 }
 
 void CLeapController::ResetControls()
@@ -244,6 +259,18 @@ void CLeapController::UpdateTransformation(const Leap::Frame &f_frame)
     }
 
     m_pose.poseIsValid = l_handFound;
+}
+
+void CLeapController::ActivateInternal()
+{
+}
+
+void CLeapController::UpdateGestures(const Leap::Frame &f_frame)
+{
+}
+
+void CLeapController::UpdateInputInternal()
+{
 }
 
 void CLeapController::UpdateHMDCoordinates()

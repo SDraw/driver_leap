@@ -17,15 +17,15 @@ class CLeapStation final : public vr::ITrackedDeviceServerDriver
     // vr::ITrackedDeviceServerDriver
     vr::EVRInitError Activate(uint32_t unObjectId);
     void Deactivate();
-    void DebugRequest(const char* pchRequest, char* pchResponseBuffer, uint32_t unResponseBufferSize);
-    void EnterStandby() {}
+    void EnterStandby();
     void* GetComponent(const char* pchComponentNameAndVersion);
+    void DebugRequest(const char* pchRequest, char* pchResponseBuffer, uint32_t unResponseBufferSize);
     vr::DriverPose_t GetPose();
 protected:
     explicit CLeapStation(CServerDriver *f_server);
     ~CLeapStation();
 
-    inline const std::string& GetSerialNumber() const { return m_serialNumber; }
+    const std::string& GetSerialNumber() const;
 
     void RunFrame();
 

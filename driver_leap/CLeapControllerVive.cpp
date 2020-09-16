@@ -26,6 +26,7 @@ CLeapControllerVive::CLeapControllerVive(unsigned char f_hand)
     m_hand = (f_hand % CH_Count);
     m_serialNumber.assign((m_hand == CH_Left) ? "LHR-F94B3BD8" : "LHR-F94B3BD9");
 }
+
 CLeapControllerVive::~CLeapControllerVive()
 {
 }

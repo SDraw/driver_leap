@@ -18,9 +18,9 @@ class CLeapController : public vr::ITrackedDeviceServerDriver
     // vr::ITrackedDeviceServerDriver
     vr::EVRInitError Activate(uint32_t unObjectId);
     void Deactivate();
-    void DebugRequest(const char* pchRequest, char* pchResponseBuffer, uint32_t unResponseBufferSize) {}
-    void EnterStandby() {}
+    void EnterStandby();
     void* GetComponent(const char* pchComponentNameAndVersion);
+    void DebugRequest(const char* pchRequest, char* pchResponseBuffer, uint32_t unResponseBufferSize);
     vr::DriverPose_t GetPose();
 public:
     enum ControllerHand : unsigned char
@@ -42,7 +42,7 @@ public:
     bool GetEnabled() const;
     void SetEnabled(bool f_state);
 
-    inline const std::string& GetSerialNumber() const { return m_serialNumber; }
+    const std::string& GetSerialNumber() const;
 
     void SetGameProfile(GameProfile f_profile);
 
@@ -59,7 +59,7 @@ protected:
     GameProfile m_gameProfile;
     std::string m_serialNumber;
 
-    virtual void ActivateInternal() {}
-    virtual void UpdateGestures(const Leap::Frame &f_frame) = 0;
-    virtual void UpdateInputInternal() {}
+    virtual void ActivateInternal();
+    virtual void UpdateGestures(const Leap::Frame &f_frame);
+    virtual void UpdateInputInternal();
 };
