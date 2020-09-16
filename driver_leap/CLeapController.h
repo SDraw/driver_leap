@@ -6,6 +6,7 @@ class CLeapController : public vr::ITrackedDeviceServerDriver
 {
     static double ms_headPosition[3U];
     static vr::HmdQuaternion_t ms_headRotation;
+    
     vr::DriverPose_t m_pose;
 
     CLeapController(const CLeapController &that) = delete;
@@ -50,14 +51,14 @@ public:
 
     static void UpdateHMDCoordinates();
 protected:
-    vr::VRInputComponentHandle_t m_haptic;
-    vr::PropertyContainerHandle_t m_propertyContainer;
     uint32_t m_trackedDevice;
+    vr::PropertyContainerHandle_t m_propertyContainer;
+    vr::VRInputComponentHandle_t m_haptic;
 
-    std::vector<CControllerButton*> m_buttons;
-    unsigned char m_hand;
-    GameProfile m_gameProfile;
     std::string m_serialNumber;
+    unsigned char m_hand;
+    std::vector<CControllerButton*> m_buttons;
+    GameProfile m_gameProfile;
 
     virtual void ActivateInternal();
     virtual void UpdateGestures(const Leap::Frame &f_frame);

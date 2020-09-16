@@ -69,6 +69,7 @@ vr::EVRInitError CLeapStation::Activate(uint32_t unObjectId)
         vr::VRProperties()->SetStringProperty(m_propertyHandle, vr::Prop_RenderModelName_String, "{leap}leap_motion_1_0");
 
         vr::VRProperties()->SetStringProperty(m_propertyHandle, vr::Prop_NamedIconPathDeviceReady_String, "{leap}/icons/base_status_ready.png");
+        vr::VRProperties()->SetStringProperty(m_propertyHandle, vr::Prop_NamedIconPathDeviceSearching_String, "{leap}/icons/base_status_searching.png");
 
         vr::VRProperties()->SetBoolProperty(m_propertyHandle, vr::Prop_HasDisplayComponent_Bool, false);
         vr::VRProperties()->SetBoolProperty(m_propertyHandle, vr::Prop_HasCameraComponent_Bool, false);
@@ -118,6 +119,23 @@ vr::DriverPose_t CLeapStation::GetPose()
 const std::string& CLeapStation::GetSerialNumber() const
 {
     return m_serialNumber;
+}
+
+void CLeapStation::SetTrackingState(TrackingState f_state)
+{
+    switch(f_state)
+    {
+        case TS_Connected:
+        {
+            m_pose.result = vr::TrackingResult_Running_OK;
+            m_pose.poseIsValid = true;
+        } break;
+        case TS_Search:
+        {
+            m_pose.result = vr::TrackingResult_Calibrating_OutOfRange;
+            m_pose.poseIsValid = false;
+        } break;
+    }
 }
 
 void CLeapStation::RunFrame()

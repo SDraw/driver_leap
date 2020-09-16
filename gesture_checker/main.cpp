@@ -1,4 +1,5 @@
 #include "stdafx.h"
+
 #include "CGestureListener.h"
 
 int main(int argc, char *argv[])

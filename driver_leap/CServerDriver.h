@@ -15,10 +15,8 @@ class CServerDriver final : public vr::IServerTrackedDeviceProvider
 
     static const char* const ms_interfaces[];
 
+    glm::bvec2 m_connectionState; // x - current, y - first
     Leap::Controller *m_leapController;
-
-    bool m_connectionState;
-    bool m_firstConnection;
     CLeapController *m_controllers[LCH_Count];
     CLeapStation *m_leapStation;
 

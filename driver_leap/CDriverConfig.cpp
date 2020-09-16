@@ -84,7 +84,7 @@ bool CDriverConfig::ms_buttonB = true;
 bool CDriverConfig::ms_thumbstick = true;
 bool CDriverConfig::ms_handsReset = false;
 
-void CDriverConfig::LoadConfig()
+void CDriverConfig::Load()
 {
     std::string l_path(g_modulePath);
     l_path.erase(l_path.begin() + l_path.rfind('\\'), l_path.end());

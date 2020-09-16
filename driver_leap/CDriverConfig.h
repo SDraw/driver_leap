@@ -48,7 +48,7 @@ public:
         TL_Full
     };
 
-    static void LoadConfig();
+    static void Load();
 
     static unsigned char GetEmulatedController();
     static bool IsLeftHandEnabled();

@@ -17,9 +17,9 @@ vr::HmdQuaternion_t CLeapController::ms_headRotation = { 1.0, .0, .0, .0 };
 
 CLeapController::CLeapController()
 {
-    m_haptic = vr::k_ulInvalidPropertyContainer;
     m_propertyContainer = vr::k_ulInvalidPropertyContainer;
     m_trackedDevice = vr::k_unTrackedDeviceIndexInvalid;
+    m_haptic = vr::k_ulInvalidPropertyContainer;
 
     m_pose = { 0 };
     m_pose.deviceIsConnected = false;

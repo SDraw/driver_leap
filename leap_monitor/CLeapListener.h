@@ -11,9 +11,8 @@ class CLeapListener final : public Leap::Listener
     virtual void onLogMessage(const Leap::Controller &controller, Leap::MessageSeverity severity, int64_t timestamp, const char *msg); // Async
     virtual void onServiceConnect(const Leap::Controller &controller);
     virtual void onServiceDisconnect(const Leap::Controller &controller);
-protected:
-    void SetMonitor(CLeapMonitor *f_monitor);
-
-    friend CLeapMonitor;
+public:
+    explicit CLeapListener(CLeapMonitor *f_monitor);
+    ~CLeapListener();
 };
 

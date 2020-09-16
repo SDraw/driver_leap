@@ -3,10 +3,9 @@
 class CControllerButton final
 {
     vr::VRInputComponentHandle_t m_handle;
-
     unsigned char m_inputType;
-    bool m_state;
     float m_value;
+    bool m_state;
     bool m_updated;
 
     CControllerButton(const CControllerButton &that) = delete;

@@ -21,13 +21,19 @@ class CLeapStation final : public vr::ITrackedDeviceServerDriver
     void* GetComponent(const char* pchComponentNameAndVersion);
     void DebugRequest(const char* pchRequest, char* pchResponseBuffer, uint32_t unResponseBufferSize);
     vr::DriverPose_t GetPose();
-protected:
+public:
+    enum TrackingState : unsigned char
+    {
+        TS_Connected = 0U,
+        TS_Search
+    };
+
     explicit CLeapStation(CServerDriver *f_server);
     ~CLeapStation();
 
     const std::string& GetSerialNumber() const;
 
-    void RunFrame();
+    void SetTrackingState(TrackingState f_state);
 
-    friend CServerDriver;
+    void RunFrame();
 };

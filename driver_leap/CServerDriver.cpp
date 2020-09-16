@@ -46,8 +46,7 @@ const char* const CServerDriver::ms_interfaces[]
 CServerDriver::CServerDriver()
 {
     m_leapController = nullptr;
-    m_connectionState = false;
-    m_firstConnection = true;
+    m_connectionState = glm::bvec2(false, true);
     for(size_t i = 0U; i < LCH_Count; i++) m_controllers[i] = nullptr;
     m_leapStation = nullptr;
 }
@@ -60,7 +59,7 @@ CServerDriver::~CServerDriver()
 vr::EVRInitError CServerDriver::Init(vr::IVRDriverContext *pDriverContext)
 {
     VR_INIT_SERVER_DRIVER_CONTEXT(pDriverContext);
-    CDriverConfig::LoadConfig();
+    CDriverConfig::Load();
 
     // Relay device for events from leap_monitor
     m_leapStation = new CLeapStation(this);
@@ -85,7 +84,7 @@ vr::EVRInitError CServerDriver::Init(vr::IVRDriverContext *pDriverContext)
     m_leapController = new Leap::Controller();
     m_leapController->setPolicy(Leap::Controller::POLICY_ALLOW_PAUSE_RESUME);
     if(CDriverConfig::GetOrientationMode() == CDriverConfig::OM_HMD) m_leapController->setPolicy(Leap::Controller::POLICY_OPTIMIZE_HMD);
-    m_connectionState = true;
+    m_connectionState.x = true;
 
     // Start utility app that closes itself on SteamVR shutdown
     std::string l_path(g_modulePath);
@@ -132,19 +131,21 @@ void CServerDriver::RunFrame()
     if(m_leapController)
     {
         bool l_connectionState = m_leapController->isConnected();
-        if(m_connectionState != l_connectionState)
+        if(m_connectionState.x != l_connectionState)
         {
-            m_connectionState = l_connectionState;
-            for(size_t i = 0U; i < LCH_Count; i++) m_controllers[i]->SetEnabled(m_connectionState);
+            m_connectionState.x = l_connectionState;
+            m_leapStation->SetTrackingState(m_connectionState.x ? CLeapStation::TS_Connected : CLeapStation::TS_Search);
+            for(size_t i = 0U; i < LCH_Count; i++) m_controllers[i]->SetEnabled(m_connectionState.x);
         }
-        if(m_connectionState)
+
+        if(m_connectionState.x)
         {
-            if(m_firstConnection)
+            if(m_connectionState.y)
             {
                 m_leapController->setPaused(!CDriverConfig::IsLeftHandEnabled() && !CDriverConfig::IsRightHandEnabled());
                 m_controllers[LCH_Left]->SetEnabled(CDriverConfig::IsLeftHandEnabled());
                 m_controllers[LCH_Right]->SetEnabled(CDriverConfig::IsRightHandEnabled());
-                m_firstConnection = false;
+                m_connectionState.y = false;
             }
             else
             {
@@ -227,7 +228,7 @@ void CServerDriver::ProcessExternalMessage(const char *f_message)
                     {
                         case SC_LeftHand:
                         {
-                            if(m_connectionState)
+                            if(m_connectionState.x)
                             {
                                 bool l_enabled = m_controllers[LCH_Left]->GetEnabled();
                                 m_controllers[LCH_Left]->SetEnabled(!l_enabled);
@@ -236,7 +237,7 @@ void CServerDriver::ProcessExternalMessage(const char *f_message)
                         } break;
                         case SC_RightHand:
                         {
-                            if(m_connectionState)
+                            if(m_connectionState.x)
                             {
                                 bool l_enabled = m_controllers[LCH_Right]->GetEnabled();
                                 m_controllers[LCH_Right]->SetEnabled(!l_enabled);
@@ -245,7 +246,7 @@ void CServerDriver::ProcessExternalMessage(const char *f_message)
                         } break;
                         case SC_ReloadConfig:
                         {
-                            CDriverConfig::LoadConfig();
+                            CDriverConfig::Load();
 
                             // Change orientation mode
                             if(CDriverConfig::GetOrientationMode() == CDriverConfig::OM_HMD) m_leapController->setPolicy(Leap::Controller::POLICY_OPTIMIZE_HMD);
