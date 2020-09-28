@@ -6,9 +6,7 @@ Fork with updated vendor libraries and extended features.
   
 ### Installation (for users)
 * Install [latest Orion Beta](https://developer.leapmotion.com/get-started)
-* Create `leap` folder in `<SteamVR_folder>/drivers`
-* Grab [latest release archive](../../releases/latest) for your platform
-* Extract archive to `<SteamVR_folder>/drivers/leap`
+* Extract [latest release archive](../../releases/latest) for your platform to `<SteamVR_folder>/drivers`
 * Add line in section `steamvr` of `<Steam_folder>/config/steamvr.vrsettings` file:
 ```JSON
 "activateMultipleDrivers": true,
