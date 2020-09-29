@@ -3,9 +3,9 @@
 
 #include "CGestureMatcher.h"
 
-const Leap::Vector g_InVector = Leap::Vector(0, 1, 0);
-const Leap::Vector g_RightVector = Leap::Vector(-1, 0, 0);
-const Leap::Vector g_UpVector = Leap::Vector(0, 0, -1);
+const Leap::Vector g_inVector = Leap::Vector(0, 1, 0);
+const Leap::Vector g_rightVector = Leap::Vector(-1, 0, 0);
+const Leap::Vector g_upVector = Leap::Vector(0, 0, -1);
 
 struct FingerData
 {
@@ -90,16 +90,16 @@ bool CGestureMatcher::GetGestures(const Leap::Frame &f_frame, GestureHand f_whic
 
                 // Flat hand gestures
                 const float l_flatHand = MapRange((l_fingerData[Leap::Finger::TYPE_THUMB].m_bend + l_fingerData[Leap::Finger::TYPE_INDEX].m_bend + l_fingerData[Leap::Finger::TYPE_MIDDLE].m_bend + l_fingerData[Leap::Finger::TYPE_RING].m_bend + l_fingerData[Leap::Finger::TYPE_PINKY].m_bend) / 5.f, 50.f, 40.f);
-                Merge(f_result[GT_FlatHandPalmUp], std::min(l_flatHand, MapRange((g_UpVector).dot(l_palmNormal), 0.8f, 0.95f)));
-                Merge(f_result[GT_FlatHandPalmDown], std::min(l_flatHand, MapRange((-g_UpVector).dot(l_palmNormal), 0.8f, 0.95f)));
-                Merge(f_result[GT_FlatHandPalmAway], std::min(l_flatHand, MapRange((g_InVector).dot(l_palmNormal), 0.8f, 0.95f)));
-                Merge(f_result[GT_FlatHandPalmTowards], std::min(l_flatHand, MapRange((-g_InVector).dot(l_palmNormal), 0.8f, 0.95f)));
+                Merge(f_result[GT_FlatHandPalmUp], std::min(l_flatHand, MapRange((g_upVector).dot(l_palmNormal), 0.8f, 0.95f)));
+                Merge(f_result[GT_FlatHandPalmDown], std::min(l_flatHand, MapRange((-g_upVector).dot(l_palmNormal), 0.8f, 0.95f)));
+                Merge(f_result[GT_FlatHandPalmAway], std::min(l_flatHand, MapRange((g_inVector).dot(l_palmNormal), 0.8f, 0.95f)));
+                Merge(f_result[GT_FlatHandPalmTowards], std::min(l_flatHand, MapRange((-g_inVector).dot(l_palmNormal), 0.8f, 0.95f)));
 
                 // ThumbsUp/Inward gestures (seems broken in new LeapSDK)
-                const Leap::Vector l_inward = ((f_which == GH_LeftHand) ? g_RightVector : -g_RightVector);
+                const Leap::Vector l_inward = ((f_which == GH_LeftHand) ? g_rightVector : -g_rightVector);
                 const float l_fistHand = MapRange((l_fingerData[Leap::Finger::TYPE_INDEX].m_bend + l_fingerData[Leap::Finger::TYPE_MIDDLE].m_bend + l_fingerData[Leap::Finger::TYPE_RING].m_bend + l_fingerData[Leap::Finger::TYPE_PINKY].m_bend) / 5.f, 120.f, 150.f);
                 const float l_straightThumb = MapRange(l_fingerData[Leap::Finger::TYPE_THUMB].m_bend, 50.f, 40.f);
-                Merge(f_result[GT_ThumbUp], std::min(l_fistHand, std::min(l_straightThumb, MapRange((g_UpVector).dot(l_fingerData[Leap::Finger::TYPE_THUMB].m_direction), 0.8f, 0.95f))));
+                Merge(f_result[GT_ThumbUp], std::min(l_fistHand, std::min(l_straightThumb, MapRange((g_upVector).dot(l_fingerData[Leap::Finger::TYPE_THUMB].m_direction), 0.8f, 0.95f))));
                 Merge(f_result[GT_ThumbInward], std::min(l_fistHand, std::min(l_straightThumb, MapRange((l_inward).dot(l_fingerData[Leap::Finger::TYPE_THUMB].m_direction), 0.8f, 0.95f))));
 
                 // VRChat gestures
