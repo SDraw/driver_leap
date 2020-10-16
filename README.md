@@ -1,10 +1,10 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/2pc49d2hpt2hx944?svg=true)](https://ci.appveyor.com/project/SDraw/driver-leap) [![Release](http://img.shields.io/github/release/SDraw/driver_leap.svg)](../../releases/latest)
+# Driver Leap [![Build status](https://ci.appveyor.com/api/projects/status/2pc49d2hpt2hx944?svg=true)](https://ci.appveyor.com/project/SDraw/driver-leap) [![Release](http://img.shields.io/github/release/SDraw/driver_leap.svg)](../../releases/latest)
 
 Fork with updated vendor libraries and extended features.
 
 [![](./.github/repository_img.png)](https://www.youtube.com/playlist?list=PLiEPsxTlqsDk5GKcgsmeDQNRs7KV8lI-s)
   
-### Installation (for users)
+## Installation (for users)
 * Install [latest Orion Beta](https://developer.leapmotion.com/get-started)
 * Extract [latest release archive](../../releases/latest) for your platform to `<SteamVR_folder>/drivers`
 * Add line in section `steamvr` of `<Steam_folder>/config/steamvr.vrsettings` file:
@@ -12,7 +12,7 @@ Fork with updated vendor libraries and extended features.
 "activateMultipleDrivers": true,
 ```
 
-### Building (for developers)
+## Building (for developers)
 * Open `driver_leap.sln` solution in Visual Studio 2013
 * Build your platform:
   * x64 - build output is in `bin/win64`
@@ -27,7 +27,7 @@ Fork with updated vendor libraries and extended features.
   * `vendor/openvr/bin/<your_platform>/openvr_api.dll`
 * Copy `resources` folder from solution root to `<SteamVR_folder>/drivers/leap`. 
   
-### Control configuration and inputs
+## Control configuration and inputs
 Driver can emulate HTC Vive controllers and Valve Index controllers with skeletal animation and work in desktop and HMD orientations. It's adjusted by editing `settings.xml` in `resources` folder.  
 There are more configurable restrictions, such as global input, trackpad, trigger, grip and etc. Check [wiki page](../../wiki/Offset-settings) for few offset settings reported from users.  
 Controls are changed by game profiles that are enabled automatically when game is started from Steam.  
@@ -36,7 +36,7 @@ Available hotkeys in NumLock active state:
 * **Ctrl-O:** Enable/disable left hand controller.
 * **Ctrl-\ (or Ctrl-|):** Reload configuration.
 
-### HTC Vive controllers emulation
+## HTC Vive controllers emulation
 Game profiles:
   * **vrchat** - profile for VRChat. Control restrictions are ignored.  
   Controls list:
@@ -57,7 +57,7 @@ Game profiles:
     * Touchpad - thumb press
     * Touchpad circle - index finger of another hand directed to palm
     
-### Valve Index controllers emulation 
+## Valve Index controllers emulation 
 Game profiles:
   * **vrchat** - profile for VRChat. Note: game gestures are not implemented due to finger tracking, grip input profile should be used.  
   Controls list:
@@ -75,4 +75,3 @@ Game profiles:
     * Button A - touching of thumb and middle finger tips
     * Button B - touching of thumb and pinky finger tips
     * System button - formed T-shape with two hands
-
