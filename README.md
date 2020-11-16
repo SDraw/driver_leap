@@ -75,3 +75,8 @@ Game profiles:
     * Button A - touching of thumb and middle finger tips
     * Button B - touching of thumb and pinky finger tips
     * System button - formed T-shape with two hands
+    
+## Notes
+There were a lot of questions about hooking position and button states from real controllers and reroute to virtual ones adding finger tracking from Leap Motion. Sadly, it's not fully possible.  
+After adding virtual controllers SteamVR sets them as primary, and at the same time sets real controllers as non-primary. Interesting observation: SteamVR doesn't send any buttons data from non-primary controllers, nor through legacy input, nor through new action input system. Moreover, new action input system lacks support of more than two active controllers.  
+This interesting idea was failed successully.
