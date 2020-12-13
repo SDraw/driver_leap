@@ -1,39 +1,23 @@
 #include "stdafx.h"
 
 #include "CLeapMonitor.h"
-#include "CLeapListener.h"
-
-#include "Utils.h"
 
 const std::chrono::milliseconds g_threadDelay(11U);
-
-const std::vector<std::string> g_steamAppKeys
-{
-    "steam.app.438100", "system.generated.vrchat.exe" // VRChat
-};
-enum SteamAppID : size_t
-{
-    SAI_VRChat = 0U,
-    SAI_VRChatNoSteam
-};
-
-const std::string g_profileName[2U]
-{
-    "Default", "VRChat"
-};
 
 CLeapMonitor::CLeapMonitor()
 {
     m_active = false;
-
     m_vrSystem = nullptr;
     m_notificationID = 0U;
     m_overlayHandle = vr::k_ulOverlayHandleInvalid;
 
-    m_leapController = nullptr;
-    m_leapListener = nullptr;
+    m_leapActive = false;
+    m_leapConnection = nullptr;
+    m_leapAllocator.allocate = CLeapMonitor::AllocateMemory;
+    m_leapAllocator.deallocate = CLeapMonitor::DeallocateMemory;
+    m_leapAllocator.state = nullptr;
+    m_leapDevice = nullptr;
 
-    m_gameProfile = GP_Default;
     m_relayDevice = vr::k_unTrackedDeviceIndexInvalid;
     m_leftHotkey = false;
     m_rightHotkey = false;
@@ -63,9 +47,20 @@ bool CLeapMonitor::Initialize()
                 }
             }
 
-            m_leapListener = new CLeapListener(this);
-            m_leapController = new Leap::Controller();
-            m_leapController->addListener(*m_leapListener);
+            if(LeapCreateConnection(nullptr, &m_leapConnection) == eLeapRS_Success)
+            {
+                if(LeapOpenConnection(m_leapConnection) == eLeapRS_Success)
+                {
+                    LeapSetAllocator(m_leapConnection, &m_leapAllocator);
+                    m_leapActive = true;
+                }
+                else
+                {
+                    LeapDestroyConnection(m_leapConnection);
+                    m_leapConnection = nullptr;
+                }
+            }
+            else m_leapConnection = nullptr;
 
             m_active = true;
         }
@@ -79,13 +74,15 @@ void CLeapMonitor::Terminate()
     {
         m_active = false;
 
-        m_leapController->removeListener(*m_leapListener);
-
-        delete m_leapController;
-        m_leapController = nullptr;
-
-        delete m_leapListener;
-        m_leapListener = nullptr;
+        if(m_leapActive)
+        {
+            if(m_leapDevice) LeapCloseDevice(m_leapDevice);
+            LeapCloseConnection(m_leapConnection);
+            LeapDestroyConnection(m_leapConnection);
+            m_leapConnection = nullptr;
+            m_leapDevice = nullptr;
+            m_leapActive = false;
+        }
 
         if(m_notificationID) vr::VRNotifications()->RemoveNotification(m_notificationID);
         vr::VROverlay()->DestroyOverlay(m_overlayHandle);
@@ -93,10 +90,7 @@ void CLeapMonitor::Terminate()
         m_notificationID = 0U;
 
         vr::VR_Shutdown();
-
         m_vrSystem = nullptr;
-
-        m_gameProfile = GP_Default;
     }
 
     m_active = false;
@@ -119,25 +113,10 @@ bool CLeapMonitor::DoPulse()
             {
                 if(m_relayDevice == m_event.trackedDeviceIndex) m_relayDevice = vr::k_unTrackedDeviceIndexInvalid;
             } break;
-            case vr::VREvent_SceneApplicationStateChanged:
-            {
-                vr::EVRSceneApplicationState l_appState = vr::VRApplications()->GetSceneApplicationState();
-                switch(l_appState)
-                {
-                    case vr::EVRSceneApplicationState_Starting:
-                    {
-                        char l_appKey[vr::k_unMaxApplicationKeyLength];
-                        if(vr::VRApplications()->GetStartingApplication(l_appKey, vr::k_unMaxApplicationKeyLength) == vr::VRApplicationError_None) UpdateGameProfile(l_appKey);
-                    } break;
-                    case vr::EVRSceneApplicationState_None:
-                        UpdateGameProfile(""); // Revert to default
-                        break;
-                }
-            } break;
         }
     }
 
-    // Process special combinations if NumLock is active
+    // Process hotkeys if NumLock is active
     if((GetKeyState(VK_NUMLOCK) & 0xFFFF) != 0)
     {
         if(GetAsyncKeyState(VK_CONTROL) & 0x8000)
@@ -149,7 +128,7 @@ bool CLeapMonitor::DoPulse()
                 if(m_leftHotkey)
                 {
                     SendCommand("setting left_hand");
-                    SendNotification("Left hand toggled");
+                    SendNotification("Left hand is toggled");
                 }
             }
 
@@ -160,7 +139,7 @@ bool CLeapMonitor::DoPulse()
                 if(m_rightHotkey)
                 {
                     SendCommand("setting right_hand");
-                    SendNotification("Right hand toggled");
+                    SendNotification("Right hand is toggled");
                 }
             }
 
@@ -171,41 +150,52 @@ bool CLeapMonitor::DoPulse()
                 if(m_reloadHotkey)
                 {
                     SendCommand("setting reload_config");
-                    SendNotification("Configuration reloaded");
+                    SendNotification("Configuration is reloaded");
                 }
+            }
+        }
+    }
+
+    if(m_leapActive)
+    {
+        LEAP_CONNECTION_MESSAGE l_message;
+        while(LeapPollConnection(m_leapConnection, 0U, &l_message) == eLeapRS_Success)
+        {
+            if(l_message.type == eLeapEventType_None) break;
+            switch(l_message.type)
+            {
+                case eLeapEventType_Connection:
+                    SendNotification("Connected to Leap Service");
+                    break;
+                case eLeapEventType_ConnectionLost:
+                    SendNotification("Connection to Leap Service is lost");
+                    break;
+                case eLeapEventType_Device:
+                {
+                    if(!m_leapDevice)
+                    {
+                        if(LeapOpenDevice(l_message.device_event->device, &m_leapDevice) != eLeapRS_Success) m_leapDevice = nullptr;
+                    }
+                    SendNotification("New device is connected");
+                } break;
+                case eLeapEventType_DeviceFailure:
+                    SendNotification("Device failure");
+                    break;
+                case eLeapEventType_Policy:
+                    SendNotification("New policies are applied/cleared");
+                    break;
+                case eLeapEventType_DeviceLost:
+                    SendNotification("Device is lost");
+                    break;
+                case eLeapEventType_DeviceStatusChange:
+                    SendNotification("Device status is changed");
+                    break;
             }
         }
     }
 
     std::this_thread::sleep_for(g_threadDelay);
     return m_active;
-}
-
-void CLeapMonitor::UpdateGameProfile(const char *f_appKey)
-{
-    GameProfile l_newProfile;
-    switch(ReadEnumVector(f_appKey, g_steamAppKeys))
-    {
-        case SAI_VRChat: case SAI_VRChatNoSteam:
-            l_newProfile = GP_VRChat;
-            break;
-        default:
-            l_newProfile = GP_Default;
-            break;
-    }
-    if(m_gameProfile != l_newProfile)
-    {
-        m_gameProfile = l_newProfile;
-
-        std::string l_command("profile ");
-        l_command.append(g_profileName[m_gameProfile]);
-        SendCommand(l_command.c_str());
-
-        std::string l_notifyText("Game profile has been changed to '");
-        l_notifyText.append(g_profileName[m_gameProfile]);
-        l_notifyText.push_back('\'');
-        SendNotification(l_notifyText.c_str());
-    }
 }
 
 void CLeapMonitor::SendCommand(const char *f_char)
@@ -223,10 +213,18 @@ void CLeapMonitor::SendNotification(const char *f_text)
     {
         if(std::strlen(f_text) != 0U)
         {
-            m_notificationLock.lock();
             if(m_notificationID) vr::VRNotifications()->RemoveNotification(m_notificationID);
             vr::VRNotifications()->CreateNotification(m_overlayHandle, 500U, vr::EVRNotificationType_Transient, f_text, vr::EVRNotificationStyle_None, nullptr, &m_notificationID);
-            m_notificationLock.unlock();
         }
     }
+}
+
+void* CLeapMonitor::AllocateMemory(uint32_t size, eLeapAllocatorType typeHint, void *state)
+{
+    return new uint8_t[size];
+}
+
+void CLeapMonitor::DeallocateMemory(void *ptr, void *state)
+{
+    delete[]reinterpret_cast<uint8_t*>(ptr);
 }

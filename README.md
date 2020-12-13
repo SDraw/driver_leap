@@ -1,8 +1,6 @@
 # Driver Leap [![Build status](https://ci.appveyor.com/api/projects/status/2pc49d2hpt2hx944?svg=true)](https://ci.appveyor.com/project/SDraw/driver-leap) [![Release](http://img.shields.io/github/release/SDraw/driver_leap.svg)](../../releases/latest)
 
-Fork with updated vendor libraries and extended features.
-
-[![](./.github/repository_img.png)](https://www.youtube.com/playlist?list=PLiEPsxTlqsDk5GKcgsmeDQNRs7KV8lI-s)
+Fork with updated vendor libraries.
   
 ## Installation (for users)
 * Install [latest Orion Beta](https://developer.leapmotion.com/get-started)
@@ -12,6 +10,63 @@ Fork with updated vendor libraries and extended features.
 "activateMultipleDrivers": true,
 ```
 
+## Usage
+### Settings
+Driver settings are configurated by editing `resources/settings.xml`. Available settings:
+* `emulatedController`: emulated controllers type. Can be `vive`, `index` or `oculus`. `index` by default.
+* `rightHand/leftHand`: sets enabling of virtual controller for specific hand. `true` by default.
+* `orientation`: Leap Motion controller mouting type. Can be `hmd` or `desktop`. `hmd` by default.
+* `trackingLevel`: skeleton tracking style for OpenVR. Can be `partial` or `full`. `partial` by default.
+* `desktopOffset`: global position offset from head in `desktop` orientation.
+* `leftHandOffset/rightHandOffset`: local offset position for specific hand controller.
+* `leftHandOffsetRotation/rightHandOffsetRotation`: local offset rotation for specific hand controller.
+* `handsReset`: marks controllers as out of range if hand for controller isn't detected by Leap Motion. `false` by default.
+* `interpolation`: enables internal Leap Motion data capture interpolation. `false` by default.
+* `useVelocity`: enables velocity data from Leap Motion for hands. `false` by default.
+
+### Gestures
+List of hands gestures that are used in tracking:
+* **Grab:** bending of middle, ring and pinky fingers.
+* **Trigger:** bending of index finger.
+* **Thumb press:** touching of middle segment of index finger by thumb.
+* **Opisthenar touch:** tounching of opisthenar by index finger of opposite hand.
+* **Palm touch:** touching of palm by index finger of opposite hand.
+* **Thumb touch:** touching of thumb finger by index finger of opposite hand.
+* **Middle touch:** touching of middle finger by index finger of opposite hand.
+* **Palm UV:** pointing index finger of opposite hand to palm.
+
+### Input list
+#### Vive wand emulation
+* **System** -> **Opisthenar touch**
+* **Menu** -> **Palm touch**
+* **Grip** -> **Grab**
+* **Trigger** -> **Trigger**
+* **Touchpad touch** -> slight **Thumb press**
+* **Touchpad press** -> full **Thumb press**
+* **Touchpad XY** -> **Palm UV**
+
+#### Index controller emulation
+* **System** -> **Opisthenar touch**
+* **Grip** -> **Grab**
+* **Trigger** -> **Trigger**
+* **A** -> **Palm touch**
+* **B** -> **Middle touch**
+* **Touchpad touch** -> slight **Thumb press**
+* **Touchpad press** -> full **Thumb press**
+* **Touchpad XY** -> **Palm UV**
+* **Thumbstick** -> **Thumb touch**
+* **Thumbstick XY** -> Not implemented due to lack of free gestures
+
+#### Oculus Touch emulation
+* **System** -> **Opisthenar touch**
+* **Trigger** -> **Trigger**
+* **Grip** -> **Grab**
+* **X/A** -> **Middle touch**
+* **Y/B** -> **Palm touch**
+* **Thumbstick touch** -> slight **Thumb press**
+* **Thumbstick press** -> full **Thumb press**
+* **Thumbstick XY** -> **Palm UV**
+
 ## Building (for developers)
 * Open `driver_leap.sln` solution in Visual Studio 2013
 * Build your platform:
@@ -19,64 +74,9 @@ Fork with updated vendor libraries and extended features.
   * x86 - build output is in `bin/win32`
 * Copy build files to `<SteamVR_folder>/drivers/leap/bin/<your_platform>`:
   * `driver_leap.dll`
-  * `gesture_checker.exe`
   * `leap_monitor.exe`  
   **Note:** There are post-build events for projects to copy build files directly to SteamVR driver folder that can be enabled manually.
 * Copy additional shared libraries to `<SteamVR_folder>/drivers/leap/bin/<your_platform>`:
   * `vendor/LeapSDK/bin/<your_platform>/LeapC.dll`
   * `vendor/openvr/bin/<your_platform>/openvr_api.dll`
 * Copy `resources` folder from solution root to `<SteamVR_folder>/drivers/leap`. 
-  
-## Control configuration and inputs
-Driver can emulate HTC Vive controllers and Valve Index controllers with skeletal animation and work in desktop and HMD orientations. It's adjusted by editing `settings.xml` in `resources` folder.  
-There are more configurable restrictions, such as global input, trackpad, trigger, grip and etc. Check [wiki page](../../wiki/Offset-settings) for few offset settings reported from users.  
-Controls are changed by game profiles that are enabled automatically when game is started from Steam.  
-Available hotkeys in NumLock active state:
-* **Ctrl-P:** Enable/disable right hand controller.
-* **Ctrl-O:** Enable/disable left hand controller.
-* **Ctrl-\ (or Ctrl-|):** Reload configuration.
-
-## HTC Vive controllers emulation
-Game profiles:
-  * **vrchat** - profile for VRChat. Control restrictions are ignored.  
-  Controls list:
-    * Gun - corresponding hand gesture
-    * V-shape - corresponding hand gesture
-    * Point - corresponding hand gesture
-    * Rock out - corresponding hand gesture
-    * Thumbs up - corresponding hand gesture
-    * Spread hand - corresponding hand gesture. Also corresponds to grip button.
-    * Trigger - grab gesture
-    * Application menu - formed T-shape with two hands
-  * **default** - profile for other games.  
-  Controls list:
-    * Trigger - bending of the index finger
-    * Grip - grab gesture
-    * System menu - formed T-shape with two hands
-    * Application menu - hand with palm directed towards face
-    * Touchpad - thumb press
-    * Touchpad circle - index finger of another hand directed to palm
-    
-## Valve Index controllers emulation 
-Game profiles:
-  * **vrchat** - profile for VRChat. Note: game gestures are not implemented due to finger tracking, grip input profile should be used.  
-  Controls list:
-    * Trigger - bending of the index finger
-    * Grip - grab gesture
-    * Game menu - formed T-shape with two hands
-  * **default** - profile for other games.  
-  Controls list:
-    * Trigger - bending of the index finger
-    * Grip - bending of middle, ring and pinky fingers
-    * Touchpad - thumb press
-    * Touchpad circle - index finger of another hand directed to palm
-    * Thumbstick press - touching of thumb finger tip and index finger tip of another hand
-    * Thumbstick direction - arrow keys for left hand, Num2/8/4/6 keys for right hand; available when NumLock is active
-    * Button A - touching of thumb and middle finger tips
-    * Button B - touching of thumb and pinky finger tips
-    * System button - formed T-shape with two hands
-    
-## Notes
-There were a lot of questions about hooking position and button states from real controllers and reroute to virtual ones adding finger tracking from Leap Motion. Sadly, it's not fully possible.  
-After adding virtual controllers SteamVR sets them as primary, and at the same time sets real controllers as non-primary. Interesting observation: SteamVR doesn't send any buttons data from non-primary controllers, nor through legacy input, nor through new action input system. Moreover, new action input system lacks support of more than two active controllers.  
-This interesting idea was failed successully.

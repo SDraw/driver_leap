@@ -4,11 +4,10 @@
 #define NOMINMAX
 #include <Windows.h>
 
+#include <string>
 #include <set>
 #include <chrono>
 #include <thread>
-#include <mutex>
-#include <atomic>
 
 #include "openvr.h"
-#include "LeapC++.h"
+#include "LeapC.h"

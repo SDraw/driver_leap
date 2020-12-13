@@ -4,15 +4,11 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="CLeapMonitor.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="Utils.h" />
-    <ClInclude Include="CLeapListener.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="CLeapMonitor.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Utils.cpp" />
-    <ClCompile Include="CLeapListener.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="leap_monitor.rc" />

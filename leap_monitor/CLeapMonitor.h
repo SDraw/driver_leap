@@ -1,7 +1,5 @@
 #pragma once
 
-class CLeapListener;
-
 class CLeapMonitor final
 {
     enum GameProfile : unsigned char
@@ -10,18 +8,17 @@ class CLeapMonitor final
         GP_VRChat
     };
 
-    std::atomic<bool> m_active;
-
+    bool m_active;
     vr::IVRSystem *m_vrSystem;
     vr::VRNotificationId m_notificationID;
     vr::VROverlayHandle_t m_overlayHandle;
     vr::VREvent_t m_event;
 
-    Leap::Controller *m_leapController;
-    CLeapListener *m_leapListener;
+    bool m_leapActive;
+    LEAP_CONNECTION m_leapConnection;
+    LEAP_ALLOCATOR m_leapAllocator;
+    LEAP_DEVICE m_leapDevice;
 
-    GameProfile m_gameProfile;
-    std::mutex m_notificationLock;
     uint32_t m_relayDevice;
     bool m_leftHotkey;
     bool m_rightHotkey;
@@ -31,7 +28,9 @@ class CLeapMonitor final
     CLeapMonitor& operator=(const CLeapMonitor &that) = delete;
 
     void SendCommand(const char *f_cmd);
-    void UpdateGameProfile(const char *f_appKey);
+
+    static void* AllocateMemory(uint32_t size, eLeapAllocatorType typeHint, void *state);
+    static void DeallocateMemory(void *ptr, void *state);
 public:
     CLeapMonitor();
     ~CLeapMonitor();
@@ -40,5 +39,5 @@ public:
     void Terminate();
     bool DoPulse();
 
-    void SendNotification(const char *f_text); // Async method
+    void SendNotification(const char *f_text);
 };
