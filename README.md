@@ -67,8 +67,20 @@ List of hands gestures that are used in tracking:
 * **Thumbstick press** -> full **Thumb press**
 * **Thumbstick XY** -> **Palm UV**
 
+## Notes
+Currently there is [a strange behaviour of tracking problems that affect AMD and few Intel systems](../../issues/56). If you're encountering with tracking problems, it's adviced to build driver on your system. Refer to **Building** section below.
+
 ## Building (for developers)
-* Open `driver_leap.sln` solution in Visual Studio 2013
+* Clone repository with `git`:
+```
+git clone https://github.com/SDraw/driver_leap.git
+```
+* Initialize submodules:
+```
+cd driver_leap
+git submodule update --init --depth=1
+```
+* Open `driver_leap.sln` solution in Visual Studio (2013 and up)
 * Build your platform:
   * x64 - build output is in `bin/win64`
   * x86 - build output is in `bin/win32`
