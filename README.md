@@ -3,7 +3,7 @@
 Fork with updated vendor libraries.
   
 ## Installation (for users)
-* Choose one of this options:
+* Choose one of these options:
   * **For Windows 7, 8, 8.1 and 10:** Install [Orion (v4)](https://developer.leapmotion.com/sdk-leap-motion-controller)
   * **For Windows 10 only:** Install [Gemini (v5)](https://developer.leapmotion.com/gemini-v5-preview)
 * Extract [latest release archive](../../releases/latest) for your platform to `<SteamVR_folder>/drivers`
