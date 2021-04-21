@@ -94,3 +94,4 @@ git submodule update --init --depth=1
   * `vendor/LeapSDK/bin/<your_platform>/LeapC.dll`
   * `vendor/openvr/bin/<your_platform>/openvr_api.dll`
 * Copy `resources` folder from solution root to `<SteamVR_folder>/drivers/leap`. 
+* Copy `driver.vrdrivermanifest` file from solution root to `<SteamVR_folder>/drivers/leap
