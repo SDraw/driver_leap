@@ -1,11 +1,9 @@
-# Driver Leap [![Build status](https://ci.appveyor.com/api/projects/status/2pc49d2hpt2hx944?svg=true)](https://ci.appveyor.com/project/SDraw/driver-leap) [![Release](http://img.shields.io/github/release/SDraw/driver_leap.svg)](../../releases/latest)
+# Driver Leap [![Release](http://img.shields.io/github/release/SDraw/driver_leap.svg)](../../releases/latest)
 Fork with updated vendor libraries.
   
 ## Installation (for users)
-* Choose one of these options:
-  * **For Windows 7, 8, 8.1 and 10:** Install [Orion (v4)](https://developer.leapmotion.com/sdk-leap-motion-controller)
-  * **For Windows 10 only:** Install [Gemini (v5)](https://developer.leapmotion.com/gemini-v5-preview)
-* Extract [latest release archive](../../releases/latest) for your platform to `<SteamVR_folder>/drivers`
+* Install [Orion (v4)](https://developer.leapmotion.com/sdk-leap-motion-controller) or [Gemini (v5)](https://developer.leapmotion.com/gemini-v5-preview)
+* Extract [latest release archive](../../releases/latest) to `<SteamVR_folder>/drivers`
 * Add line in section `steamvr` of `<Steam_folder>/config/steamvr.vrsettings` file:
 ```JSON
 "activateMultipleDrivers": true,
@@ -69,7 +67,7 @@ List of hands gestures that are used in tracking:
 * **Thumbstick XY** -> **Palm UV**
 
 ## Notes
-Currently there is [a strange behaviour of tracking problems that affect AMD and few Intel systems](../../issues/56). If you're encountering with tracking problems, it's adviced to build driver on your system. Refer to **Building** section below.
+Currently there is a strange behaviour of tracking problems that affect AMD and few Intel systems. If you're encountering with tracking problems, it's adviced to choose different release with higher `vc####`, or build driver on your system. Refer to **Building** section below.
 
 ## Building (for developers)
 * Clone repository with `git`:
@@ -93,4 +91,4 @@ git submodule update --init --depth=1
   * `vendor/LeapSDK/bin/<your_platform>/LeapC.dll`
   * `vendor/openvr/bin/<your_platform>/openvr_api.dll`
 * Copy `resources` folder from solution root to `<SteamVR_folder>/drivers/leap`. 
-* Copy `driver.vrdrivermanifest` file from solution root to `<SteamVR_folder>/drivers/leap
+* Copy `driver.vrdrivermanifest` file from solution root to `<SteamVR_folder>/drivers/leap`.
