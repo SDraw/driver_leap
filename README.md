@@ -67,7 +67,7 @@ List of hands gestures that are used in tracking:
 * **Thumbstick XY** -> **Palm UV**
 
 ## Notes
-Currently there is a strange behaviour of tracking problems that affect AMD and few Intel systems. If you're encountering with tracking problems, it's adviced to choose different release with higher `vc####`, or build driver on your system. Refer to **Building** section below.
+Currently there is a strange behaviour of tracking problems that affect AMD and few Intel systems. If you're encountering with tracking problems, it's adviced to choose different release with higher `vs####`, or build driver on your system. Refer to **Building** section below.
 
 ## Building (for developers)
 * Clone repository with `git`:
