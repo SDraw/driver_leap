@@ -89,7 +89,7 @@ vr::EVRInitError CServerDriver::Init(vr::IVRDriverContext *pDriverContext)
     if(m_leapPoller->Initialize())
     {
         m_leapPoller->SetPolicy(eLeapPolicyFlag_AllowPauseResume);
-        if(CDriverConfig::GetOrientationMode() == CDriverConfig::OM_HMD) m_leapPoller->SetPolicy(eLeapPolicyFlag_OptimizeHMD);
+        m_leapPoller->SetTrackingMode((CDriverConfig::GetOrientationMode() == CDriverConfig::OM_HMD) ? eLeapTrackingMode_HMD : eLeapTrackingMode_Desktop);
     }
     //m_connectionState = true;
 
@@ -226,10 +226,7 @@ void CServerDriver::ProcessExternalMessage(const char *f_message)
                         case SC_ReloadConfig:
                         {
                             CDriverConfig::Load();
-
-                            // Change orientation mode
-                            if(CDriverConfig::GetOrientationMode() == CDriverConfig::OM_HMD) m_leapPoller->SetPolicy(eLeapPolicyFlag_OptimizeHMD);
-                            else m_leapPoller->SetPolicy(0U, eLeapPolicyFlag_OptimizeHMD);
+                            m_leapPoller->SetTrackingMode((CDriverConfig::GetOrientationMode() == CDriverConfig::OM_HMD) ? eLeapTrackingMode_HMD : eLeapTrackingMode_Desktop);
                         } break;
                     }
                 }

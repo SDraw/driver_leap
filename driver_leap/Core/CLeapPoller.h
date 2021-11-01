@@ -31,6 +31,7 @@ public:
     const LEAP_TRACKING_EVENT* GetFrame();
 
     void SetPolicy(uint64_t f_set, uint64_t f_clear = 0U);
+    void SetTrackingMode(eLeapTrackingMode f_mode);
     void SetPaused(bool f_state);
 
     void Update();

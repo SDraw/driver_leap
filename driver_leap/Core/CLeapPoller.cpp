@@ -96,6 +96,11 @@ const LEAP_TRACKING_EVENT* CLeapPoller::GetFrame()
     return l_result;
 }
 
+void CLeapPoller::SetTrackingMode(eLeapTrackingMode f_mode)
+{
+    if(m_active) LeapSetTrackingMode(m_connection, f_mode);
+}
+
 void CLeapPoller::SetPolicy(uint64_t f_set, uint64_t f_clear)
 {
     if(m_active) LeapSetPolicyFlags(m_connection, f_set, f_clear);

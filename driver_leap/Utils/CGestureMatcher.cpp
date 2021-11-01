@@ -17,17 +17,18 @@ void CGestureMatcher::GetGestures(const LEAP_HAND *f_hand, std::vector<float> &f
     {
         const LEAP_DIGIT &l_finger = f_hand->digits[i];
         glm::vec3 l_prevDirection;
-        for(size_t j = 0U; j < 4U; j++)
+        const size_t l_startBoneIndex = ((i == 0U) ? 1U : 0U);
+        for(size_t j = l_startBoneIndex; j < 4U; j++)
         {
             const LEAP_BONE &l_bone = l_finger.bones[j];
             glm::vec3 l_direction(l_bone.next_joint.x - l_bone.prev_joint.x, l_bone.next_joint.y - l_bone.prev_joint.y, l_bone.next_joint.z - l_bone.prev_joint.z);
             l_direction = glm::normalize(l_direction);
-            if(j > 0) l_fingerBend[i] += glm::acos(glm::dot(l_direction, l_prevDirection));
+            if(j > l_startBoneIndex) l_fingerBend[i] += glm::acos(glm::dot(l_direction, l_prevDirection));
             l_prevDirection = l_direction;
         }
     }
 
-    for(size_t i = 0U; i <= HG_PinkyBend; i++) f_result[i] = NormalizeRange(l_fingerBend[i], g_piHalf, g_pi);
+    for(size_t i = 0U; i <= HG_PinkyBend; i++) f_result[i] = NormalizeRange(l_fingerBend[i], (i == 0U) ? 0.f : g_piQuarter, (i == 0U) ? g_piQuarter : g_pi);
 
     // Simple gestures
     f_result[HG_Trigger] = f_result[HG_IndexBend];
