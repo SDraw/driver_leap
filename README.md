@@ -2,7 +2,7 @@
 Fork with updated vendor libraries.
   
 ## Installation (for users)
-* Install [Orion (v4)](https://developer.leapmotion.com/sdk-leap-motion-controller) or [Gemini (v5)](https://developer.leapmotion.com/gemini-v5-preview)
+* Install [Ultraleap Gemini v5.2.0](https://developer.leapmotion.com/tracking-software-download)
 * Extract [latest release archive](../../releases/latest) to `<SteamVR_folder>/drivers`
 * Add line in section `steamvr` of `<Steam_folder>/config/steamvr.vrsettings` file:
 ```JSON
@@ -82,13 +82,12 @@ git submodule update --init --depth=1
 * Open `driver_leap.sln` solution in Visual Studio (2013 and up)
 * Build your platform:
   * x64 - build output is in `bin/win64`
-  * x86 - build output is in `bin/win32`
-* Copy build files to `<SteamVR_folder>/drivers/leap/bin/<your_platform>`:
+* Copy build files to `<SteamVR_folder>/drivers/leap/bin/win64`:
   * `driver_leap.dll`
   * `leap_monitor.exe`  
   **Note:** There are post-build events for projects to copy build files directly to SteamVR driver folder that can be enabled manually.
-* Copy additional shared libraries to `<SteamVR_folder>/drivers/leap/bin/<your_platform>`:
-  * `vendor/LeapSDK/bin/<your_platform>/LeapC.dll`
-  * `vendor/openvr/bin/<your_platform>/openvr_api.dll`
+* Copy additional shared libraries to `<SteamVR_folder>/drivers/leap/bin/win64`:
+  * `vendor/LeapSDK/bin/x64/LeapC.dll`
+  * `vendor/openvr/bin/win64/openvr_api.dll`
 * Copy `resources` folder from solution root to `<SteamVR_folder>/drivers/leap`. 
 * Copy `driver.vrdrivermanifest` file from solution root to `<SteamVR_folder>/drivers/leap`.
