@@ -123,7 +123,7 @@ void CLeapPoller::Update()
             m_frameLock.unlock();
         }
 
-        LEAP_CONNECTION_INFO l_info;
+        LEAP_CONNECTION_INFO l_info = {sizeof(l_info)};
         if(LeapGetConnectionInfo(m_connection, &l_info) == eLeapRS_Success) m_connected = (l_info.status == eLeapConnectionStatus_Connected);
         else m_connected = false;
     }
