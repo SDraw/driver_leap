@@ -1,7 +1,7 @@
 #pragma once
 
 class CLeapPoller;
-class CLeapController;
+class CLeapControllerIndex;
 class CLeapStation;
 
 class CServerDriver final : public vr::IServerTrackedDeviceProvider
@@ -18,7 +18,7 @@ class CServerDriver final : public vr::IServerTrackedDeviceProvider
 
     bool m_connectionState;
     CLeapPoller *m_leapPoller;
-    CLeapController *m_controllers[LCH_Count];
+    CLeapControllerIndex *m_controllers[LCH_Count];
     CLeapStation *m_leapStation;
 
     CServerDriver(const CServerDriver &that) = delete;

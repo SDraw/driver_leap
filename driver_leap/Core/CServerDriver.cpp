@@ -2,9 +2,7 @@
 
 #include "Core/CServerDriver.h"
 #include "Core/CLeapPoller.h"
-#include "Devices/CLeapController/CLeapControllerVive.h"
 #include "Devices/CLeapController/CLeapControllerIndex.h"
-#include "Devices/CLeapController/CLeapControllerOculus.h"
 #include "Devices/CLeapStation.h"
 
 #include "Core/CDriverConfig.h"
@@ -14,22 +12,63 @@ extern char g_modulePath[];
 
 const std::vector<std::string> g_debugRequests
 {
-    "setting"
+    "input"
 };
 enum DebugRequest : size_t
 {
-    DR_Setting = 0U
+    DR_Input = 0U
 };
 
-const std::vector<std::string> g_settingCommands
+const std::vector<std::string> g_inputHands
 {
-    "left_hand", "right_hand", "reload_config"
+    "left", "right"
 };
-enum SettingCommand : size_t
+enum InputHands : size_t
 {
-    SC_LeftHand = 0U,
-    SC_RightHand,
-    SC_ReloadConfig
+    IH_LeftHand = 0U,
+    IH_RightHand
+};
+
+const std::vector<std::string> g_buttonTypes
+{
+    "button", "axis"
+};
+enum ButtonTypes : size_t
+{
+    BT_Button = 0U,
+    BT_Axis
+};
+
+const std::vector<std::string> g_buttonNames
+{
+    "a", "b", "system"
+};
+enum ButtonNames : size_t
+{
+    BN_A = 0U,
+    BN_B,
+    BN_System
+};
+
+const std::vector<std::string> g_axisNames
+{
+    "thumbstick", "touchpad"
+};
+enum AxisNames : size_t
+{
+    AN_Thumbstick = 0U,
+    AN_Touchpad
+};
+
+const std::vector<std::string> g_buttonStates
+{
+    "none", "touched", "clicked"
+};
+enum ButtonStates : size_t
+{
+    BS_None = 0U,
+    BS_Touched,
+    BS_Clicked
 };
 
 const char* const CServerDriver::ms_interfaces[]
@@ -57,48 +96,32 @@ vr::EVRInitError CServerDriver::Init(vr::IVRDriverContext *pDriverContext)
     VR_INIT_SERVER_DRIVER_CONTEXT(pDriverContext);
     CDriverConfig::Load();
 
-    // Relay device for events from leap_monitor
+    // Relay device for events from leap_control
     m_leapStation = new CLeapStation(this);
     vr::VRServerDriverHost()->TrackedDeviceAdded(m_leapStation->GetSerialNumber().c_str(), vr::TrackedDeviceClass_TrackingReference, m_leapStation);
 
-    switch(CDriverConfig::GetEmulatedController())
-    {
-        case CDriverConfig::EC_Vive:
-        {
-            if(CDriverConfig::IsLeftHandEnabled()) m_controllers[LCH_Left] = new CLeapControllerVive(CLeapController::CH_Left);
-            if(CDriverConfig::IsRightHandEnabled()) m_controllers[LCH_Right] = new CLeapControllerVive(CLeapController::CH_Right);
-        } break;
-        case CDriverConfig::EC_Index:
-        {
-            if(CDriverConfig::IsLeftHandEnabled()) m_controllers[LCH_Left] = new CLeapControllerIndex(CLeapController::CH_Left);
-            if(CDriverConfig::IsRightHandEnabled()) m_controllers[LCH_Right] = new CLeapControllerIndex(CLeapController::CH_Right);
-        } break;
-        case CDriverConfig::EC_Oculus:
-        {
-            if(CDriverConfig::IsLeftHandEnabled()) m_controllers[LCH_Left] = new CLeapControllerOculus(CLeapController::CH_Left);
-            if(CDriverConfig::IsRightHandEnabled()) m_controllers[LCH_Right] = new CLeapControllerOculus(CLeapController::CH_Right);
-        } break;
-    }
+    m_controllers[LCH_Left] = new CLeapControllerIndex(CLeapController::CH_Left);
+    m_controllers[LCH_Right] = new CLeapControllerIndex(CLeapController::CH_Right);
 
     for(size_t i = 0U; i < LCH_Count; i++)
     {
-        if(m_controllers[i]) vr::VRServerDriverHost()->TrackedDeviceAdded(m_controllers[i]->GetSerialNumber().c_str(), vr::TrackedDeviceClass_Controller, m_controllers[i]);
+        vr::VRServerDriverHost()->TrackedDeviceAdded(m_controllers[i]->GetSerialNumber().c_str(), vr::TrackedDeviceClass_Controller, m_controllers[i]);
     }
 
     m_leapPoller = new CLeapPoller();
     if(m_leapPoller->Initialize())
     {
         m_leapPoller->SetPolicy(eLeapPolicyFlag_AllowPauseResume);
-        m_leapPoller->SetTrackingMode((CDriverConfig::GetOrientationMode() == CDriverConfig::OM_HMD) ? eLeapTrackingMode_HMD : eLeapTrackingMode_Desktop);
+        m_leapPoller->SetTrackingMode(_eLeapTrackingMode::eLeapTrackingMode_HMD);
+        m_leapPoller->SetPolicy(eLeapPolicyFlag::eLeapPolicyFlag_OptimizeHMD, eLeapPolicyFlag::eLeapPolicyFlag_OptimizeScreenTop);
     }
-    //m_connectionState = true;
 
-    // Start utility app that closes itself on SteamVR shutdown
+    // Start leap_control
     std::string l_path(g_modulePath);
     l_path.erase(l_path.begin() + l_path.rfind('\\'), l_path.end());
 
     std::string l_appPath(l_path);
-    l_appPath.append("\\leap_monitor.exe");
+    l_appPath.append("\\leap_control.exe");
 
     STARTUPINFOA l_infoProcess = { 0 };
     PROCESS_INFORMATION l_monitorInfo = { 0 };
@@ -141,7 +164,7 @@ void CServerDriver::RunFrame()
         m_leapStation->SetTrackingState(m_connectionState ? CLeapStation::TS_Connected : CLeapStation::TS_Search);
         for(size_t i = 0U; i < LCH_Count; i++)
         {
-            if(m_controllers[i]) m_controllers[i]->SetEnabled(m_connectionState);
+            m_controllers[i]->SetEnabled(m_connectionState);
         }
     }
 
@@ -163,7 +186,7 @@ void CServerDriver::RunFrame()
     // Update devices
     for(size_t i = 0U; i < LCH_Count; i++)
     {
-        if(m_controllers[i]) m_controllers[i]->RunFrame(l_hands[i],l_hands[(i+1)%LCH_Count]);
+        m_controllers[i]->RunFrame(l_hands[i], l_hands[(i + 1) % LCH_Count]);
     }
     m_leapStation->RunFrame();
 }
@@ -182,52 +205,121 @@ void CServerDriver::LeaveStandby()
 }
 
 // CServerDriver
-void CServerDriver::TryToPause()
-{
-    if(m_leapPoller)
-    {
-        bool l_pause = false;
-        for(size_t i = 0U; i < LCH_Count; i++)
-        {
-            if(m_controllers[i]) l_pause = (l_pause || !m_controllers[i]->IsEnabled());
-        }
-        m_leapPoller->SetPaused(l_pause);
-    }
-}
-
 void CServerDriver::ProcessExternalMessage(const char *f_message)
 {
     std::stringstream l_stream(f_message);
     std::string l_event;
 
+    // Scary stuff
     l_stream >> l_event;
     if(!l_stream.fail() && !l_event.empty())
     {
         switch(ReadEnumVector(l_event, g_debugRequests))
         {
-            case DR_Setting:
+            case DR_Input:
             {
-                std::string l_settingCommand;
-                l_stream >> l_settingCommand;
-                if(!l_stream.fail() && !l_settingCommand.empty())
+                std::string l_inputHand;
+                l_stream >> l_inputHand;
+                if(!l_stream.fail() && !l_inputHand.empty())
                 {
-                    size_t l_setting = ReadEnumVector(l_settingCommand, g_settingCommands);
-                    switch(l_setting)
+                    size_t l_inputHandIndex = ReadEnumVector(l_inputHand, g_inputHands);
+                    if(l_inputHandIndex != std::numeric_limits<size_t>::max())
                     {
-                        case SC_LeftHand: case SC_RightHand:
+                        std::string l_buttonType;
+                        l_stream >> l_buttonType;
+                        if(!l_stream.fail() && !l_buttonType.empty())
                         {
-                            if(m_connectionState && m_controllers[l_setting])
+                            size_t l_buttonTypeIndex = ReadEnumVector(l_buttonType, g_buttonTypes);
+                            if(l_buttonTypeIndex != std::numeric_limits<size_t>::max())
                             {
-                                bool l_enabled = m_controllers[l_setting]->IsEnabled();
-                                m_controllers[l_setting]->SetEnabled(!l_enabled);
-                                TryToPause();
+                                switch(l_buttonTypeIndex)
+                                {
+                                    case ButtonTypes::BT_Button:
+                                    {
+                                        std::string l_buttonName;
+                                        l_stream >> l_buttonName;
+                                        if(!l_stream.fail() && !l_buttonName.empty())
+                                        {
+                                            size_t l_buttonNameIndex = ReadEnumVector(l_buttonName, g_buttonNames);
+                                            if(l_buttonNameIndex != std::numeric_limits<size_t>::max())
+                                            {
+                                                std::string l_buttonState;
+                                                l_stream >> l_buttonState;
+                                                if(!l_stream.fail() && !l_buttonState.empty())
+                                                {
+                                                    size_t l_buttonStateIndex = ReadEnumVector(l_buttonState, g_buttonStates);
+                                                    if(l_buttonStateIndex != std::numeric_limits<size_t>::max())
+                                                    {
+                                                        switch(l_buttonNameIndex)
+                                                        {
+                                                            case ButtonNames::BN_A:
+                                                            {
+                                                                m_controllers[l_inputHandIndex]->SetButtonState(CLeapControllerIndex::IB_ATouch, l_buttonStateIndex >= ButtonStates::BS_Touched);
+                                                                m_controllers[l_inputHandIndex]->SetButtonState(CLeapControllerIndex::IB_AClick, l_buttonStateIndex >= ButtonStates::BS_Clicked);
+                                                            } break;
+                                                            case ButtonNames::BN_B:
+                                                            {
+                                                                m_controllers[l_inputHandIndex]->SetButtonState(CLeapControllerIndex::IB_BTouch, l_buttonStateIndex >= ButtonStates::BS_Touched);
+                                                                m_controllers[l_inputHandIndex]->SetButtonState(CLeapControllerIndex::IB_BClick, l_buttonStateIndex >= ButtonStates::BS_Clicked);
+                                                            } break;
+                                                            case ButtonNames::BN_System:
+                                                            {
+                                                                m_controllers[l_inputHandIndex]->SetButtonState(CLeapControllerIndex::IB_SystemTouch, l_buttonStateIndex >= ButtonStates::BS_Touched);
+                                                                m_controllers[l_inputHandIndex]->SetButtonState(CLeapControllerIndex::IB_SystemClick, l_buttonStateIndex >= ButtonStates::BS_Clicked);
+                                                            } break;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    } break;
+
+                                    case ButtonTypes::BT_Axis:
+                                    {
+                                        std::string l_axisName;
+                                        l_stream >> l_axisName;
+                                        if(!l_stream.fail() && !l_axisName.empty())
+                                        {
+                                            size_t l_axisNameIndex = ReadEnumVector(l_axisName, g_axisNames);
+                                            if(l_axisNameIndex != std::numeric_limits<size_t>::max())
+                                            {
+                                                std::string l_buttonState;
+                                                l_stream >> l_buttonState;
+                                                if(!l_stream.fail() && !l_buttonState.empty())
+                                                {
+                                                    size_t l_buttonStateIndex = ReadEnumVector(l_buttonState, g_buttonStates);
+                                                    if(l_buttonStateIndex != std::numeric_limits<size_t>::max())
+                                                    {
+                                                        glm::vec2 l_axisValues(0.f);
+                                                        l_stream >> l_axisValues.x >> l_axisValues.y;
+                                                        if(!l_stream.fail())
+                                                        {
+                                                            switch(l_axisNameIndex)
+                                                            {
+                                                                case AxisNames::AN_Thumbstick:
+                                                                {
+                                                                    m_controllers[l_inputHandIndex]->SetButtonState(CLeapControllerIndex::IB_ThumbstickTouch, l_buttonStateIndex >= ButtonStates::BS_Touched);
+                                                                    m_controllers[l_inputHandIndex]->SetButtonState(CLeapControllerIndex::IB_ThumbstickClick, l_buttonStateIndex >= ButtonStates::BS_Clicked);
+                                                                    m_controllers[l_inputHandIndex]->SetButtonValue(CLeapControllerIndex::IB_ThumbstickX, (l_buttonStateIndex >= ButtonStates::BS_Touched) ? l_axisValues.x : 0.f);
+                                                                    m_controllers[l_inputHandIndex]->SetButtonValue(CLeapControllerIndex::IB_ThumbstickY, (l_buttonStateIndex >= ButtonStates::BS_Touched) ? l_axisValues.y : 0.f);
+                                                                } break;
+                                                                case AxisNames::AN_Touchpad:
+                                                                {
+                                                                    m_controllers[l_inputHandIndex]->SetButtonState(CLeapControllerIndex::IB_TrackpadTouch, l_buttonStateIndex >= ButtonStates::BS_Touched);
+                                                                    m_controllers[l_inputHandIndex]->SetButtonValue(CLeapControllerIndex::IB_TrackpadForce, (l_buttonStateIndex == ButtonStates::BS_Clicked) ? 1.f : 0.f);
+                                                                    m_controllers[l_inputHandIndex]->SetButtonValue(CLeapControllerIndex::IB_TrackpadX, (l_buttonStateIndex >= ButtonStates::BS_Touched) ? l_axisValues.x : 0.f);
+                                                                    m_controllers[l_inputHandIndex]->SetButtonValue(CLeapControllerIndex::IB_TrackpadY, (l_buttonStateIndex >= ButtonStates::BS_Touched) ? l_axisValues.y : 0.f);
+                                                                } break;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    } break;
+                                }
                             }
-                        } break;
-                        case SC_ReloadConfig:
-                        {
-                            CDriverConfig::Load();
-                            m_leapPoller->SetTrackingMode((CDriverConfig::GetOrientationMode() == CDriverConfig::OM_HMD) ? eLeapTrackingMode_HMD : eLeapTrackingMode_Desktop);
-                        } break;
+                        }
                     }
                 }
             } break;

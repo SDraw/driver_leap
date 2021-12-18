@@ -56,6 +56,38 @@ class CLeapControllerIndex final : public CLeapController
     void UpdateGestures(const LEAP_HAND *f_hand, const LEAP_HAND *f_oppHand) override;
     void UpdateInputInternal() override;
 public:
+    enum IndexButton : size_t
+    {
+        IB_SystemClick = 0U,
+        IB_SystemTouch,
+        IB_TriggerClick,
+        IB_TriggerValue,
+        IB_TrackpadX,
+        IB_TrackpadY,
+        IB_TrackpadTouch,
+        IB_TrackpadForce,
+        IB_GripTouch,
+        IB_GripForce,
+        IB_GripValue,
+        IB_ThumbstickClick,
+        IB_ThumbstickTouch,
+        IB_ThumbstickX,
+        IB_ThumbstickY,
+        IB_AClick,
+        IB_ATouch,
+        IB_BClick,
+        IB_BTouch,
+        IB_FingerIndex,
+        IB_FingerMiddle,
+        IB_FingerRing,
+        IB_FingerPinky,
+
+        IB_Count
+    };
+
     explicit CLeapControllerIndex(unsigned char f_hand);
     ~CLeapControllerIndex();
+
+    void SetButtonState(size_t f_button, bool f_state);
+    void SetButtonValue(size_t f_button, float f_value);
 };

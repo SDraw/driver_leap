@@ -16,15 +16,6 @@ public:
         // Simple gestures
         HG_Trigger,
         HG_Grab,
-        HG_ThumbPress,
-
-        // Two-handed gesture
-        HG_OpisthenarTouch,
-        HG_PalmTouch,
-        HG_PalmPointX,
-        HG_PalmPointY,
-        HG_ThumbCrossTouch,
-        HG_MiddleCrossTouch,
 
         HG_Count
     };

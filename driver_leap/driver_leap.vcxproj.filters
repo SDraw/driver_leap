@@ -24,9 +24,6 @@
     <ClCompile Include="Devices\CLeapController\CLeapControllerIndex.cpp">
       <Filter>Devices\CLeapController</Filter>
     </ClCompile>
-    <ClCompile Include="Devices\CLeapController\CLeapControllerVive.cpp">
-      <Filter>Devices\CLeapController</Filter>
-    </ClCompile>
     <ClCompile Include="Core\CServerDriver.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -35,9 +32,6 @@
     </ClCompile>
     <ClCompile Include="Core\CDriverConfig.cpp">
       <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Devices\CLeapController\CLeapControllerOculus.cpp">
-      <Filter>Devices\CLeapController</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -60,9 +54,6 @@
     <ClInclude Include="Devices\CLeapController\CLeapControllerIndex.h">
       <Filter>Devices\CLeapController</Filter>
     </ClInclude>
-    <ClInclude Include="Devices\CLeapController\CLeapControllerVive.h">
-      <Filter>Devices\CLeapController</Filter>
-    </ClInclude>
     <ClInclude Include="Core\CServerDriver.h">
       <Filter>Core</Filter>
     </ClInclude>
@@ -71,9 +62,6 @@
     </ClInclude>
     <ClInclude Include="Core\CDriverConfig.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Devices\CLeapController\CLeapControllerOculus.h">
-      <Filter>Devices\CLeapController</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

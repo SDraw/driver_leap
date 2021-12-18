@@ -24,13 +24,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -129,8 +129,6 @@
     <ClInclude Include="Devices\CLeapController\CControllerButton.h" />
     <ClInclude Include="Devices\CLeapController\CLeapController.h" />
     <ClInclude Include="Devices\CLeapController\CLeapControllerIndex.h" />
-    <ClInclude Include="Devices\CLeapController\CLeapControllerOculus.h" />
-    <ClInclude Include="Devices\CLeapController\CLeapControllerVive.h" />
     <ClInclude Include="Devices\CLeapStation.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Utils\CGestureMatcher.h" />
@@ -147,8 +145,6 @@
     <ClCompile Include="Devices\CLeapController\CControllerButton.cpp" />
     <ClCompile Include="Devices\CLeapController\CLeapController.cpp" />
     <ClCompile Include="Devices\CLeapController\CLeapControllerIndex.cpp" />
-    <ClCompile Include="Devices\CLeapController\CLeapControllerOculus.cpp" />
-    <ClCompile Include="Devices\CLeapController\CLeapControllerVive.cpp" />
     <ClCompile Include="Devices\CLeapStation.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="stdafx.cpp">

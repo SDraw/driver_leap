@@ -22,35 +22,6 @@ enum HandFinger : size_t
     HF_Count
 };
 
-enum IndexButton : size_t
-{
-    IB_SystemClick = 0U,
-    IB_SystemTouch,
-    IB_TriggerClick,
-    IB_TriggerValue,
-    IB_TrackpadX,
-    IB_TrackpadY,
-    IB_TrackpadTouch,
-    IB_TrackpadForce,
-    IB_GripTouch,
-    IB_GripForce,
-    IB_GripValue,
-    IB_ThumbstickClick,
-    IB_ThumbstickTouch,
-    IB_ThumbstickX,
-    IB_ThumbstickY,
-    IB_AClick,
-    IB_ATouch,
-    IB_BClick,
-    IB_BTouch,
-    IB_FingerIndex,
-    IB_FingerMiddle,
-    IB_FingerRing,
-    IB_FingerPinky,
-
-    IB_Count
-};
-
 CLeapControllerIndex::CLeapControllerIndex(unsigned char f_hand)
 {
     m_hand = (f_hand % CH_Count);
@@ -302,31 +273,6 @@ void CLeapControllerIndex::UpdateGestures(const LEAP_HAND *f_hand, const LEAP_HA
         m_buttons[IB_GripTouch]->SetState(l_gestures[CGestureMatcher::HG_Grab] >= 0.25f);
         m_buttons[IB_GripForce]->SetValue((l_gestures[CGestureMatcher::HG_Grab] >= 0.75f) ? (l_gestures[CGestureMatcher::HG_Grab] - 0.75f) * 4.f : 0.f);
 
-        m_buttons[IB_TrackpadTouch]->SetState(l_gestures[CGestureMatcher::HG_ThumbPress] >= 0.5f);
-        m_buttons[IB_TrackpadForce]->SetState((l_gestures[CGestureMatcher::HG_ThumbPress] >= 0.5f) ? (l_gestures[CGestureMatcher::HG_ThumbPress] - 0.5f) *2.f : 0.f);
-        if(l_gestures[CGestureMatcher::HG_ThumbPress] >= 0.5f)
-        {
-            m_buttons[IB_TrackpadX]->SetValue(l_gestures[CGestureMatcher::HG_PalmPointX]);
-            m_buttons[IB_TrackpadY]->SetValue(l_gestures[CGestureMatcher::HG_PalmPointY]);
-        }
-        else
-        {
-            m_buttons[IB_TrackpadX]->SetValue(0.f);
-            m_buttons[IB_TrackpadY]->SetValue(0.f);
-        }
-
-        m_buttons[IB_SystemTouch]->SetState(l_gestures[CGestureMatcher::HG_OpisthenarTouch] >= 0.5f);
-        m_buttons[IB_SystemClick]->SetState(l_gestures[CGestureMatcher::HG_OpisthenarTouch] >= 0.75f);
-
-        m_buttons[IB_BTouch]->SetState(l_gestures[CGestureMatcher::HG_PalmTouch] >= 0.5f);
-        m_buttons[IB_BClick]->SetState(l_gestures[CGestureMatcher::HG_PalmTouch] >= 0.75f);
-
-        m_buttons[IB_ATouch]->SetState(l_gestures[CGestureMatcher::HG_MiddleCrossTouch] >= 0.5f);
-        m_buttons[IB_AClick]->SetState(l_gestures[CGestureMatcher::HG_MiddleCrossTouch] >= 0.75f);
-
-        m_buttons[IB_ThumbstickTouch]->SetState(l_gestures[CGestureMatcher::HG_ThumbCrossTouch] >= 0.5f);
-        m_buttons[IB_ThumbstickClick]->SetState(l_gestures[CGestureMatcher::HG_ThumbCrossTouch] >= 0.75f);
-
         m_buttons[IB_FingerIndex]->SetValue(l_gestures[CGestureMatcher::HG_IndexBend]);
         m_buttons[IB_FingerMiddle]->SetValue(l_gestures[CGestureMatcher::HG_MiddleBend]);
         m_buttons[IB_FingerRing]->SetValue(l_gestures[CGestureMatcher::HG_RingBend]);
@@ -348,7 +294,7 @@ void CLeapControllerIndex::UpdateGestures(const LEAP_HAND *f_hand, const LEAP_HA
                 l_leapRotation = l_finger.bones[j].rotation;
                 ConvertQuaternion(l_leapRotation, l_segmentRotation);
 
-                glm::quat l_segmentResult = l_prevSegmentRotationInv*l_segmentRotation;
+                glm::quat l_segmentResult = l_prevSegmentRotationInv * l_segmentRotation;
                 ChangeBoneOrientation(l_segmentResult);
                 if(l_transformIndex == HSB_Thumb0)
                 {
@@ -382,9 +328,9 @@ void CLeapControllerIndex::UpdateGestures(const LEAP_HAND *f_hand, const LEAP_HA
             {
                 ConvertVector3(m_boneTransform[l_chainIndex + j].position, l_position);
                 ConvertQuaternion(m_boneTransform[l_chainIndex + j].orientation, l_rotation);
-                l_chainMat = l_chainMat*(glm::translate(g_identityMatrix, l_position)*glm::mat4_cast(l_rotation));
+                l_chainMat = l_chainMat * (glm::translate(g_identityMatrix, l_position)*glm::mat4_cast(l_rotation));
             }
-            l_position = l_chainMat*g_zeroPoint;
+            l_position = l_chainMat * g_zeroPoint;
             l_rotation = glm::quat_cast(l_chainMat);
             if(m_hand == CH_Left) ChangeAuxTransformation(l_position, l_rotation);
             ConvertVector3(l_position, m_boneTransform[HSB_Aux_Thumb + i].position);
@@ -397,4 +343,16 @@ void CLeapControllerIndex::UpdateInputInternal()
 {
     vr::VRDriverInput()->UpdateSkeletonComponent(m_skeletonHandle, vr::VRSkeletalMotionRange_WithController, m_boneTransform, HSB_Count);
     vr::VRDriverInput()->UpdateSkeletonComponent(m_skeletonHandle, vr::VRSkeletalMotionRange_WithoutController, m_boneTransform, HSB_Count);
+}
+
+void CLeapControllerIndex::SetButtonState(size_t f_button, bool f_state)
+{
+    if(f_button < m_buttons.size())
+        m_buttons[f_button]->SetState(f_state);
+}
+
+void CLeapControllerIndex::SetButtonValue(size_t f_button, float f_value)
+{
+    if(f_button < m_buttons.size())
+        m_buttons[f_button]->SetValue(f_value);
 }

@@ -1,0 +1,214 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B156A0E6-BC15-4987-A1E8-F6D6E69786BC}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>leap_control</RootNamespace>
+    <AssemblyName>leap_control</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\bin\win64\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>..\bin\win64\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="GlmSharp, Version=0.9.8.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\GlmSharp.0.9.8\lib\Net45\GlmSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="SFML.Graphics, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SFML.Graphics.2.5.0\lib\netstandard2.0\SFML.Graphics.dll</HintPath>
+    </Reference>
+    <Reference Include="SFML.System, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SFML.System.2.5.0\lib\netstandard2.0\SFML.System.dll</HintPath>
+    </Reference>
+    <Reference Include="SFML.Window, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\SFML.Window.2.5.0\lib\netstandard2.0\SFML.Window.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\Arm.cs">
+      <Link>vendor\LeapCSharp\Arm.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\Bone.cs">
+      <Link>vendor\LeapCSharp\Bone.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\CircularObjectBuffer.cs">
+      <Link>vendor\LeapCSharp\CircularObjectBuffer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\Config.cs">
+      <Link>vendor\LeapCSharp\Config.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\Connection.cs">
+      <Link>vendor\LeapCSharp\Connection.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\Controller.cs">
+      <Link>vendor\LeapCSharp\Controller.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\CopyFromLeapCExtensions.cs">
+      <Link>vendor\LeapCSharp\CopyFromLeapCExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\CopyFromOtherExtensions.cs">
+      <Link>vendor\LeapCSharp\CopyFromOtherExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\CSharpExtensions.cs">
+      <Link>vendor\LeapCSharp\CSharpExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\Device.cs">
+      <Link>vendor\LeapCSharp\Device.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\DeviceList.cs">
+      <Link>vendor\LeapCSharp\DeviceList.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\DistortionData.cs">
+      <Link>vendor\LeapCSharp\DistortionData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\Events.cs">
+      <Link>vendor\LeapCSharp\Events.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\FailedDevice.cs">
+      <Link>vendor\LeapCSharp\FailedDevice.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\FailedDeviceList.cs">
+      <Link>vendor\LeapCSharp\FailedDeviceList.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\Finger.cs">
+      <Link>vendor\LeapCSharp\Finger.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\Frame.cs">
+      <Link>vendor\LeapCSharp\Frame.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\Hand.cs">
+      <Link>vendor\LeapCSharp\Hand.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\IController.cs">
+      <Link>vendor\LeapCSharp\IController.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\Image.cs">
+      <Link>vendor\LeapCSharp\Image.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\ImageData.cs">
+      <Link>vendor\LeapCSharp\ImageData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\LeapC.cs">
+      <Link>vendor\LeapCSharp\LeapC.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\LeapQuaternion.cs">
+      <Link>vendor\LeapCSharp\LeapQuaternion.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\LeapTransform.cs">
+      <Link>vendor\LeapCSharp\LeapTransform.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\Logger.cs">
+      <Link>vendor\LeapCSharp\Logger.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\Matrix.cs">
+      <Link>vendor\LeapCSharp\Matrix.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\MemoryManager.cs">
+      <Link>vendor\LeapCSharp\MemoryManager.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\MessageSeverity.cs">
+      <Link>vendor\LeapCSharp\MessageSeverity.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\PointMapping.cs">
+      <Link>vendor\LeapCSharp\PointMapping.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\StructMarshal.cs">
+      <Link>vendor\LeapCSharp\StructMarshal.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\TransformExtensions.cs">
+      <Link>vendor\LeapCSharp\TransformExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\Vector.cs">
+      <Link>vendor\LeapCSharp\Vector.cs</Link>
+    </Compile>
+    <Compile Include="..\..\..\repos\driver_leap\vendor\openvr\headers\openvr_api.cs">
+      <Link>vendor\openvr\openvr_api.cs</Link>
+    </Compile>
+    <Compile Include="Overlay\ControlButton.cs" />
+    <Compile Include="Managers\LeapManager.cs" />
+    <Compile Include="Core\Core.cs" />
+    <Compile Include="Managers\ControlManager.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Managers\SfmlManager.cs" />
+    <Compile Include="Managers\VRManager.cs" />
+    <Compile Include="Overlay\HandOverlay.cs" />
+    <Compile Include="Utils.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -66,7 +66,7 @@ void CLeapPoller::Terminate()
         m_clockSynchronizer = nullptr;
         m_interpolatedFrameBuffer.clear();
         m_device = nullptr;
-        
+
         delete m_lastFrame;
         m_lastFrame = nullptr;
         delete m_newFrame;
@@ -123,7 +123,7 @@ void CLeapPoller::Update()
             m_frameLock.unlock();
         }
 
-        LEAP_CONNECTION_INFO l_info = {sizeof(l_info)};
+        LEAP_CONNECTION_INFO l_info{ sizeof(LEAP_CONNECTION_INFO) };
         if(LeapGetConnectionInfo(m_connection, &l_info) == eLeapRS_Success) m_connected = (l_info.status == eLeapConnectionStatus_Connected);
         else m_connected = false;
     }
@@ -152,7 +152,7 @@ void CLeapPoller::ThreadUpdate()
     while(m_active)
     {
         // Poll events
-        LEAP_CONNECTION_MESSAGE l_message;
+        LEAP_CONNECTION_MESSAGE l_message{ sizeof(LEAP_CONNECTION_MESSAGE) };
         while(LeapPollConnection(m_connection, 0U, &l_message) == eLeapRS_Success)
         {
             if(l_message.type == eLeapEventType_None) break;
