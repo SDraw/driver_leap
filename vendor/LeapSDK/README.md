@@ -14,14 +14,14 @@ LeapSDK
 - samples
 	* Various samples demonstrating several different usages.
 - LICENSE.md
-	* Ultraleap SDK license.
+	* Ultraleap Tracking SDK license.
 - Uninstall.exe
 	* Program to uninstall the LeapSDK application.
 
 ## Requirements:
 
 1. Running requires
-    * Leap Motion Software https://developer.leapmotion.com/get-started/
+    * Ultraleap Tracking Software https://developer.leapmotion.com/get-started/
 
 2. Building Samples requires
     * CMake 3.16.3+ (https://cmake.org/)
@@ -33,7 +33,7 @@ LeapSDK
 
 2. Choose a suitable destination location on your computer.
 
-3. Read and accept the Leap Motion SDK Agreement to use the Ultraleap SDK.
+3. Read and accept the Ultraleap Tracking SDK Agreement to use the Ultraleap SDK.
 
 ## Usage:
 
@@ -76,9 +76,9 @@ cmake --build $env:REPOS_BUILD_ROOT/$env:BUILD_TYPE/LeapSDK/leapc_example -j --c
 
 ## Resources:
 
-1. The Leap Motion Developer Portal (https://developer.leapmotion.com)
-     provides examples, community forums, Leap Motion news, and documentation
-     to help you to learn how to develop applications using the Leap Motion
+1. Ultraleap For Developers Site (https://developer.leapmotion.com)
+     provides examples, community forums, Ultraleap news, and documentation
+     to help you to learn how to develop applications using the Ultraleap Tracking
      SDK.
 
 2. C# and Unity bindings (https://github.com/leapmotion/UnityModules)
@@ -89,4 +89,4 @@ cmake --build $env:REPOS_BUILD_ROOT/$env:BUILD_TYPE/LeapSDK/leapc_example -j --c
 
 Copyright © 2012-2020 Ultraleap Ltd. All rights reserved.
 
-Use subject to the terms of the Leap Motion SDK Agreement `LICENSE.md` next to this `README.md` file.
+Use subject to the terms of the Ultraleap Tracking SDK Agreement `LICENSE.md` next to this `README.md` file.

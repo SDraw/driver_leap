@@ -1,3 +1,12 @@
+/* Copyright (C) 2021 Ultraleap Limited. All rights reserved.
+ *
+ * Use of this code is subject to the terms of the Ultraleap SDK agreement
+ * available at https://central.leapmotion.com/agreements/SdkAgreement unless
+ * Ultraleap has signed a separate license agreement with you or your
+ * organisation.
+ *
+ */
+
 #include "LeapC.h"
 
 #include <stdint.h>
@@ -36,7 +45,12 @@ int main(int argc, const char** argv)
 
     LeapPollConnection(connection, timeout, &msg);
 
-    assert(LeapGetDeviceList(connection, NULL, &computed_array_size) == eLeapRS_Success);
+    eLeapRS return_code = LeapGetDeviceList(connection, NULL, &computed_array_size);
+    if (return_code == eLeapRS_NotConnected)
+    {
+      continue;
+    }
+    assert(return_code == eLeapRS_Success);
     printf("Number of devices available: %u\n", computed_array_size);
 
     if (computed_array_size > 0U)

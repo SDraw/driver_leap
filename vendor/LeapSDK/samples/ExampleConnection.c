@@ -1,6 +1,10 @@
 /* Copyright (C) 2012-2017 Ultraleap Limited. All rights reserved.
  *
- * <RELEASE-SPECIFIC-EULA>
+ * Use of this code is subject to the terms of the Ultraleap SDK agreement
+ * available at https://central.leapmotion.com/agreements/SdkAgreement unless
+ * Ultraleap has signed a separate license agreement with you or your
+ * organisation.
+ *
  */
 
 #include "ExampleConnection.h"
@@ -66,6 +70,7 @@ LEAP_CONNECTION* OpenConnection(){
       InitializeCriticalSection(&dataLock);
       pollingThread = (HANDLE)_beginthread(serviceMessageLoop, 0, NULL);
 #else
+      pthread_mutex_init(&dataLock, NULL);
       pthread_create(&pollingThread, NULL, serviceMessageLoop, NULL);
 #endif
     }
@@ -84,6 +89,7 @@ void CloseConnection(){
   CloseHandle(pollingThread);
 #else
   pthread_join(pollingThread, NULL);
+  pthread_mutex_destroy(&dataLock);
 #endif
 }
 

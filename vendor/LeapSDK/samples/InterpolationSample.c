@@ -1,6 +1,10 @@
 /* Copyright (C) 2012-2017 Ultraleap Limited. All rights reserved.
  *
- * <RELEASE-SPECIFIC-EULA>
+ * Use of this code is subject to the terms of the Ultraleap SDK agreement
+ * available at https://central.leapmotion.com/agreements/SdkAgreement unless
+ * Ultraleap has signed a separate license agreement with you or your
+ * organisation.
+ *
  */
 
 #include <stdio.h>

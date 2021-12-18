@@ -1,6 +1,10 @@
 /* Copyright (C) 2012-2017 Ultraleap Limited. All rights reserved.
  *
- * <RELEASE-SPECIFIC-EULA>
+ * Use of this code is subject to the terms of the Ultraleap SDK agreement
+ * available at https://central.leapmotion.com/agreements/SdkAgreement unless
+ * Ultraleap has signed a separate license agreement with you or your
+ * organisation.
+ *
  */
 
 #ifndef _LEAP_C_H
@@ -20,8 +24,10 @@
 #  define LEAP_CALL
 #endif
 
-#if defined(__cplusplus) && __cplusplus >= 201103
+#if defined(__cplusplus) && __cplusplus >= 201103L
 #  define LEAP_STATIC_ASSERT static_assert
+#elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+#  define LEAP_STATIC_ASSERT _Static_assert
 #else
 #  define LEAP_STATIC_ASSERT(x, y)
 #endif
@@ -65,7 +71,7 @@ typedef enum _eLeapRS {
   /**
    * An undetermined error has occurred.
    * This is usually the result of an abnormal operating condition in LeapC,
-   * the Leap Motion service, or the host computer itself.
+   * the Ultraleap Tracking Service, or the host computer itself.
    * @since 3.0.0
    */
   eLeapRS_UnknownError                  = 0xE2010000,
@@ -176,7 +182,7 @@ typedef enum _eLeapRS {
   eLeapRS_ConcurrentPoll                = 0xE201000F,
 
   /**
-   * A connection to the Leap Motion service could not be established.
+   * A connection to the Ultraleap Tracking Service could not be established.
    @since 3.0.0
    */
   eLeapRS_NotAvailable                  = 0xE7010002,
@@ -194,6 +200,7 @@ typedef enum _eLeapRS {
    */
   eLeapRS_CannotOpenDevice              = 0xE7010005,
 } eLeapRS;
+LEAP_STATIC_ASSERT(sizeof(eLeapRS) == 4, "Incorrect enum size");
 
 /**  \ingroup Enum
  * Enumerates values for the tracking mode.
@@ -211,6 +218,7 @@ typedef enum _eLeapTrackingMode {
   /** Tracking mode is not known (allows triggering of a new LEAP_TRACKING_MODE_EVENT) @since 5.0.0 */
   eLeapTrackingMode_Unknown = 3
 } eLeapTrackingMode;
+LEAP_STATIC_ASSERT(sizeof(eLeapTrackingMode) == 4, "Incorrect enum size");
 
 /**
  * Evaluates to true if the specified return code is a success code
@@ -268,6 +276,7 @@ typedef enum _eLeapConnectionConfig {
    */
   eLeapConnectionConfig_MultiDeviceAware = 0x00000001,
 } eLeapConnectionConfig;
+LEAP_STATIC_ASSERT(sizeof(eLeapConnectionConfig) == 4, "Incorrect enum size");
 
 /** \ingroup Structs
  * Specifies the configuration for a connection.
@@ -322,6 +331,7 @@ typedef enum _eLeapAllocatorType {
   /** Double-precision 64-bit floating-point @since 4.0.0 */
   eLeapAllocatorType_Double = 10,
 } eLeapAllocatorType;
+LEAP_STATIC_ASSERT(sizeof(eLeapAllocatorType) == 4, "Incorrect enum size");
 
 /** \ingroup Structs
  * Specifies the allocator/deallocator functions to be used when the library
@@ -370,7 +380,7 @@ LEAP_EXPORT int64_t LEAP_CALL LeapGetNow(void);
  * Creates a new LEAP_CONNECTION object.
  *
  * Pass the LEAP_CONNECTION pointer to LeapOpenConnection() to establish a
- * connection to the Leap Motion service; and to subsequent operations
+ * connection to the Ultraleap Tracking Service; and to subsequent operations
  * on the same connection.
  *
  * @param pConfig The configuration to be used with the newly created connection.
@@ -419,9 +429,10 @@ typedef enum _eLeapServiceDisposition {
     | eLeapServiceState_PoorPerformancePause
     | eLeapServiceState_TrackingErrorUnknown
 } eLeapServiceDisposition;
+LEAP_STATIC_ASSERT(sizeof(eLeapServiceDisposition) == 4, "Incorrect enum size");
 
 /**  \ingroup Structs
- * Received from LeapPollConnection() when a connection to the Leap Motion service is established.
+ * Received from LeapPollConnection() when a connection to the Ultraleap Tracking Service is established.
  * @since 3.0.0
  */
 typedef struct _LEAP_CONNECTION_EVENT {
@@ -430,9 +441,9 @@ typedef struct _LEAP_CONNECTION_EVENT {
 } LEAP_CONNECTION_EVENT;
 
 /** \ingroup Structs
- * Received from LeapPollConnection() when a connection to the Leap Motion service is lost.
+ * Received from LeapPollConnection() when a connection to the Ultraleap Tracking Service is lost.
  *
- * If a LeapC function that performs a transaction with the Leap Motion service is called
+ * If a LeapC function that performs a transaction with the Ultraleap Tracking Service is called
  * after the connection is lost, the next call to LeapPollConnection() will return
  * this event. Otherwise, it can take up to 5 seconds of polling the connection to
  * receive this event.
@@ -452,7 +463,7 @@ typedef struct _LEAP_CONNECTION_LOST_EVENT {
 typedef enum _eLeapConnectionStatus {
   /**
    * The connection is not open.
-   * Call LeapOpenConnection() to open a connection to the Leap Motion service.
+   * Call LeapOpenConnection() to open a connection to the Ultraleap Tracking Service.
    * @since 3.0.0
    */
   eLeapConnectionStatus_NotConnected = 0,
@@ -470,12 +481,13 @@ typedef enum _eLeapConnectionStatus {
   eLeapConnectionStatus_HandshakeIncomplete,
 
   /**
-   * The connection could not be opened because the Leap Motion service does not
+   * The connection could not be opened because the Ultraleap Tracking Service does not
    * appear to be running.
    * @since 3.0.0
    */
   eLeapConnectionStatus_NotRunning    = 0xE7030004
 } eLeapConnectionStatus;
+LEAP_STATIC_ASSERT(sizeof(eLeapConnectionStatus) == 4, "Incorrect enum size");
 
 /** \ingroup Structs
  * Information about a connection.
@@ -533,6 +545,7 @@ typedef enum _eLeapPolicyFlag {
   /** The policy specifying whether to optimize tracking for screen-top device. @since 5.0.0 */
   eLeapPolicyFlag_OptimizeScreenTop = 0x00000100,
 } eLeapPolicyFlag;
+LEAP_STATIC_ASSERT(sizeof(eLeapPolicyFlag) == 4, "Incorrect enum size");
 
 /** \ingroup Structs
  * The response from a request to get or set a policy.
@@ -615,7 +628,6 @@ LEAP_EXPORT eLeapRS LEAP_CALL LeapSetTrackingMode(LEAP_CONNECTION hConnection, e
  * The eLeapTrackingMode enumeration defines the tracking mode.
  *
  * @param hConnection The connection handle created by LeapCreateConnection().
- * @param mode The enum value specifying the requested tracking mode
  * @returns The operation result code, a member of the eLeapRS enumeration.
  * @since 5.0.0
  */
@@ -726,7 +738,7 @@ typedef struct _LEAP_CONFIG_CHANGE_EVENT {
 } LEAP_CONFIG_CHANGE_EVENT;
 
 /** \ingroup Functions
- * Causes the client to commit a configuration change to the Leap Motion service.
+ * Causes the client to commit a configuration change to the Ultraleap Tracking Service.
  *
  * The change is performed asynchronously -- and may fail. LeapPollConnection()
  * returns this event structure when the request has been processed. Use the pRequestID
@@ -756,7 +768,7 @@ LEAP_EXPORT eLeapRS LEAP_CALL LeapSaveConfigValue(LEAP_CONNECTION hConnection, c
 LEAP_EXPORT eLeapRS LEAP_CALL LeapRequestConfigValue(LEAP_CONNECTION hConnection, const char* key, uint32_t* pRequestID);
 
 /** \ingroup Functions
- * Retrieves a list of Leap Motion devices currently attached to the system.
+ * Retrieves a list of Ultraleap Tracking camera devices currently attached to the system.
  *
  * To get the number of connected devices, call this function with the pArray parameter
  * set to null. The number of devices is written to the memory specified by pnArray.
@@ -806,10 +818,10 @@ enum eLeapDeviceCaps {
  * Device hardware types. @since 3.0.0
  */
 typedef enum _eLeapDevicePID {
-  /** An unknown device. @since 3.1.3 */
+  /** An unknown device that is compatible with the tracking software. @since 3.1.3 */
   eLeapDevicePID_Unknown         = 0x0000,
 
-  /** The Leap Motion consumer peripheral. @since 3.0.0 */
+  /** The Leap Motion Controller (the first consumer peripheral). @since 3.0.0 */
   eLeapDevicePID_Peripheral      = 0x0003,
 
   /** Internal research product codename "Dragonfly". @since 3.0.0 */
@@ -821,9 +833,16 @@ typedef enum _eLeapDevicePID {
   /** Research product codename "Rigel". @since 4.0.0 */
   eLeapDevicePID_Rigel           = 0x1202,
 
-  /** An invalid device type value. @since 3.1.3 */
+  /** The Ultraleap Stereo IR 170 (SIR170) hand tracking module. @since 5.3.0 */
+  eLeapDevicePID_SIR170          = 0x1203,
+
+  /** The Ultraleap 3Di hand tracking camera. @since 5.3.0 */
+  eLeapDevicePID_3Di             = 0x1204,
+
+  /** An invalid device type. Not currently in use. @since 3.1.3 */
   eLeapDevicePID_Invalid = 0xFFFFFFFF
 } eLeapDevicePID;
+LEAP_STATIC_ASSERT(sizeof(eLeapDevicePID) == 4, "Incorrect enum size");
 
 /** \ingroup Structs
  * Properties of a Leap device.
@@ -943,6 +962,7 @@ typedef enum _eLeapDeviceStatus {
   /** The device USB control interfaces failed to initialize. @since 3.0.0 */
   eLeapDeviceStatus_BadControl     = 0xE8010004,
 } eLeapDeviceStatus;
+LEAP_STATIC_ASSERT(sizeof(eLeapDeviceStatus) == 4, "Incorrect enum size");
 
 /** \ingroup Structs
  * Device failure information.
@@ -1004,6 +1024,7 @@ typedef enum _eLeapImageType {
   /** Raw images from the device. @since 3.0.0 */
   eLeapImageType_Raw
 } eLeapImageType;
+LEAP_STATIC_ASSERT(sizeof(eLeapImageType) == 4, "Incorrect enum size");
 
 /**  \ingroup Enum
  * Image formats.
@@ -1019,6 +1040,7 @@ typedef enum _eLeapImageFormat {
   /** A Bayer RGBIr image with uncorrected RGB channels. @since 3.0.0 */
   eLeapImageFormat_RGBIr_Bayer = 0x49425247,
 } eLeapImageFormat;
+LEAP_STATIC_ASSERT(sizeof(eLeapImageFormat) == 4, "Incorrect enum size");
 
 /**  \ingroup Enum
  * Camera perspective types.
@@ -1037,6 +1059,7 @@ typedef enum _eLeapPerspectiveType {
   /** Reserved for future use. @since 3.0.0 */
   eLeapPerspectiveType_mono = 3,
 } eLeapPerspectiveType;
+LEAP_STATIC_ASSERT(sizeof(eLeapPerspectiveType) == 4, "Incorrect enum size");
 
 /**  \ingroup Enum
  * Camera calibration types.
@@ -1049,6 +1072,7 @@ typedef enum _eLeapCameraCalibrationType {
   /** Visual calibration. @since 4.1.0 */
   eLeapCameraCalibrationType_visual = 1,
 } eLeapCameraCalibrationType;
+LEAP_STATIC_ASSERT(sizeof(eLeapCameraCalibrationType) == 4, "Incorrect enum size");
 
 /** \ingroup Structs
  * Properties of a sensor image.
@@ -1223,7 +1247,7 @@ typedef struct _LEAP_DIGIT {
        * For thumbs, this bone is set to have zero length and width, an identity basis matrix,
        * and its joint positions are equal.
        * Note that this is anatomically incorrect; in anatomical terms, the intermediate phalange
-       * is absent in a real thumb, rather than the metacarpal bone. In the Leap Motion model,
+       * is absent in a real thumb, rather than the metacarpal bone. In the Ultraleap Tracking model,
        * however, we use a "zero" metacarpal bone instead for ease of programming.
        * @since 3.0.0
        */
@@ -1251,7 +1275,7 @@ typedef struct _LEAP_DIGIT {
  */
 typedef struct _LEAP_PALM {
   /**
-   * The center position of the palm in millimeters from the Leap Motion origin.
+   * The center position of the palm in millimeters from the Ultraleap Tracking camera device origin.
    * @since 3.0.0
    */
   LEAP_VECTOR position;
@@ -1312,6 +1336,7 @@ typedef enum _eLeapHandType {
   /** A right hand. @since 3.0.0 */
   eLeapHandType_Right
 } eLeapHandType;
+LEAP_STATIC_ASSERT(sizeof(eLeapHandType) == 4, "Incorrect enum size");
 
 /** \ingroup Structs
  * Describes a tracked hand. @since 3.0.0
@@ -1465,6 +1490,7 @@ typedef enum _eLeapLogSeverity {
   /** A system status message. @since 3.0.0 */
   eLeapLogSeverity_Information
 } eLeapLogSeverity;
+LEAP_STATIC_ASSERT(sizeof(eLeapLogSeverity) == 4, "Incorrect enum size");
 
 /** \ingroup Structs
  * A system log message. @since 3.0.0
@@ -1519,6 +1545,7 @@ typedef enum _eLeapDroppedFrameType {
   eLeapDroppedFrameType_TrackingQueue,
   eLeapDroppedFrameType_Other
 } eLeapDroppedFrameType;
+LEAP_STATIC_ASSERT(sizeof(eLeapDroppedFrameType) == 4, "Incorrect enum size");
 
 typedef struct _LEAP_DROPPED_FRAME_EVENT {
   int64_t frame_id;
@@ -1655,6 +1682,7 @@ typedef enum _eLeapIMUFlag {
   /** Has a temperature measurement. @since 4.1.0 */
   eLeapIMUFlag_HasTemperature   = 0x00000004,
 } eLeapIMUFlag;
+LEAP_STATIC_ASSERT(sizeof(eLeapIMUFlag) == 4, "Incorrect enum size");
 
 typedef struct _LEAP_IMU_EVENT {
   /**
@@ -1728,13 +1756,13 @@ typedef enum _eLeapEventType {
   eLeapEventType_None = 0,
 
   /**
-   * A connection to the Leap Motion service has been established.
+   * A connection to the Ultraleap Tracking Service has been established.
    * @since 3.0.0
    */
   eLeapEventType_Connection,
 
   /**
-   * The connection to the Leap Motion service has been lost.
+   * The connection to the Ultraleap Tracking Service has been lost.
    * @since 3.0.0
    */
   eLeapEventType_ConnectionLost,
@@ -1761,7 +1789,7 @@ typedef enum _eLeapEventType {
    * A policy change has occurred.
    * This can be due to setting a policy with LeapSetPolicyFlags() or due to changing
    * or policy-related config settings, including images_mode.
-   * (A user can also change these policies using the Leap Motion Control Panel.)
+   * (A user can also change these policies using the Ultraleap Tracking Control Panel.)
    * @since 3.0.0
    */
   eLeapEventType_Policy,
@@ -1839,7 +1867,7 @@ typedef enum _eLeapEventType {
    * @since 4.0.0
    */
   eLeapEventType_PointMappingChange,
-  
+
    /**
     * A tracking mode change has occurred.
     * This can be due to changing the hmd or screentop policy with LeapSetPolicyFlags().
@@ -1869,6 +1897,7 @@ typedef enum _eLeapEventType {
   */
   eLeapEventType_IMU
 } eLeapEventType;
+LEAP_STATIC_ASSERT(sizeof(eLeapEventType) == 4, "Incorrect enum size");
 
 /** \ingroup Structs
  * Defines a basic message from the LeapC message queue.
@@ -1998,7 +2027,7 @@ LEAP_EXPORT eLeapRS LEAP_CALL LeapGetFrameSizeEx(LEAP_CONNECTION hConnection, LE
  *
  * Use LeapCreateClockRebaser(), LeapUpdateRebase(), and LeapRebaseClock() to
  * synchronize time measurements in the application with time measurements in
- * the Leap Motion service. This process is required to achieve accurate, smooth
+ * the Ultraleap Tracking Service. This process is required to achieve accurate, smooth
  * interpolation.
  * @param hConnection The connection handle created by LeapCreateConnection().
  * @param timestamp The timestamp at which to interpolate the frame data.
@@ -2018,7 +2047,7 @@ LEAP_EXPORT eLeapRS LEAP_CALL LeapInterpolateFrame(LEAP_CONNECTION hConnection, 
  *
  * Use LeapCreateClockRebaser(), LeapUpdateRebase(), and LeapRebaseClock() to
  * synchronize time measurements in the application with time measurements in
- * the Leap Motion service. This process is required to achieve accurate, smooth
+ * the Ultraleap Tracking Service. This process is required to achieve accurate, smooth
  * interpolation.
  * @param hConnection The connection handle created by LeapCreateConnection().
  * @param hDevice A device handle returned by LeapOpenDevice().
@@ -2039,7 +2068,7 @@ LEAP_EXPORT eLeapRS LEAP_CALL LeapInterpolateFrameEx(LEAP_CONNECTION hConnection
 *
 * Use LeapCreateClockRebaser(), LeapUpdateRebase(), and LeapRebaseClock() to
 * synchronize time measurements in the application with time measurements in
-* the Leap Motion service. This process is required to achieve accurate, smooth
+* the Ultraleap Tracking Service. This process is required to achieve accurate, smooth
 * interpolation.
 * @param hConnection The connection handle created by LeapCreateConnection().
 * @param timestamp The timestamp to which to interpolate the frame data.
@@ -2061,7 +2090,7 @@ LEAP_EXPORT eLeapRS LEAP_CALL LeapInterpolateFrameFromTime(LEAP_CONNECTION hConn
 *
 * Use LeapCreateClockRebaser(), LeapUpdateRebase(), and LeapRebaseClock() to
 * synchronize time measurements in the application with time measurements in
-* the Leap Motion service. This process is required to achieve accurate, smooth
+* the Ultraleap Tracking Service. This process is required to achieve accurate, smooth
 * interpolation.
 * @param hConnection The connection handle created by LeapCreateConnection().
 * @param hDevice A device handle returned by LeapOpenDevice().
@@ -2134,35 +2163,35 @@ typedef struct _LEAP_CLOCK_REBASER *LEAP_CLOCK_REBASER;
 LEAP_EXPORT eLeapRS LEAP_CALL LeapCreateClockRebaser(LEAP_CLOCK_REBASER* phClockRebaser);
 
 /** \ingroup Functions
- * Updates the relationship between the Leap Motion clock and the user clock.
+ * Updates the relationship between the Ultraleap Tracking Service clock and the user clock.
  *
  * When using LeapInterpolateFrame(), call this function for every graphics frame
  * rendered by your application. The function should be called as close to the
  * actual point of rendering as possible.
  *
- * The relationship between the application clock and the Leap Motion clock is
+ * The relationship between the application clock and the Ultraleap Tracking Service clock is
  * neither fixed nor stable. Simulation restarts can cause user clock values to change
  * instantaneously. Certain systems simulate slow motion, or respond to heavy load, by reducing the tick rate
  * of the user clock. As a result, the LeapUpdateRebase() function must be called for every rendered frame.
  *
  * @param hClockRebaser The handle to a rebaser object created by LeapCreateClockRebaser().
  * @param userClock A clock value supplied by the application, sampled at about the same time as LeapGetNow() was sampled.
- * @param leapClock The Leap Motion clock value sampled by a call to LeapGetNow().
+ * @param leapClock The Ultraleap Tracking Service clock value sampled by a call to LeapGetNow().
  * @returns The operation result code, a member of the eLeapRS enumeration.
  * @since 3.1.2
  */
 LEAP_EXPORT eLeapRS LEAP_CALL LeapUpdateRebase(LEAP_CLOCK_REBASER hClockRebaser, int64_t userClock, int64_t leapClock);
 
 /** \ingroup Functions
- * Computes the Leap Motion clock corresponding to a specified application clock value.
+ * Computes the Ultraleap Tracking Service clock corresponding to a specified application clock value.
  *
- * Use this function to translate your application clock to the Leap Motion clock
+ * Use this function to translate your application clock to the Ultraleap Tracking Service clock
  * when interpolating frames. LeapUpdateRebase() must be called for every rendered
  * frame for the relationship between the two clocks to remain synchronized.
  *
  * @param hClockRebaser The handle to a rebaser object created by LeapCreateClockRebaser().
  * @param userClock The clock in microseconds referenced to the application clock.
- * @param[out] pLeapClock The corresponding Leap Motion clock value.
+ * @param[out] pLeapClock The corresponding Ultraleap Tracking Service clock value.
  * @returns The operation result code, a member of the eLeapRS enumeration.
  * @since 3.1.2
  */
@@ -2183,13 +2212,13 @@ LEAP_EXPORT void LEAP_CALL LeapDestroyClockRebaser(LEAP_CLOCK_REBASER hClockReba
  *
  * Given a point on the image, ``LeapPixelToRectilinear()`` corrects for camera distortion
  * and returns the true direction from the camera to the source of that image point
- * within the Leap Motion field of view.
+ * within the Ultraleap Tracking camera field of view.
  *
  * This direction vector has an x and y component [x, y, 1], with the third element
  * always 1. Note that this vector uses the 2D camera coordinate system
  * where the x-axis parallels the longer (typically horizontal) dimension and
  * the y-axis parallels the shorter (vertical) dimension. The camera coordinate
- * system does not correlate to the 3D Leap Motion coordinate system.
+ * system does not correlate to the 3D Ultraleap Tracking coordinate system.
  *
  * @param hConnection The connection handle created by LeapCreateConnection().
  * @param camera The camera to use, a member of the eLeapPerspectiveType enumeration
@@ -2205,13 +2234,13 @@ LEAP_EXPORT LEAP_VECTOR LEAP_CALL LeapPixelToRectilinear(LEAP_CONNECTION hConnec
  *
  * Given a point on the image, ``LeapPixelToRectilinearEx()`` corrects for camera distortion
  * and returns the true direction from the camera to the source of that image point
- * within the Leap Motion field of view.
+ * within the Devices field of view.
  *
  * This direction vector has an x and y component [x, y, 1], with the third element
  * always 1. Note that this vector uses the 2D camera coordinate system
  * where the x-axis parallels the longer (typically horizontal) dimension and
  * the y-axis parallels the shorter (vertical) dimension. The camera coordinate
- * system does not correlate to the 3D Leap Motion coordinate system.
+ * system does not correlate to the 3D Ultraleap coordinate system.
  *
  * @param hConnection The connection handle created by LeapCreateConnection().
  * @param hDevice A device handle returned by LeapOpenDevice().
@@ -2298,7 +2327,7 @@ LEAP_EXPORT void LEAP_CALL LeapCameraMatrixEx(LEAP_CONNECTION hConnection, LEAP_
 
 /** \ingroup Functions
  * This finds the default device and returns the result LeapExtrinsicCameraMatrixEx()
- * 
+ *
  * @param hConnection The connection handle created by LeapCreateConnection().
  * @param camera The camera to use, a member of the eLeapPerspectiveType enumeration
  * @param[out] dest  A pointer to a single-precision float array of size 16, containing
@@ -2308,16 +2337,16 @@ LEAP_EXPORT void LEAP_CALL LeapCameraMatrixEx(LEAP_CONNECTION hConnection, LEAP_
 LEAP_EXPORT void LEAP_CALL LeapExtrinsicCameraMatrix(LEAP_CONNECTION hConnection, eLeapPerspectiveType camera, float* dest);
 
 /** \ingroup Functions
- * 
+ *
  * Returns a transformation matrix from 3D Leap coordinate space to the coordinate system of the requested camera
  * This is composed of a 4 x 4 matrix of the form:
  *
  * R, t <br>
- * 0, 1 
- * 
+ * 0, 1
+ *
  *  R is a 3 x 3 rotation matrix <br>
- *  t is a 3 x 1 translation vector 
- * 
+ *  t is a 3 x 1 translation vector
+ *
  * @param hConnection The connection handle created by LeapCreateConnection().
  * @param hDevice A device handle returned by LeapOpenDevice().
  * @param camera The camera to use, a member of the eLeapPerspectiveType enumeration
@@ -2381,6 +2410,7 @@ typedef enum _eLeapRecordingFlags {
   eLeapRecordingFlags_Flushing = 0x00000004,
   eLeapRecordingFlags_Compressed = 0x00000008
 } eLeapRecordingFlags;
+LEAP_STATIC_ASSERT(sizeof(eLeapRecordingFlags) == 4, "Incorrect enum size");
 
 
 /** \ingroup Structs
@@ -2500,7 +2530,7 @@ LEAP_EXPORT uint64_t LEAP_CALL LeapTelemetryGetNow();
 /** \ingroup Functions
  * This finds the default device and returns the result of LeapScaleOffsetMatrixEx()
  * @sa LeapScaleOffsetMatrixEx for additional information
- * 
+ *
  * @param hConnection The connection handle created by LeapCreateConnection().
  * @param camera The camera to use, a member of the eLeapPerspectiveType enumeration
  * @param[out] dest  A pointer to a single-precision float array of size 16, containing
@@ -2510,31 +2540,31 @@ LEAP_EXPORT uint64_t LEAP_CALL LeapTelemetryGetNow();
 LEAP_EXPORT void LEAP_CALL LeapScaleOffsetMatrix(LEAP_CONNECTION hConnection, eLeapPerspectiveType camera, float* dest);
 
 /** \ingroup Functions
- * 
+ *
  * Returns the appropriate scale and offset coefficients required to project
  * normalised Rectilinear coordinates to image-scale coordinates.
- * 
+ *
  * This is composed of a 4 x 4 matrix of the form:
  *
  * scale_x, 0, 0, offset_x,
  * 0, 1, 0, 0,
  * 0, 0, scale_z, offset_z
- * 0, 0, 0, 1 
- * 
+ * 0, 0, 0, 1
+ *
  * This matrix is specific to the size of the current image as contained within LEAP_IMAGE.
- * 
+ *
  * In practical terms, use this matrix in combination with normalised rays
  * to project 3D points into a rectilinear image space (i.e. to visualise hands on an undistorted image).
- * 
+ *
  * The pipeline would be:
  * 1) Take 3D points from hand tracking.
  * 2) Apply an extrinsic transformation to a specific camera's coordinate system (@sa LeapExtrinsicCameraMatrixEx)
  * 3) Apply a perspective division to transform 3D points to rays.
  * 4) Apply the ScaleOffset matrix to these points.
- * 
+ *
  * These points will now be in the correct coordinate system consistent with the undistorted rectilinear image
  * provided by LEAP_IMAGE::distortion_matrix.
- * 
+ *
  * @param hConnection The connection handle created by LeapCreateConnection().
  * @param hDevice A device handle returned by LeapOpenDevice().
  * @param camera The camera to use, a member of the eLeapPerspectiveType enumeration
@@ -2560,7 +2590,7 @@ typedef enum _eLeapVersionPart {
    * @since 5.2.x
    */
   eLeapVersionPart_ClientProtocol = 1,
-  
+
   /**
    * The parameter for requesting the version of the server.
    * @since 5.2.x
@@ -2573,15 +2603,16 @@ typedef enum _eLeapVersionPart {
    */
   eLeapVersionPart_ServerProtocol = 3,
 } eLeapVersionPart;
+LEAP_STATIC_ASSERT(sizeof(eLeapVersionPart) == 4, "Incorrect enum size");
 
 
 /** \ingroup Structs
  * Version information.
  *
  * The members can be converted to a version string using the format:
- * 
+ *
  * major.minor.patch.build
- * 
+ *
  * @since 5.2.0
  */
 typedef struct _LEAP_VERSION {
@@ -2590,27 +2621,27 @@ typedef struct _LEAP_VERSION {
    * @since 5.2.0
    */
   int32_t major;
-  
+
   /**
    * The minor version.
    * @since 5.2.0
    */
   int32_t minor;
-  
+
   /**
    * The patch version.
    * @since 5.2.0
    */
   int32_t patch;
-  
+
 } LEAP_VERSION;
 
 /** \ingroup Functions
- * 
+ *
  * Returns the version of a specified part of the system.
- * 
+ *
  * If an invalid connection handle is provided only the version details of the client will be available.
- * 
+ *
  * @param hConnection The connection handle created by LeapCreateConnection().
  * @param versionPart The version part to return, this will reference one part of the system.
  * @param[out] pVersion A pointer to a struct used to store the version number.
