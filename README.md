@@ -24,3 +24,4 @@ List of hands gestures that correspond to controller original input:
 
 ### Notes
 * Testing commits are currently pushed.
+* If you see only green dots that represent tip of your index fingers, force application to launch on dGPU through control panel of your GPU vendor.
