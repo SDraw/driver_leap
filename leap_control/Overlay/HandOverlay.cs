@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace leap_control
 {
@@ -31,14 +28,10 @@ namespace leap_control
         static readonly SFML.Graphics.Color ms_touchColor = new SFML.Graphics.Color(0xFF, 0x00, 0x00);
         static readonly SFML.Graphics.Color ms_axisColorTouch = new SFML.Graphics.Color(0x00, 0xFF, 0x00);
         static readonly SFML.Graphics.Color ms_axisColorClick = new SFML.Graphics.Color(0xFF, 0xA5, 0x00);
-        static readonly GlmSharp.vec3 ms_forwardDirection = new GlmSharp.vec3(0f, 0f, -1f);
-        //static readonly GlmSharp.vec3 ms_backwardDirection = new GlmSharp.vec3(0f, 0f, 1f);
-        static readonly GlmSharp.vec4 ms_pointMultiplier = new GlmSharp.vec4(0f, 0f, 0f, 1f);
         static readonly float ms_overlayWidth = 0.125f;
         static readonly float ms_overlayWidthHalf = ms_overlayWidth * 0.5f;
         static readonly float ms_touchDistance = ms_overlayWidth * 0.5f * 0.5f;
-        static readonly float ms_clickDistance = ms_overlayWidth * 0.5f * 0.333333f;
-        static readonly float ms_radius = (float)Math.Sqrt(2f * Math.Pow(ms_overlayWidth * 0.5f, 2f));
+        static readonly float ms_clickDistance = ms_overlayWidth * 0.5f * 0.25f;
         static readonly GlmSharp.quat ms_rotation = new GlmSharp.quat(new GlmSharp.vec3(-(float)Math.PI / 2f, 0f, 0f));
         static readonly GlmSharp.vec3 ms_displacement = new GlmSharp.vec3(0f, 0f, 0.0625f);
 
@@ -139,9 +132,9 @@ namespace leap_control
 
         public void SetWorldTransform(GlmSharp.mat4 f_mat)
         {
-            m_position = (f_mat * ms_pointMultiplier).xyz;
+            m_position = (f_mat * GlmSharp.vec4.UnitW).xyz;
             m_rotation = f_mat.ToQuaternion * ms_rotation;
-            m_direction = m_rotation * ms_forwardDirection;
+            m_direction = m_rotation * -GlmSharp.vec3.UnitZ;
             m_position += m_rotation * ms_displacement;
         }
 
@@ -159,14 +152,14 @@ namespace leap_control
             foreach(ControlButton l_controlButton in m_controlButtons)
                 l_controlButton.ResetUpdate();
 
-            m_tipPositionGlobal = ((f_headTransform * GlmSharp.mat4.Translate(m_tipPositionLocal)) * ms_pointMultiplier).xyz;
+            m_tipPositionGlobal = ((f_headTransform * GlmSharp.mat4.Translate(m_tipPositionLocal)) * GlmSharp.vec4.UnitW).xyz;
 
             // Update overlays transform
             m_matrix = (GlmSharp.mat4.Translate(m_position) * m_rotation.ToMat4);
             m_matrix.Convert(ref m_vrMatrix);
             Valve.VR.OpenVR.Overlay.SetOverlayTransformAbsolute(m_overlay, Valve.VR.ETrackingUniverseOrigin.TrackingUniverseRawAndUncalibrated, ref m_vrMatrix);
 
-            m_cursorPosition = ((m_matrix.Inverse * GlmSharp.mat4.Translate(m_tipPositionGlobal)) * ms_pointMultiplier).xyz;
+            m_cursorPosition = ((m_matrix.Inverse * GlmSharp.mat4.Translate(m_tipPositionGlobal)) * GlmSharp.vec4.UnitW).xyz;
             if(m_handPresence && m_cursorPosition.IsInRange(-ms_overlayWidthHalf, ms_overlayWidthHalf) && (m_cursorPosition.z > -0.025f))
             {
                 m_cursorShape.FillColor = ((m_cursorPosition.z <= ms_touchDistance) ? ms_touchColor : ms_activeColor);
@@ -188,6 +181,11 @@ namespace leap_control
                         m_controlButtons[(int)ButtonIndex.Thumbstick].SetState(m_cursorPosition.z <= ms_clickDistance ? ControlButton.ButtonState.Clicked : ControlButton.ButtonState.Touched);
                         m_controlButtons[(int)ButtonIndex.Thumbstick].SetAxes(l_axes);
                     }
+                    else
+                    {
+                        m_controlButtons[(int)ButtonIndex.Thumbstick].SetState(ControlButton.ButtonState.None);
+                        m_controlButtons[(int)ButtonIndex.Thumbstick].SetAxes(GlmSharp.vec2.Zero);
+                    }
 
                     if(m_touchpadShape.GetGlobalBounds().Contains(m_cursorPlanePosition.x, m_cursorPlanePosition.y))
                     {
@@ -198,6 +196,11 @@ namespace leap_control
                         l_axes.y *= -1f;
                         m_controlButtons[(int)ButtonIndex.Touchpad].SetState(m_cursorPosition.z <= ms_clickDistance ? ControlButton.ButtonState.Clicked : ControlButton.ButtonState.Touched);
                         m_controlButtons[(int)ButtonIndex.Touchpad].SetAxes(l_axes);
+                    }
+                    else
+                    {
+                        m_controlButtons[(int)ButtonIndex.Touchpad].SetState(ControlButton.ButtonState.None);
+                        m_controlButtons[(int)ButtonIndex.Touchpad].SetAxes(GlmSharp.vec2.Zero);
                     }
 
                     // Check for buttons
@@ -238,7 +241,9 @@ namespace leap_control
                 else
                 {
                     m_controlButtons[(int)ButtonIndex.Thumbstick].SetState(ControlButton.ButtonState.None);
+                    m_controlButtons[(int)ButtonIndex.Thumbstick].SetAxes(GlmSharp.vec2.Zero);
                     m_controlButtons[(int)ButtonIndex.Touchpad].SetState(ControlButton.ButtonState.None);
+                    m_controlButtons[(int)ButtonIndex.Touchpad].SetAxes(GlmSharp.vec2.Zero);
 
                     m_buttonA.Color = ms_inactiveColor;
                     m_controlButtons[(int)ButtonIndex.A].SetState(ControlButton.ButtonState.None);
@@ -253,7 +258,7 @@ namespace leap_control
                 // Presure indicator
                 float l_presure = 1f - Utils.Clamp(Utils.Clamp(m_cursorPosition.z, 0f, float.MaxValue) / ms_overlayWidthHalf, 0f, 1f);
                 m_presureFillRectangle.Size = new SFML.System.Vector2f(m_presureFillRectangle.Size.X, -320f * l_presure);
-                m_presureFillRectangle.FillColor = ((l_presure >= 0.5f) ? ((l_presure >= 0.666667f) ? ms_axisColorClick : ms_axisColorTouch) : ms_activeColor);
+                m_presureFillRectangle.FillColor = ((l_presure >= 0.5f) ? ((l_presure >= 0.75f) ? ms_axisColorClick : ms_axisColorTouch) : ms_activeColor);
 
                 m_inRange = true;
             }

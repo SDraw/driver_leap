@@ -27,7 +27,6 @@ const std::vector<std::string> g_trackingLevels
 
 unsigned char CDriverConfig::ms_trackingLevel = CDriverConfig::TL_Partial;
 bool CDriverConfig::ms_handsReset = false;
-bool CDriverConfig::ms_interpolation = false;
 bool CDriverConfig::ms_useVelocity = false;
 
 void CDriverConfig::Load()
@@ -58,8 +57,6 @@ void CDriverConfig::Load()
                         case ConfigSetting::CS_HandsReset:
                             ms_handsReset = l_attribValue.as_bool(false);
                             break;
-                        case ConfigSetting::CS_Interpolation:
-                            ms_interpolation = l_attribValue.as_bool(false);
                             break;
                         case ConfigSetting::CS_Velocity:
                             ms_useVelocity = l_attribValue.as_bool(false);
@@ -80,11 +77,6 @@ unsigned char CDriverConfig::GetTrackingLevel()
 bool CDriverConfig::IsHandsResetEnabled()
 {
     return ms_handsReset;
-}
-
-bool CDriverConfig::IsInterpolationEnabled()
-{
-    return ms_interpolation;
 }
 
 bool CDriverConfig::IsVelocityUsed()

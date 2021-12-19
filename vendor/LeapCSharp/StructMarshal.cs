@@ -73,7 +73,7 @@ namespace LeapInternal
             }
             catch (Exception e)
             {
-                //UnityEngine.Debug.LogException(e);
+                Console.Error.WriteLine(e);
                 t = default(T);
             }
 #endif

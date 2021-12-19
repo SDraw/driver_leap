@@ -108,7 +108,7 @@ namespace LeapInternal
             }
             catch (Exception e)
             {
-                //UnityEngine.Debug.LogException(e);
+                Console.Error.WriteLine(e);
             }
 
             return IntPtr.Zero;
@@ -138,7 +138,7 @@ namespace LeapInternal
             }
             catch (Exception e)
             {
-                //UnityEngine.Debug.LogException(e);
+                Console.Error.WriteLine(e);
             }
         }
 

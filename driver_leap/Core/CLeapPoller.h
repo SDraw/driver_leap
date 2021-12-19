@@ -7,13 +7,12 @@ class CLeapPoller
     std::thread *m_thread;
 
     LEAP_CONNECTION m_connection;
-    LEAP_CLOCK_REBASER m_clockSynchronizer;
-    LEAP_ALLOCATOR m_allocator;
+    //LEAP_ALLOCATOR m_allocator;
     LEAP_TRACKING_EVENT *m_lastFrame;
     LEAP_TRACKING_EVENT *m_newFrame;
-    std::vector<uint8_t> m_interpolatedFrameBuffer;
-    LEAP_DEVICE m_device;
-    bool m_connected;
+
+    // Shenanigans for idiotic behaviour of new SDK
+    std::atomic<bool> m_deviceValidFrames;
 
     void ThreadUpdate();
 
@@ -27,12 +26,10 @@ public:
     void Terminate();
 
     bool IsConnected() const;
-    const LEAP_TRACKING_EVENT* GetInterpolatedFrame();
     const LEAP_TRACKING_EVENT* GetFrame();
 
     void SetPolicy(uint64_t f_set, uint64_t f_clear = 0U);
     void SetTrackingMode(eLeapTrackingMode f_mode);
-    void SetPaused(bool f_state);
 
     void Update();
     void UpdateInterpolation();

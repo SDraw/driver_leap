@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Valve.VR;
 
 namespace leap_control
@@ -20,8 +17,8 @@ namespace leap_control
 
         ulong m_notificationOverlay = 0;
         uint m_leapDevice = 0;
-        uint m_leftHandController = 0;
-        uint m_rightHandController = 0;
+        uint m_leftHandController = OpenVR.k_unTrackedDeviceIndexInvalid;
+        uint m_rightHandController = OpenVR.k_unTrackedDeviceIndexInvalid;
 
         TrackedDevicePose_t[] m_trackedPoses = null;
 
@@ -58,6 +55,8 @@ namespace leap_control
                     m_initialized = true;
                     m_active = true;
                 }
+                else
+                    System.Windows.Forms.MessageBox.Show("Unable to initialize OpenVR: " + Valve.VR.OpenVR.GetStringForHmdError(l_initError), "Driver Leap Control");
 
             }
 
@@ -82,14 +81,16 @@ namespace leap_control
                 switch(m_vrEvent.eventType)
                 {
                     case (uint)EVREventType.VREvent_Quit:
+                    case (uint)EVREventType.VREvent_RestartRequested:
+                    case (uint)EVREventType.VREvent_ProcessQuit:
                         m_active = false;
                         break;
                     case (uint)EVREventType.VREvent_TrackedDeviceDeactivated:
                     {
                         if(m_leftHandController == m_vrEvent.trackedDeviceIndex)
-                            m_leftHandController = 0;
+                            m_leftHandController = OpenVR.k_unTrackedDeviceIndexInvalid;
                         if(m_rightHandController == m_vrEvent.trackedDeviceIndex)
-                            m_rightHandController = 0;
+                            m_rightHandController = OpenVR.k_unTrackedDeviceIndexInvalid;
                     }
                     break;
                 }
@@ -102,7 +103,7 @@ namespace leap_control
                 m_core.ControlManager.SetHeadTransform(l_matrix);
             }
 
-            if(m_leftHandController != 0)
+            if(m_leftHandController != OpenVR.k_unTrackedDeviceIndexInvalid)
             {
                 GlmSharp.mat4 l_matrix = GlmSharp.mat4.Identity;
                 m_trackedPoses[m_leftHandController].mDeviceToAbsoluteTracking.Convert(ref l_matrix);
@@ -111,7 +112,7 @@ namespace leap_control
             else
                 m_leftHandController = m_vrSystem.GetTrackedDeviceIndexForControllerRole(ETrackedControllerRole.LeftHand);
 
-            if(m_rightHandController != 0)
+            if(m_rightHandController != OpenVR.k_unTrackedDeviceIndexInvalid)
             {
                 GlmSharp.mat4 l_matrix = GlmSharp.mat4.Identity;
                 m_trackedPoses[m_rightHandController].mDeviceToAbsoluteTracking.Convert(ref l_matrix);

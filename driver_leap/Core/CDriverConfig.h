@@ -4,7 +4,6 @@ class CDriverConfig final
 {
     static unsigned char ms_trackingLevel;
     static bool ms_handsReset;
-    static bool ms_interpolation;
     static bool ms_useVelocity;
 
     CDriverConfig() = delete;
@@ -22,6 +21,5 @@ public:
 
     static unsigned char GetTrackingLevel();
     static bool IsHandsResetEnabled();
-    static bool IsInterpolationEnabled();
     static bool IsVelocityUsed();
 };

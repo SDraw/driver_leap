@@ -111,7 +111,6 @@ vr::EVRInitError CServerDriver::Init(vr::IVRDriverContext *pDriverContext)
     m_leapPoller = new CLeapPoller();
     if(m_leapPoller->Initialize())
     {
-        m_leapPoller->SetPolicy(eLeapPolicyFlag_AllowPauseResume);
         m_leapPoller->SetTrackingMode(_eLeapTrackingMode::eLeapTrackingMode_HMD);
         m_leapPoller->SetPolicy(eLeapPolicyFlag::eLeapPolicyFlag_OptimizeHMD, eLeapPolicyFlag::eLeapPolicyFlag_OptimizeScreenTop);
     }
@@ -166,14 +165,15 @@ void CServerDriver::RunFrame()
         {
             m_controllers[i]->SetEnabled(m_connectionState);
         }
+
+        m_leapPoller->SetTrackingMode(_eLeapTrackingMode::eLeapTrackingMode_HMD);
+        m_leapPoller->SetPolicy(eLeapPolicyFlag::eLeapPolicyFlag_OptimizeHMD, eLeapPolicyFlag::eLeapPolicyFlag_OptimizeScreenTop);
     }
 
     LEAP_HAND *l_hands[LCH_Count] = { nullptr };
     if(m_connectionState)
     {
-        if(CDriverConfig::IsInterpolationEnabled()) m_leapPoller->UpdateInterpolation();
-
-        const LEAP_TRACKING_EVENT *l_frame = (CDriverConfig::IsInterpolationEnabled() ? m_leapPoller->GetInterpolatedFrame() : m_leapPoller->GetFrame());
+        const LEAP_TRACKING_EVENT *l_frame = m_leapPoller->GetFrame();
         if(l_frame)
         {
             for(size_t i = 0U; i < l_frame->nHands; i++)

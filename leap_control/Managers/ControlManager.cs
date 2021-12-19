@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace leap_control
 {
@@ -13,8 +9,6 @@ namespace leap_control
             Left = 0,
             Right
         };
-
-        static readonly GlmSharp.vec4 ms_pointMultiplier = new GlmSharp.vec4(0f, 0f, 0f, 1f);
 
         bool m_initialized = false;
 
@@ -51,7 +45,6 @@ namespace leap_control
 
                 Valve.VR.OpenVR.Overlay.CreateOverlay("leap.cursor.right", "Left Hand Finger Cursor", ref m_rightFingerOverlay);
                 Valve.VR.OpenVR.Overlay.SetOverlayFromFile(m_rightFingerOverlay, System.AppDomain.CurrentDomain.BaseDirectory + "resources\\tx_cursor.png");
-                Console.WriteLine(System.AppDomain.CurrentDomain.BaseDirectory + "resources\\tx_cursor.png");
                 Valve.VR.OpenVR.Overlay.SetOverlayColor(m_rightFingerOverlay, 0f, 1f, 0f);
                 Valve.VR.OpenVR.Overlay.SetOverlaySortOrder(m_rightFingerOverlay, 1);
                 Valve.VR.OpenVR.Overlay.SetOverlayWidthInMeters(m_rightFingerOverlay, 0.00625f);
@@ -101,7 +94,6 @@ namespace leap_control
                 break;
                 case Hand.Right:
                 {
-
                     m_rightHandOverlay.SetHandPresence(f_state, f_tipPos);
 
                     Valve.VR.HmdMatrix34_t l_matrix = new Valve.VR.HmdMatrix34_t();

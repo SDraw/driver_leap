@@ -3,6 +3,5 @@
   <setting name="trackingLevel" value="partial"/> <!--"partial" or "full"-->
   <!--Arbitrary settings-->
   <setting name="handsReset" value="false"/> <!--Mark controllers as out of range if hands aren't detected-->
-  <setting name="interpolation" value="false"/> <!--Enable Leap Motion internal interpolation, can be unstable on low-end machines-->
   <setting name="useVelocity" value="false"/> <!--Send velocity from Leap Motion, visible position twitching on low-end machines-->
 </settings>
