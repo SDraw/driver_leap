@@ -15,9 +15,6 @@ class CLeapPoller
     std::atomic<bool> m_deviceValidFrames;
 
     void ThreadUpdate();
-
-    static void* AllocateMemory(uint32_t size, eLeapAllocatorType typeHint, void *state);
-    static void DeallocateMemory(void *ptr, void *state);
 public:
     CLeapPoller();
     ~CLeapPoller();
@@ -28,11 +25,10 @@ public:
     bool IsConnected() const;
     const LEAP_TRACKING_EVENT* GetFrame();
 
-    void SetPolicy(uint64_t f_set, uint64_t f_clear = 0U);
-    void SetTrackingMode(eLeapTrackingMode f_mode);
+    void SetPolicy(uint64_t p_set, uint64_t p_clear = 0U);
+    void SetTrackingMode(eLeapTrackingMode p_mode);
 
     void Update();
-    void UpdateInterpolation();
 };
 
 

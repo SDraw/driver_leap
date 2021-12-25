@@ -24,13 +24,13 @@ public:
     vr::VRInputComponentHandle_t GetHandle() const;
     vr::VRInputComponentHandle_t& GetHandleRef();
 
-    void SetInputType(unsigned char f_type);
+    void SetInputType(unsigned char p_type);
     unsigned char GetInputType() const;
 
-    void SetState(bool f_state);
+    void SetState(bool p_state);
     bool GetState() const;
 
-    void SetValue(float f_value);
+    void SetValue(float p_value);
     float GetValue() const;
 
     bool IsUpdated() const;

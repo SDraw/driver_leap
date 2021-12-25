@@ -7,15 +7,15 @@ const float g_piHalf = g_pi * 0.5f;
 const float g_piQuarter = g_pi * 0.25f;
 extern const glm::mat4 g_identityMatrix;
 
-void CGestureMatcher::GetGestures(const LEAP_HAND *f_hand, std::vector<float> &f_result, const LEAP_HAND *f_oppHand)
+void CGestureMatcher::GetGestures(const LEAP_HAND *p_hand, std::vector<float> &p_result)
 {
-    f_result.resize(HG_Count, 0.f);
+    p_result.resize(HG_Count, 0.f);
 
     // Finger bends
     float l_fingerBend[5U] = { 0.f };
     for(size_t i = 0U; i < 5U; i++)
     {
-        const LEAP_DIGIT &l_finger = f_hand->digits[i];
+        const LEAP_DIGIT &l_finger = p_hand->digits[i];
         glm::vec3 l_prevDirection;
         const size_t l_startBoneIndex = ((i == 0U) ? 1U : 0U);
         for(size_t j = l_startBoneIndex; j < 4U; j++)
@@ -28,15 +28,15 @@ void CGestureMatcher::GetGestures(const LEAP_HAND *f_hand, std::vector<float> &f
         }
     }
 
-    for(size_t i = 0U; i <= HG_PinkyBend; i++) f_result[i] = NormalizeRange(l_fingerBend[i], (i == 0U) ? 0.f : g_piQuarter, (i == 0U) ? g_piQuarter : g_pi);
+    for(size_t i = 0U; i <= HG_PinkyBend; i++) p_result[i] = NormalizeRange(l_fingerBend[i], (i == 0U) ? 0.f : g_piQuarter, (i == 0U) ? g_piQuarter : g_pi);
 
     // Simple gestures
-    f_result[HG_Trigger] = f_result[HG_IndexBend];
-    f_result[HG_Grab] = NormalizeRange((l_fingerBend[2U] + l_fingerBend[3U] + l_fingerBend[4U]) / 3.f, g_piHalf, g_pi);
+    p_result[HG_Trigger] = p_result[HG_IndexBend];
+    p_result[HG_Grab] = NormalizeRange((l_fingerBend[2U] + l_fingerBend[3U] + l_fingerBend[4U]) / 3.f, g_piHalf, g_pi);
 }
 
-float CGestureMatcher::NormalizeRange(float f_val, float f_min, float f_max)
+float CGestureMatcher::NormalizeRange(float p_val, float p_min, float p_max)
 {
-    const float l_mapped = (f_val - f_min) / (f_max - f_min);
+    const float l_mapped = (p_val - p_min) / (p_max - p_min);
     return glm::clamp(l_mapped, 0.f, 1.f);
 }

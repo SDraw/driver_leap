@@ -13,9 +13,9 @@
         GlmSharp.vec3 m_leftTipPosition;
         GlmSharp.vec3 m_rightTipPosition;
 
-        public LeapManager(Core f_core)
+        public LeapManager(Core p_core)
         {
-            m_core = f_core;
+            m_core = p_core;
         }
 
         public bool Initialize()
@@ -110,6 +110,6 @@
             }
         }
 
-        void ConvertOrientation(ref GlmSharp.vec3 f_vec) => f_vec = -0.001f * f_vec.swizzle.xzy;
+        void ConvertOrientation(ref GlmSharp.vec3 p_vec) => p_vec = -0.001f * p_vec.swizzle.xzy;
     }
 }

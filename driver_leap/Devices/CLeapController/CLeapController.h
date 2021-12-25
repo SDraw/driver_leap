@@ -14,7 +14,7 @@ class CLeapController : public vr::ITrackedDeviceServerDriver
 
     void ResetControls();
     void UpdateInput();
-    void UpdateTransformation(const LEAP_HAND *f_hand);
+    void UpdateTransformation(const LEAP_HAND *p_hand);
 
     // vr::ITrackedDeviceServerDriver
     vr::EVRInitError Activate(uint32_t unObjectId);
@@ -47,9 +47,9 @@ public:
     const std::string& GetSerialNumber() const;
 
     bool IsEnabled() const;
-    void SetEnabled(bool f_state);
+    void SetEnabled(bool p_state);
 
-    void RunFrame(const LEAP_HAND *f_hand, const LEAP_HAND *f_oppHand);
+    void RunFrame(const LEAP_HAND *p_hand);
 
     static void UpdateHMDCoordinates();
 protected:
@@ -63,6 +63,6 @@ protected:
     std::vector<CControllerButton*> m_buttons;
 
     virtual void ActivateInternal();
-    virtual void UpdateGestures(const LEAP_HAND *f_hand, const LEAP_HAND *f_oppHand);
+    virtual void UpdateGestures(const LEAP_HAND *p_hand);
     virtual void UpdateInputInternal();
 };

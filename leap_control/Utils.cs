@@ -8,63 +8,61 @@ namespace leap_control
 {
     static class Utils
     {
-        public static void Convert(this GlmSharp.mat4 f_src, ref Valve.VR.HmdMatrix34_t f_dst)
+        public static void Convert(this GlmSharp.mat4 p_src, ref Valve.VR.HmdMatrix34_t p_dst)
         {
-            f_dst.m0 = f_src.m00;
-            f_dst.m1 = f_src.m10;
-            f_dst.m2 = f_src.m20;
-            f_dst.m3 = f_src.m30;
+            p_dst.m0 = p_src.m00;
+            p_dst.m1 = p_src.m10;
+            p_dst.m2 = p_src.m20;
+            p_dst.m3 = p_src.m30;
 
-            f_dst.m4 = f_src.m01;
-            f_dst.m5 = f_src.m11;
-            f_dst.m6 = f_src.m21;
-            f_dst.m7 = f_src.m31;
+            p_dst.m4 = p_src.m01;
+            p_dst.m5 = p_src.m11;
+            p_dst.m6 = p_src.m21;
+            p_dst.m7 = p_src.m31;
 
-            f_dst.m8 = f_src.m02;
-            f_dst.m9 = f_src.m12;
-            f_dst.m10 = f_src.m22;
-            f_dst.m11 = f_src.m32;
+            p_dst.m8 = p_src.m02;
+            p_dst.m9 = p_src.m12;
+            p_dst.m10 = p_src.m22;
+            p_dst.m11 = p_src.m32;
         }
 
-        public static void Convert(this Valve.VR.HmdMatrix34_t f_src, ref GlmSharp.mat4 f_dst)
+        public static void Convert(this Valve.VR.HmdMatrix34_t p_src, ref GlmSharp.mat4 p_dst)
         {
-            f_dst.m00 = f_src.m0;
-            f_dst.m01 = f_src.m4;
-            f_dst.m02 = f_src.m8;
-            f_dst.m03 = 0f;
+            p_dst.m00 = p_src.m0;
+            p_dst.m01 = p_src.m4;
+            p_dst.m02 = p_src.m8;
+            p_dst.m03 = 0f;
 
-            f_dst.m10 = f_src.m1;
-            f_dst.m11 = f_src.m5;
-            f_dst.m12 = f_src.m9;
-            f_dst.m13 = 0f;
+            p_dst.m10 = p_src.m1;
+            p_dst.m11 = p_src.m5;
+            p_dst.m12 = p_src.m9;
+            p_dst.m13 = 0f;
 
-            f_dst.m20 = f_src.m2;
-            f_dst.m21 = f_src.m6;
-            f_dst.m22 = f_src.m10;
-            f_dst.m23 = 0f;
+            p_dst.m20 = p_src.m2;
+            p_dst.m21 = p_src.m6;
+            p_dst.m22 = p_src.m10;
+            p_dst.m23 = 0f;
 
-            f_dst.m30 = f_src.m3;
-            f_dst.m31 = f_src.m7;
-            f_dst.m32 = f_src.m11;
-            f_dst.m33 = 1f;
+            p_dst.m30 = p_src.m3;
+            p_dst.m31 = p_src.m7;
+            p_dst.m32 = p_src.m11;
+            p_dst.m33 = 1f;
         }
 
-        public static void Convert(this Leap.Vector f_src, ref GlmSharp.vec3 f_dst)
+        public static void Convert(this Leap.Vector p_src, ref GlmSharp.vec3 p_dst)
         {
-            f_dst.x = f_src.x;
-            f_dst.y = f_src.y;
-            f_dst.z = f_src.z;
+            p_dst.x = p_src.x;
+            p_dst.y = p_src.y;
+            p_dst.z = p_src.z;
         }
 
-        public static float Clamp(float f_value, float f_min, float f_max) => Math.Min(Math.Max(f_value, f_min), f_max);
-
-        public static bool InRange(float f_value, float f_min, float f_max)
+        public static bool InRange(float p_value, float p_min, float p_max)
         {
-            return ((f_value >= f_min) && (f_value <= f_max));
+            return ((p_value >= p_min) && (p_value <= p_max));
         }
-        public static bool IsInRange(this GlmSharp.vec3 f_vec, float f_min, float f_max)
+        public static bool IsInRange(this GlmSharp.vec3 p_vec, float p_min, float p_max)
         {
-            return (InRange(f_vec.x, f_min, f_max) && InRange(f_vec.y, f_min, f_max) && InRange(f_vec.z, f_min, f_max));
+            return (InRange(p_vec.x, p_min, p_max) && InRange(p_vec.y, p_min, p_max) && InRange(p_vec.z, p_min, p_max));
         }
     }
 }

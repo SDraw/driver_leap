@@ -5,6 +5,7 @@
 #include <SDKDDKVer.h>
 #include <Windows.h>
 
+#include <iostream>
 #include <string>
 #include <sstream>
 #include <vector>

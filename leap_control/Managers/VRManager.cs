@@ -16,15 +16,15 @@ namespace leap_control
         bool m_active = false;
 
         ulong m_notificationOverlay = 0;
-        uint m_leapDevice = 0;
+        uint m_leapDevice = OpenVR.k_unTrackedDeviceIndexInvalid;
         uint m_leftHandController = OpenVR.k_unTrackedDeviceIndexInvalid;
         uint m_rightHandController = OpenVR.k_unTrackedDeviceIndexInvalid;
 
         TrackedDevicePose_t[] m_trackedPoses = null;
 
-        public VRManager(Core f_core)
+        public VRManager(Core p_core)
         {
-            m_core = f_core;
+            m_core = p_core;
 
             m_trackedPoses = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
         }
@@ -124,26 +124,24 @@ namespace leap_control
             return m_active;
         }
 
-        public void SendMessage(string f_message)
+        public void SendMessage(string p_message)
         {
-            Console.WriteLine(f_message);
-            if(m_leapDevice != 0)
+            if(m_leapDevice != OpenVR.k_unTrackedDeviceIndexInvalid)
             {
                 StringBuilder l_stringBuilder = new StringBuilder(32);
-                OpenVR.Debug.DriverDebugRequest(m_leapDevice, f_message, l_stringBuilder, 32);
+                OpenVR.Debug.DriverDebugRequest(m_leapDevice, p_message, l_stringBuilder, 32);
             }
         }
 
-        public void ShowNotification(string f_message)
+        public void ShowNotification(string p_message)
         {
-            // Why is it borked? It worked in C++, ffs
             uint l_notification = 0;
             NotificationBitmap_t l_bitmap = new NotificationBitmap_t();
             l_bitmap.m_pImageData = (IntPtr)0;
             l_bitmap.m_nHeight = 0;
             l_bitmap.m_nWidth = 0;
             l_bitmap.m_nBytesPerPixel = 0;
-            Console.WriteLine(OpenVR.Notifications.CreateNotification(m_notificationOverlay, 500, EVRNotificationType.Transient, f_message, EVRNotificationStyle.None, ref l_bitmap, ref l_notification).ToString());
+            OpenVR.Notifications.CreateNotification(m_notificationOverlay, 500, EVRNotificationType.Transient, p_message, EVRNotificationStyle.None, ref l_bitmap, ref l_notification);
         }
     }
 }

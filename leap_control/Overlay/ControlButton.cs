@@ -21,26 +21,26 @@
         GlmSharp.vec2 m_axisValues;
         bool m_updated = false;
 
-        public ControlButton(ButtonType f_type, string f_name)
+        public ControlButton(ButtonType p_type, string p_name)
         {
-            m_name = f_name;
-            m_type = f_type;
+            m_name = p_name;
+            m_type = p_type;
         }
 
-        public void SetState(ButtonState f_state)
+        public void SetState(ButtonState p_state)
         {
-            if(m_state != f_state)
+            if(m_state != p_state)
             {
-                m_state = f_state;
+                m_state = p_state;
                 m_updated = true;
             }
         }
 
-        public void SetAxes(GlmSharp.vec2 f_vec)
+        public void SetAxes(GlmSharp.vec2 p_vec)
         {
-            if(m_type == ButtonType.Axis && (m_axisValues != f_vec))
+            if(m_type == ButtonType.Axis && (m_axisValues != p_vec))
             {
-                m_axisValues = f_vec;
+                m_axisValues = p_vec;
                 m_updated = true;
             }
         }

@@ -7,17 +7,15 @@ CLeapPoller::CLeapPoller()
     m_active = false;
     m_thread = nullptr;
     m_connection = nullptr;
-    //m_allocator.allocate = CLeapPoller::AllocateMemory;
-    //m_allocator.deallocate = CLeapPoller::DeallocateMemory;
-    //m_allocator.state = nullptr;
-    m_lastFrame = nullptr;
-    m_newFrame = nullptr;
+    m_lastFrame = new LEAP_TRACKING_EVENT();
+    m_newFrame = new LEAP_TRACKING_EVENT();
     m_deviceValidFrames = false;
 }
 
 CLeapPoller::~CLeapPoller()
 {
     delete m_lastFrame;
+    delete m_newFrame;
 }
 
 bool CLeapPoller::Initialize()
@@ -28,9 +26,6 @@ bool CLeapPoller::Initialize()
         {
             if(LeapOpenConnection(m_connection) == eLeapRS_Success)
             {
-                //LeapSetAllocator(m_connection, &m_allocator);
-                m_lastFrame = new LEAP_TRACKING_EVENT();
-                m_newFrame = new LEAP_TRACKING_EVENT();
                 m_active = true;
                 m_thread = new std::thread(&CLeapPoller::ThreadUpdate, this);
             }
@@ -58,11 +53,6 @@ void CLeapPoller::Terminate()
         LeapDestroyConnection(m_connection);
 
         m_connection = nullptr;
-
-        delete m_lastFrame;
-        m_lastFrame = nullptr;
-        delete m_newFrame;
-        m_newFrame = nullptr;
     }
 }
 
@@ -78,14 +68,14 @@ const LEAP_TRACKING_EVENT* CLeapPoller::GetFrame()
     return l_result;
 }
 
-void CLeapPoller::SetTrackingMode(eLeapTrackingMode f_mode)
+void CLeapPoller::SetTrackingMode(eLeapTrackingMode p_mode)
 {
-    if(m_active) LeapSetTrackingMode(m_connection, f_mode);
+    if(m_active) LeapSetTrackingMode(m_connection, p_mode);
 }
 
-void CLeapPoller::SetPolicy(uint64_t f_set, uint64_t f_clear)
+void CLeapPoller::SetPolicy(uint64_t p_set, uint64_t p_clear)
 {
-    if(m_active) LeapSetPolicyFlags(m_connection, f_set, f_clear);
+    if(m_active) LeapSetPolicyFlags(m_connection, p_set, p_clear);
 }
 
 void CLeapPoller::Update()

@@ -3,7 +3,7 @@
 #include "Devices/CLeapStation.h"
 #include "Core/CServerDriver.h"
 
-CLeapStation::CLeapStation(CServerDriver *f_server)
+CLeapStation::CLeapStation(CServerDriver *p_server)
 {
     m_pose = { 0 };
     m_pose.deviceIsConnected = true;
@@ -29,7 +29,7 @@ CLeapStation::CLeapStation(CServerDriver *f_server)
     m_trackedDevice = vr::k_unTrackedDeviceIndexInvalid;
 
     m_serialNumber.assign("leap_motion_station");
-    m_serverDriver = f_server;
+    m_serverDriver = p_server;
 }
 
 CLeapStation::~CLeapStation()
@@ -121,9 +121,9 @@ const std::string& CLeapStation::GetSerialNumber() const
     return m_serialNumber;
 }
 
-void CLeapStation::SetTrackingState(TrackingState f_state)
+void CLeapStation::SetTrackingState(TrackingState p_state)
 {
-    switch(f_state)
+    switch(p_state)
     {
         case TS_Connected:
         {

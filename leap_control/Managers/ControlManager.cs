@@ -22,9 +22,9 @@ namespace leap_control
 
         GlmSharp.mat4 m_headTransform;
 
-        public ControlManager(Core f_core)
+        public ControlManager(Core p_core)
         {
-            m_core = f_core;
+            m_core = p_core;
         }
 
         public bool Initialize()
@@ -66,66 +66,69 @@ namespace leap_control
             }
         }
 
-        public void SetHandTransform(Hand f_hand, GlmSharp.mat4 f_mat)
+        public void SetHandTransform(Hand p_hand, GlmSharp.mat4 p_mat)
         {
-            switch(f_hand)
+            switch(p_hand)
             {
                 case Hand.Left:
-                    m_leftHandOverlay.SetWorldTransform(f_mat);
+                    m_leftHandOverlay.SetWorldTransform(p_mat);
                     break;
                 case Hand.Right:
-                    m_rightHandOverlay.SetWorldTransform(f_mat);
+                    m_rightHandOverlay.SetWorldTransform(p_mat);
                     break;
             }
         }
 
-        public void SetHandPresence(Hand f_hand, bool f_state, GlmSharp.vec3 f_tipPos)
+        public void SetHandPresence(Hand p_hand, bool p_state, GlmSharp.vec3 p_tipPos)
         {
-            switch(f_hand)
+            switch(p_hand)
             {
                 case Hand.Left:
                 {
-                    m_leftHandOverlay.SetHandPresence(f_state, f_tipPos);
+                    m_leftHandOverlay.SetHandPresence(p_state, p_tipPos);
 
                     Valve.VR.HmdMatrix34_t l_matrix = new Valve.VR.HmdMatrix34_t();
-                    (m_headTransform * GlmSharp.mat4.Translate(f_tipPos)).Convert(ref l_matrix);
+                    (m_headTransform * GlmSharp.mat4.Translate(p_tipPos)).Convert(ref l_matrix);
                     Valve.VR.OpenVR.Overlay.SetOverlayTransformAbsolute(m_leftFingerOverlay, Valve.VR.ETrackingUniverseOrigin.TrackingUniverseRawAndUncalibrated, ref l_matrix);
                 }
                 break;
                 case Hand.Right:
                 {
-                    m_rightHandOverlay.SetHandPresence(f_state, f_tipPos);
+                    m_rightHandOverlay.SetHandPresence(p_state, p_tipPos);
 
                     Valve.VR.HmdMatrix34_t l_matrix = new Valve.VR.HmdMatrix34_t();
-                    (m_headTransform * GlmSharp.mat4.Translate(f_tipPos)).Convert(ref l_matrix);
+                    (m_headTransform * GlmSharp.mat4.Translate(p_tipPos)).Convert(ref l_matrix);
                     Valve.VR.OpenVR.Overlay.SetOverlayTransformAbsolute(m_rightFingerOverlay, Valve.VR.ETrackingUniverseOrigin.TrackingUniverseRawAndUncalibrated, ref l_matrix);
                 }
                 break;
             }
         }
 
-        public void SetHeadTransform(GlmSharp.mat4 f_transform)
+        public void SetHeadTransform(GlmSharp.mat4 p_transform)
         {
-            m_headTransform = f_transform;
+            m_headTransform = p_transform;
         }
 
         public void DoPulse()
         {
+            m_leftHandOverlay.SetLocked(m_rightHandOverlay.IsInputActive());
             m_leftHandOverlay.Update(m_headTransform);
+
+            m_rightHandOverlay.SetLocked(m_leftHandOverlay.IsInputActive());
             m_rightHandOverlay.Update(m_headTransform);
 
             ProcessControls(m_leftHandOverlay.GetControlButtons(), Hand.Left);
             ProcessControls(m_rightHandOverlay.GetControlButtons(), Hand.Right);
         }
 
-        void ProcessControls(List<ControlButton> l_buttons, Hand f_hand)
+        void ProcessControls(List<ControlButton> p_buttons, Hand p_hand)
         {
-            foreach(var l_controlButton in l_buttons)
+            foreach(var l_controlButton in p_buttons)
             {
                 if(l_controlButton.IsUpdated())
                 {
                     string l_message = "input ";
-                    l_message += f_hand.ToString().ToLower();
+                    l_message += p_hand.ToString().ToLower();
                     l_message += ' ';
                     switch(l_controlButton.GetButtonType())
                     {

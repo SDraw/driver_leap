@@ -25,9 +25,9 @@ vr::VRInputComponentHandle_t& CControllerButton::GetHandleRef()
     return m_handle;
 }
 
-void CControllerButton::SetInputType(unsigned char f_type)
+void CControllerButton::SetInputType(unsigned char p_type)
 {
-    m_inputType = f_type;
+    m_inputType = p_type;
 }
 
 unsigned char CControllerButton::GetInputType() const
@@ -35,13 +35,13 @@ unsigned char CControllerButton::GetInputType() const
     return m_inputType;
 }
 
-void CControllerButton::SetState(bool f_state)
+void CControllerButton::SetState(bool p_state)
 {
     if(m_inputType == IT_Boolean)
     {
-        if(m_state != f_state)
+        if(m_state != p_state)
         {
-            m_state = f_state;
+            m_state = p_state;
             m_updated = true;
         }
     }
@@ -52,13 +52,13 @@ bool CControllerButton::GetState() const
     return m_state;
 }
 
-void CControllerButton::SetValue(float f_value)
+void CControllerButton::SetValue(float p_value)
 {
     if(m_inputType == IT_Float)
     {
-        if(m_value != f_value)
+        if(m_value != p_value)
         {
-            m_value = f_value;
+            m_value = p_value;
             m_updated = true;
         }
     }

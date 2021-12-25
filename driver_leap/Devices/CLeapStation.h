@@ -28,12 +28,12 @@ public:
         TS_Search
     };
 
-    explicit CLeapStation(CServerDriver *f_server);
+    explicit CLeapStation(CServerDriver *p_server);
     ~CLeapStation();
 
     const std::string& GetSerialNumber() const;
 
-    void SetTrackingState(TrackingState f_state);
+    void SetTrackingState(TrackingState p_state);
 
     void RunFrame();
 };

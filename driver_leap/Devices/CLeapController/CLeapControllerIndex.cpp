@@ -22,9 +22,9 @@ enum HandFinger : size_t
     HF_Count
 };
 
-CLeapControllerIndex::CLeapControllerIndex(unsigned char f_hand)
+CLeapControllerIndex::CLeapControllerIndex(unsigned char p_hand)
 {
-    m_hand = (f_hand % CH_Count);
+    m_hand = (p_hand % CH_Count);
     m_type = CT_IndexKnuckle;
     m_serialNumber.assign((m_hand == CH_Left) ? "LHR-E217CD00" : "LHR-E217CD01");
 
@@ -67,32 +67,32 @@ CLeapControllerIndex::~CLeapControllerIndex()
 {
 }
 
-void CLeapControllerIndex::ChangeBoneOrientation(glm::quat &f_rot)
+void CLeapControllerIndex::ChangeBoneOrientation(glm::quat &p_rot)
 {
-    std::swap(f_rot.x, f_rot.z);
-    f_rot.z *= -1.f;
+    std::swap(p_rot.x, p_rot.z);
+    p_rot.z *= -1.f;
     if(m_hand == CH_Left)
     {
-        f_rot.x *= -1.f;
-        f_rot.y *= -1.f;
+        p_rot.x *= -1.f;
+        p_rot.y *= -1.f;
     }
 }
 
-void CLeapControllerIndex::ChangeAuxTransformation(glm::vec3 &f_pos, glm::quat &f_rot)
+void CLeapControllerIndex::ChangeAuxTransformation(glm::vec3 &p_pos, glm::quat &p_rot)
 {
-    f_pos.y *= -1.f;
-    f_pos.z *= -1.f;
+    p_pos.y *= -1.f;
+    p_pos.z *= -1.f;
 
-    std::swap(f_rot.x, f_rot.w);
-    f_rot.w *= -1.f;
-    std::swap(f_rot.y, f_rot.z);
-    f_rot.y *= -1.f;
+    std::swap(p_rot.x, p_rot.w);
+    p_rot.w *= -1.f;
+    std::swap(p_rot.y, p_rot.z);
+    p_rot.y *= -1.f;
 }
 
-size_t CLeapControllerIndex::GetFingerBoneIndex(size_t f_id)
+size_t CLeapControllerIndex::GetFingerBoneIndex(size_t p_id)
 {
     size_t l_result = 0U;
-    switch(f_id)
+    switch(p_id)
     {
         case HF_Thumb:
             l_result = HSB_Thumb0;
@@ -259,12 +259,12 @@ void CLeapControllerIndex::ActivateInternal()
     vr::VRDriverInput()->CreateHapticComponent(m_propertyContainer, "/output/haptic", &m_haptic);
 }
 
-void CLeapControllerIndex::UpdateGestures(const LEAP_HAND *f_hand, const LEAP_HAND *f_oppHand)
+void CLeapControllerIndex::UpdateGestures(const LEAP_HAND *p_hand)
 {
-    if(f_hand)
+    if(p_hand)
     {
         std::vector<float> l_gestures;
-        CGestureMatcher::GetGestures(f_hand, l_gestures, f_oppHand);
+        CGestureMatcher::GetGestures(p_hand, l_gestures);
 
         m_buttons[IB_TriggerValue]->SetValue(l_gestures[CGestureMatcher::HG_Trigger]);
         m_buttons[IB_TriggerClick]->SetState(l_gestures[CGestureMatcher::HG_Trigger] >= 0.75f);
@@ -280,11 +280,11 @@ void CLeapControllerIndex::UpdateGestures(const LEAP_HAND *f_hand, const LEAP_HA
 
         for(size_t i = 0U; i < 5U; i++)
         {
-            const LEAP_DIGIT &l_finger = f_hand->digits[i];
+            const LEAP_DIGIT &l_finger = p_hand->digits[i];
             size_t l_transformIndex = GetFingerBoneIndex(i);
             if(l_transformIndex != HSB_Thumb0) l_transformIndex++;
 
-            LEAP_QUATERNION l_leapRotation = f_hand->palm.orientation;
+            LEAP_QUATERNION l_leapRotation = p_hand->palm.orientation;
             glm::quat l_segmentRotation;
             ConvertQuaternion(l_leapRotation, l_segmentRotation);
 
@@ -345,14 +345,14 @@ void CLeapControllerIndex::UpdateInputInternal()
     vr::VRDriverInput()->UpdateSkeletonComponent(m_skeletonHandle, vr::VRSkeletalMotionRange_WithoutController, m_boneTransform, HSB_Count);
 }
 
-void CLeapControllerIndex::SetButtonState(size_t f_button, bool f_state)
+void CLeapControllerIndex::SetButtonState(size_t p_button, bool p_state)
 {
-    if(f_button < m_buttons.size())
-        m_buttons[f_button]->SetState(f_state);
+    if(p_button < m_buttons.size())
+        m_buttons[p_button]->SetState(p_state);
 }
 
-void CLeapControllerIndex::SetButtonValue(size_t f_button, float f_value)
+void CLeapControllerIndex::SetButtonValue(size_t p_button, float p_value)
 {
-    if(f_button < m_buttons.size())
-        m_buttons[f_button]->SetValue(f_value);
+    if(p_button < m_buttons.size())
+        m_buttons[p_button]->SetValue(p_value);
 }

@@ -47,13 +47,13 @@ class CLeapControllerIndex final : public CLeapController
     CLeapControllerIndex(const CLeapControllerIndex &that) = delete;
     CLeapControllerIndex& operator=(const CLeapControllerIndex &that) = delete;
 
-    void ChangeBoneOrientation(glm::quat &f_rot);
-    static void ChangeAuxTransformation(glm::vec3 &f_pos, glm::quat &f_rot);
-    static size_t GetFingerBoneIndex(size_t f_id);
+    void ChangeBoneOrientation(glm::quat &p_rot);
+    static void ChangeAuxTransformation(glm::vec3 &p_pos, glm::quat &p_rot);
+    static size_t GetFingerBoneIndex(size_t p_id);
 
     // CLeapController
     void ActivateInternal() override;
-    void UpdateGestures(const LEAP_HAND *f_hand, const LEAP_HAND *f_oppHand) override;
+    void UpdateGestures(const LEAP_HAND *p_hand) override;
     void UpdateInputInternal() override;
 public:
     enum IndexButton : size_t
@@ -85,9 +85,9 @@ public:
         IB_Count
     };
 
-    explicit CLeapControllerIndex(unsigned char f_hand);
+    explicit CLeapControllerIndex(unsigned char p_hand);
     ~CLeapControllerIndex();
 
-    void SetButtonState(size_t f_button, bool f_state);
-    void SetButtonValue(size_t f_button, float f_value);
+    void SetButtonState(size_t p_button, bool p_state);
+    void SetButtonValue(size_t p_button, float p_value);
 };

@@ -32,8 +32,8 @@ namespace leap_control
         static readonly float ms_overlayWidthHalf = ms_overlayWidth * 0.5f;
         static readonly float ms_touchDistance = ms_overlayWidth * 0.5f * 0.5f;
         static readonly float ms_clickDistance = ms_overlayWidth * 0.5f * 0.25f;
-        static readonly GlmSharp.quat ms_rotation = new GlmSharp.quat(new GlmSharp.vec3(-(float)Math.PI / 2f, 0f, 0f));
-        static readonly GlmSharp.vec3 ms_displacement = new GlmSharp.vec3(0f, 0f, 0.0625f);
+        static readonly GlmSharp.quat ms_rotationOffset = new GlmSharp.quat(new GlmSharp.vec3(-(float)Math.PI / 2f, 0f, 0f));
+        static readonly GlmSharp.vec3 ms_positionOffset = new GlmSharp.vec3(0f, 0f, 0.0625f);
 
         static Dictionary<string, SFML.Graphics.Texture> ms_resources = new Dictionary<string, SFML.Graphics.Texture>();
 
@@ -69,7 +69,12 @@ namespace leap_control
 
         List<ControlButton> m_controlButtons = null;
 
-        public HandOverlay(Hand f_hand)
+        float m_opacity = 1f;
+        float m_rangeOpacity = 0.5f;
+
+        bool m_locked = false;
+
+        public HandOverlay(Hand p_hand)
         {
             m_renderTexture = new SFML.Graphics.RenderTexture(512, 512);
 
@@ -114,7 +119,7 @@ namespace leap_control
             m_presureFillRectangle.FillColor = ms_inactiveColor;
 
             // Create overlay
-            Valve.VR.OpenVR.Overlay.CreateOverlay(ms_overlayNames[(int)f_hand], "Ultraleap hand overlay", ref m_overlay);
+            Valve.VR.OpenVR.Overlay.CreateOverlay(ms_overlayNames[(int)p_hand], "Ultraleap hand overlay", ref m_overlay);
             Valve.VR.OpenVR.Overlay.SetOverlayWidthInMeters(m_overlay, ms_overlayWidth);
             Valve.VR.OpenVR.Overlay.ShowOverlay(m_overlay);
             m_overlayTexture.eColorSpace = Valve.VR.EColorSpace.Gamma;
@@ -130,29 +135,29 @@ namespace leap_control
             m_controlButtons.Add(new ControlButton(ControlButton.ButtonType.Axis, "touchpad"));
         }
 
-        public void SetWorldTransform(GlmSharp.mat4 f_mat)
+        public void SetWorldTransform(GlmSharp.mat4 p_mat)
         {
-            m_position = (f_mat * GlmSharp.vec4.UnitW).xyz;
-            m_rotation = f_mat.ToQuaternion * ms_rotation;
+            m_position = (p_mat * GlmSharp.vec4.UnitW).xyz;
+            m_rotation = p_mat.ToQuaternion * ms_rotationOffset;
             m_direction = m_rotation * -GlmSharp.vec3.UnitZ;
-            m_position += m_rotation * ms_displacement;
+            m_position += m_rotation * ms_positionOffset;
         }
 
-        public void SetHandPresence(bool f_presence, GlmSharp.vec3 f_tipPos)
+        public void SetHandPresence(bool p_presence, GlmSharp.vec3 p_tipPos)
         {
-            m_handPresence = f_presence;
-            m_tipPositionLocal = f_tipPos;
+            m_handPresence = p_presence;
+            m_tipPositionLocal = p_tipPos;
         }
 
         public List<ControlButton> GetControlButtons() => m_controlButtons;
 
-        public void Update(GlmSharp.mat4 f_headTransform)
+        public void Update(GlmSharp.mat4 p_headTransform)
         {
             // Reset controls
             foreach(ControlButton l_controlButton in m_controlButtons)
                 l_controlButton.ResetUpdate();
 
-            m_tipPositionGlobal = ((f_headTransform * GlmSharp.mat4.Translate(m_tipPositionLocal)) * GlmSharp.vec4.UnitW).xyz;
+            m_tipPositionGlobal = ((p_headTransform * GlmSharp.mat4.Translate(m_tipPositionLocal)) * GlmSharp.vec4.UnitW).xyz;
 
             // Update overlays transform
             m_matrix = (GlmSharp.mat4.Translate(m_position) * m_rotation.ToMat4);
@@ -160,7 +165,7 @@ namespace leap_control
             Valve.VR.OpenVR.Overlay.SetOverlayTransformAbsolute(m_overlay, Valve.VR.ETrackingUniverseOrigin.TrackingUniverseRawAndUncalibrated, ref m_vrMatrix);
 
             m_cursorPosition = ((m_matrix.Inverse * GlmSharp.mat4.Translate(m_tipPositionGlobal)) * GlmSharp.vec4.UnitW).xyz;
-            if(m_handPresence && m_cursorPosition.IsInRange(-ms_overlayWidthHalf, ms_overlayWidthHalf) && (m_cursorPosition.z > -0.025f))
+            if(m_handPresence && !m_locked && m_cursorPosition.IsInRange(-ms_overlayWidthHalf, ms_overlayWidthHalf) && (m_cursorPosition.z > -0.025f))
             {
                 m_cursorShape.FillColor = ((m_cursorPosition.z <= ms_touchDistance) ? ms_touchColor : ms_activeColor);
                 m_cursorPlanePosition.x = ((m_cursorPosition.x + ms_overlayWidthHalf) / ms_overlayWidth) * 512f;
@@ -256,7 +261,7 @@ namespace leap_control
                 }
 
                 // Presure indicator
-                float l_presure = 1f - Utils.Clamp(Utils.Clamp(m_cursorPosition.z, 0f, float.MaxValue) / ms_overlayWidthHalf, 0f, 1f);
+                float l_presure = 1f - GlmSharp.glm.Clamp(GlmSharp.glm.Clamp(m_cursorPosition.z, 0f, float.MaxValue) / ms_overlayWidthHalf, 0f, 1f);
                 m_presureFillRectangle.Size = new SFML.System.Vector2f(m_presureFillRectangle.Size.X, -320f * l_presure);
                 m_presureFillRectangle.FillColor = ((l_presure >= 0.5f) ? ((l_presure >= 0.75f) ? ms_axisColorClick : ms_axisColorTouch) : ms_activeColor);
 
@@ -290,8 +295,16 @@ namespace leap_control
             }
 
             // Update overlay
+            m_rangeOpacity = GlmSharp.glm.Lerp(m_rangeOpacity, m_locked ? 0f : 0.5f, 0.25f);
+            m_opacity = GlmSharp.glm.Lerp(m_opacity, m_inRange ? 1f : m_rangeOpacity, 0.25f);
             Valve.VR.OpenVR.Overlay.SetOverlayTexture(m_overlay, ref m_overlayTexture);
+            Valve.VR.OpenVR.Overlay.SetOverlayAlpha(m_overlay, m_opacity);
         }
+
+        public bool GetLocked() => m_locked;
+        public bool SetLocked(bool p_state) => m_locked = p_state;
+
+        public bool IsInputActive() => m_inRange;
 
         public static void LoadResources()
         {

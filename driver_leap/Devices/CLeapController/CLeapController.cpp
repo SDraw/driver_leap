@@ -96,9 +96,9 @@ bool CLeapController::IsEnabled() const
     return m_pose.deviceIsConnected;
 }
 
-void CLeapController::SetEnabled(bool f_state)
+void CLeapController::SetEnabled(bool p_state)
 {
-    m_pose.deviceIsConnected = f_state;
+    m_pose.deviceIsConnected = p_state;
     if(m_trackedDevice != vr::k_unTrackedDeviceIndexInvalid) vr::VRServerDriverHost()->TrackedDevicePoseUpdated(m_trackedDevice, m_pose, sizeof(vr::DriverPose_t));
 }
 
@@ -116,16 +116,16 @@ void CLeapController::ResetControls()
     }
 }
 
-void CLeapController::RunFrame(const LEAP_HAND *f_hand, const LEAP_HAND *f_oppHand)
+void CLeapController::RunFrame(const LEAP_HAND *p_hand)
 {
     if(m_trackedDevice != vr::k_unTrackedDeviceIndexInvalid)
     {
         if(m_pose.deviceIsConnected)
         {
-            UpdateTransformation(f_hand);
+            UpdateTransformation(p_hand);
             vr::VRServerDriverHost()->TrackedDevicePoseUpdated(m_trackedDevice, m_pose, sizeof(vr::DriverPose_t));
 
-            UpdateGestures(f_hand, f_oppHand);
+            UpdateGestures(p_hand);
             UpdateInput();
         }
         else vr::VRServerDriverHost()->TrackedDevicePoseUpdated(m_trackedDevice, m_pose, sizeof(vr::DriverPose_t));
@@ -153,16 +153,16 @@ void CLeapController::UpdateInput()
     UpdateInputInternal();
 }
 
-void CLeapController::UpdateTransformation(const LEAP_HAND *f_hand)
+void CLeapController::UpdateTransformation(const LEAP_HAND *p_hand)
 {
-    m_pose.poseIsValid = (f_hand != nullptr);
+    m_pose.poseIsValid = (p_hand != nullptr);
 
-    if(f_hand)
+    if(p_hand)
     {
         std::memcpy(m_pose.vecWorldFromDriverTranslation, ms_headPosition, sizeof(double) * 3U);
 
-        const LEAP_VECTOR l_palmPosition = f_hand->palm.position;
-        const LEAP_QUATERNION l_palmOrientation = f_hand->palm.orientation;
+        const LEAP_VECTOR l_palmPosition = p_hand->palm.position;
+        const LEAP_QUATERNION l_palmOrientation = p_hand->palm.orientation;
 
         std::memcpy(&m_pose.qWorldFromDriverRotation, &ms_headRotation, sizeof(vr::HmdQuaternion_t));
 
@@ -172,7 +172,7 @@ void CLeapController::UpdateTransformation(const LEAP_HAND *f_hand)
 
         if(CDriverConfig::IsVelocityUsed())
         {
-            const LEAP_VECTOR l_palmVelocity = f_hand->palm.velocity;
+            const LEAP_VECTOR l_palmVelocity = p_hand->palm.velocity;
             glm::vec3 l_resultVelocity(-0.001f*l_palmVelocity.x, -0.001f*l_palmVelocity.z, -0.001f*l_palmVelocity.y);
             l_resultVelocity = glm::quat(ms_headRotation.w, ms_headRotation.x, ms_headRotation.y, ms_headRotation.z)  * l_resultVelocity;
             m_pose.vecVelocity[0] = l_resultVelocity.x;
@@ -207,7 +207,7 @@ void CLeapController::ActivateInternal()
 {
 }
 
-void CLeapController::UpdateGestures(const LEAP_HAND *f_hand, const LEAP_HAND *f_oppHand)
+void CLeapController::UpdateGestures(const LEAP_HAND *p_hand)
 {
 }
 

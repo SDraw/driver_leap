@@ -42,48 +42,48 @@ extern const vr::VRBoneTransform_t g_openHandGesture[31U]
 
 extern const glm::vec4 g_zeroPoint(0.f, 0.f, 0.f, 1.f);
 
-void ConvertMatrix(const vr::HmdMatrix34_t &f_matVR, glm::mat4 &f_mat)
+void ConvertMatrix(const vr::HmdMatrix34_t &p_matVR, glm::mat4 &p_mat)
 {
     for(int i = 0; i < 4; i++)
     {
-        for(int j = 0; j < 3; j++) f_mat[i][j] = f_matVR.m[j][i];
+        for(int j = 0; j < 3; j++) p_mat[i][j] = p_matVR.m[j][i];
     }
-    for(int i = 0; i < 3; i++) f_mat[i][3] = 0.f;
-    f_mat[3][3] = 1.f;
+    for(int i = 0; i < 3; i++) p_mat[i][3] = 0.f;
+    p_mat[3][3] = 1.f;
 }
 
-void ConvertVector3(const vr::HmdVector4_t &f_vrVec, glm::vec3 &f_glmVec)
+void ConvertVector3(const vr::HmdVector4_t &p_vrVec, glm::vec3 &p_glmVec)
 {
-    for(size_t i = 0U; i < 3U; i++) f_glmVec[i] = f_vrVec.v[i];
+    for(size_t i = 0U; i < 3U; i++) p_glmVec[i] = p_vrVec.v[i];
 }
 
-void ConvertVector3(const glm::vec3 &f_glmVec, vr::HmdVector4_t &f_vrVec)
+void ConvertVector3(const glm::vec3 &p_glmVec, vr::HmdVector4_t &p_vrVec)
 {
-    for(size_t i = 0U; i < 3U; i++) f_vrVec.v[i] = f_glmVec[i];
+    for(size_t i = 0U; i < 3U; i++) p_vrVec.v[i] = p_glmVec[i];
 }
 
-size_t ReadEnumVector(const std::string &f_val, const std::vector<std::string> &f_vec)
+size_t ReadEnumVector(const std::string &p_val, const std::vector<std::string> &p_vec)
 {
     size_t l_result = std::numeric_limits<size_t>::max();
-    for(auto iter = f_vec.begin(), iterEnd = f_vec.end(); iter != iterEnd; ++iter)
+    for(auto iter = p_vec.begin(), iterEnd = p_vec.end(); iter != iterEnd; ++iter)
     {
-        if(!iter->compare(f_val))
+        if(!iter->compare(p_val))
         {
-            l_result = std::distance(f_vec.begin(), iter);
+            l_result = std::distance(p_vec.begin(), iter);
             break;
         }
     }
     return l_result;
 }
 
-size_t ReadEnumVector(const char *f_val, const std::vector<std::string> &f_vec)
+size_t ReadEnumVector(const char *p_val, const std::vector<std::string> &p_vec)
 {
     size_t l_result = std::numeric_limits<size_t>::max();
-    for(auto iter = f_vec.begin(), iterEnd = f_vec.end(); iter != iterEnd; ++iter)
+    for(auto iter = p_vec.begin(), iterEnd = p_vec.end(); iter != iterEnd; ++iter)
     {
-        if(!iter->compare(f_val))
+        if(!iter->compare(p_val))
         {
-            l_result = std::distance(f_vec.begin(), iter);
+            l_result = std::distance(p_vec.begin(), iter);
             break;
         }
     }

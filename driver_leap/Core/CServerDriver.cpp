@@ -186,7 +186,7 @@ void CServerDriver::RunFrame()
     // Update devices
     for(size_t i = 0U; i < LCH_Count; i++)
     {
-        m_controllers[i]->RunFrame(l_hands[i], l_hands[(i + 1) % LCH_Count]);
+        m_controllers[i]->RunFrame(l_hands[i]);
     }
     m_leapStation->RunFrame();
 }
@@ -205,9 +205,9 @@ void CServerDriver::LeaveStandby()
 }
 
 // CServerDriver
-void CServerDriver::ProcessExternalMessage(const char *f_message)
+void CServerDriver::ProcessExternalMessage(const char *p_message)
 {
-    std::stringstream l_stream(f_message);
+    std::stringstream l_stream(p_message);
     std::string l_event;
 
     // Scary stuff
