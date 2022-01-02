@@ -28,7 +28,7 @@ void CGestureMatcher::GetGestures(const LEAP_HAND *p_hand, std::vector<float> &p
         }
     }
 
-    for(size_t i = 0U; i <= HG_PinkyBend; i++) p_result[i] = NormalizeRange(l_fingerBend[i], (i == 0U) ? 0.f : g_piQuarter, (i == 0U) ? g_piQuarter : g_pi);
+    for(size_t i = 0U; i < 5U; i++) p_result[HG_ThumbBend + i] = NormalizeRange(l_fingerBend[i], (i == 0U) ? 0.f : g_piQuarter, (i == 0U) ? g_piQuarter : g_pi);
 
     // Simple gestures
     p_result[HG_Trigger] = p_result[HG_IndexBend];

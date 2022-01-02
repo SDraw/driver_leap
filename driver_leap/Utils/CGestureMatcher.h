@@ -7,11 +7,11 @@ public:
     enum HandGesture : size_t
     {
         // Simple gestures
-        HG_Trigger,
+        HG_Trigger = 0U,
         HG_Grab,
 
         // Finger bends
-        HG_ThumbBend = 0U,
+        HG_ThumbBend,
         HG_IndexBend,
         HG_MiddleBend,
         HG_RingBend,

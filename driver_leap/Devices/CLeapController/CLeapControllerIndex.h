@@ -61,6 +61,7 @@ public:
         IB_SystemClick = 0U,
         IB_SystemTouch,
         IB_TriggerClick,
+        IB_TriggerTouch,
         IB_TriggerValue,
         IB_TrackpadX,
         IB_TrackpadY,

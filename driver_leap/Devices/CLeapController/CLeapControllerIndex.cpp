@@ -185,6 +185,9 @@ void CLeapControllerIndex::ActivateInternal()
     vr::VRDriverInput()->CreateBooleanComponent(m_propertyContainer, "/input/trigger/click", &m_buttons[IB_TriggerClick]->GetHandleRef());
     m_buttons[IB_TriggerClick]->SetInputType(CControllerButton::IT_Boolean);
 
+    vr::VRDriverInput()->CreateBooleanComponent(m_propertyContainer, "/input/trigger/touch", &m_buttons[IB_TriggerTouch]->GetHandleRef());
+    m_buttons[IB_TriggerClick]->SetInputType(CControllerButton::IT_Boolean);
+
     vr::VRDriverInput()->CreateScalarComponent(m_propertyContainer, "/input/trigger/value", &m_buttons[IB_TriggerValue]->GetHandleRef(), vr::VRScalarType_Absolute, vr::VRScalarUnits_NormalizedOneSided);
     m_buttons[IB_TriggerValue]->SetInputType(CControllerButton::IT_Float);
 
@@ -267,12 +270,13 @@ void CLeapControllerIndex::UpdateGestures(const LEAP_HAND *p_hand)
         CGestureMatcher::GetGestures(p_hand, l_gestures);
 
         m_buttons[IB_TriggerValue]->SetValue(l_gestures[CGestureMatcher::HG_Trigger]);
+        m_buttons[IB_TriggerTouch]->SetState(l_gestures[CGestureMatcher::HG_Trigger] >= 0.5f);
         m_buttons[IB_TriggerClick]->SetState(l_gestures[CGestureMatcher::HG_Trigger] >= 0.75f);
 
         m_buttons[IB_GripValue]->SetValue(l_gestures[CGestureMatcher::HG_Grab]);
-        m_buttons[IB_GripTouch]->SetState(l_gestures[CGestureMatcher::HG_Grab] >= 0.25f);
-        m_buttons[IB_GripForce]->SetValue((l_gestures[CGestureMatcher::HG_Grab] >= 0.75f) ? (l_gestures[CGestureMatcher::HG_Grab] - 0.75f) * 4.f : 0.f);
-
+        m_buttons[IB_GripTouch]->SetState(l_gestures[CGestureMatcher::HG_Grab] >= 0.75f);
+        m_buttons[IB_GripForce]->SetValue((l_gestures[CGestureMatcher::HG_Grab] >= 0.9f) ? (l_gestures[CGestureMatcher::HG_Grab] - 0.9f) * 10.f : 0.f);
+        
         m_buttons[IB_FingerIndex]->SetValue(l_gestures[CGestureMatcher::HG_IndexBend]);
         m_buttons[IB_FingerMiddle]->SetValue(l_gestures[CGestureMatcher::HG_MiddleBend]);
         m_buttons[IB_FingerRing]->SetValue(l_gestures[CGestureMatcher::HG_RingBend]);
