@@ -24,7 +24,6 @@ List of hands gestures that correspond to controller original input:
 * **Trigger:** bending of index finger
 
 ## Notes
-* Testing commits are currently pushed.
+* CSFML graphics module is built from [fork](https://github.com/SDraw/SFML/tree/2.5.x) to address [SteamVR OpenGL textures problems on AMD GPUs](https://github.com/ValveSoftware/openvr/issues/1246).
 * If you see only green dots that represent tip of your index fingers, force `leap_control` to launch on dGPU through control panel of your GPU vendor.
-  * Overlays aren't rendered on AMD GPUs due to [SteamVR internal bug](https://github.com/ValveSoftware/openvr/issues/1246).
-* Tracking will be lost upon service shutdown/restart
+* Tracking will be lost upon service shutdown/restart.
