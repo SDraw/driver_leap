@@ -7,11 +7,10 @@ class CLeapPoller
     std::thread *m_thread;
 
     LEAP_CONNECTION m_connection;
-    //LEAP_ALLOCATOR m_allocator;
     LEAP_TRACKING_EVENT *m_lastFrame;
     LEAP_TRACKING_EVENT *m_newFrame;
 
-    // Shenanigans for idiotic behaviour of new SDK
+    // Shenanigans for weird behaviour of new SDK
     std::atomic<bool> m_deviceValidFrames;
 
     void ThreadUpdate();

@@ -10,6 +10,16 @@ const glm::quat g_reverseRotation(0.f, 0.f, 0.70106769f, -0.70106769f);
 const glm::quat g_rotateHalfPiZ(0.70106769f, 0.f, 0.f, 0.70106769f);
 const glm::quat g_rotateHalfPiZN(0.70106769f, 0.f, 0.f, -0.70106769f);
 const vr::HmdQuaternion_t g_vrZeroRotation = { 1.0, .0, .0, .0 };
+const glm::vec3 g_positionInversions[] =
+{
+    { 1.f, 1.f, 1.f },
+    { -1.f, 1.f, 1.f }
+};
+const glm::vec3 g_rotationInversions[] =
+{
+    { 1.f, 1.f, 1.f },
+    { 1.f, -1.f, -1.f }
+};
 
 double CLeapController::ms_headPosition[] = { .0, .0, .0 };
 vr::HmdQuaternion_t CLeapController::ms_headRotation = { 1.0, .0, .0, .0 };
@@ -160,35 +170,56 @@ void CLeapController::UpdateTransformation(const LEAP_HAND *p_hand)
     if(p_hand)
     {
         std::memcpy(m_pose.vecWorldFromDriverTranslation, ms_headPosition, sizeof(double) * 3U);
-
-        const LEAP_VECTOR l_palmPosition = p_hand->palm.position;
-        const LEAP_QUATERNION l_palmOrientation = p_hand->palm.orientation;
-
         std::memcpy(&m_pose.qWorldFromDriverRotation, &ms_headRotation, sizeof(vr::HmdQuaternion_t));
 
-        m_pose.vecPosition[0] = -0.001f*l_palmPosition.x;
-        m_pose.vecPosition[1] = -0.001f*l_palmPosition.z;
-        m_pose.vecPosition[2] = -0.001f*l_palmPosition.y;
+        // Root offset
+        glm::quat l_headRot(ms_headRotation.w, ms_headRotation.x, ms_headRotation.y, ms_headRotation.z);
+        glm::vec3 l_rootLocalOffset = l_headRot * CDriverConfig::GetRootOffset();
 
+        m_pose.vecWorldFromDriverTranslation[0] += l_rootLocalOffset.x;
+        m_pose.vecWorldFromDriverTranslation[1] += l_rootLocalOffset.y;
+        m_pose.vecWorldFromDriverTranslation[2] += l_rootLocalOffset.z;
+
+        // Root angle
+        glm::quat l_rootAngle(glm::vec3(CDriverConfig::GetRootAngle(), 0.f, 0.f));
+        glm::quat l_appliedRot = l_headRot * l_rootAngle;
+
+        m_pose.qWorldFromDriverRotation.w = l_appliedRot.w;
+        m_pose.qWorldFromDriverRotation.x = l_appliedRot.x;
+        m_pose.qWorldFromDriverRotation.y = l_appliedRot.y;
+        m_pose.qWorldFromDriverRotation.z = l_appliedRot.z;
+
+        // Velocity
         if(CDriverConfig::IsVelocityUsed())
         {
-            const LEAP_VECTOR l_palmVelocity = p_hand->palm.velocity;
-            glm::vec3 l_resultVelocity(-0.001f*l_palmVelocity.x, -0.001f*l_palmVelocity.z, -0.001f*l_palmVelocity.y);
-            l_resultVelocity = glm::quat(ms_headRotation.w, ms_headRotation.x, ms_headRotation.y, ms_headRotation.z)  * l_resultVelocity;
+            glm::vec3 l_resultVelocity(-0.001f * p_hand->palm.velocity.x, -0.001f * p_hand->palm.velocity.z, -0.001f * p_hand->palm.velocity.y);
+            l_resultVelocity = l_appliedRot * l_resultVelocity;
             m_pose.vecVelocity[0] = l_resultVelocity.x;
             m_pose.vecVelocity[1] = l_resultVelocity.y;
             m_pose.vecVelocity[2] = l_resultVelocity.z;
         }
 
-        glm::quat l_rotation(l_palmOrientation.w, l_palmOrientation.x, l_palmOrientation.y, l_palmOrientation.z);
-        l_rotation = g_reverseRotation * l_rotation;
-        l_rotation *= ((m_hand == CH_Left) ? g_rotateHalfPiZN : g_rotateHalfPiZ);
-        l_rotation = glm::normalize(l_rotation);
+        // Rotation
+        glm::quat l_localRotation(p_hand->palm.orientation.w, p_hand->palm.orientation.x, p_hand->palm.orientation.y, p_hand->palm.orientation.z);
+        l_localRotation = g_reverseRotation * l_localRotation;
+        l_localRotation *= ((m_hand == CH_Left) ? g_rotateHalfPiZN : g_rotateHalfPiZ);
+        l_localRotation = glm::normalize(l_localRotation);
 
-        m_pose.qRotation.x = l_rotation.x;
-        m_pose.qRotation.y = l_rotation.y;
-        m_pose.qRotation.z = l_rotation.z;
-        m_pose.qRotation.w = l_rotation.w;
+        // Offset position
+        glm::vec3 l_localPos(-0.001f * p_hand->palm.position.x, -0.001f * p_hand->palm.position.z, -0.001f * p_hand->palm.position.y);
+        l_localPos += (l_localRotation * (CDriverConfig::GetHandsOffset() * g_positionInversions[m_hand]));
+
+        m_pose.vecPosition[0] = l_localPos.x;
+        m_pose.vecPosition[1] = l_localPos.y;
+        m_pose.vecPosition[2] = l_localPos.z;
+
+        // Offset rotation
+        l_localRotation = l_localRotation * (glm::quat(CDriverConfig::GetHandsRotationOffset() * g_rotationInversions[m_hand]));
+
+        m_pose.qRotation.x = l_localRotation.x;
+        m_pose.qRotation.y = l_localRotation.y;
+        m_pose.qRotation.z = l_localRotation.z;
+        m_pose.qRotation.w = l_localRotation.w;
         m_pose.result = vr::TrackingResult_Running_OK;
     }
     else

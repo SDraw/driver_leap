@@ -17,6 +17,10 @@ Driver settings are configurated by editing `resources/settings.xml`. Available 
 * `trackingLevel`: skeleton tracking style for OpenVR. Can be `partial` or `full`. `partial` by default.
 * `handsReset`: marks controllers as out of range if hand for controller isn't detected by Leap Motion. `false` by default.
 * `useVelocity`: enables velocity data from Leap Motion for hands. `false` by default.
+* `rootOffset`: local position offset from HMD view point, values are in meters.
+* `rootAngle`: local rotation offset for axis X, can be used with `rootOffset` to configure tracking for neck mounts, value is in degrees.
+* `handsOffset`: local position offset for controllers from theirs transformation point, X axis will be inverted for right hand, values are in meters.
+* `handsRotationOffset`: local rotation offset for controllers from theirs transformation point, Y and Z axes will be inverted for right hand, values are in degrees.
 
 ### Gestures
 List of hands gestures that correspond to controller original input:
@@ -27,3 +31,5 @@ List of hands gestures that correspond to controller original input:
 * CSFML graphics module is built from [fork](https://github.com/SDraw/SFML/tree/2.5.x) to address [SteamVR OpenGL textures problems on AMD GPUs](https://github.com/ValveSoftware/openvr/issues/1246).
 * If you see only green dots that represent tip of your index fingers, force `leap_control` to launch on dGPU through control panel of your GPU vendor.
 * Tracking will be lost upon service shutdown/restart.
+* Coordinate system used for offsets is right handed  
+![](https://learnopengl.com/img/getting-started/coordinate_systems_right_handed.png)

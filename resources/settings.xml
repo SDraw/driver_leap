@@ -4,4 +4,9 @@
   <!--Arbitrary settings-->
   <setting name="handsReset" value="false"/> <!--Mark controllers as out of range if hands aren't detected-->
   <setting name="useVelocity" value="false"/> <!--Send velocity from Leap Motion, visible position twitching on low-end machines-->
+  <!--Offset settings-->
+  <setting name="rootOffset" value="0.0 0.0 0.0"/> <!--Local root offset based on head transformation-->
+  <setting name="rootAngle" value="0.0"/> <!--Up/down root angle (X axis), useful for neck mounts, Euler angle-->
+  <setting name="handsOffset" value="0.0 0.0 0.0"/> <!--Local hand offset, right hand X axis value is inversed-->
+  <setting name="handsRotationOffset" value="0.0 0.0 0.0"/> <!--Local rotation hand offset, right hand Y and Z values are inverted, Euler angle-->
 </settings>
