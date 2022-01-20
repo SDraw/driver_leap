@@ -12,11 +12,12 @@ extern char g_modulePath[];
 
 const std::vector<std::string> g_debugRequests
 {
-    "input"
+    "input", "reload"
 };
 enum DebugRequest : size_t
 {
-    DR_Input = 0U
+    DR_Input = 0U,
+    DR_Reload
 };
 
 const std::vector<std::string> g_inputHands
@@ -93,7 +94,7 @@ CServerDriver::~CServerDriver()
 // vr::IServerTrackedDeviceProvider
 vr::EVRInitError CServerDriver::Init(vr::IVRDriverContext *pDriverContext)
 {
-    VR_INIT_SERVER_DRIVER_CONTEXT(pDriverContext);
+    VR_INIT_SERVER_DRIVER_CONTEXT(pDriverContext)
     CDriverConfig::Load();
 
     // Relay device for events from leap_control
@@ -144,7 +145,7 @@ void CServerDriver::Cleanup()
     delete m_leapPoller;
     m_leapPoller = nullptr;
 
-    VR_CLEANUP_SERVER_DRIVER_CONTEXT();
+    VR_CLEANUP_SERVER_DRIVER_CONTEXT()
 }
 
 const char* const* CServerDriver::GetInterfaceVersions()
@@ -323,6 +324,10 @@ void CServerDriver::ProcessExternalMessage(const char *p_message)
                     }
                 }
             } break;
+
+            case DR_Reload:
+                CDriverConfig::Load();
+                break;
         }
     }
 }

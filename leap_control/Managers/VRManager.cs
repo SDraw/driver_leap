@@ -12,21 +12,22 @@ namespace leap_control
 
         CVRSystem m_vrSystem;
         VREvent_t m_vrEvent;
-        static uint ms_eventSize = 0;
+        uint m_eventSize = 0;
         bool m_active = false;
 
-        ulong m_notificationOverlay = 0;
+        ulong m_notificationOverlay = OpenVR.k_ulOverlayHandleInvalid;
         uint m_leapDevice = OpenVR.k_unTrackedDeviceIndexInvalid;
         uint m_leftHandController = OpenVR.k_unTrackedDeviceIndexInvalid;
         uint m_rightHandController = OpenVR.k_unTrackedDeviceIndexInvalid;
 
-        TrackedDevicePose_t[] m_trackedPoses = null;
+        readonly TrackedDevicePose_t[] m_trackedPoses = null;
 
         public VRManager(Core p_core)
         {
             m_core = p_core;
 
             m_trackedPoses = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
+            m_eventSize = (uint)System.Runtime.InteropServices.Marshal.SizeOf(m_vrEvent);
         }
 
         public bool Initialize()
@@ -51,7 +52,6 @@ namespace leap_control
                         }
                     }
 
-                    ms_eventSize = (uint)System.Runtime.InteropServices.Marshal.SizeOf(m_vrEvent);
                     m_initialized = true;
                     m_active = true;
                 }
@@ -76,7 +76,7 @@ namespace leap_control
         {
             m_vrSystem.GetDeviceToAbsoluteTrackingPose(ETrackingUniverseOrigin.TrackingUniverseRawAndUncalibrated, 0f, m_trackedPoses);
 
-            while(m_vrSystem.PollNextEvent(ref m_vrEvent, ms_eventSize))
+            while(m_vrSystem.PollNextEvent(ref m_vrEvent, m_eventSize))
             {
                 switch(m_vrEvent.eventType)
                 {
@@ -100,14 +100,14 @@ namespace leap_control
             {
                 GlmSharp.mat4 l_matrix = GlmSharp.mat4.Identity;
                 m_trackedPoses[OpenVR.k_unTrackedDeviceIndex_Hmd].mDeviceToAbsoluteTracking.Convert(ref l_matrix);
-                m_core.ControlManager.SetHeadTransform(l_matrix);
+                m_core.GetControlManager().SetHeadTransform(l_matrix);
             }
 
             if(m_leftHandController != OpenVR.k_unTrackedDeviceIndexInvalid)
             {
                 GlmSharp.mat4 l_matrix = GlmSharp.mat4.Identity;
                 m_trackedPoses[m_leftHandController].mDeviceToAbsoluteTracking.Convert(ref l_matrix);
-                m_core.ControlManager.SetHandTransform(ControlManager.Hand.Left, l_matrix);
+                m_core.GetControlManager().SetHandTransform(ControlManager.Hand.Left, l_matrix);
             }
             else
                 m_leftHandController = m_vrSystem.GetTrackedDeviceIndexForControllerRole(ETrackedControllerRole.LeftHand);
@@ -116,7 +116,7 @@ namespace leap_control
             {
                 GlmSharp.mat4 l_matrix = GlmSharp.mat4.Identity;
                 m_trackedPoses[m_rightHandController].mDeviceToAbsoluteTracking.Convert(ref l_matrix);
-                m_core.ControlManager.SetHandTransform(ControlManager.Hand.Right, l_matrix);
+                m_core.GetControlManager().SetHandTransform(ControlManager.Hand.Right, l_matrix);
             }
             else
                 m_rightHandController = m_vrSystem.GetTrackedDeviceIndexForControllerRole(ETrackedControllerRole.RightHand);

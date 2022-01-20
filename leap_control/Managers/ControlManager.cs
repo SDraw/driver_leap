@@ -12,7 +12,7 @@ namespace leap_control
 
         bool m_initialized = false;
 
-        Core m_core = null;
+        readonly Core m_core = null;
 
         HandOverlay m_leftHandOverlay = null;
         HandOverlay m_rightHandOverlay = null;
@@ -154,7 +154,7 @@ namespace leap_control
                         l_message += l_axisValues.y.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture);
                     }
 
-                    m_core.VRManager.SendMessage(l_message);
+                    m_core.GetVRManager().SendMessage(l_message);
                 }
             }
         }

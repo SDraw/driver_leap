@@ -50,17 +50,17 @@
 
         void OnControllerPolicyChange(object sender, Leap.PolicyEventArgs e)
         {
-            m_core.VRManager.ShowNotification("Policies changed");
+            m_core.GetVRManager().ShowNotification("Policies changed");
         }
 
         void OnControllerConnected(object sender, Leap.DeviceEventArgs e)
         {
-            m_core.VRManager.ShowNotification("Controller connected");
+            m_core.GetVRManager().ShowNotification("Controller connected");
         }
 
         void OnControllerDisconnected(object sender, Leap.DeviceEventArgs e)
         {
-            m_core.VRManager.ShowNotification("Controller disconnected");
+            m_core.GetVRManager().ShowNotification("Controller disconnected");
         }
 
         public void DoPulse()
@@ -105,8 +105,8 @@
                     }
                 }
 
-                m_core.ControlManager.SetHandPresence(ControlManager.Hand.Left, l_rightFound, l_rightFound ? m_rightTipPosition : ms_zeroPoint);
-                m_core.ControlManager.SetHandPresence(ControlManager.Hand.Right, l_leftFound, l_leftFound ? m_leftTipPosition : ms_zeroPoint);
+                m_core.GetControlManager().SetHandPresence(ControlManager.Hand.Left, l_rightFound, l_rightFound ? m_rightTipPosition : ms_zeroPoint);
+                m_core.GetControlManager().SetHandPresence(ControlManager.Hand.Right, l_leftFound, l_leftFound ? m_leftTipPosition : ms_zeroPoint);
             }
         }
 

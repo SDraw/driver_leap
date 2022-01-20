@@ -37,37 +37,34 @@ namespace leap_control
 
         static Dictionary<string, SFML.Graphics.Texture> ms_resources = new Dictionary<string, SFML.Graphics.Texture>();
 
-        ulong m_overlay = 0;
+        ulong m_overlay = Valve.VR.OpenVR.k_ulOverlayHandleInvalid;
         Valve.VR.Texture_t m_overlayTexture;
 
-        SFML.Graphics.RenderTexture m_renderTexture = null;
-        SFML.Graphics.Sprite m_backgroundSprite = null;
-        SFML.Graphics.Sprite m_thumbstickShape = null;
-        SFML.Graphics.Sprite m_touchpadShape = null;
-        SFML.Graphics.Sprite m_buttonA = null;
-        SFML.Graphics.Sprite m_buttonB = null;
-        SFML.Graphics.Sprite m_buttonSystem = null;
-        SFML.Graphics.CircleShape m_cursorShape = null;
-        SFML.Graphics.CircleShape m_thumbstickAxisShape = null;
-        SFML.Graphics.CircleShape m_touchpadAxisShape = null;
-        SFML.Graphics.RectangleShape m_presureRectangle = null;
-        SFML.Graphics.RectangleShape m_presureFillRectangle = null;
+        readonly SFML.Graphics.RenderTexture m_renderTexture = null;
+        readonly SFML.Graphics.Sprite m_backgroundSprite = null;
+        readonly SFML.Graphics.Sprite m_thumbstickShape = null;
+        readonly SFML.Graphics.Sprite m_touchpadShape = null;
+        readonly SFML.Graphics.Sprite m_buttonA = null;
+        readonly SFML.Graphics.Sprite m_buttonB = null;
+        readonly SFML.Graphics.Sprite m_buttonSystem = null;
+        readonly SFML.Graphics.CircleShape m_cursorShape = null;
+        readonly SFML.Graphics.CircleShape m_thumbstickAxisShape = null;
+        readonly SFML.Graphics.CircleShape m_touchpadAxisShape = null;
+        readonly SFML.Graphics.RectangleShape m_presureRectangle = null;
+        readonly SFML.Graphics.RectangleShape m_presureFillRectangle = null;
 
         GlmSharp.vec3 m_position;
         GlmSharp.quat m_rotation;
         GlmSharp.vec3 m_direction;
-        GlmSharp.mat4 m_matrix;
         Valve.VR.HmdMatrix34_t m_vrMatrix;
 
         GlmSharp.vec3 m_tipPositionLocal;
-        GlmSharp.vec3 m_tipPositionGlobal;
         bool m_handPresence = false;
 
         bool m_inRange = false;
-        GlmSharp.vec3 m_cursorPosition;
         GlmSharp.vec2 m_cursorPlanePosition;
 
-        List<ControlButton> m_controlButtons = null;
+        readonly List<ControlButton> m_controlButtons = null;
 
         float m_opacity = 1f;
         float m_rangeOpacity = 0.5f;
@@ -157,33 +154,33 @@ namespace leap_control
             foreach(ControlButton l_controlButton in m_controlButtons)
                 l_controlButton.ResetUpdate();
 
-            m_tipPositionGlobal = ((p_headTransform * GlmSharp.mat4.Translate(m_tipPositionLocal)) * GlmSharp.vec4.UnitW).xyz;
+            GlmSharp.vec3 l_tipPositionGlobal = ((p_headTransform * GlmSharp.mat4.Translate(m_tipPositionLocal)) * GlmSharp.vec4.UnitW).xyz;
 
             // Update overlays transform
-            m_matrix = (GlmSharp.mat4.Translate(m_position) * m_rotation.ToMat4);
-            m_matrix.Convert(ref m_vrMatrix);
+            GlmSharp.mat4 l_matrix = (GlmSharp.mat4.Translate(m_position) * m_rotation.ToMat4);
+            l_matrix.Convert(ref m_vrMatrix);
             Valve.VR.OpenVR.Overlay.SetOverlayTransformAbsolute(m_overlay, Valve.VR.ETrackingUniverseOrigin.TrackingUniverseRawAndUncalibrated, ref m_vrMatrix);
 
-            m_cursorPosition = ((m_matrix.Inverse * GlmSharp.mat4.Translate(m_tipPositionGlobal)) * GlmSharp.vec4.UnitW).xyz;
-            if(m_handPresence && !m_locked && m_cursorPosition.IsInRange(-ms_overlayWidthHalf, ms_overlayWidthHalf) && (m_cursorPosition.z > -0.025f))
+            GlmSharp.vec3 l_cursorPosition = ((l_matrix.Inverse * GlmSharp.mat4.Translate(l_tipPositionGlobal)) * GlmSharp.vec4.UnitW).xyz;
+            if(m_handPresence && !m_locked && l_cursorPosition.IsInRange(-ms_overlayWidthHalf, ms_overlayWidthHalf) && (l_cursorPosition.z > -0.025f))
             {
-                m_cursorShape.FillColor = ((m_cursorPosition.z <= ms_touchDistance) ? ms_touchColor : ms_activeColor);
-                m_cursorPlanePosition.x = ((m_cursorPosition.x + ms_overlayWidthHalf) / ms_overlayWidth) * 512f;
-                m_cursorPlanePosition.y = ((-m_cursorPosition.y + ms_overlayWidthHalf) / ms_overlayWidth) * 512f;
+                m_cursorShape.FillColor = ((l_cursorPosition.z <= ms_touchDistance) ? ms_touchColor : ms_activeColor);
+                m_cursorPlanePosition.x = ((l_cursorPosition.x + ms_overlayWidthHalf) / ms_overlayWidth) * 512f;
+                m_cursorPlanePosition.y = ((-l_cursorPosition.y + ms_overlayWidthHalf) / ms_overlayWidth) * 512f;
                 m_cursorShape.Position = new SFML.System.Vector2f(m_cursorPlanePosition.x - 5f, m_cursorPlanePosition.y - 5f);
 
-                if(m_cursorPosition.z <= ms_touchDistance)
+                if(l_cursorPosition.z <= ms_touchDistance)
                 {
                     // Check for axes
                     if(m_thumbstickShape.GetGlobalBounds().Contains(m_cursorPlanePosition.x, m_cursorPlanePosition.y))
                     {
-                        m_thumbstickAxisShape.FillColor = (m_cursorPosition.z <= ms_clickDistance ? ms_axisColorClick : ms_axisColorTouch);
+                        m_thumbstickAxisShape.FillColor = (l_cursorPosition.z <= ms_clickDistance ? ms_axisColorClick : ms_axisColorTouch);
                         m_thumbstickAxisShape.Position = new SFML.System.Vector2f(m_cursorPlanePosition.x - 7.5f, m_cursorPlanePosition.y - 7.5f);
 
                         GlmSharp.vec2 l_axes = (m_cursorPlanePosition.xy - 145f) / 105f;
                         l_axes.y *= -1f;
 
-                        m_controlButtons[(int)ButtonIndex.Thumbstick].SetState(m_cursorPosition.z <= ms_clickDistance ? ControlButton.ButtonState.Clicked : ControlButton.ButtonState.Touched);
+                        m_controlButtons[(int)ButtonIndex.Thumbstick].SetState(l_cursorPosition.z <= ms_clickDistance ? ControlButton.ButtonState.Clicked : ControlButton.ButtonState.Touched);
                         m_controlButtons[(int)ButtonIndex.Thumbstick].SetAxes(l_axes);
                     }
                     else
@@ -194,12 +191,12 @@ namespace leap_control
 
                     if(m_touchpadShape.GetGlobalBounds().Contains(m_cursorPlanePosition.x, m_cursorPlanePosition.y))
                     {
-                        m_touchpadAxisShape.FillColor = (m_cursorPosition.z <= ms_clickDistance ? ms_axisColorClick : ms_axisColorTouch);
+                        m_touchpadAxisShape.FillColor = (l_cursorPosition.z <= ms_clickDistance ? ms_axisColorClick : ms_axisColorTouch);
                         m_touchpadAxisShape.Position = new SFML.System.Vector2f(m_cursorPlanePosition.x - 7.5f, m_cursorPlanePosition.y - 7.5f);
 
                         GlmSharp.vec2 l_axes = (m_cursorPlanePosition.xy - new GlmSharp.vec2(145f, 375f)) / 105f;
                         l_axes.y *= -1f;
-                        m_controlButtons[(int)ButtonIndex.Touchpad].SetState(m_cursorPosition.z <= ms_clickDistance ? ControlButton.ButtonState.Clicked : ControlButton.ButtonState.Touched);
+                        m_controlButtons[(int)ButtonIndex.Touchpad].SetState(l_cursorPosition.z <= ms_clickDistance ? ControlButton.ButtonState.Clicked : ControlButton.ButtonState.Touched);
                         m_controlButtons[(int)ButtonIndex.Touchpad].SetAxes(l_axes);
                     }
                     else
@@ -211,8 +208,8 @@ namespace leap_control
                     // Check for buttons
                     if(m_buttonA.GetGlobalBounds().Contains(m_cursorPlanePosition.x, m_cursorPlanePosition.y))
                     {
-                        m_buttonA.Color = (m_cursorPosition.z <= ms_clickDistance ? ms_axisColorClick : ms_axisColorTouch);
-                        m_controlButtons[(int)ButtonIndex.A].SetState((m_cursorPosition.z <= ms_clickDistance) ? ControlButton.ButtonState.Clicked : ControlButton.ButtonState.Touched);
+                        m_buttonA.Color = (l_cursorPosition.z <= ms_clickDistance ? ms_axisColorClick : ms_axisColorTouch);
+                        m_controlButtons[(int)ButtonIndex.A].SetState((l_cursorPosition.z <= ms_clickDistance) ? ControlButton.ButtonState.Clicked : ControlButton.ButtonState.Touched);
                     }
                     else
                     {
@@ -222,8 +219,8 @@ namespace leap_control
 
                     if(m_buttonB.GetGlobalBounds().Contains(m_cursorPlanePosition.x, m_cursorPlanePosition.y))
                     {
-                        m_buttonB.Color = (m_cursorPosition.z <= ms_clickDistance ? ms_axisColorClick : ms_axisColorTouch);
-                        m_controlButtons[(int)ButtonIndex.B].SetState((m_cursorPosition.z <= ms_clickDistance) ? ControlButton.ButtonState.Clicked : ControlButton.ButtonState.Touched);
+                        m_buttonB.Color = (l_cursorPosition.z <= ms_clickDistance ? ms_axisColorClick : ms_axisColorTouch);
+                        m_controlButtons[(int)ButtonIndex.B].SetState((l_cursorPosition.z <= ms_clickDistance) ? ControlButton.ButtonState.Clicked : ControlButton.ButtonState.Touched);
                     }
                     else
                     {
@@ -234,8 +231,8 @@ namespace leap_control
                     if(m_buttonSystem.GetGlobalBounds().Contains(m_cursorPlanePosition.x, m_cursorPlanePosition.y))
                     {
 
-                        m_buttonSystem.Color = (m_cursorPosition.z <= ms_clickDistance ? ms_axisColorClick : ms_axisColorTouch);
-                        m_controlButtons[(int)ButtonIndex.System].SetState((m_cursorPosition.z <= ms_clickDistance) ? ControlButton.ButtonState.Clicked : ControlButton.ButtonState.Touched);
+                        m_buttonSystem.Color = (l_cursorPosition.z <= ms_clickDistance ? ms_axisColorClick : ms_axisColorTouch);
+                        m_controlButtons[(int)ButtonIndex.System].SetState((l_cursorPosition.z <= ms_clickDistance) ? ControlButton.ButtonState.Clicked : ControlButton.ButtonState.Touched);
                     }
                     else
                     {
@@ -261,7 +258,7 @@ namespace leap_control
                 }
 
                 // Presure indicator
-                float l_presure = 1f - GlmSharp.glm.Clamp(GlmSharp.glm.Clamp(m_cursorPosition.z, 0f, float.MaxValue) / ms_overlayWidthHalf, 0f, 1f);
+                float l_presure = 1f - GlmSharp.glm.Clamp(GlmSharp.glm.Clamp(l_cursorPosition.z, 0f, float.MaxValue) / ms_overlayWidthHalf, 0f, 1f);
                 m_presureFillRectangle.Size = new SFML.System.Vector2f(m_presureFillRectangle.Size.X, -320f * l_presure);
                 m_presureFillRectangle.FillColor = ((l_presure >= 0.5f) ? ((l_presure >= 0.75f) ? ms_axisColorClick : ms_axisColorTouch) : ms_activeColor);
 

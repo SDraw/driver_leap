@@ -22,6 +22,8 @@ Driver settings are configurated by editing `resources/settings.xml`. Available 
 * `handsOffset`: local position offset for controllers from theirs transformation point, X axis will be inverted for right hand, values are in meters.
 * `handsRotationOffset`: local rotation offset for controllers from theirs transformation point, Y and Z axes will be inverted for right hand, values are in degrees.
 
+Settings can be reloaded at runtime from menu item by clicking on "Driver Leap Control" tray icon. All settings, except `trackingLevel`, are reloaded and applied.
+
 ### Gestures
 List of hands gestures that correspond to controller original input:
 * **Grip:** bending of middle, ring and pinky fingers
@@ -31,5 +33,5 @@ List of hands gestures that correspond to controller original input:
 * CSFML graphics module is built from [fork](https://github.com/SDraw/SFML/tree/2.5.x) to address [SteamVR OpenGL textures problems on AMD GPUs](https://github.com/ValveSoftware/openvr/issues/1246).
 * If you see only green dots that represent tip of your index fingers, force `leap_control` to launch on dGPU through control panel of your GPU vendor.
 * Tracking will be lost upon service shutdown/restart.
-* Coordinate system used for offsets is right handed  
+* Coordinate system used for offsets is right handed.  
 ![](https://learnopengl.com/img/getting-started/coordinate_systems_right_handed.png)
