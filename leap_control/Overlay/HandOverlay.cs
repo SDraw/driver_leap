@@ -305,11 +305,11 @@ namespace leap_control
 
         public static void LoadResources()
         {
-            ms_resources.Add("background", new SFML.Graphics.Texture(new SFML.Graphics.Image("resources/tx_background.png")));
-            ms_resources.Add("circle", new SFML.Graphics.Texture(new SFML.Graphics.Image("resources/tx_circle.png")));
-            ms_resources.Add("buttonA", new SFML.Graphics.Texture(new SFML.Graphics.Image("resources/tx_buttonA.png")));
-            ms_resources.Add("buttonB", new SFML.Graphics.Texture(new SFML.Graphics.Image("resources/tx_buttonB.png")));
-            ms_resources.Add("buttonS", new SFML.Graphics.Texture(new SFML.Graphics.Image("resources/tx_buttonS.png")));
+            ms_resources.Add("background", new SFML.Graphics.Texture(new SFML.Graphics.Image("../../resources/textures/tx_background.png")));
+            ms_resources.Add("circle", new SFML.Graphics.Texture(new SFML.Graphics.Image("../../resources/textures/tx_circle.png")));
+            ms_resources.Add("buttonA", new SFML.Graphics.Texture(new SFML.Graphics.Image("../../resources/textures/tx_buttonA.png")));
+            ms_resources.Add("buttonB", new SFML.Graphics.Texture(new SFML.Graphics.Image("../../resources/textures/tx_buttonB.png")));
+            ms_resources.Add("buttonS", new SFML.Graphics.Texture(new SFML.Graphics.Image("../../resources/textures/tx_buttonS.png")));
         }
     }
 }

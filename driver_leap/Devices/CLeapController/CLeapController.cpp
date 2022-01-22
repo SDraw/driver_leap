@@ -181,8 +181,7 @@ void CLeapController::UpdateTransformation(const LEAP_HAND *p_hand)
         m_pose.vecWorldFromDriverTranslation[2] += l_rootLocalOffset.z;
 
         // Root angle
-        glm::quat l_rootAngle(glm::vec3(CDriverConfig::GetRootAngle(), 0.f, 0.f));
-        glm::quat l_appliedRot = l_headRot * l_rootAngle;
+        glm::quat l_appliedRot = l_headRot * glm::quat(glm::vec3(CDriverConfig::GetRootAngle(), 0.f, 0.f));
 
         m_pose.qWorldFromDriverRotation.w = l_appliedRot.w;
         m_pose.qWorldFromDriverRotation.x = l_appliedRot.x;

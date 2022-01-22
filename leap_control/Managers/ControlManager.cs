@@ -37,14 +37,14 @@ namespace leap_control
                 m_rightHandOverlay = new HandOverlay(HandOverlay.Hand.Right);
 
                 Valve.VR.OpenVR.Overlay.CreateOverlay("leap.cursor.left", "Left Hand Finger Cursor", ref m_leftFingerOverlay);
-                Valve.VR.OpenVR.Overlay.SetOverlayFromFile(m_leftFingerOverlay, System.AppDomain.CurrentDomain.BaseDirectory + "resources\\tx_cursor.png");
+                Valve.VR.OpenVR.Overlay.SetOverlayFromFile(m_leftFingerOverlay, System.AppDomain.CurrentDomain.BaseDirectory + "..\\..\\resources\\textures\\tx_cursor.png");
                 Valve.VR.OpenVR.Overlay.SetOverlayColor(m_leftFingerOverlay, 0f, 1f, 0f);
                 Valve.VR.OpenVR.Overlay.SetOverlayWidthInMeters(m_leftFingerOverlay, 0.006625f);
                 Valve.VR.OpenVR.Overlay.SetOverlaySortOrder(m_leftFingerOverlay, 1);
                 Valve.VR.OpenVR.Overlay.ShowOverlay(m_leftFingerOverlay);
 
                 Valve.VR.OpenVR.Overlay.CreateOverlay("leap.cursor.right", "Left Hand Finger Cursor", ref m_rightFingerOverlay);
-                Valve.VR.OpenVR.Overlay.SetOverlayFromFile(m_rightFingerOverlay, System.AppDomain.CurrentDomain.BaseDirectory + "resources\\tx_cursor.png");
+                Valve.VR.OpenVR.Overlay.SetOverlayFromFile(m_rightFingerOverlay, System.AppDomain.CurrentDomain.BaseDirectory + "..\\..\\resources\\textures\\tx_cursor.png");
                 Valve.VR.OpenVR.Overlay.SetOverlayColor(m_rightFingerOverlay, 0f, 1f, 0f);
                 Valve.VR.OpenVR.Overlay.SetOverlaySortOrder(m_rightFingerOverlay, 1);
                 Valve.VR.OpenVR.Overlay.SetOverlayWidthInMeters(m_rightFingerOverlay, 0.00625f);
@@ -106,7 +106,7 @@ namespace leap_control
 
         public void SetHeadTransform(GlmSharp.mat4 p_transform)
         {
-            m_headTransform = p_transform;
+            m_headTransform = p_transform * m_core.GetConfigManager().GetRootTransform();
         }
 
         public void DoPulse()

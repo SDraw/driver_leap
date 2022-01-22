@@ -18,9 +18,9 @@ Driver settings are configurated by editing `resources/settings.xml`. Available 
 * `handsReset`: marks controllers as out of range if hand for controller isn't detected by Leap Motion. `false` by default.
 * `useVelocity`: enables velocity data from Leap Motion for hands. `false` by default.
 * `rootOffset`: local position offset from HMD view point, values are in meters.
-* `rootAngle`: local rotation offset for axis X, can be used with `rootOffset` to configure tracking for neck mounts, value is in degrees.
+* `rootAngle`: local rotation offset for axis X, can be used with `rootOffset` to configure tracking for neck mounts, value is in radians.
 * `handsOffset`: local position offset for controllers from theirs transformation point, X axis will be inverted for right hand, values are in meters.
-* `handsRotationOffset`: local rotation offset for controllers from theirs transformation point, Y and Z axes will be inverted for right hand, values are in degrees.
+* `handsRotationOffset`: local rotation offset for controllers from theirs transformation point, Y and Z axes will be inverted for right hand, values are in radians.
 
 Settings can be reloaded at runtime from menu item by clicking on "Driver Leap Control" tray icon. All settings, except `trackingLevel`, are reloaded and applied.
 

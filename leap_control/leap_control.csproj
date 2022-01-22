@@ -180,6 +180,7 @@
     <Compile Include="..\..\..\repos\driver_leap\vendor\openvr\headers\openvr_api.cs">
       <Link>vendor\openvr\openvr_api.cs</Link>
     </Compile>
+    <Compile Include="Managers\ConfigManager.cs" />
     <Compile Include="Overlay\ControlButton.cs" />
     <Compile Include="Managers\LeapManager.cs" />
     <Compile Include="Core\Core.cs" />

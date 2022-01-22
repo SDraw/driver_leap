@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading;
 
 namespace leap_control
 {
@@ -7,6 +9,7 @@ namespace leap_control
         bool m_initialized = false;
         bool m_active = false;
 
+        ConfigManager m_configManager = null;
         SfmlManager m_sfmlManager = null;
         VRManager m_vrManager = null;
         LeapManager m_leapManager = null;
@@ -15,15 +18,26 @@ namespace leap_control
         System.Threading.Thread m_trayThread = null;
         System.Windows.Forms.NotifyIcon m_trayIcon = null;
 
+        List<System.Action> m_tasks = null;
+        Mutex m_tasksMutex = null;
+
+        Core()
+        {
+            m_tasks = new List<Action>();
+            m_tasksMutex = new Mutex();
+        }
+
         bool Initialize()
         {
             if(!m_initialized)
             {
+                m_configManager = new ConfigManager();
                 m_sfmlManager = new SfmlManager();
                 m_vrManager = new VRManager(this);
                 m_leapManager = new LeapManager(this);
                 m_controlManager = new ControlManager(this);
 
+                m_configManager.Load();
                 m_initialized = (m_vrManager.Initialize() && m_sfmlManager.Initialize() && m_leapManager.Initialize() && m_controlManager.Initialize());
 
                 if(m_initialized)
@@ -42,15 +56,15 @@ namespace leap_control
                             l_reloadItem.Text = "Reload settings";
                             l_reloadItem.Click += new EventHandler((o, e) =>
                             {
-                                // Safe to call from another thread
-                                this.GetVRManager().SendMessage("reload");
-                                this.GetVRManager().ShowNotification("Settings reloaded");
+                                m_tasksMutex.WaitOne();
+                                m_tasks.Add(ReloadSettings);
+                                m_tasksMutex.ReleaseMutex();
                             });
                             m_trayIcon.ContextMenu.MenuItems.Add(l_reloadItem);
 
                             System.Windows.Forms.Application.Run();
                         }
-                        catch(System.Threading.ThreadAbortException)
+                        catch(ThreadAbortException)
                         {
                             System.Windows.Forms.Application.Exit();
                         }
@@ -90,6 +104,18 @@ namespace leap_control
 
         bool DoPulse()
         {
+            // Tasks
+            if(m_tasksMutex.WaitOne(0))
+            {
+                if(m_tasks.Count > 0)
+                {
+                    foreach(Action l_task in m_tasks)
+                        l_task.Invoke();
+                    m_tasks.Clear();
+                }
+                m_tasksMutex.ReleaseMutex();
+            }
+
             m_active |= m_vrManager.DoPulse();
             m_leapManager.DoPulse();
             m_controlManager.DoPulse();
@@ -100,6 +126,14 @@ namespace leap_control
 
         public VRManager GetVRManager() => m_vrManager;
         public ControlManager GetControlManager() => m_controlManager;
+        public ConfigManager GetConfigManager() => m_configManager;
+
+        void ReloadSettings()
+        {
+            m_configManager.Load();
+            m_vrManager.SendMessage("reload");
+            m_vrManager.ShowNotification("Settings reloaded");
+        }
 
         static void Main(string[] args)
         {
@@ -107,7 +141,8 @@ namespace leap_control
             if(l_core.Initialize())
             {
                 while(l_core.DoPulse())
-                { }
+                {
+                }
                 l_core.Terminate();
             }
         }
