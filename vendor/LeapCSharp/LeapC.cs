@@ -57,7 +57,15 @@ namespace LeapInternal
         /// <summary>
         /// Research product codename "Rigel".
         /// </summary>
-        eLeapDevicePID_Rigel = 0x1202
+        eLeapDevicePID_Rigel = 0x1202,
+        /// <summary>
+        /// The Ultraleap Stereo IR 170 (SIR170) hand tracking module.
+        /// </summary>
+        eLeapDevicePID_SIR170 = 0x1203,
+        /// <summary>
+        /// The Ultraleap 3Di hand tracking camera.
+        /// </summary>
+        eLeapDevicePID_3Di = 0x1204
     };
 
     public enum eLeapServiceDisposition : uint
