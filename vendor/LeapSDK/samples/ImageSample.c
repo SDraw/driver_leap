@@ -56,6 +56,8 @@ int main(int argc, char** argv) {
 
   printf("Press Enter to exit program.\n");
   getchar();
+  CloseConnection();
+  DestroyConnection();
   return 0;
 }
 //End-of-Sample

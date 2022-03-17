@@ -1,4 +1,4 @@
-/* Copyright (C) 2012-2017 Ultraleap Limited. All rights reserved.
+/* Copyright (C) 2012-2022 Ultraleap Limited. All rights reserved.
  *
  * Use of this code is subject to the terms of the Ultraleap SDK agreement
  * available at https://central.leapmotion.com/agreements/SdkAgreement unless
@@ -199,6 +199,12 @@ typedef enum _eLeapRS {
    * @since 3.0.0
    */
   eLeapRS_CannotOpenDevice              = 0xE7010005,
+
+  /**
+   * The request is not supported by this version of the service.
+   * @since 5.4.0
+   */
+  eLeapRS_Unsupported                   = 0xE7010006,
 } eLeapRS;
 LEAP_STATIC_ASSERT(sizeof(eLeapRS) == 4, "Incorrect enum size");
 
@@ -589,8 +595,8 @@ typedef struct _LEAP_TRACKING_MODE_EVENT {
  * policies, reflecting any changes.
  *
  * To get the current policies without changes, specify zero for both the set
- * and clear parameters. When ready, LeapPollConnection() provides the
- * a LEAP_POLICY_EVENT containing the current settings.
+ * and clear parameters. When ready, LeapPollConnection() provides a LEAP_POLICY_EVENT
+ * containing the current settings.
  *
  * The eLeapPolicyFlag enumeration defines the policy flags.
  *
@@ -601,6 +607,30 @@ typedef struct _LEAP_TRACKING_MODE_EVENT {
  * @since 3.0.0
  */
 LEAP_EXPORT eLeapRS LEAP_CALL LeapSetPolicyFlags(LEAP_CONNECTION hConnection, uint64_t set, uint64_t clear);
+
+/** \ingroup Functions
+ * Sets or clears one or more policy flags for a particular device.
+ *
+ * Changing policies is asynchronous. After you call this function, a subsequent
+ * call to LeapPollConnection provides a LEAP_POLICY_EVENT containing the current
+ * policies, reflecting any changes.
+ *
+ * To get the current policies without changes, specify zero for both the set
+ * and clear parameters. When ready, LeapPollConnection() provides a LEAP_POLICY_EVENT
+ * containing the current settings.
+ *
+ * The eLeapPolicyFlag enumeration defines the policy flags.
+ *
+ * @param hConnection The connection handle created by LeapCreateConnection().
+ * @param hDevice A device handle returned by LeapOpenDevice().
+ * @param set A bitwise combination of flags to be set. Set to 0 if not setting any flags.
+ * @param clear A bitwise combination of flags to be cleared. Set to 0 if not clearing any flags.
+ * @returns The operation result code, a member of the eLeapRS enumeration.
+ * @since 5.4.0
+ */
+/*
+LEAP_EXPORT eLeapRS LEAP_CALL LeapSetPolicyFlagsEx(LEAP_CONNECTION hConnection, LEAP_DEVICE hDevice, uint64_t set, uint64_t clear);
+ */
 
 /** \ingroup Functions
  * Requests a tracking mode.
@@ -619,6 +649,25 @@ LEAP_EXPORT eLeapRS LEAP_CALL LeapSetPolicyFlags(LEAP_CONNECTION hConnection, ui
 LEAP_EXPORT eLeapRS LEAP_CALL LeapSetTrackingMode(LEAP_CONNECTION hConnection, eLeapTrackingMode mode);
 
 /** \ingroup Functions
+ * Requests a tracking mode for a particular device.
+ *
+ * Changing tracking modes is asynchronous. After you call this function, a subsequent
+ * call to LeapPollConnection provides a LEAP_POLICY_EVENT containing the current
+ * policies, reflecting any changes.
+ *
+ * The eLeapTrackingMode enumeration defines the tracking mode.
+ *
+ * @param hConnection The connection handle created by LeapCreateConnection().
+ * @param hDevice A device handle returned by LeapOpenDevice().
+ * @param mode The enum value specifying the requested tracking mode.
+ * @returns The operation result code, a member of the eLeapRS enumeration.
+ * @since 5.4.0
+ */
+/*
+LEAP_EXPORT eLeapRS LEAP_CALL LeapSetTrackingModeEx(LEAP_CONNECTION hConnection, LEAP_DEVICE hDevice, eLeapTrackingMode mode);
+ */
+
+/** \ingroup Functions
  * Requests the currently set tracking mode.
  *
  * Requesting the current tracking mode is asynchronous. After you call this function, a subsequent
@@ -634,6 +683,24 @@ LEAP_EXPORT eLeapRS LEAP_CALL LeapSetTrackingMode(LEAP_CONNECTION hConnection, e
 LEAP_EXPORT eLeapRS LEAP_CALL LeapGetTrackingMode(LEAP_CONNECTION hConnection);
 
 /** \ingroup Functions
+ * Requests the currently set tracking mode for a particular device.
+ *
+ * Requesting the current tracking mode is asynchronous. After you call this function, a subsequent
+ * call to LeapPollConnection provides a LEAP_TRACKING_MODE_EVENT containing the current
+ * tracking mode, reflecting any changes.
+ *
+ * The eLeapTrackingMode enumeration defines the tracking mode.
+ *
+ * @param hConnection The connection handle created by LeapCreateConnection().
+ * @param hDevice A device handle returned by LeapOpenDevice().
+ * @returns The operation result code, a member of the eLeapRS enumeration.
+ * @since 5.4.0
+ */
+/*
+LEAP_EXPORT eLeapRS LEAP_CALL LeapGetTrackingModeEx(LEAP_CONNECTION hConnection, LEAP_DEVICE hDevice);
+ */
+
+/** \ingroup Functions
  * Pauses the service
  *
  * Attempts to pause or unpause the service depending on the argument.
@@ -642,7 +709,7 @@ LEAP_EXPORT eLeapRS LEAP_CALL LeapGetTrackingMode(LEAP_CONNECTION hConnection);
  * or it will fail with eLeapRS_InvalidArgument.
  *
  * @param hConnection The connection handle created by LeapCreateConnection().
- * @param pause Set to 'true' to pause, or 'false' to unpause
+ * @param pause Set to 'true' to pause, or 'false' to unpause.
  * @returns The operation result code, a member of the eLeapRS enumeration.
  * @since 4.0.0
  */
@@ -800,10 +867,64 @@ LEAP_EXPORT eLeapRS LEAP_CALL LeapGetDeviceList(LEAP_CONNECTION hConnection, LEA
  */
 LEAP_EXPORT eLeapRS LEAP_CALL LeapOpenDevice(LEAP_DEVICE_REF rDevice, LEAP_DEVICE* phDevice);
 
+/** \ingroup Functions
+ * For a multi-device aware client, sets the device to use in the context of
+ * non-"Ex" API functions which are logically device-specific but don't provide
+ * a device parameter.
+ *
+ * Automatically subscribes to the specified device (see LeapSubscribeEvents()),
+ * and if \p unsubscribeOthers is \c true, then unsubscribes from all other devices
+ * as well (see LeapUnsubscribeEvents()).
+ *
+ * Affects future invocations of the following functions:
+ *  - LeapCameraMatrix()
+ *  - LeapDistortionCoeffs()
+ *  - LeapGetFrameSize()
+ *  - LeapInterpolateFrame()
+ *  - LeapInterpolateFrameFromTime()
+ *  - LeapPixelToRectilinear()
+ *  - LeapRectilinearToPixel()
+ *
+ * It is not necessary to call this function from a client that does not claim
+ * to be multi-device-aware (see ::eLeapConnectionConfig and
+ * ::LeapCreateConnection).
+ *
+ * @param hConnection The connection handle created by LeapCreateConnection().
+ * @param hDevice A device handle returned by LeapOpenDevice().
+ * @param unsubscribeOthers If \c true, unsubscribe from all other devices.
+ * @returns The operation result code, a member of the eLeapRS enumeration.
+ * @since 5.4.0
+ */
 LEAP_EXPORT eLeapRS LEAP_CALL LeapSetPrimaryDevice(LEAP_CONNECTION hConnection, LEAP_DEVICE hDevice, bool unsubscribeOthers);
 
+/** \ingroup Functions
+ * Subscribe to event messages based on device.
+ *
+ * If events from multiple devices are being sent from a service, this function
+ * allows the client to receive events from the specified device. Clients that
+ * claim to be multi-device-aware (see ::eLeapConnectionConfig and
+ * ::LeapCreateConnection) must subscribe to a device to receive various
+ * device-specific events.
+ *
+ * @param hConnection The connection handle created by LeapCreateConnection().
+ * @param hDevice A handle to the device for which events are desired.
+ * @returns The operation result code, a member of the eLeapRS enumeration.
+ * @since 5.4.0
+ */
 LEAP_EXPORT eLeapRS LEAP_CALL LeapSubscribeEvents(LEAP_CONNECTION hConnection, LEAP_DEVICE hDevice);
 
+/** \ingroup Functions
+ * Unsubscribe from event messages based on device.
+ *
+ * If events from multiple devices are being sent from a service, this function
+ * prevents receiving further events from the specified device that had
+ * previously been enabled using a call to LeapSubscribeEvents().
+ *
+ * @param hConnection The connection handle created by LeapCreateConnection().
+ * @param hDevice A handle to the device for which events are desired.
+ * @returns The operation result code, a member of the eLeapRS enumeration.
+ * @since 5.4.0
+ */
 LEAP_EXPORT eLeapRS LEAP_CALL LeapUnsubscribeEvents(LEAP_CONNECTION hConnection, LEAP_DEVICE hDevice);
 
 /**  \ingroup Enum
@@ -904,6 +1025,40 @@ typedef struct _LEAP_DEVICE_INFO {
  * @since 3.0.0
  */
 LEAP_EXPORT eLeapRS LEAP_CALL LeapGetDeviceInfo(LEAP_DEVICE hDevice, LEAP_DEVICE_INFO* info);
+
+/** \ingroup Functions
+ * Get the transform to world coordinates from 3D Leap coordinates.
+ *
+ * To get the transform, you must supply an array of 16 elements.
+ *
+ * The function will return a an array representing a 4 x 4 matrix of the form:
+ *
+ * R, t
+ * 0, 1
+ *
+ * where:
+ * R is a 3 x 3 rotation matrix
+ * t is a 3 x 1 translation vector
+ *
+ * Note that the matrix is in column major, e.g. transform[12] corresponds to the x coordinate of the
+ * translation vector t.
+ *
+ * A possible pipeline would be, for example:
+ * 1) Get "palm_pos" the position of the center of the palm (as a 3x1 vector)
+ * 2) Construct a 4x1 vector using the palm_position: palm_pos_4 = (palm_pos.x; palm_pos.y; palm_pos.z; 1.0f)
+ * 3) Create a 4x4 matrix "trans_mat" as illustrated above using the returned transform
+ * 4) Get the position of the center of the palm in world coordinates by multiplying trans_mat and palm_pos_4:
+ *    center_world_4 = trans_mat * palm_pos_4
+ *
+ * This function returns eLeapRS_Unsupported in the case where this functionality is not yet supported.
+ *
+ * @param hDevice A handle to the device to be queried.
+ * @param[out] transform A pointer to a single-precision float array of size 16, containing
+ *  the coefficients of the 4x4 matrix in Column Major order.
+ * @returns The operation result code, a member of the eLeapRS enumeration.
+ * @since 5.4.0
+ */
+LEAP_EXPORT eLeapRS LEAP_CALL LeapGetDeviceTransform(LEAP_DEVICE hDevice, float* transform);
 
 /** \ingroup Structs
  * Device event information.
@@ -2014,7 +2169,7 @@ LEAP_EXPORT eLeapRS LEAP_CALL LeapGetFrameSize(LEAP_CONNECTION hConnection, int6
  * @param timestamp The timestamp of the frame whose size is to be queried.
  * @param[out] pncbEvent A pointer that receives the number of bytes required to store the specified frame.
  * @returns The operation result code, a member of the eLeapRS enumeration.
- * @since 4.1.0
+ * @since 5.4.0
  */
 LEAP_EXPORT eLeapRS LEAP_CALL LeapGetFrameSizeEx(LEAP_CONNECTION hConnection, LEAP_DEVICE hDevice, int64_t timestamp, uint64_t* pncbEvent);
 
@@ -2055,9 +2210,11 @@ LEAP_EXPORT eLeapRS LEAP_CALL LeapInterpolateFrame(LEAP_CONNECTION hConnection, 
  * @param[out] pEvent A pointer to a flat buffer which is filled with an interpolated frame.
  * @param ncbEvent The number of bytes pointed to by pEvent.
  * @returns The operation result code, a member of the eLeapRS enumeration.
- * @since 4.1.0
+ * @since 5.4.0
  */
 LEAP_EXPORT eLeapRS LEAP_CALL LeapInterpolateFrameEx(LEAP_CONNECTION hConnection, LEAP_DEVICE hDevice, int64_t timestamp, LEAP_TRACKING_EVENT* pEvent, uint64_t ncbEvent);
+
+
 
 /** \ingroup Functions
 * Constructs a frame at the specified timestamp by interpolating between a frame near the timestamp
@@ -2099,15 +2256,12 @@ LEAP_EXPORT eLeapRS LEAP_CALL LeapInterpolateFrameFromTime(LEAP_CONNECTION hConn
 * @param[out] pEvent A pointer to a flat buffer which is filled with an interpolated frame.
 * @param ncbEvent The number of bytes pointed to by pEvent.
 * @returns The operation result code, a member of the eLeapRS enumeration.
-* @since 4.1.0
+* @since 5.4.0
 */
 LEAP_EXPORT eLeapRS LEAP_CALL LeapInterpolateFrameFromTimeEx(LEAP_CONNECTION hConnection, LEAP_DEVICE hDevice, int64_t timestamp, int64_t sourceTimestamp, LEAP_TRACKING_EVENT* pEvent, uint64_t ncbEvent);
 
-LEAP_EXPORT eLeapRS LEAP_CALL LeapInterpolateHeadPose(LEAP_CONNECTION hConnection, int64_t timestamp, LEAP_HEAD_POSE_EVENT* pEvent);
 
-LEAP_EXPORT eLeapRS LEAP_CALL LeapInterpolateHeadPoseEx(LEAP_CONNECTION hConnection, LEAP_DEVICE hDevice, int64_t timestamp, LEAP_HEAD_POSE_EVENT* pEvent);
 
-LEAP_EXPORT eLeapRS LEAP_CALL LeapInterpolateEyePositions(LEAP_CONNECTION hConnection, int64_t timestamp, LEAP_EYE_EVENT* pEvent);
 
 /** \ingroup Functions
  * Closes a device handle previously opened with LeapOpenDevice.
@@ -2245,12 +2399,13 @@ LEAP_EXPORT LEAP_VECTOR LEAP_CALL LeapPixelToRectilinear(LEAP_CONNECTION hConnec
  * @param hConnection The connection handle created by LeapCreateConnection().
  * @param hDevice A device handle returned by LeapOpenDevice().
  * @param camera The camera to use, a member of the eLeapPerspectiveType enumeration
- * @param calibrationType The type of camera calibration to use
  * @param pixel A Vector containing the position of a pixel in the image.
  * @returns A Vector containing the ray direction (the z-component of the vector is always 1).
- * @since 4.1.0
+ * @since 5.4.0
  */
-LEAP_EXPORT LEAP_VECTOR LEAP_CALL LeapPixelToRectilinearEx(LEAP_CONNECTION hConnection, LEAP_DEVICE hDevice, eLeapPerspectiveType camera, eLeapCameraCalibrationType calibrationType, LEAP_VECTOR pixel);
+LEAP_EXPORT LEAP_VECTOR LEAP_CALL LeapPixelToRectilinearEx(LEAP_CONNECTION hConnection, LEAP_DEVICE hDevice, eLeapPerspectiveType camera, LEAP_VECTOR pixel);
+
+
 
 /** \ingroup Functions
  * Provides the point in the image corresponding to a ray projecting
@@ -2299,12 +2454,11 @@ LEAP_EXPORT LEAP_VECTOR LEAP_CALL LeapRectilinearToPixel(LEAP_CONNECTION hConnec
  * @param hConnection The connection handle created by LeapCreateConnection().
  * @param hDevice A device handle returned by LeapOpenDevice().
  * @param camera The camera to use, a member of the eLeapPerspectiveType enumeration
- * @param calibrationType The type of camera calibration to use
  * @param rectilinear A Vector containing the ray direction.
  * @returns A Vector containing the pixel coordinates [x, y, 1] (with z always 1).
- * @since 4.1.0
+ * @since 5.4.0
  */
-LEAP_EXPORT LEAP_VECTOR LEAP_CALL LeapRectilinearToPixelEx(LEAP_CONNECTION hConnection, LEAP_DEVICE hDevice, eLeapPerspectiveType camera, eLeapCameraCalibrationType calibrationType, LEAP_VECTOR rectilinear);
+LEAP_EXPORT LEAP_VECTOR LEAP_CALL LeapRectilinearToPixelEx(LEAP_CONNECTION hConnection, LEAP_DEVICE hDevice, eLeapPerspectiveType camera, LEAP_VECTOR rectilinear);
 
 /** \ingroup Functions
  * Returns an OpenCV-compatible camera matrix.
@@ -2321,7 +2475,7 @@ LEAP_EXPORT void LEAP_CALL LeapCameraMatrix(LEAP_CONNECTION hConnection, eLeapPe
  * @param hDevice A device handle returned by LeapOpenDevice().
  * @param camera The camera to use, a member of the eLeapPerspectiveType enumeration
  * @param[out] dest A pointer to a single-precision float array of size 9
- * @since 4.1.0
+ * @since 5.4.0
  */
 LEAP_EXPORT void LEAP_CALL LeapCameraMatrixEx(LEAP_CONNECTION hConnection, LEAP_DEVICE hDevice, eLeapPerspectiveType camera, float* dest);
 
@@ -2379,7 +2533,7 @@ LEAP_EXPORT void LEAP_CALL LeapDistortionCoeffs(LEAP_CONNECTION hConnection, eLe
  * @param hDevice A device handle returned by LeapOpenDevice().
  * @param camera The camera to use, a member of the eLeapPerspectiveType enumeration
  * @param[out] dest A pointer to a single-precision float array of size 8.
- * @since 4.1.0
+ * @since 5.4.0
  */
 LEAP_EXPORT void LEAP_CALL LeapDistortionCoeffsEx(LEAP_CONNECTION hConnection, LEAP_DEVICE hDevice, eLeapPerspectiveType camera, float* dest);
 
@@ -2395,8 +2549,6 @@ LEAP_EXPORT void LEAP_CALL LeapDistortionCoeffsEx(LEAP_CONNECTION hConnection, L
  */
 LEAP_EXPORT const char* LEAP_CALL LeapDevicePIDToString(eLeapDevicePID pid);
 
-LEAP_EXPORT eLeapRS LEAP_CALL LeapGetPointMappingSize(LEAP_CONNECTION hConnection, uint64_t* pSize);
-LEAP_EXPORT eLeapRS LEAP_CALL LeapGetPointMapping(LEAP_CONNECTION hConnection, LEAP_POINT_MAPPING* pointMapping, uint64_t* pSize);
 
 /** \ingroup Enum
   * Defines the recording mode provided to the LeapRecordingOpen()
@@ -2512,19 +2664,6 @@ LEAP_EXPORT eLeapRS LEAP_CALL LeapRecordingRead(LEAP_RECORDING pRecording, LEAP_
   */
 LEAP_EXPORT eLeapRS LEAP_CALL LeapRecordingWrite(LEAP_RECORDING pRecording, LEAP_TRACKING_EVENT* pEvent, uint64_t* pnBytesWritten);
 
-typedef struct _LEAP_TELEMETRY_DATA {
-  uint32_t thread_id;
-  uint64_t start_time;
-  uint64_t end_time;
-  uint32_t zone_depth;
-  const char* file_name;
-  uint32_t line_number;
-  const char* zone_name;
-} LEAP_TELEMETRY_DATA;
-
-LEAP_EXPORT eLeapRS LEAP_CALL LeapTelemetryProfiling(LEAP_CONNECTION hConnection, const LEAP_TELEMETRY_DATA* telemetryData);
-
-LEAP_EXPORT uint64_t LEAP_CALL LeapTelemetryGetNow();
 
 
 /** \ingroup Functions
@@ -2649,6 +2788,33 @@ typedef struct _LEAP_VERSION {
  * @since 5.2.x
  */
 LEAP_EXPORT eLeapRS LEAP_CALL LeapGetVersion(LEAP_CONNECTION hConnection, eLeapVersionPart versionPart, LEAP_VERSION* pVersion);
+
+/**
+ * Not Supported:
+ *
+ * The following functions are included for API compatibility with earlier LeapC version.
+ * They are no longer supported and calling them will have no effects.
+ */
+
+LEAP_EXPORT eLeapRS LEAP_CALL LeapGetPointMappingSize(LEAP_CONNECTION hConnection, uint64_t* pSize);
+LEAP_EXPORT eLeapRS LEAP_CALL LeapGetPointMapping(LEAP_CONNECTION hConnection, LEAP_POINT_MAPPING* pointMapping, uint64_t* pSize);
+
+typedef struct _LEAP_TELEMETRY_DATA {
+  uint32_t thread_id;
+  uint64_t start_time;
+  uint64_t end_time;
+  uint32_t zone_depth;
+  const char* file_name;
+  uint32_t line_number;
+  const char* zone_name;
+} LEAP_TELEMETRY_DATA;
+
+LEAP_EXPORT eLeapRS LEAP_CALL LeapTelemetryProfiling(LEAP_CONNECTION hConnection, const LEAP_TELEMETRY_DATA* telemetryData);
+LEAP_EXPORT uint64_t LEAP_CALL LeapTelemetryGetNow();
+
+LEAP_EXPORT eLeapRS LEAP_CALL LeapInterpolateHeadPose(LEAP_CONNECTION hConnection, int64_t timestamp, LEAP_HEAD_POSE_EVENT* pEvent);
+LEAP_EXPORT eLeapRS LEAP_CALL LeapInterpolateHeadPoseEx(LEAP_CONNECTION hConnection, LEAP_DEVICE hDevice, int64_t timestamp, LEAP_HEAD_POSE_EVENT* pEvent);
+LEAP_EXPORT eLeapRS LEAP_CALL LeapInterpolateEyePositions(LEAP_CONNECTION hConnection, int64_t timestamp, LEAP_EYE_EVENT* pEvent);
 
 #ifdef __cplusplus
 }

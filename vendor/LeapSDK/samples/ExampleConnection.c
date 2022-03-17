@@ -58,7 +58,7 @@ static pthread_mutex_t dataLock;
  * Creates the connection handle and opens a connection to the Leap Motion
  * service. On success, creates a thread to service the LeapC message pump.
  */
-LEAP_CONNECTION* OpenConnection(){
+LEAP_CONNECTION* OpenConnection(void){
   if(_isRunning){
     return &connectionHandle;
   }
@@ -78,7 +78,7 @@ LEAP_CONNECTION* OpenConnection(){
   return &connectionHandle;
 }
 
-void CloseConnection(){
+void CloseConnection(void){
   if(!_isRunning){
     return;
   }
@@ -93,7 +93,7 @@ void CloseConnection(){
 #endif
 }
 
-void DestroyConnection(){
+void DestroyConnection(void){
   CloseConnection();
   LeapDestroyConnection(connectionHandle);
 }

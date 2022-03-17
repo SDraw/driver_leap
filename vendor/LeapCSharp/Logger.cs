@@ -17,7 +17,7 @@ namespace LeapInternal
         /// <summary>
         /// Logs message to the a Console.
         /// </summary>
-        public static void Log(string message)
+        public static void Log(object message)
         {
             Console.WriteLine(message);
         }

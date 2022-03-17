@@ -13,20 +13,20 @@
 #include "LeapC.h"
 
 /* Client functions */
-LEAP_CONNECTION* OpenConnection();
-void CloseConnection();
-void DestroyConnection();
-LEAP_TRACKING_EVENT* GetFrame(); //Used in polling example
-LEAP_DEVICE_INFO* GetDeviceProperties(); //Used in polling example
+LEAP_CONNECTION* OpenConnection(void);
+void CloseConnection(void);
+void DestroyConnection(void);
+LEAP_TRACKING_EVENT* GetFrame(void); //Used in polling example
+LEAP_DEVICE_INFO* GetDeviceProperties(void); //Used in polling example
 const char* ResultString(eLeapRS r);
 
 /* State */
 extern bool IsConnected;
 
 /* Callback function pointers */
-typedef void (*connection_callback)     ();
+typedef void (*connection_callback)     (void);
 typedef void (*device_callback)         (const LEAP_DEVICE_INFO *device);
-typedef void (*device_lost_callback)    ();
+typedef void (*device_lost_callback)    (void);
 typedef void (*device_failure_callback) (const eLeapDeviceStatus failure_code,
                                          const LEAP_DEVICE failed_device);
 typedef void (*policy_callback)         (const uint32_t current_policies);

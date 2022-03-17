@@ -40,6 +40,8 @@ namespace Leap
     {
         Connection _connection;
         bool _disposed = false;
+        bool _supportsMultipleDevices = true;
+        string _serverNamespace = "Leap Service";
         Config _config;
 
         /// <summary>
@@ -96,7 +98,6 @@ namespace Leap
             }
         }
 
-        private bool _hasConnected = false;
         private EventHandler<ConnectionEventArgs> _connect;
 
         /// <summary>
@@ -426,7 +427,7 @@ namespace Leap
         /// 
         /// @since 1.0
         /// </summary>
-        public Controller() : this(0, null) { }
+        public Controller() : this(0, null, true) { }
 
         /// <summary>
         /// Constructs a Controller object using the specified connection key.
@@ -440,7 +441,7 @@ namespace Leap
         /// Otherwise, a new connection is created.
         /// @since 3.0
         /// </summary>
-        public Controller(int connectionKey, string serverNamespace = null)
+        public Controller(int connectionKey, string serverNamespace = "Leap Service", bool supportsMultipleDevices = true)
         {
             _connection = Connection.GetConnection(new Connection.Key(connectionKey, serverNamespace));
             _connection.EventContext = SynchronizationContext.Current;
@@ -449,8 +450,12 @@ namespace Leap
             _connection.LeapConnection += OnConnect;
             _connection.LeapConnectionLost += OnDisconnect;
 
-            _connection.Start();
+            _supportsMultipleDevices = supportsMultipleDevices;
+            _serverNamespace = serverNamespace;
+
+            _connection.Start(serverNamespace, supportsMultipleDevices);
         }
+
 
         /// <summary>
         /// Starts the connection.
@@ -462,7 +467,7 @@ namespace Leap
         /// </summary>
         public void StartConnection()
         {
-            _connection.Start();
+            _connection.Start(_serverNamespace, _supportsMultipleDevices);
         }
 
         /// <summary>
@@ -504,10 +509,11 @@ namespace Leap
         /// the change was accepted. 
         /// @since 2.1.6 
         /// </summary>
-        public void SetAndClearPolicy(PolicyFlag set, PolicyFlag clear)
+        public void SetAndClearPolicy(PolicyFlag set, PolicyFlag clear, string deviceSerial = "")
         {
             _connection.SetAndClearPolicy(set, clear);
         }
+
         public void SetPolicy(PolicyFlag policy)
         {
             _connection.SetPolicy(policy);
@@ -633,6 +639,58 @@ namespace Leap
         public void GetInterpolatedHeadPose(ref LEAP_HEAD_POSE_EVENT toFill, Int64 time)
         {
             _connection.GetInterpolatedHeadPose(ref toFill, time);
+        }
+
+        /// <summary>
+        /// Subscribes to the events coming from an individual device
+        /// 
+        /// If this is not called, only the primary device will be subscribed.
+        /// Will automatically unsubscribe the primary device if this is called 
+        /// on a secondary device, but not a primary one.  
+        /// 
+        /// @since 4.1
+        /// </summary>
+        public void SubscribeToDeviceEvents(Device device)
+        {
+            _connection.SubscribeToDeviceEvents(device);
+        }
+
+        /// <summary>
+        /// Unsubscribes from the events coming from an individual device
+        /// 
+        /// This can be called safely, even if the device has not been subscribed.
+        /// 
+        /// @since 4.1
+        /// </summary>
+        public void UnsubscribeFromDeviceEvents(Device device)
+        {
+            _connection.UnsubscribeFromDeviceEvents(device);
+        }
+
+        /// <summary>
+        /// Subscribes to the events coming from all devices
+        /// 
+        /// @since 4.1
+        /// </summary>
+        public void SubscribeToAllDevices()
+        {
+            for (int i = 1; i < Devices.Count; i++)
+            {
+                _connection.SubscribeToDeviceEvents(Devices[i]);
+            }
+        }
+
+        /// <summary>
+        /// Unsubscribes from the events coming from all devices
+        /// 
+        /// @since 4.1
+        /// </summary>
+        public void UnsubscribeFromAllDevices()
+        {
+            for (int i = 1; i < Devices.Count; i++)
+            {
+                _connection.UnsubscribeFromDeviceEvents(Devices[i]);
+            }
         }
 
         public void TelemetryProfiling(ref LEAP_TELEMETRY_DATA telemetryData)
@@ -825,13 +883,11 @@ namespace Leap
 
         protected virtual void OnConnect(object sender, ConnectionEventArgs eventArgs)
         {
-            _hasConnected = true;
         }
 
         protected virtual void OnDisconnect(object sender, ConnectionLostEventArgs eventArgs)
         {
             _hasInitialized = false;
-            _hasConnected = false;
         }
     }
 }
