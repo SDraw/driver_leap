@@ -19,7 +19,7 @@ namespace LeapInternal
         /// </summary>
         public static void Log(object message)
         {
-            Console.WriteLine(message);
+            Console.Error.WriteLine(message.ToString());
         }
 
         public static void LogStruct(object thisObject, string title = "")

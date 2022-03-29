@@ -106,7 +106,7 @@ namespace LeapInternal
             }
             catch (Exception e)
             {
-                Console.Error.WriteLine(e);
+                Console.Error.WriteLine(e.Message);
             }
 
             return IntPtr.Zero;
@@ -135,7 +135,7 @@ namespace LeapInternal
             }
             catch (Exception e)
             {
-                Console.Error.WriteLine(e);
+                Console.Error.WriteLine(e.Message);
             }
         }
 
