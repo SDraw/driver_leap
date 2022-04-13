@@ -5290,3 +5290,107 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 -------------------------------------------------------------------------------
+
+
+nano-ecc (1.0.0) - BSD License
+===============================================================================
+```
+Copyright (c) 2013, Mike Ryan
+Based on micro-ecc, Copyright (c) 2013, Kenneth MacKay
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+```
+-------------------------------------------------------------------------------
+
+Qt third-party licences
+=======================
+
+Ultraleap Tracking Software makes use of QtCore and QtGui, which themselves use third-party libraries in their modules. The licenses are listed here: https://doc.qt.io/qt-5/licenses-used-in-qt.html
+
+As of March 23, 2022, the dependencies for QtCore and QtGui were listed as:
+
+#### Qt Core
+| Library                                                                                                                                | License                                                    |
+| -------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------                    |
+| Data Compression Library (zlib), version 1.2.11                                                                                        | Zlib License                                               |
+| Easing Equations by Robert Penner                                                                                                      | BSD 3-clause "New" or "Revised" License                    |
+| Efficient Binary-Decimal and Decimal-Binary Conversion Routines for IEEE Doubles, version 3.1.5                                        | BSD 3-clause "New" or "Revised" License                    |
+| FreeBSD strtoll and strtoull, version 18b29f3fb8abee5d57ed8f4a44f806bec7e0eeff                                                         | BSD 3-clause "New" or "Revised" License                    |
+| MD4                                                                                                                                    | Public Domain                                              |
+| MD5                                                                                                                                    | Public Domain                                              |
+| PCRE2 - Stack-less Just-In-Time Compiler, version 10.39                                                                                | BSD 2-clause "Simplified" License                          |
+| PCRE2, version 10.39                                                                                                                   | BSD 3-clause "New" or "Revised" License                    |
+| QEventDispatcher on macOS                                                                                                              | BSD 3-clause "New" or "Revised" License                    |
+| Secure Hash Algorithm SHA-1                                                                                                            | Public Domain                                              |
+| Secure Hash Algorithm SHA-3 - Keccak, version 3.2                                                                                      | Creative Commons Zero v1.0 Universal                       |
+| Secure Hash Algorithm SHA-3 - brg_endian, version https://github.com/BrianGladman/sha/ commit 4b9e13ead2c5b5e41ca27c65de4dd69ae0bac228 | BSD 2-clause "Simplified" License                          |
+| Secure Hash Algorithms SHA-384 and SHA-512                                                                                             | BSD 3-clause "New" or "Revised" License                    |
+| Text Codec: EUC-JP                                                                                                                     | BSD 2-clause "Simplified" License                          |
+| Text Codec: EUC-KR                                                                                                                     | BSD 2-clause "Simplified" License                          |
+| Text Codec: GBK                                                                                                                        | BSD 2-clause "Simplified" License                          |
+| Text Codec: ISO 2022-JP (JIS)                                                                                                          | BSD 2-clause "Simplified" License                          |
+| Text Codec: Shift-JIS                                                                                                                  | BSD 2-clause "Simplified" License                          |
+| Text Codec: TSCII                                                                                                                      | BSD 2-clause "Simplified" License                          |
+| Text Codecs: Big5, Big5-HKSCS                                                                                                          | BSD 2-clause "Simplified" License                          |
+| The Public Suffix List, version d4e247a71d1b6da08dad906b098c818493166fcc, fetched on 2021-06-11                                        | Mozilla Public License 2.0                                 |
+| TinyCBOR, version 0.6+patches                                                                                                          | MIT License                                                |
+| Unicode Character Database (UCD), version 26                                                                                           | Unicode License Agreement - Data Files and Software (2016) |
+| Unicode Common Locale Data Repository (CLDR), version v39                                                                              | Unicode License Agreement - Data Files and Software (2016) |
+| forkfd                                                                                                                                 | MIT License                                                |
+
+#### Qt GUI
+
+| Library                                               | License                                                                                     |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| ANGLE Library, version chromium/3280                  | BSD 3-clause "New" or "Revised" License                                                     |
+| ANGLE: Array Bounds Clamper for WebKit                | BSD 2-clause "Simplified" License                                                           |
+| ANGLE: Khronos Headers                                | MIT License                                                                                 |
+| ANGLE: Murmurhash                                     | Public Domain                                                                               |
+| ANGLE: Systeminfo                                     | BSD 2-clause "Simplified" License                                                           |
+| ANGLE: trace_event                                    | BSD 3-clause "New" or "Revised" License                                                     |
+| Adobe Glyph List For New Fonts, version 1.7           | BSD 3-Clause "New" or "Revised" License                                                     |
+| Anti-aliasing rasterizer from FreeType 2              | Freetype Project License or GNU General Public License v2.0 only                            |
+| Bitstream Vera Font, version 1.10                     | Bitstream Vera Font License                                                                 |
+| Cocoa Platform Plugin                                 | BSD 3-clause "New" or "Revised" License                                                     |
+| DejaVu Fonts, version 2.37                            | Bitstream Vera Font License                                                                 |
+| Freetype 2 - Bitmap Distribution Format (BDF) support | MIT License                                                                                 |
+| Freetype 2 - Portable Compiled Format (PCF) support   | MIT License                                                                                 |
+| Freetype 2 - zlib                                     | Zlib License                                                                                |
+| Freetype 2, version 2.10.4                            | Freetype Project License or GNU General Public License v2.0 only                            |
+| HarfBuzz                                              | MIT License                                                                                 |
+| HarfBuzz-NG, version 1.7.4                            | MIT License                                                                                 |
+| IAccessible2 IDL Specification, version 1.3.0         | BSD 3-clause "New" or "Revised" License                                                     |
+| LibJPEG-turbo, version 2.1.1                          | Independent JPEG Group License and BSD 3-Clause "New" or "Revised" License and zlib License |
+| LibPNG, version 1.6.37                                | Libpng License and PNG Reference Library version 2                                          |
+| MD4C, version 0.4.8                                   | MIT License                                                                                 |
+| Native Style for Android                              | Apache License 2.0                                                                          |
+| OpenGL ES 2 Headers, version Revision 27673           | MIT License                                                                                 |
+| OpenGL Headers, version Revision 27684                | MIT License                                                                                 |
+| Pixman, version 0.17.12                               | MIT License                                                                                 |
+| Smooth Scaling Algorithm                              | BSD 2-clause "Simplified" License and Imlib2 License                                        |
+| Vulkan API Registry, version 1.0.39                   | MIT License                                                                                 |
+| Vulkan Memory Allocator, version 2.2.0                | MIT License                                                                                 |
+| WebGradients                                          | MIT License                                                                                 |
+| Wintab API                                            | LCS-Telegraphics License                                                                    |
+| X Server helper                                       | X11 License and Historical Permission Notice and Disclaimer                                 |
+| XCB-XInput                                            | MIT License                                                                                 |
+| sRGB color profile icc file                           | International Color Consortium License                                                      |
+-------------------------------------------------------------------------------

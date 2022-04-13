@@ -628,9 +628,8 @@ LEAP_EXPORT eLeapRS LEAP_CALL LeapSetPolicyFlags(LEAP_CONNECTION hConnection, ui
  * @returns The operation result code, a member of the eLeapRS enumeration.
  * @since 5.4.0
  */
-/*
+
 LEAP_EXPORT eLeapRS LEAP_CALL LeapSetPolicyFlagsEx(LEAP_CONNECTION hConnection, LEAP_DEVICE hDevice, uint64_t set, uint64_t clear);
- */
 
 /** \ingroup Functions
  * Requests a tracking mode.
@@ -663,9 +662,9 @@ LEAP_EXPORT eLeapRS LEAP_CALL LeapSetTrackingMode(LEAP_CONNECTION hConnection, e
  * @returns The operation result code, a member of the eLeapRS enumeration.
  * @since 5.4.0
  */
-/*
+
 LEAP_EXPORT eLeapRS LEAP_CALL LeapSetTrackingModeEx(LEAP_CONNECTION hConnection, LEAP_DEVICE hDevice, eLeapTrackingMode mode);
- */
+
 
 /** \ingroup Functions
  * Requests the currently set tracking mode.
@@ -696,9 +695,9 @@ LEAP_EXPORT eLeapRS LEAP_CALL LeapGetTrackingMode(LEAP_CONNECTION hConnection);
  * @returns The operation result code, a member of the eLeapRS enumeration.
  * @since 5.4.0
  */
-/*
+
 LEAP_EXPORT eLeapRS LEAP_CALL LeapGetTrackingModeEx(LEAP_CONNECTION hConnection, LEAP_DEVICE hDevice);
- */
+
 
 /** \ingroup Functions
  * Pauses the service

@@ -1,5 +1,5 @@
 ULTRALEAP TRACKING SDK AGREEMENT
-Updated: 26 October 2021
+Updated: 22 March 2022
 Permitted uses
 This SDK Agreement (“Agreement”) covers use of the Ultraleap hand tracking SDK (the “SDK”) by
 individuals and businesses for the following purposes:
@@ -355,7 +355,7 @@ permitted uses set out in this Agreement.
 “Ultraleap” “we” or “us” means Ultraleap Limited, a company registered in England with company
 number 08781720, with a principal place of business at The West Wing, Glass Wharf, Bristol, BS2 0EL,
 United Kingdom.
-“Ultraleap Hardware” means the Leap Motion Controller or Stereo IR 170, each being a device that
+“Ultraleap Hardware” means the Leap Motion Controller, Stereo IR 170, Stereo IR 170 EK or Ultraleap 3Di each being a device that
 detects and reads movements within a 3-D interaction space to precisely interact with and control
 software on a computing device, or an Ultraleap-authorized embedded optical module.
 “Ultraleap Redistributables” means any .lib code, .dll files, .so files, sample code, or other materials
