@@ -46,8 +46,8 @@ namespace LeapInternal
 
         private static ConcurrentDictionary<IntPtr, ActiveMemoryInfo> _activeMemory =
           new ConcurrentDictionary<IntPtr, ActiveMemoryInfo>();
-        private static ConcurrentDictionary<PoolKey, Queue<object>> _pooledMemory =
-          new ConcurrentDictionary<PoolKey, Queue<object>>();
+        private static ConcurrentDictionary<PoolKey, ConcurrentQueue<object>> _pooledMemory =
+          new ConcurrentDictionary<PoolKey, ConcurrentQueue<object>>();
 
         public static IntPtr Pin(UInt32 size, eLeapAllocatorType typeHint, IntPtr state)
         {
@@ -61,11 +61,11 @@ namespace LeapInternal
                 };
 
                 //Attempt to find the pool that holds this type of allocation
-                Queue<object> pool;
+                ConcurrentQueue<object> pool;
                 if (!_pooledMemory.TryGetValue(key, out pool))
                 {
                     //Construct a new pool if none exists yet
-                    pool = new Queue<object>();
+                    pool = new ConcurrentQueue<object>();
                     _pooledMemory[key] = pool;
                 }
 
@@ -73,7 +73,7 @@ namespace LeapInternal
                 object memory;
                 if (EnablePooling && pool.Count > MinPoolSize)
                 {
-                    memory = pool.Dequeue();
+                    pool.TryDequeue(out memory);
                 }
                 else
                 {
@@ -106,7 +106,7 @@ namespace LeapInternal
             }
             catch (Exception e)
             {
-                Console.Error.WriteLine(e.Message);
+                Console.Error.WriteLine(e);
             }
 
             return IntPtr.Zero;
@@ -135,7 +135,7 @@ namespace LeapInternal
             }
             catch (Exception e)
             {
-                Console.Error.WriteLine(e.Message);
+                Console.Error.WriteLine(e);
             }
         }
 

@@ -73,7 +73,7 @@ namespace LeapInternal
             }
             catch (Exception e)
             {
-                Console.Error.WriteLine(e.Message);
+                Console.Error.WriteLine(e);
                 t = default(T);
             }
 #endif

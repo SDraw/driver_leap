@@ -4,7 +4,7 @@ Self-sustainable fork of SteamVR driver for Leap Motion controller with updated 
 [![](./.github/img_01.png)](https://www.youtube.com/watch?v=RdGnCV2g_oE)
   
 ## Installation (for users)
-* Install [Ultraleap Gemini v5.3.1](https://developer.leapmotion.com/tracking-software-download)
+* Install [latest Ultraleap Gemini](https://developer.leapmotion.com/tracking-software-download)
 * Extract [latest release archive](../../releases/latest) to `<SteamVR_folder>/drivers`
 * Add line in section `steamvr` of `<Steam_folder>/config/steamvr.vrsettings` file:
 ```JSON
