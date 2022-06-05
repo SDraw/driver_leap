@@ -16,7 +16,7 @@ LeapSDK
 - LICENSE.md
 	* Ultraleap Tracking SDK license.
 - Uninstall.exe
-	* Program to uninstall the LeapSDK application.
+	* Program to uninstall the LeapSDK application (Windows only).
 
 ## Requirements:
 
@@ -25,15 +25,12 @@ LeapSDK
 
 2. Building Samples requires
     * CMake 3.16.3+ (https://cmake.org/)
-    * Microsoft Visual Studio 15+
+    * Microsoft Visual Studio 15+ (Windows)
+    * GCC (Linux - tested on v9.4.0)
 
 ## Installation:
 
-1. Execute the LeapSDK installer.
-
-2. Choose a suitable destination location on your computer.
-
-3. Read and accept the Ultraleap Tracking SDK Agreement to use the Ultraleap SDK.
+The LeapSDK is installed with Ultraleap Tracking.
 
 ## Usage:
 
@@ -44,35 +41,60 @@ LeapSDK
         * Or : Pass the LeapSDK's path to find_package with the PATHS option.
     * call find_package(LeapSDK 5 [PATHS ...]).
     * call target_link_libraries(<your project> PUBLIC|PRIVATE LeapSDK::LeapC).
-    * Ensure LeapC.dll is in your dynamic library search path.
+    * Ensure LeapC.dll/LeapC.so is in your dynamic library search path.
         * A popular option is to add a post-build step that copies it to your project's output directory.
 
 2. For non-CMake projects
     * Use a C/C++ compiler such as MSVC, Clang or GCC.
     * Add LeapSDK/include to the compiler include search paths.
-    * Either add a linker reference to LeapC.lib or dynamically load LeapC.dll.
+    * Either add a linker reference to LeapC.lib or dynamically load LeapC.dll/LeapC.so.
 
 ## Building Samples:
+
+### Windows
 
 1. Open CMake using LeapSDK/samples as the source directory
 
 2. Select a build directory (often LeapSDK/samples/build) to use
 
 3. Configure & Generate CMake with the generator of your choice
+
+4. Open and build the CMake generated project files. For more help, see the CMake documentation.
     * An example script would be :
 ```powershell
 $env:BUILD_TYPE = 'Release'
 $env:REPOS_BUILD_ROOT = 'C:/build'
 $env:REPOS_INSTALL_ROOT = 'C:/Program Files'
 
-cmake -j -S "C:/Program Files/Ultraleap/LeapSDK/samples" -B $env:REPOS_BUILD_ROOT/$env:BUILD_TYPE/LeapSDK/leapc_example `
+cmake -S "C:/Program Files/Ultraleap/LeapSDK/samples" -B $env:REPOS_BUILD_ROOT/$env:BUILD_TYPE/LeapSDK/leapc_example `
 		-DCMAKE_INSTALL_PREFIX="$env:REPOS_INSTALL_ROOT/leapc_example" `
 		-DCMAKE_BUILD_TYPE="$env:BUILD_TYPE"
 
 cmake --build $env:REPOS_BUILD_ROOT/$env:BUILD_TYPE/LeapSDK/leapc_example -j --config $env:BUILD_TYPE
 ```
 
+### x64 Linux
+
+1. Open CMake using /usr/share/doc/ultraleap-tracking/samples as the source directory    
+    
+2. Select a build directory (eg. ~/ultraleap-tracking-samples/build) to use    
+    
+3. Configure & Generate CMake with the generator of your choice
+
 4. Open and build the CMake generated project files. For more help, see the CMake documentation.
+    * An example script would be :    
+```bash    
+SRC_DIR=/usr/share/doc/ultraleap-tracking/samples    
+BUILD_TYPE='Release'    
+REPOS_BUILD_ROOT=~/ultraleap-tracking-samples/build     
+REPOS_INSTALL_ROOT=/usr/bin/ultraleap-tracking-samples    
+    
+cmake -S ${SRC_DIR} -B ${REPOS_BUILD_ROOT}/${BUILD_TYPE}/LeapSDK/leapc_example `       
+        -DCMAKE_INSTALL_PREFIX="${REPOS_INSTALL_ROOT}/leapc_example" `    
+        -DCMAKE_BUILD_TYPE="${BUILD_TYPE}"    
+    
+cmake --build ${REPOS_BUILD_ROOT}/${BUILD_TYPE}/LeapSDK/leapc_example -j --config ${BUILD_TYPE}    
+``` 
 
 ## Resources:
 
