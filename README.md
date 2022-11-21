@@ -14,15 +14,15 @@ Self-sustainable fork of SteamVR driver for Leap Motion controller with updated 
 ## Usage
 ### Settings
 Driver settings are configurated by editing `resources/settings.xml`. Available settings:
-* `trackingLevel`: skeleton tracking style for OpenVR. Can be `partial` or `full`. `partial` by default.
-* `handsReset`: marks controllers as out of range if hand for controller isn't detected by Leap Motion. `false` by default.
-* `useVelocity`: enables velocity data from Leap Motion for hands. `false` by default.
-* `rootOffset`: local position offset from HMD view point, values are in meters.
-* `rootAngle`: local rotation offset for axis X, can be used with `rootOffset` to configure tracking for neck mounts, value is in radians.
-* `handsOffset`: local position offset for controllers from theirs transformation point, X axis will be inverted for right hand, values are in meters.
-* `handsRotationOffset`: local rotation offset for controllers from theirs transformation point, Y and Z axes will be inverted for right hand, values are in radians.
+* `trackingLevel`: skeleton tracking style for OpenVR. Can be `partial` or `full`; `partial` by default.
+* `handsReset`: marks controller as out of range if hand isn't detected by Leap Motion; `false` by default.
+* `useVelocity`: enables velocity data from Leap Motion for hands; `false` by default.
+* `rootOffset`: local position offset from HMD view point; values are in meters.
+* `rootAngle`: local rotation offset for axis X, can be used with `rootOffset` to configure tracking for neck mounts; value is in radians.
+* `handsOffset`: local position offset for controllers from theirs transformation point, X axis will be inverted for right hand; values are in meters.
+* `handsRotationOffset`: local rotation offset for controllers from theirs transformation point, Y and Z axes will be inverted for right hand; values are in radians.
 
-Settings can be reloaded at runtime from menu item by clicking on "Driver Leap Control" tray icon. All settings, except `trackingLevel`, are reloaded and applied.
+Settings can be reloaded at runtime from menu item by clicking on "Driver Leap Control" tray icon. All settings (except `trackingLevel`) are reloaded and applied.
 
 ### Gestures
 List of hands gestures that correspond to controller original input:
@@ -30,7 +30,7 @@ List of hands gestures that correspond to controller original input:
 * **Trigger:** bending of index finger
 
 ## Notes
-* CSFML graphics module is built from [fork](https://github.com/SDraw/SFML/tree/2.5.x) to address [SteamVR OpenGL textures problems on AMD GPUs](https://github.com/ValveSoftware/openvr/issues/1246).
+* CSFML graphics module is built from [fork](https://github.com/SDraw/SFML/tree/2.5.x) to address [SteamVR OpenGL textures problems on AMD GPUs](https://github.com/ValveSoftware/openvr/issues/1246). However, it's highly possible to have no effect due to lack of testing hardware.
 * If you see only green dots that represent tip of your index fingers, force `leap_control` to launch on dGPU through control panel of your GPU vendor.
 * Tracking will be lost upon service shutdown/restart.
 * Coordinate system used for offsets is right handed.  
