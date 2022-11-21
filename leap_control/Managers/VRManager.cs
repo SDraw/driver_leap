@@ -12,7 +12,7 @@ namespace leap_control
 
         CVRSystem m_vrSystem;
         VREvent_t m_vrEvent;
-        uint m_eventSize = 0;
+        readonly uint m_eventSize = 0;
         bool m_active = false;
 
         ulong m_notificationOverlay = OpenVR.k_ulOverlayHandleInvalid;
@@ -27,7 +27,7 @@ namespace leap_control
             m_core = p_core;
 
             m_trackedPoses = new TrackedDevicePose_t[OpenVR.k_unMaxTrackedDeviceCount];
-            m_eventSize = (uint)System.Runtime.InteropServices.Marshal.SizeOf(m_vrEvent);
+            m_eventSize = (uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(VREvent_t));
         }
 
         public bool Initialize()

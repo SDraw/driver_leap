@@ -95,7 +95,7 @@ CServerDriver::~CServerDriver()
 vr::EVRInitError CServerDriver::Init(vr::IVRDriverContext *pDriverContext)
 {
     VR_INIT_SERVER_DRIVER_CONTEXT(pDriverContext)
-    CDriverConfig::Load();
+        CDriverConfig::Load();
 
     // Relay device for events from leap_control
     m_leapStation = new CLeapStation(this);

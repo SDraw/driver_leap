@@ -24,8 +24,6 @@ class CServerDriver final : public vr::IServerTrackedDeviceProvider
     CServerDriver(const CServerDriver &that) = delete;
     CServerDriver& operator=(const CServerDriver &that) = delete;
 
-    void TryToPause();
-
     // vr::IServerTrackedDeviceProvider
     vr::EVRInitError Init(vr::IVRDriverContext *pDriverContext);
     void Cleanup();

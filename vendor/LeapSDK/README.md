@@ -75,7 +75,7 @@ cmake --build $env:REPOS_BUILD_ROOT/$env:BUILD_TYPE/LeapSDK/leapc_example -j --c
 
 ### x64 Linux
 
-1. Open CMake using /usr/share/doc/ultraleap-tracking/samples as the source directory    
+1. Open CMake using /usr/share/doc/ultraleap-hand-tracking-service/samples as the source directory    
     
 2. Select a build directory (eg. ~/ultraleap-tracking-samples/build) to use    
     
@@ -84,7 +84,7 @@ cmake --build $env:REPOS_BUILD_ROOT/$env:BUILD_TYPE/LeapSDK/leapc_example -j --c
 4. Open and build the CMake generated project files. For more help, see the CMake documentation.
     * An example script would be :    
 ```bash    
-SRC_DIR=/usr/share/doc/ultraleap-tracking/samples    
+SRC_DIR=/usr/share/doc/ultraleap-hand-tracking-service/samples    
 BUILD_TYPE='Release'    
 REPOS_BUILD_ROOT=~/ultraleap-tracking-samples/build     
 REPOS_INSTALL_ROOT=/usr/bin/ultraleap-tracking-samples    

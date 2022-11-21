@@ -15,11 +15,11 @@ namespace leap_control
         LeapManager m_leapManager = null;
         ControlManager m_controlManager = null;
 
-        System.Threading.Thread m_trayThread = null;
+        Thread m_trayThread = null;
         System.Windows.Forms.NotifyIcon m_trayIcon = null;
 
-        List<System.Action> m_tasks = null;
-        Mutex m_tasksMutex = null;
+        readonly List<Action> m_tasks = null;
+        readonly Mutex m_tasksMutex = null;
 
         Core()
         {
@@ -42,7 +42,7 @@ namespace leap_control
 
                 if(m_initialized)
                 {
-                    m_trayThread = new System.Threading.Thread(() =>
+                    m_trayThread = new Thread(() =>
                     {
                         try
                         {
@@ -95,6 +95,8 @@ namespace leap_control
 
             m_trayThread?.Abort();
             m_trayThread = null;
+
+            m_tasks.Clear();
 
             m_trayIcon?.Dispose();
             m_trayIcon = null;

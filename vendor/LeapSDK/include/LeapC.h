@@ -1065,6 +1065,14 @@ LEAP_EXPORT eLeapRS LEAP_CALL LeapGetDeviceTransform(LEAP_DEVICE hDevice, float*
  * LeapPollConnection() produces a message containing this event when a new
  * device is detected. You can use the handle provided by the device filed to
  * open a device so that you can access its properties.
+ * 
+ * This can be used when the connection is set to multi device mode to
+ * interact with or enable multiple leap devices.
+ * 
+ * Note that while this struct will contain a device ID via the field
+ * `device.id`, it is not itself a multi-connection event (so the 
+ * value of device_id in LEAP_CONNECTION_MESSAGE will be 0).
+ * 
  * @since 3.0.0
  */
 typedef struct _LEAP_DEVICE_EVENT {
@@ -1911,12 +1919,14 @@ typedef enum _eLeapEventType {
 
   /**
    * A connection to the Ultraleap Tracking Service has been established.
+   * This event is stored in union member connection_event (LEAP_CONNECTION_EVENT).
    * @since 3.0.0
    */
   eLeapEventType_Connection,
 
   /**
    * The connection to the Ultraleap Tracking Service has been lost.
+   * This event is stored in union member connection_lost_event (LEAP_CONNECTION_LOST_EVENT).
    * @since 3.0.0
    */
   eLeapEventType_ConnectionLost,
@@ -1926,6 +1936,7 @@ typedef enum _eLeapEventType {
    * A device event is dispatched after a connection is established for any
    * devices already plugged in. (The system currently only supports one
    * streaming device at a time.)
+   * This event is stored in union member device_event (LEAP_DEVICE_EVENT).
    * @since 3.0.0
    */
   eLeapEventType_Device,
@@ -1935,6 +1946,7 @@ typedef enum _eLeapEventType {
    * Device failure could be caused by hardware failure, USB controller issues, or
    * other system instability. Note that unplugging a device generates an
    * eLeapEventType_DeviceLost event message, not a failure message.
+   * This event is no longer generated, enum present for historic API compatibility.
    * @since 3.0.0
    */
   eLeapEventType_DeviceFailure,
@@ -1944,12 +1956,14 @@ typedef enum _eLeapEventType {
    * This can be due to setting a policy with LeapSetPolicyFlags() or due to changing
    * or policy-related config settings, including images_mode.
    * (A user can also change these policies using the Ultraleap Tracking Control Panel.)
+   * This event is stored in union member policy_event (LEAP_POLICY_EVENT).
    * @since 3.0.0
    */
   eLeapEventType_Policy,
 
   /**
    * A tracking frame. The message contains the tracking data for the frame.
+   * This event is stored in union member tracking_mode_event (LEAP_TRACKING_MODE_EVENT).
    * @since 3.0.0
    */
   eLeapEventType_Tracking = 0x100,
@@ -1958,20 +1972,23 @@ typedef enum _eLeapEventType {
    * The request for an image has failed.
    * The message contains information about the failure. The client application
    * will not receive the requested image set.
+   * This event is no longer generated, enum present for historic API compatibility.
    * @since 3.0.0
    */
   eLeapEventType_ImageRequestError,
 
   /**
-  * The request for an image is complete.
-  * The image data has been completely written to the application-provided
-  * buffer.
-  * @since 3.0.0
-  */
+   * The request for an image is complete.
+   * The image data has been completely written to the application-provided
+   * buffer.
+   * This event is no longer generated, enum present for historic API compatibility.
+   * @since 3.0.0
+   */
   eLeapEventType_ImageComplete,
 
   /**
    * A system message. @since 3.0.0
+   * This event is stored in union member log_event (LEAP_LOG_EVENT).
    */
   eLeapEventType_LogEvent,
 
@@ -1982,6 +1999,7 @@ typedef enum _eLeapEventType {
    * connection to the service has been lost, or if the device is closed while streaming. Generally,
    * any event where the system can conclude no further frames will be received will result in this
    * message. The DeviceEvent field will be filled with the id of the formerly attached device.
+   * This event is stored in union member device_event (LEAP_DEVICE_EVENT).
    * @since 3.0.0
    */
   eLeapEventType_DeviceLost,
@@ -1989,6 +2007,7 @@ typedef enum _eLeapEventType {
   /**
    * The asynchronous response to a call to LeapRequestConfigValue().
    * Contains the value of requested configuration item.
+   * This event is stored in union member config_response_event (LEAP_CONFIG_RESPONSE_EVENT).
    * @since 3.0.0
    */
   eLeapEventType_ConfigResponse,
@@ -1996,13 +2015,14 @@ typedef enum _eLeapEventType {
   /**
    * The asynchronous response to a call to LeapSaveConfigValue().
    * Reports whether the change succeeded or failed.
+   * This event is stored in union member config_change_event (LEAP_CONFIG_CHANGE_EVENT).
    * @since 3.0.0
    */
   eLeapEventType_ConfigChange,
 
   /**
    * Notification that a status change has been detected on an attached device
-   *
+   * This event is stored in union member device_status_change_event (LEAP_DEVICE_STATUS_CHANGE_EVENT).
    * @since 3.1.3
    */
   eLeapEventType_DeviceStatusChange,
@@ -2010,45 +2030,51 @@ typedef enum _eLeapEventType {
 
   /**
    * Notification that an unrequested stereo image pair is available
-   *
+   * This event is stored in union member image_event (LEAP_IMAGE_EVENT).
    * @since 4.0.0
    */
   eLeapEventType_Image,
 
   /**
    * Notification that point mapping has changed
+   * This event is no longer generated, enum present for historic API compatibility.
    *
    * @since 4.0.0
    */
   eLeapEventType_PointMappingChange,
 
-   /**
-    * A tracking mode change has occurred.
-    * This can be due to changing the hmd or screentop policy with LeapSetPolicyFlags().
-    * or setting the tracking mode using LeapSetTrackingMode().
-    * @since 5.0.0
-    */
+  /**
+   * A tracking mode change has occurred.
+   * This can be due to changing the hmd or screentop policy with LeapSetPolicyFlags().
+   * or setting the tracking mode using LeapSetTrackingMode().
+   * This event is stored in union member tracking_mode_event (LEAP_TRACKING_MODE_EVENT).
+   * @since 5.0.0
+   */
   eLeapEventType_TrackingMode,
 
   /**
    * An array of system messages. @since 4.0.0
+   * This event is stored in union member log_events (LEAP_LOG_EVENTS).
    */
   eLeapEventType_LogEvents,
 
   /**
-  * A head pose. The message contains the timestamped head position and orientation.
-  * @since 4.1.0
-  */
+   * A head pose. The message contains the timestamped head position and orientation.
+   * This event is no longer generated, enum present for historic API compatibility.
+   * @since 4.1.0
+   */
   eLeapEventType_HeadPose,
 
   /**
-  * Tracked eye positions. @since 4.1.0
-  */
+   * Tracked eye positions. @since 4.1.0
+   * This event is no longer generated, enum present for historic API compatibility.
+   */
   eLeapEventType_Eyes,
 
   /**
-  * An IMU reading. @since 4.1.0
-  */
+   * An IMU reading. @since 4.1.0
+   * This event is stored in union member imu_event (LEAP_IMU_EVENT).
+   */
   eLeapEventType_IMU
 } eLeapEventType;
 LEAP_STATIC_ASSERT(sizeof(eLeapEventType) == 4, "Incorrect enum size");
@@ -2372,11 +2398,19 @@ LEAP_EXPORT void LEAP_CALL LeapDestroyClockRebaser(LEAP_CLOCK_REBASER hClockReba
  * where the x-axis parallels the longer (typically horizontal) dimension and
  * the y-axis parallels the shorter (vertical) dimension. The camera coordinate
  * system does not correlate to the 3D Ultraleap Tracking coordinate system.
+ *  
+ * For this function to work, you must have fetched at least 1 image from the LeapC polling event loop,
+ * i.e. call LeapSetPolicyFlags(eLeapPolicyFlag_Images, 0), and received one LEAP_IMAGE_EVENT type
+ * for your given device handle.
  *
  * @param hConnection The connection handle created by LeapCreateConnection().
  * @param camera The camera to use, a member of the eLeapPerspectiveType enumeration
  * @param pixel A Vector containing the position of a pixel in the image.
  * @returns A Vector containing the ray direction (the z-component of the vector is always 1).
+ * May return [NaN, NaN, 1] (quiet NaN type) under the following conditions:
+ * *) You do not have a valid connection or device handle.
+ * *) You passed an invalid camera enum.
+ * *) You have never received any images from LeapC as detailed above.
  * @since 3.1.3
  */
 LEAP_EXPORT LEAP_VECTOR LEAP_CALL LeapPixelToRectilinear(LEAP_CONNECTION hConnection, eLeapPerspectiveType camera, LEAP_VECTOR pixel);
@@ -2394,12 +2428,21 @@ LEAP_EXPORT LEAP_VECTOR LEAP_CALL LeapPixelToRectilinear(LEAP_CONNECTION hConnec
  * where the x-axis parallels the longer (typically horizontal) dimension and
  * the y-axis parallels the shorter (vertical) dimension. The camera coordinate
  * system does not correlate to the 3D Ultraleap coordinate system.
- *
+ * 
+ * For this function to work, you must have fetched at least 1 image from the LeapC polling event loop,
+ * i.e. call LeapSetPolicyFlags(eLeapPolicyFlag_Images, 0), and received one LEAP_IMAGE_EVENT type
+ * for your given device handle.
+ * 
  * @param hConnection The connection handle created by LeapCreateConnection().
  * @param hDevice A device handle returned by LeapOpenDevice().
  * @param camera The camera to use, a member of the eLeapPerspectiveType enumeration
  * @param pixel A Vector containing the position of a pixel in the image.
  * @returns A Vector containing the ray direction (the z-component of the vector is always 1).
+ * May return [NaN, NaN, 1] (quiet NaN type) under the following conditions:
+ * *) You do not have a valid connection or device handle.
+ * *) You passed an invalid camera enum.
+ * *) You have never received any images from LeapC as detailed above.
+ * 
  * @since 5.4.0
  */
 LEAP_EXPORT LEAP_VECTOR LEAP_CALL LeapPixelToRectilinearEx(LEAP_CONNECTION hConnection, LEAP_DEVICE hDevice, eLeapPerspectiveType camera, LEAP_VECTOR pixel);
@@ -2423,11 +2466,20 @@ LEAP_EXPORT LEAP_VECTOR LEAP_CALL LeapPixelToRectilinearEx(LEAP_CONNECTION hConn
  *
  * ``LeapRectilinearToPixel()`` is typically not fast enough for realtime distortion correction.
  * For better performance, use a shader program executed on a GPU.
+ * 
+ * For this function to work, you must have fetched at least 1 image from the LeapC polling event loop,
+ * i.e. call LeapSetPolicyFlags(eLeapPolicyFlag_Images, 0), and received one LEAP_IMAGE_EVENT type
+ * for your given device handle.
  *
  * @param hConnection The connection handle created by LeapCreateConnection().
  * @param camera The camera to use, a member of the eLeapPerspectiveType enumeration
  * @param rectilinear A Vector containing the ray direction.
  * @returns A Vector containing the pixel coordinates [x, y, 1] (with z always 1).
+ * May return [NaN, NaN, 1] (quiet NaN type) under the following conditions:
+ * *) You do not have a valid connection or device handle.
+ * *) You passed an invalid camera enum.
+ * *) You have never received any images from LeapC as detailed above.
+ * 
  * @since 3.1.3
  */
 LEAP_EXPORT LEAP_VECTOR LEAP_CALL LeapRectilinearToPixel(LEAP_CONNECTION hConnection, eLeapPerspectiveType camera, LEAP_VECTOR rectilinear);
@@ -2449,12 +2501,21 @@ LEAP_EXPORT LEAP_VECTOR LEAP_CALL LeapRectilinearToPixel(LEAP_CONNECTION hConnec
  *
  * ``LeapRectilinearToPixelEx()`` is typically not fast enough for realtime distortion correction.
  * For better performance, use a shader program executed on a GPU.
+ * 
+ * For this function to work, you must have fetched at least 1 image from the LeapC polling event loop,
+ * i.e. call LeapSetPolicyFlags(eLeapPolicyFlag_Images, 0), and received one LEAP_IMAGE_EVENT type
+ * for your given device handle.
  *
  * @param hConnection The connection handle created by LeapCreateConnection().
  * @param hDevice A device handle returned by LeapOpenDevice().
  * @param camera The camera to use, a member of the eLeapPerspectiveType enumeration
  * @param rectilinear A Vector containing the ray direction.
  * @returns A Vector containing the pixel coordinates [x, y, 1] (with z always 1).
+ * May return [NaN, NaN, 1] (quiet NaN type) under the following conditions:
+ * *) You do not have a valid connection or device handle.
+ * *) You passed an invalid camera enum.
+ * *) You have never received any images from LeapC as detailed above.
+ * 
  * @since 5.4.0
  */
 LEAP_EXPORT LEAP_VECTOR LEAP_CALL LeapRectilinearToPixelEx(LEAP_CONNECTION hConnection, LEAP_DEVICE hDevice, eLeapPerspectiveType camera, LEAP_VECTOR rectilinear);

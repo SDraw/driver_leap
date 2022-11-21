@@ -6,6 +6,8 @@
   <!--Offset settings-->
   <setting name="rootOffset" value="0.0 0.0 0.0"/> <!--Local root offset; meters-->
   <setting name="rootAngle" value="0.0"/> <!--Up/down root angle (X axis), useful in combination with root offset for neck mounts; Euler angle, radians-->
-  <setting name="handsOffset" value="0.0 0.0 0.0"/> <!--Local hand offset, right hand X axis value is inverted; meters-->
-  <setting name="handsRotationOffset" value="0.0 0.0 0.0"/> <!--Local rotation hand offset, right hand Y and Z values are inverted; Euler angles, radians-->
+  <setting name="handsOffset" value="0.05 0.0875 -0.14"/> <!--Local hand offset, right hand X axis value is inverted; meters-->
+  <setting name="handsRotationOffset" value="0.6518805 0.0 0.0"/> <!--Local rotation hand offset, right hand Y and Z values are inverted; Euler angles, radians-->
 </settings>
+<!--Current settings are made to bring LM's finger tips closer to finger tips of default hands model in SteamVR Home as much as possible.-->
+<!--Downside of it is hard to click trigger. You can try to find your own good offsets too.-->

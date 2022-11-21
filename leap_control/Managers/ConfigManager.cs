@@ -31,21 +31,24 @@ namespace leap_control
                         XmlAttribute l_attribValue = l_node.Attributes?["value"];
                         if((l_attribName != null) && (l_attribValue != null))
                         {
-                            if(l_attribName.Value == "rootOffset")
+                            switch(l_attribName.Value)
                             {
-                                float[] l_values = l_attribValue.Value.Split().Select(x => float.Parse(x, System.Globalization.CultureInfo.InvariantCulture)).ToArray();
-                                if(l_values.Count() >= 3)
+                                case "rootOffset":
                                 {
-                                    for(int i = 0; i < 3; i++)
-                                        l_point[i] = l_values[i];
+                                    float[] l_values = l_attribValue.Value.Split().Select(x => float.Parse(x, System.Globalization.CultureInfo.InvariantCulture)).ToArray();
+                                    if(l_values.Count() >= 3)
+                                    {
+                                        for(int i = 0; i < 3; i++)
+                                            l_point[i] = l_values[i];
+                                    }
                                 }
-                                continue;
-                            }
+                                break;
 
-                            if(l_attribName.Value == "rootAngle")
-                            {
-                                l_angle = float.Parse(l_attribValue.Value, System.Globalization.CultureInfo.InvariantCulture);
-                                continue;
+                                case "rootAngle":
+                                {
+                                    l_angle = float.Parse(l_attribValue.Value, System.Globalization.CultureInfo.InvariantCulture);
+                                }
+                                break;
                             }
                         }
                     }

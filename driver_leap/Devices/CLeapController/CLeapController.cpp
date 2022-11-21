@@ -205,7 +205,7 @@ void CLeapController::UpdateTransformation(const LEAP_HAND *p_hand)
         l_localRotation = glm::normalize(l_localRotation);
 
         // Offset position
-        glm::vec3 l_localPos(-0.001f * p_hand->palm.position.x, -0.001f * p_hand->palm.position.z, -0.001f * p_hand->palm.position.y);
+        glm::vec3 l_localPos(-0.001f * p_hand->arm.next_joint.x, -0.001f * p_hand->arm.next_joint.z, -0.001f * p_hand->arm.next_joint.y);
         l_localPos += (l_localRotation * (CDriverConfig::GetHandsOffset() * g_positionInversions[m_hand]));
 
         m_pose.vecPosition[0] = l_localPos.x;
