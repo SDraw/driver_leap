@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -81,103 +81,103 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\Arm.cs">
+    <Compile Include="..\vendor\LeapCSharp\Arm.cs">
       <Link>vendor\LeapCSharp\Arm.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\Bone.cs">
+    <Compile Include="..\vendor\LeapCSharp\Bone.cs">
       <Link>vendor\LeapCSharp\Bone.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\CircularObjectBuffer.cs">
+    <Compile Include="..\vendor\LeapCSharp\CircularObjectBuffer.cs">
       <Link>vendor\LeapCSharp\CircularObjectBuffer.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\Config.cs">
+    <Compile Include="..\vendor\LeapCSharp\Config.cs">
       <Link>vendor\LeapCSharp\Config.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\Connection.cs">
+    <Compile Include="..\vendor\LeapCSharp\Connection.cs">
       <Link>vendor\LeapCSharp\Connection.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\Controller.cs">
+    <Compile Include="..\vendor\LeapCSharp\Controller.cs">
       <Link>vendor\LeapCSharp\Controller.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\CopyFromLeapCExtensions.cs">
+    <Compile Include="..\vendor\LeapCSharp\CopyFromLeapCExtensions.cs">
       <Link>vendor\LeapCSharp\CopyFromLeapCExtensions.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\CopyFromOtherExtensions.cs">
+    <Compile Include="..\vendor\LeapCSharp\CopyFromOtherExtensions.cs">
       <Link>vendor\LeapCSharp\CopyFromOtherExtensions.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\CSharpExtensions.cs">
+    <Compile Include="..\vendor\LeapCSharp\CSharpExtensions.cs">
       <Link>vendor\LeapCSharp\CSharpExtensions.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\Device.cs">
+    <Compile Include="..\vendor\LeapCSharp\Device.cs">
       <Link>vendor\LeapCSharp\Device.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\DeviceList.cs">
+    <Compile Include="..\vendor\LeapCSharp\DeviceList.cs">
       <Link>vendor\LeapCSharp\DeviceList.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\DistortionData.cs">
+    <Compile Include="..\vendor\LeapCSharp\DistortionData.cs">
       <Link>vendor\LeapCSharp\DistortionData.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\Events.cs">
+    <Compile Include="..\vendor\LeapCSharp\Events.cs">
       <Link>vendor\LeapCSharp\Events.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\FailedDevice.cs">
+    <Compile Include="..\vendor\LeapCSharp\FailedDevice.cs">
       <Link>vendor\LeapCSharp\FailedDevice.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\FailedDeviceList.cs">
+    <Compile Include="..\vendor\LeapCSharp\FailedDeviceList.cs">
       <Link>vendor\LeapCSharp\FailedDeviceList.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\Finger.cs">
+    <Compile Include="..\vendor\LeapCSharp\Finger.cs">
       <Link>vendor\LeapCSharp\Finger.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\Frame.cs">
+    <Compile Include="..\vendor\LeapCSharp\Frame.cs">
       <Link>vendor\LeapCSharp\Frame.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\Hand.cs">
+    <Compile Include="..\vendor\LeapCSharp\Hand.cs">
       <Link>vendor\LeapCSharp\Hand.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\IController.cs">
+    <Compile Include="..\vendor\LeapCSharp\IController.cs">
       <Link>vendor\LeapCSharp\IController.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\Image.cs">
+    <Compile Include="..\vendor\LeapCSharp\Image.cs">
       <Link>vendor\LeapCSharp\Image.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\ImageData.cs">
+    <Compile Include="..\vendor\LeapCSharp\ImageData.cs">
       <Link>vendor\LeapCSharp\ImageData.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\LeapC.cs">
+    <Compile Include="..\vendor\LeapCSharp\LeapC.cs">
       <Link>vendor\LeapCSharp\LeapC.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\LeapQuaternion.cs">
+    <Compile Include="..\vendor\LeapCSharp\LeapQuaternion.cs">
       <Link>vendor\LeapCSharp\LeapQuaternion.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\LeapTransform.cs">
+    <Compile Include="..\vendor\LeapCSharp\LeapTransform.cs">
       <Link>vendor\LeapCSharp\LeapTransform.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\Logger.cs">
+    <Compile Include="..\vendor\LeapCSharp\Logger.cs">
       <Link>vendor\LeapCSharp\Logger.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\Matrix.cs">
+    <Compile Include="..\vendor\LeapCSharp\Matrix.cs">
       <Link>vendor\LeapCSharp\Matrix.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\MemoryManager.cs">
+    <Compile Include="..\vendor\LeapCSharp\MemoryManager.cs">
       <Link>vendor\LeapCSharp\MemoryManager.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\MessageSeverity.cs">
+    <Compile Include="..\vendor\LeapCSharp\MessageSeverity.cs">
       <Link>vendor\LeapCSharp\MessageSeverity.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\PointMapping.cs">
+    <Compile Include="..\vendor\LeapCSharp\PointMapping.cs">
       <Link>vendor\LeapCSharp\PointMapping.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\StructMarshal.cs">
+    <Compile Include="..\vendor\LeapCSharp\StructMarshal.cs">
       <Link>vendor\LeapCSharp\StructMarshal.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\TransformExtensions.cs">
+    <Compile Include="..\vendor\LeapCSharp\TransformExtensions.cs">
       <Link>vendor\LeapCSharp\TransformExtensions.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\repos\driver_leap\vendor\LeapCSharp\Vector.cs">
+    <Compile Include="..\vendor\LeapCSharp\Vector.cs">
       <Link>vendor\LeapCSharp\Vector.cs</Link>
     </Compile>
-    <Compile Include="..\..\..\repos\driver_leap\vendor\openvr\headers\openvr_api.cs">
+    <Compile Include="..\vendor\openvr\headers\openvr_api.cs">
       <Link>vendor\openvr\openvr_api.cs</Link>
     </Compile>
     <Compile Include="Managers\ConfigManager.cs" />
