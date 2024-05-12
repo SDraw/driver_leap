@@ -35,3 +35,18 @@ List of hands gestures that correspond to controller original input:
 * Tracking will be lost upon service shutdown/restart.
 * Coordinate system used for offsets is right handed.  
 ![](https://learnopengl.com/img/getting-started/coordinate_systems_right_handed.png)
+
+# Announcement
+The biggest problem of this project is user usability, and it's awful, very awful.  
+Attempts of making new utility application that will allow average user to configure all aspects of driver have failed.
+* Unity: unable to force application to always run on dedicated GPUs
+* Qt: unable to compile projects at all, even OpenVR's `helloworldoverlay`
+* SFML: problem of OpenGL's internal textures type mismatch between SFML and SteamVR on AMD GPUs
+
+If you know any framework or library that:
+* Has own implemented UI elements
+* Uses Direct3D/OpenGL for UI rendering
+* Has offscreen rendering support
+* C++ or C# support
+
+Write it down in [this opened issue](https://github.com/SDraw/driver_leap/issues/2).
