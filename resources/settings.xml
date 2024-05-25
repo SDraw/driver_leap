@@ -1,13 +1,21 @@
+<?xml version="1.0"?>
 <settings>
-  <!--General settings-->
-  <setting name="trackingLevel" value="partial"/> <!--"partial" or "full"-->
-  <setting name="handsReset" value="false"/> <!--Mark controllers as out of range if hands aren't detected-->
-  <setting name="useVelocity" value="false"/> <!--Send velocity from Leap Motion, visible position twitching on low-end machines-->
-  <!--Offset settings-->
-  <setting name="rootOffset" value="0.0 0.0 0.0"/> <!--Local root offset; meters-->
-  <setting name="rootAngle" value="0.0"/> <!--Up/down root angle (X axis), useful in combination with root offset for neck mounts; Euler angle, radians-->
-  <setting name="handsOffset" value="0.05 0.0875 -0.14"/> <!--Local hand offset, right hand X axis value is inverted; meters-->
-  <setting name="handsRotationOffset" value="0.6518805 0.0 0.0"/> <!--Local rotation hand offset, right hand Y and Z values are inverted; Euler angles, radians-->
+	<setting name="trackingLevel" value="1" />
+	<setting name="handsReset" value="false" />
+	<setting name="useVelocity" value="false" />
+	<setting name="showOverlays" value="true" />
+	<setting name="rootOffsetX" value="0" />
+	<setting name="rootOffsetY" value="0" />
+	<setting name="rootOffsetZ" value="0" />
+	<setting name="rootAngleX" value="0" />
+	<setting name="rootAngleY" value="0" />
+	<setting name="rootAngleZ" value="0" />
+	<setting name="overlayOffsetX" value="0.00999999046" />
+	<setting name="overlayOffsetY" value="0.0299999714" />
+	<setting name="overlayOffsetZ" value="0.0299999714" />
+	<setting name="overlayAngleX" value="-118.799995" />
+	<setting name="overlayAngleY" value="0" />
+	<setting name="overlayAngleZ" value="-10.7999954" />
+	<setting name="startMinimized" value="false" />
+	<setting name="overlaySize" value="0.128000006" />
 </settings>
-<!--Current settings are made to bring LM's finger tips closer to finger tips of default hands model in SteamVR Home as much as possible.-->
-<!--Downside of it is hard to click trigger. You can try to find your own good offsets too.-->

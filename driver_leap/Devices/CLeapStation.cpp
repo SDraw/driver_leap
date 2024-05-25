@@ -1,9 +1,10 @@
 #include "stdafx.h"
 
 #include "Devices/CLeapStation.h"
-#include "Core/CServerDriver.h"
+#include "Core/CDriverConfig.h"
+#include "Utils/Utils.h"
 
-CLeapStation::CLeapStation(CServerDriver *p_server)
+CLeapStation::CLeapStation()
 {
     m_pose = { 0 };
     m_pose.deviceIsConnected = true;
@@ -29,11 +30,6 @@ CLeapStation::CLeapStation(CServerDriver *p_server)
     m_trackedDevice = vr::k_unTrackedDeviceIndexInvalid;
 
     m_serialNumber.assign("leap_motion_station");
-    m_serverDriver = p_server;
-}
-
-CLeapStation::~CLeapStation()
-{
 }
 
 // vr::ITrackedDeviceServerDriver
@@ -76,7 +72,7 @@ vr::EVRInitError CLeapStation::Activate(uint32_t unObjectId)
         vr::VRProperties()->SetBoolProperty(m_propertyHandle, vr::Prop_HasDriverDirectModeComponent_Bool, false);
         vr::VRProperties()->SetBoolProperty(m_propertyHandle, vr::Prop_HasVirtualDisplayComponent_Bool, false);
 
-        vr::VRProperties()->SetUint64Property(m_propertyHandle, vr::Prop_VendorSpecific_Reserved_Start, 0x4C4D6F74696F6E); // "LMotion", hidden property for leap_monitor
+        vr::VRProperties()->SetUint64Property(m_propertyHandle, vr::Prop_VendorSpecific_Reserved_Start, 0x4C4DU); // "LM", _hidden_ property for leap_monitor
 
         m_pose.vecWorldFromDriverTranslation[0U] = 0.1f; // Slightly move to avoid base stations
 
@@ -98,16 +94,15 @@ void CLeapStation::EnterStandby()
 void* CLeapStation::GetComponent(const char* pchComponentNameAndVersion)
 {
     void *l_result = nullptr;
-    if(!strcmp(pchComponentNameAndVersion, vr::ITrackedDeviceServerDriver_Version)) l_result = dynamic_cast<vr::ITrackedDeviceServerDriver*>(this);
+    if(!strcmp(pchComponentNameAndVersion, vr::ITrackedDeviceServerDriver_Version))
+        l_result = dynamic_cast<vr::ITrackedDeviceServerDriver*>(this);
     return l_result;
 }
 
 void CLeapStation::DebugRequest(const char* pchRequest, char* pchResponseBuffer, uint32_t unResponseBufferSize)
 {
     if(m_trackedDevice != vr::k_unTrackedDeviceIndexInvalid)
-    {
-        if(m_serverDriver) m_serverDriver->ProcessExternalMessage(pchRequest);
-    }
+        CDriverConfig::ProcessExternalSetting(pchRequest);
 }
 
 vr::DriverPose_t CLeapStation::GetPose()
@@ -141,7 +136,5 @@ void CLeapStation::SetTrackingState(TrackingState p_state)
 void CLeapStation::RunFrame()
 {
     if(m_trackedDevice != vr::k_unTrackedDeviceIndexInvalid)
-    {
         vr::VRServerDriverHost()->TrackedDevicePoseUpdated(m_trackedDevice, m_pose, sizeof(vr::DriverPose_t));
-    }
 }

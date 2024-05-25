@@ -2,20 +2,31 @@
 
 class CDriverConfig final
 {
-    static unsigned char ms_trackingLevel;
+    static int ms_trackingLevel;
     static bool ms_handsReset;
     static bool ms_useVelocity;
     static glm::vec3 ms_rootOffset;
-    static float ms_rootAngle;
-    static glm::vec3 ms_handsOffset;
-    static glm::vec3 ms_handsRotationOffset;
+    static glm::vec3 ms_rootAngle;
 
     CDriverConfig() = delete;
     ~CDriverConfig() = delete;
     CDriverConfig(const CDriverConfig &that) = delete;
     CDriverConfig& operator=(const CDriverConfig &that) = delete;
 public:
-    enum TrackingLevel : unsigned char
+    enum ConfigSetting : size_t
+    {
+        CS_TrackingLevel = 0U,
+        CS_HandsReset,
+        CS_UseVelocity,
+        CS_RootOffsetX,
+        CS_RootOffsetY,
+        CS_RootOffsetZ,
+        CS_RootAngleX,
+        CS_RootAngleY,
+        CS_RootAngleZ
+    };
+
+    enum TrackingLevel : int
     {
         TL_Partial = 0U,
         TL_Full
@@ -23,12 +34,11 @@ public:
 
     static void Load();
 
-    static unsigned char GetTrackingLevel();
+    static int GetTrackingLevel();
     static bool IsHandsResetEnabled();
     static bool IsVelocityUsed();
-
     static const glm::vec3& GetRootOffset();
-    static float GetRootAngle();
-    static const glm::vec3& GetHandsOffset();
-    static const glm::vec3& GetHandsRotationOffset();
+    static const glm::vec3& GetRootAngle();
+
+    static void ProcessExternalSetting(const char *p_message);
 };

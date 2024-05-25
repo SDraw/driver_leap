@@ -1,0 +1,152 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Managers">
+      <UniqueIdentifier>{06392c3b-913e-4d64-b857-e8202b5dc60e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Ui">
+      <UniqueIdentifier>{7d3569e6-aa25-4a20-a21a-6c946c085983}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>qrc;rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="vendor">
+      <UniqueIdentifier>{5a2a5f55-7103-4b85-aa32-ddab7ec625e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="vendor\pugixml">
+      <UniqueIdentifier>{26e6f03d-0c4e-4cb3-b23a-42ecc9099fa0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{44c96d25-eab6-4598-9e32-b23438ee4f30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Overlay">
+      <UniqueIdentifier>{0ddde06f-10dd-4511-9592-75798015308f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{a81eff6d-76ef-477b-9a74-dc46715f98fa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Leap">
+      <UniqueIdentifier>{3cc7d4c7-6bc4-4685-baee-6be510fd0b8e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="..\vendor\pugixml\src\pugixml.cpp">
+      <Filter>vendor\pugixml</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\CCore.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Managers\COpenGLManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="Managers\COverlayManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="Managers\CSettingsManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="Managers\CVRManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="Ui\leap_control.cpp">
+      <Filter>Ui</Filter>
+    </ClCompile>
+    <ClCompile Include="Ui\vr_overlay.cpp">
+      <Filter>Ui</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\Utils.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Overlay\CRenderTarget.cpp">
+      <Filter>Overlay</Filter>
+    </ClCompile>
+    <ClCompile Include="Leap\CLeapPoller.cpp">
+      <Filter>Leap</Filter>
+    </ClCompile>
+    <ClCompile Include="Managers\CLeapManager.cpp">
+      <Filter>Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="Overlay\CHandOverlay.cpp">
+      <Filter>Overlay</Filter>
+    </ClCompile>
+    <ClCompile Include="Overlay\CCursorOverlay.cpp">
+      <Filter>Overlay</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils\CButton.cpp">
+      <Filter>Utils</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Core\CCore.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Managers\COpenGLManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Managers\COverlayManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Managers\CSettingsManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Managers\CVRManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\Utils.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Overlay\CRenderTarget.h">
+      <Filter>Overlay</Filter>
+    </ClInclude>
+    <ClInclude Include="Leap\CLeapPoller.h">
+      <Filter>Leap</Filter>
+    </ClInclude>
+    <ClInclude Include="Managers\CLeapManager.h">
+      <Filter>Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="Overlay\CHandOverlay.h">
+      <Filter>Overlay</Filter>
+    </ClInclude>
+    <ClInclude Include="Overlay\CCursorOverlay.h">
+      <Filter>Overlay</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils\CButton.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="Ui\leap_control.h">
+      <Filter>Ui</Filter>
+    </QtMoc>
+    <QtMoc Include="Ui\vr_overlay.h">
+      <Filter>Ui</Filter>
+    </QtMoc>
+  </ItemGroup>
+  <ItemGroup>
+    <QtUic Include="Ui\leap_control.ui">
+      <Filter>Ui</Filter>
+    </QtUic>
+    <QtUic Include="Ui\vr_overlay.ui">
+      <Filter>Ui</Filter>
+    </QtUic>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\leap_control.aps">
+      <Filter>Resources</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Resources\leap_control.ico">
+      <Filter>Resources</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <QtRcc Include="Resources\leap_control.qrc">
+      <Filter>Resources</Filter>
+    </QtRcc>
+  </ItemGroup>
+</Project>

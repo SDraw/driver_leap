@@ -6,62 +6,62 @@
     <ClCompile Include="..\vendor\pugixml\src\pugixml.cpp">
       <Filter>vendor\pugixml</Filter>
     </ClCompile>
-    <ClCompile Include="Utils\CGestureMatcher.cpp">
-      <Filter>Utils</Filter>
-    </ClCompile>
     <ClCompile Include="Utils\Utils.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
     <ClCompile Include="Devices\CLeapStation.cpp">
       <Filter>Devices</Filter>
     </ClCompile>
-    <ClCompile Include="Devices\CLeapController\CControllerButton.cpp">
-      <Filter>Devices\CLeapController</Filter>
-    </ClCompile>
-    <ClCompile Include="Devices\CLeapController\CLeapController.cpp">
-      <Filter>Devices\CLeapController</Filter>
-    </ClCompile>
-    <ClCompile Include="Devices\CLeapController\CLeapControllerIndex.cpp">
-      <Filter>Devices\CLeapController</Filter>
-    </ClCompile>
     <ClCompile Include="Core\CServerDriver.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\CLeapPoller.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Core\CDriverConfig.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="Leap\CLeapFrame.cpp">
+      <Filter>Leap</Filter>
+    </ClCompile>
+    <ClCompile Include="Leap\CLeapHand.cpp">
+      <Filter>Leap</Filter>
+    </ClCompile>
+    <ClCompile Include="Leap\CLeapPoller.cpp">
+      <Filter>Leap</Filter>
+    </ClCompile>
+    <ClCompile Include="Devices\Controller\CControllerButton.cpp">
+      <Filter>Devices\Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="Devices\Controller\CLeapIndexController.cpp">
+      <Filter>Devices\Controller</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="Utils\CGestureMatcher.h">
-      <Filter>Utils</Filter>
-    </ClInclude>
     <ClInclude Include="Utils\Utils.h">
       <Filter>Utils</Filter>
     </ClInclude>
     <ClInclude Include="Devices\CLeapStation.h">
       <Filter>Devices</Filter>
     </ClInclude>
-    <ClInclude Include="Devices\CLeapController\CControllerButton.h">
-      <Filter>Devices\CLeapController</Filter>
-    </ClInclude>
-    <ClInclude Include="Devices\CLeapController\CLeapController.h">
-      <Filter>Devices\CLeapController</Filter>
-    </ClInclude>
-    <ClInclude Include="Devices\CLeapController\CLeapControllerIndex.h">
-      <Filter>Devices\CLeapController</Filter>
-    </ClInclude>
     <ClInclude Include="Core\CServerDriver.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\CLeapPoller.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Core\CDriverConfig.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Leap\CLeapFrame.h">
+      <Filter>Leap</Filter>
+    </ClInclude>
+    <ClInclude Include="Leap\CLeapHand.h">
+      <Filter>Leap</Filter>
+    </ClInclude>
+    <ClInclude Include="Leap\CLeapPoller.h">
+      <Filter>Leap</Filter>
+    </ClInclude>
+    <ClInclude Include="Devices\Controller\CControllerButton.h">
+      <Filter>Devices\Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="Devices\Controller\CLeapIndexController.h">
+      <Filter>Devices\Controller</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -80,7 +80,10 @@
     <Filter Include="Devices">
       <UniqueIdentifier>{5709dbc5-cf75-4243-a691-22f7d553f0da}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Devices\CLeapController">
+    <Filter Include="Leap">
+      <UniqueIdentifier>{32d26d56-e07f-41de-aa44-3e0d88c9f835}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Devices\Controller">
       <UniqueIdentifier>{82e3a6c5-9886-457e-8308-b6c62ec7ce03}</UniqueIdentifier>
     </Filter>
   </ItemGroup>

@@ -8,33 +8,22 @@ extern char g_modulePath[];
 
 const std::vector<std::string> g_settingNames
 {
-    "trackingLevel", "handsReset", "velocity",
-    "rootOffset", "rootAngle", "handsOffset", "handsRotationOffset"
+    "trackingLevel",
+    "handsReset",
+    "useVelocity",
+    "rootOffsetX",
+    "rootOffsetY",
+    "rootOffsetZ",
+    "rootAngleX",
+    "rootAngleY",
+    "rootAngleZ"
 };
 
-enum ConfigSetting : size_t
-{
-    CS_TrackingLevel = 0U,
-    CS_HandsReset,
-    CS_Velocity,
-    CS_RootOffset,
-    CS_RootAngle,
-    CS_HandsOffset,
-    CS_HandsRotationOffset
-};
-
-const std::vector<std::string> g_trackingLevels
-{
-    "partial", "full"
-};
-
-unsigned char CDriverConfig::ms_trackingLevel = CDriverConfig::TL_Partial;
+int CDriverConfig::ms_trackingLevel = CDriverConfig::TL_Partial;
 bool CDriverConfig::ms_handsReset = false;
 bool CDriverConfig::ms_useVelocity = false;
 glm::vec3 CDriverConfig::ms_rootOffset = glm::vec3(0.f);
-float CDriverConfig::ms_rootAngle = 0.f;
-glm::vec3 CDriverConfig::ms_handsOffset = glm::vec3(0.f);
-glm::vec3 CDriverConfig::ms_handsRotationOffset = glm::vec3(0.f);
+glm::vec3 CDriverConfig::ms_rootAngle = glm::vec3(0.f);
 
 void CDriverConfig::Load()
 {
@@ -42,10 +31,10 @@ void CDriverConfig::Load()
     l_path.erase(l_path.begin() + l_path.rfind('\\'), l_path.end());
     l_path.append("\\..\\..\\resources\\settings.xml");
 
-    pugi::xml_document *l_document = new pugi::xml_document();
-    if(l_document->load_file(l_path.c_str()))
+    pugi::xml_document l_document;
+    if(l_document.load_file(l_path.c_str()))
     {
-        const pugi::xml_node l_root = l_document->child("settings");
+        const pugi::xml_node l_root = l_document.child("settings");
         if(l_root)
         {
             for(pugi::xml_node l_node = l_root.child("setting"); l_node; l_node = l_node.next_sibling("setting"))
@@ -56,44 +45,49 @@ void CDriverConfig::Load()
                 {
                     switch(ReadEnumVector(l_attribName.as_string(), g_settingNames))
                     {
-                        case ConfigSetting::CS_TrackingLevel:
-                        {
-                            const size_t l_tableIndex = ReadEnumVector(l_attribValue.as_string(), g_trackingLevels);
-                            if(l_tableIndex != std::numeric_limits<size_t>::max()) ms_trackingLevel = static_cast<unsigned char>(l_tableIndex);
-                        } break;
-                        case ConfigSetting::CS_HandsReset:
+                        case CS_TrackingLevel:
+                            ms_trackingLevel = glm::clamp(l_attribValue.as_int(0), static_cast<int>(TL_Partial), static_cast<int>(TL_Full));
+                            break;
+
+                        case CS_HandsReset:
                             ms_handsReset = l_attribValue.as_bool(false);
                             break;
-                        case ConfigSetting::CS_Velocity:
+
+                        case CS_UseVelocity:
                             ms_useVelocity = l_attribValue.as_bool(false);
                             break;
-                        case ConfigSetting::CS_RootOffset:
-                        {
-                            std::stringstream l_stream(l_attribValue.as_string("0.0 0.0 0.0"));
-                            l_stream >> ms_rootOffset.x >> ms_rootOffset.y >> ms_rootOffset.z;
-                        } break;
-                        case ConfigSetting::CS_RootAngle:
-                            ms_rootAngle = l_attribValue.as_float(0.f);
+
+                        case CS_RootOffsetX:
+                            ms_rootOffset.x = glm::clamp(l_attribValue.as_float(0.f), -1.f, 1.f);
                             break;
-                        case ConfigSetting::CS_HandsOffset:
-                        {
-                            std::stringstream l_stream(l_attribValue.as_string("0.0 0.0 0.0"));
-                            l_stream >> ms_handsOffset.x >> ms_handsOffset.y >> ms_handsOffset.z;
-                        } break;
-                        case ConfigSetting::CS_HandsRotationOffset:
-                        {
-                            std::stringstream l_stream(l_attribValue.as_string("0.0 0.0 0.0"));
-                            l_stream >> ms_handsRotationOffset.x >> ms_handsRotationOffset.y >> ms_handsRotationOffset.z;
-                        } break;
+
+                        case CS_RootOffsetY:
+                            ms_rootOffset.y = glm::clamp(l_attribValue.as_float(0.f), -1.f, 1.f);
+                            break;
+
+                        case CS_RootOffsetZ:
+                            ms_rootOffset.z = glm::clamp(l_attribValue.as_float(0.f), -1.f, 1.f);
+                            break;
+
+                        case CS_RootAngleX:
+                            ms_rootAngle.x = glm::clamp(l_attribValue.as_float(0.f), -180.f, 180.f);
+                            break;
+
+                        case CS_RootAngleY:
+                            ms_rootAngle.y = glm::clamp(l_attribValue.as_float(0.f), -180.f, 180.f);
+                            break;
+
+                        case CS_RootAngleZ:
+                            ms_rootAngle.z = glm::clamp(l_attribValue.as_float(0.f), -180.f, 180.f);
+                            break;
                     }
                 }
             }
         }
     }
-    delete l_document;
 }
 
-unsigned char CDriverConfig::GetTrackingLevel()
+int CDriverConfig::GetTrackingLevel()
 {
     return ms_trackingLevel;
 }
@@ -113,17 +107,80 @@ const glm::vec3& CDriverConfig::GetRootOffset()
     return ms_rootOffset;
 }
 
-float CDriverConfig::GetRootAngle()
+const glm::vec3& CDriverConfig::GetRootAngle()
 {
     return ms_rootAngle;
 }
 
-const glm::vec3& CDriverConfig::GetHandsOffset()
+void CDriverConfig::ProcessExternalSetting(const char *p_message)
 {
-    return ms_handsOffset;
-}
+    // Message format: "{setting} {value}"
+    std::vector<std::string> l_chunks;
+    SplitString(p_message, ' ', l_chunks);
 
-const glm::vec3& CDriverConfig::GetHandsRotationOffset()
-{
-    return ms_handsRotationOffset;
+    if(l_chunks.size() >= 2U)
+    {
+        size_t l_index = 0U;
+        if(ReadEnumVector(l_chunks[0U], g_settingNames, l_index))
+        {
+            switch(l_index)
+            {
+                case CS_HandsReset:
+                {
+                    int l_value = -1;
+                    if(TryParse(l_chunks[1U], l_value))
+                        ms_handsReset = (l_value == 1);
+                } break;
+
+                case CS_UseVelocity:
+                {
+                    int l_value = -1;
+                    if(TryParse(l_chunks[1U], l_value))
+                        ms_useVelocity = (l_value == 1);
+                } break;
+
+                case CS_RootAngleX:
+                {
+                    float l_value = 0.f;
+                    if(TryParse(l_chunks[1U], l_value))
+                        ms_rootAngle.x = l_value;
+                } break;
+
+                case CS_RootAngleY:
+                {
+                    float l_value = 0.f;
+                    if(TryParse(l_chunks[1U], l_value))
+                        ms_rootAngle.y = l_value;
+                } break;
+
+                case CS_RootAngleZ:
+                {
+                    float l_value = 0.f;
+                    if(TryParse(l_chunks[1U], l_value))
+                        ms_rootAngle.z = l_value;
+                } break;
+
+                case CS_RootOffsetX:
+                {
+                    float l_value = 0.f;
+                    if(TryParse(l_chunks[1U], l_value))
+                        ms_rootOffset.x = l_value;
+                } break;
+
+                case CS_RootOffsetY:
+                {
+                    float l_value = 0.f;
+                    if(TryParse(l_chunks[1U], l_value))
+                        ms_rootOffset.y = l_value;
+                } break;
+
+                case CS_RootOffsetZ:
+                {
+                    float l_value = 0.f;
+                    if(TryParse(l_chunks[1U], l_value))
+                        ms_rootOffset.z = l_value;
+                } break;
+            }
+        }
+    }
 }

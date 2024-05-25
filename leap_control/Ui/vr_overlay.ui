@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>vr_overlayClass</class>
+ <widget class="QWidget" name="vr_overlayClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>512</width>
+    <height>512</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>vr_overlay</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget#vr_overlayClass
+{
+	background-color: transparent;
+	border: 0px;
+}</string>
+  </property>
+  <widget class="QFrame" name="frame">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>512</width>
+     <height>512</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QFrame#frame
+{
+	background-color: rgb(14, 20, 27);
+	border-radius: 10px;
+}</string>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::StyledPanel</enum>
+   </property>
+   <property name="frameShadow">
+    <enum>QFrame::Raised</enum>
+   </property>
+   <widget class="QFrame" name="m_pressureArea">
+    <property name="geometry">
+     <rect>
+      <x>480</x>
+      <y>100</y>
+      <width>10</width>
+      <height>320</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QFrame
+{
+	background-color: #23262e;
+	border-radius: 2px;
+}</string>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+    <widget class="QFrame" name="m_pressureRectangle">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>10</width>
+       <height>50</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QFrame
+{
+	background-color: #ffffff;
+	border-radius: 2px;
+}</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QFrame" name="m_buttonSys">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>325</y>
+      <width>150</width>
+      <height>100</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QFrame
+{
+	background-color: #23262e;
+	border-radius: 10px;
+}</string>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+    <widget class="QLabel" name="label_3">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>150</width>
+       <height>100</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>48</pointsize>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QLabel
+{
+	color: rgb(14, 20, 27);
+}</string>
+     </property>
+     <property name="text">
+      <string>S</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QFrame" name="m_touchpadArea">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>270</y>
+      <width>210</width>
+      <height>210</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QFrame
+{
+	background-color: #23262e;
+	border-radius: 105px;
+}</string>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+    <widget class="QFrame" name="frame_5">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>103</y>
+       <width>210</width>
+       <height>4</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QFrame
+{
+	background-color: rgb(14, 20, 27);
+}</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+    </widget>
+    <widget class="QFrame" name="frame_6">
+     <property name="geometry">
+      <rect>
+       <x>103</x>
+       <y>0</y>
+       <width>4</width>
+       <height>210</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QFrame
+{
+	background-color: rgb(14, 20, 27);
+}</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+    </widget>
+    <widget class="QFrame" name="m_touchpadCursor">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>16</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QFrame
+{
+	background-color: rgb(0, 255, 0);
+	border-radius: 8px;
+}</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QFrame" name="m_buttonA">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>210</y>
+      <width>150</width>
+      <height>100</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QFrame
+{
+	background-color: #23262e;
+	border-radius: 10px;
+}</string>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+    <widget class="QLabel" name="label_2">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>150</width>
+       <height>100</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>48</pointsize>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QLabel
+{
+	color: rgb(14, 20, 27);
+}</string>
+     </property>
+     <property name="text">
+      <string>A</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QFrame" name="m_buttonB">
+    <property name="geometry">
+     <rect>
+      <x>310</x>
+      <y>95</y>
+      <width>150</width>
+      <height>100</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QFrame
+{
+	background-color: #23262e;
+	border-radius: 10px;
+}</string>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>150</width>
+       <height>100</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>48</pointsize>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QLabel
+{
+	color: rgb(14, 20, 27);
+}</string>
+     </property>
+     <property name="text">
+      <string>B</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QFrame" name="m_thumbstickArea">
+    <property name="geometry">
+     <rect>
+      <x>40</x>
+      <y>40</y>
+      <width>210</width>
+      <height>210</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QFrame
+{
+	background-color: #23262e;
+	border-radius: 105px;
+}</string>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+    <widget class="QFrame" name="frame_2">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>103</y>
+       <width>210</width>
+       <height>4</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QFrame
+{
+	background-color: rgb(14, 20, 27);
+}</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+    </widget>
+    <widget class="QFrame" name="frame_3">
+     <property name="geometry">
+      <rect>
+       <x>103</x>
+       <y>0</y>
+       <width>4</width>
+       <height>210</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QFrame
+{
+	background-color: rgb(14, 20, 27);
+}</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+    </widget>
+    <widget class="QFrame" name="m_thumbstickCursor">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>0</y>
+       <width>16</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QFrame
+{
+	background-color: rgb(0, 255, 0);
+	border-radius: 8px;
+}</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QFrame" name="m_cursor">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>10</width>
+      <height>10</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QFrame
+{
+	background-color: #3399ff;
+	border-radius: 5px;
+}</string>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

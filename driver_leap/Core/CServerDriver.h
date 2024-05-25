@@ -1,24 +1,19 @@
 #pragma once
 
 class CLeapPoller;
-class CLeapControllerIndex;
+class CLeapFrame;
+class CLeapIndexController;
 class CLeapStation;
 
 class CServerDriver final : public vr::IServerTrackedDeviceProvider
 {
-    enum LeapControllerHand : size_t
-    {
-        LCH_Left = 0U,
-        LCH_Right = 1U,
-
-        LCH_Count
-    };
-
     static const char* const ms_interfaces[];
 
     bool m_connectionState;
     CLeapPoller *m_leapPoller;
-    CLeapControllerIndex *m_controllers[LCH_Count];
+    CLeapFrame *m_leapFrame;
+    CLeapIndexController *m_leftController;
+    CLeapIndexController *m_rightController;
     CLeapStation *m_leapStation;
 
     CServerDriver(const CServerDriver &that) = delete;
@@ -35,6 +30,4 @@ class CServerDriver final : public vr::IServerTrackedDeviceProvider
 public:
     CServerDriver();
     ~CServerDriver();
-
-    void ProcessExternalMessage(const char *p_message);
 };

@@ -1,14 +1,11 @@
 #pragma once
 
-class CServerDriver;
-
 class CLeapStation final : public vr::ITrackedDeviceServerDriver
 {
     vr::DriverPose_t m_pose;
     vr::PropertyContainerHandle_t m_propertyHandle;
     uint32_t m_trackedDevice;
 
-    CServerDriver *m_serverDriver;
     std::string m_serialNumber;
 
     CLeapStation(const CLeapStation &that) = delete;
@@ -28,8 +25,8 @@ public:
         TS_Search
     };
 
-    explicit CLeapStation(CServerDriver *p_server);
-    ~CLeapStation();
+    CLeapStation();
+    ~CLeapStation() = default;
 
     const std::string& GetSerialNumber() const;
 

@@ -15,6 +15,7 @@
 #include <atomic>
 #include <mutex>
 #include <thread>
+#include <array>
 
 #include "openvr_driver.h"
 #include "LeapC.h"

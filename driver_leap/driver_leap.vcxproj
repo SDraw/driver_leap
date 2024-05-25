@@ -16,7 +16,7 @@
     <ProjectName>driver_leap</ProjectName>
     <RootNamespace>driver_leap</RootNamespace>
     <DefaultLanguage>en-US</DefaultLanguage>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -127,21 +127,20 @@
       <Message />
     </CustomBuildStep>
     <PostBuildEvent>
-      <Command>copy /y "$(TargetPath)" "C:\Program Files (x86)\Steam\steamapps\common\SteamVR\drivers\leap\bin\win64\$(TargetFileName)"
-copy /y "$(SolutionDir)vendor\LeapSDK\lib\x64\LeapC.dll" "C:\Program Files (x86)\Steam\steamapps\common\SteamVR\drivers\leap\bin\win64\"</Command>
+      <Command>copy /y "$(TargetPath)" "C:\Program Files (x86)\Steam\steamapps\common\SteamVR\drivers\leap\bin\win64\$(TargetFileName)"</Command>
       <Message>Install Binary</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Core\CDriverConfig.h" />
-    <ClInclude Include="Core\CLeapPoller.h" />
     <ClInclude Include="Core\CServerDriver.h" />
-    <ClInclude Include="Devices\CLeapController\CControllerButton.h" />
-    <ClInclude Include="Devices\CLeapController\CLeapController.h" />
-    <ClInclude Include="Devices\CLeapController\CLeapControllerIndex.h" />
     <ClInclude Include="Devices\CLeapStation.h" />
+    <ClInclude Include="Devices\Controller\CControllerButton.h" />
+    <ClInclude Include="Devices\Controller\CLeapIndexController.h" />
+    <ClInclude Include="Leap\CLeapFrame.h" />
+    <ClInclude Include="Leap\CLeapHand.h" />
+    <ClInclude Include="Leap\CLeapPoller.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="Utils\CGestureMatcher.h" />
     <ClInclude Include="Utils\Utils.h" />
   </ItemGroup>
   <ItemGroup>
@@ -150,18 +149,18 @@ copy /y "$(SolutionDir)vendor\LeapSDK\lib\x64\LeapC.dll" "C:\Program Files (x86)
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Core\CDriverConfig.cpp" />
-    <ClCompile Include="Core\CLeapPoller.cpp" />
     <ClCompile Include="Core\CServerDriver.cpp" />
-    <ClCompile Include="Devices\CLeapController\CControllerButton.cpp" />
-    <ClCompile Include="Devices\CLeapController\CLeapController.cpp" />
-    <ClCompile Include="Devices\CLeapController\CLeapControllerIndex.cpp" />
     <ClCompile Include="Devices\CLeapStation.cpp" />
+    <ClCompile Include="Devices\Controller\CControllerButton.cpp" />
+    <ClCompile Include="Devices\Controller\CLeapIndexController.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="Leap\CLeapFrame.cpp" />
+    <ClCompile Include="Leap\CLeapHand.cpp" />
+    <ClCompile Include="Leap\CLeapPoller.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Utils\CGestureMatcher.cpp" />
     <ClCompile Include="Utils\Utils.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

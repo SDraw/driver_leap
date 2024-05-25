@@ -1,0 +1,3377 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>leap_controlClass</class>
+ <widget class="QWidget" name="leap_controlClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>640</width>
+    <height>510</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>640</width>
+    <height>510</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>640</width>
+    <height>510</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Leap Control</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../Resources/leap_control.qrc">
+    <normaloff>:/leap_control/leap_control.ico</normaloff>:/leap_control/leap_control.ico</iconset>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">QWidget#leap_controlClass
+{
+	background-color: rgb(14, 20, 27);
+}</string>
+  </property>
+  <widget class="QPushButton" name="m_saveButton">
+   <property name="geometry">
+    <rect>
+     <x>540</x>
+     <y>10</y>
+     <width>80</width>
+     <height>40</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>-1</pointsize>
+     <weight>50</weight>
+     <italic>false</italic>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="toolTip">
+    <string>Manual settings save</string>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton
+{
+	background-color: #493b4b;
+	color: #ffffff;
+	border-radius: 5px;
+	font-size: 16px;
+}
+
+QPushButton::disabled
+{
+	background-color: #493b4b;
+	color: #ffffff;
+}
+
+QPushButton::hover
+{
+	background-color: #725b75;
+}
+
+QPushButton::pressed
+{
+	background-color: #2d242e;
+	color: #ffffff;
+}
+
+QToolTip
+{
+	background-color:  rgb(14, 20, 27);
+	border: 1px solid #23262e;
+	border-radius: 2px;
+	color: white;
+	font: 14px;
+}</string>
+   </property>
+   <property name="text">
+    <string>Save</string>
+   </property>
+  </widget>
+  <widget class="QTabWidget" name="tabWidget">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>620</width>
+     <height>490</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>14</pointsize>
+    </font>
+   </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QTabBar::tab::!selected
+{
+	height: 40px;
+	width:100px;
+	background-color: #1e242c;
+	color:#ffffff;
+	border-radius: 5px;
+	font-size: 16px;
+}
+QTabBar::tab::!selected:hover 
+{
+	background-color: #343945;
+}
+QTabBar::tab:selected
+{
+	height: 40px;
+	width: 100px;
+	background-color: #343945;
+	color:#ffffff;
+	border-radius: 5px;
+	font-size: 16px;
+}
+QTabBar::tab::selected:hover 
+{
+	background-color: #5b6678;
+}
+QTabWidget::pane
+{
+	border: 0px #0a0f14;
+	background-color: rgb(14, 20, 27);
+}
+QTabWidget::tab-bar
+{
+	left: 10px;
+}</string>
+   </property>
+   <property name="currentIndex">
+    <number>0</number>
+   </property>
+   <widget class="QWidget" name="tab">
+    <attribute name="title">
+     <string>General</string>
+    </attribute>
+    <widget class="QFrame" name="frame">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>600</width>
+       <height>40</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+       <underline>false</underline>
+       <strikeout>false</strikeout>
+       <kerning>true</kerning>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QFrame#frame
+{
+	background-color: rgb(10, 14, 19);
+	border-radius: 10px;
+}</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <widget class="QLabel" name="label">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>300</width>
+        <height>40</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>-1</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>SteamVR restart required upon change</string>
+      </property>
+      <property name="toolTipDuration">
+       <number>-1</number>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel
+{
+	color: rgb(255, 255, 255);
+	font-size: 16px;
+}
+QToolTip
+{
+	background-color:  rgb(14, 20, 27);
+	border: 1px solid #23262e;
+	border-radius: 2px;
+	color: white;
+	font: 14px;
+}</string>
+      </property>
+      <property name="lineWidth">
+       <number>0</number>
+      </property>
+      <property name="text">
+       <string>Tracking level</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="margin">
+       <number>0</number>
+      </property>
+      <property name="indent">
+       <number>0</number>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::NoTextInteraction</set>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="m_trackingLevelComboBox">
+      <property name="geometry">
+       <rect>
+        <x>300</x>
+        <y>0</y>
+        <width>300</width>
+        <height>40</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>-1</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+        <kerning>false</kerning>
+       </font>
+      </property>
+      <property name="contextMenuPolicy">
+       <enum>Qt::DefaultContextMenu</enum>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QComboBox
+{
+    background-color: #23262e;
+    color: #ffffff;
+	border-radius: 5px;
+	font-size: 16px;
+}
+
+QComboBox::disabled
+{
+	background-color: #23262e;
+	color: #656565;
+}
+
+QComboBox::hover
+{
+    background-color: #3d4450;
+}
+
+QComboBox::on
+{
+    background-color: #3d4450;
+}
+
+QComboBox QAbstractItemView
+{
+    background-color: #23262e;
+    color: #ffffff;
+    selection-background-color: #3d4450;
+    selection-color: #ffffff;
+	border-radius: 10px;
+}
+
+QComboBox::drop-down
+{
+	border-radius: 10px;
+}</string>
+      </property>
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>20</width>
+        <height>20</height>
+       </size>
+      </property>
+      <property name="duplicatesEnabled">
+       <bool>false</bool>
+      </property>
+      <property name="frame">
+       <bool>true</bool>
+      </property>
+      <property name="modelColumn">
+       <number>0</number>
+      </property>
+      <item>
+       <property name="text">
+        <string>Partial</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Full</string>
+       </property>
+      </item>
+     </widget>
+     <zorder>m_trackingLevelComboBox</zorder>
+     <zorder>label</zorder>
+    </widget>
+    <widget class="QFrame" name="frame_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>60</y>
+       <width>600</width>
+       <height>40</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+       <underline>false</underline>
+       <strikeout>false</strikeout>
+       <kerning>true</kerning>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(10, 14, 19);
+border-radius: 10px;</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <widget class="QLabel" name="label_3">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>300</width>
+        <height>40</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>-1</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Mark controller(s) as out of range if Leap Motion can't detect hand(s)</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel
+{
+	color: rgb(255, 255, 255);
+	font-size: 16px;
+}
+QToolTip
+{
+	background-color:  rgb(14, 20, 27);
+	border: 1px solid #23262e;
+	border-radius: 2px;
+	color: white;
+	font: 14px;
+}</string>
+      </property>
+      <property name="lineWidth">
+       <number>0</number>
+      </property>
+      <property name="text">
+       <string>Hands reset</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="margin">
+       <number>0</number>
+      </property>
+      <property name="indent">
+       <number>0</number>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::NoTextInteraction</set>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="m_handsResetCheckBox">
+      <property name="geometry">
+       <rect>
+        <x>432</x>
+        <y>4</y>
+        <width>32</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QCheckBox::indicator
+{
+    background-color: #23262e;
+	border-radius: 4px;
+    width: 32px;
+    height: 32px;
+}
+
+QCheckBox::indicator:checked
+{
+    background-color: #ffffff;
+	border: 4px solid #3d4450;
+    width: 24px;
+   	height: 24px;
+}
+
+QCheckBox::indicator:unchecked:hover
+{
+	background-color: #3d4450;
+}</string>
+      </property>
+      <property name="text">
+       <string>CheckBox</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QFrame" name="frame_3">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>110</y>
+       <width>600</width>
+       <height>40</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+       <underline>false</underline>
+       <strikeout>false</strikeout>
+       <kerning>true</kerning>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(10, 14, 19);
+border-radius: 10px;</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <widget class="QLabel" name="label_4">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>300</width>
+        <height>40</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>-1</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Some games use velocity for fast movements detection</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel
+{
+	color: rgb(255, 255, 255);
+	font-size: 16px;
+}
+QToolTip
+{
+	background-color:  rgb(14, 20, 27);
+	border: 1px solid #23262e;
+	border-radius: 2px;
+	color: white;
+	font: 14px;
+}</string>
+      </property>
+      <property name="lineWidth">
+       <number>0</number>
+      </property>
+      <property name="text">
+       <string>Use velocity</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="margin">
+       <number>0</number>
+      </property>
+      <property name="indent">
+       <number>0</number>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::NoTextInteraction</set>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="m_useVelocityCheckBox">
+      <property name="geometry">
+       <rect>
+        <x>432</x>
+        <y>4</y>
+        <width>32</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QCheckBox::indicator
+{
+    background-color: #23262e;
+	border-radius: 4px;
+    width: 32px;
+    height: 32px;
+}
+
+QCheckBox::indicator:checked
+{
+    background-color: #ffffff;
+	border: 4px solid #3d4450;
+    width: 24px;
+   	height: 24px;
+}
+
+QCheckBox::indicator:unchecked:hover
+{
+	background-color: #3d4450;
+}</string>
+      </property>
+      <property name="text">
+       <string>CheckBox</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QFrame" name="frame_9">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>160</y>
+       <width>600</width>
+       <height>40</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+       <underline>false</underline>
+       <strikeout>false</strikeout>
+       <kerning>true</kerning>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(10, 14, 19);
+border-radius: 10px;</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <widget class="QLabel" name="label_5">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>300</width>
+        <height>40</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>-1</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>If enabled, use tray icon to show this window</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel
+{
+	color: rgb(255, 255, 255);
+	font-size: 16px;
+}
+QToolTip
+{
+	background-color:  rgb(14, 20, 27);
+	border: 1px solid #23262e;
+	border-radius: 2px;
+	color: white;
+	font: 14px;
+}</string>
+      </property>
+      <property name="lineWidth">
+       <number>0</number>
+      </property>
+      <property name="text">
+       <string>Start minimized</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="margin">
+       <number>0</number>
+      </property>
+      <property name="indent">
+       <number>0</number>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::NoTextInteraction</set>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="m_startMinimizedCheckBox">
+      <property name="geometry">
+       <rect>
+        <x>432</x>
+        <y>4</y>
+        <width>32</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QCheckBox::indicator
+{
+    background-color: #23262e;
+	border-radius: 4px;
+    width: 32px;
+    height: 32px;
+}
+
+QCheckBox::indicator:checked
+{
+    background-color: #ffffff;
+	border: 4px solid #3d4450;
+    width: 24px;
+   	height: 24px;
+}
+
+QCheckBox::indicator:unchecked:hover
+{
+	background-color: #3d4450;
+}</string>
+      </property>
+      <property name="text">
+       <string>CheckBox</string>
+      </property>
+     </widget>
+    </widget>
+    <zorder>frame_2</zorder>
+    <zorder>frame_3</zorder>
+    <zorder>frame</zorder>
+    <zorder>frame_9</zorder>
+   </widget>
+   <widget class="QWidget" name="tab_2">
+    <attribute name="title">
+     <string>Root</string>
+    </attribute>
+    <widget class="QFrame" name="frame_5">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>160</y>
+       <width>600</width>
+       <height>140</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+       <underline>false</underline>
+       <strikeout>false</strikeout>
+       <kerning>true</kerning>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(10, 14, 19);
+border-radius: 10px;</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <widget class="QLabel" name="label_6">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>600</width>
+        <height>40</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>-1</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Local rotation angle of Leap Motion from HMD transformation</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel
+{
+	color: rgb(255, 255, 255);
+	font-size: 16px;
+}
+QToolTip
+{
+	background-color:  rgb(14, 20, 27);
+	border: 1px solid #23262e;
+	border-radius: 2px;
+	color: white;
+	font: 14px;
+}</string>
+      </property>
+      <property name="lineWidth">
+       <number>0</number>
+      </property>
+      <property name="text">
+       <string>Root angle</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="margin">
+       <number>0</number>
+      </property>
+      <property name="indent">
+       <number>0</number>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::NoTextInteraction</set>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="m_rootAngleResetButton">
+      <property name="geometry">
+       <rect>
+        <x>505</x>
+        <y>5</y>
+        <width>90</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>-1</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton
+{
+	background-color: #23262e;
+	color: #ffffff;
+	border-radius: 5px;
+	font-size: 16px;
+}
+
+QPushButton::disabled
+{
+	background-color: #23262e;
+	color: #ffffff;
+}
+
+QPushButton::hover
+{
+	background-color: #3d4450;
+}
+
+QPushButton::pressed
+{
+	background-color: #1e2126;
+	color: #ffffff;
+}</string>
+      </property>
+      <property name="text">
+       <string>Reset</string>
+      </property>
+     </widget>
+     <widget class="QFrame" name="frame_6">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>39</y>
+        <width>600</width>
+        <height>2</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(14, 20, 27);
+background-color: rgb(14, 20, 27);</string>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+     </widget>
+     <widget class="QSlider" name="m_rootAngleSliderX">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>50</y>
+        <width>500</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>X axis angle: 0.0</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QSlider::groove:horizontal 
+{
+	background-color: transparent;
+	height: 4px;
+}
+
+QSlider::sub-page:horizontal 
+{
+	background-color: #0e141b;
+}
+
+QSlider::add-page:horizontal 
+{
+	background-color: #0e141b;
+}
+
+QSlider::handle:horizontal 
+{
+	background-color: #22242c;
+	width: 20px;
+	margin-top: -8px;
+	margin-bottom: -8px;
+	border: 0px;
+	border-radius: 10px;
+}
+
+QSlider::handle:horizontal:hover 
+{
+	background-color: #3d4450;
+}
+
+
+QSlider::sub-page:horizontal:disabled 
+{
+	background-color: #bbb;
+	border-color: #999;
+}
+
+QSlider::add-page:horizontal:disabled 
+{
+	background-color: #eee;
+	border-color: #999;
+}
+
+QSlider::handle:horizontal:disabled 
+{
+	background-color: #eee;
+	border: 1px solid #aaa;
+	border-radius: 3px;
+}
+
+QToolTip
+{
+	background-color: rgb(10, 14, 19);
+	border: 1px solid #23262e;
+	border-radius: 2px;
+	color: white;
+	font: 14px;
+}</string>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="pageStep">
+       <number>10</number>
+      </property>
+      <property name="sliderPosition">
+       <number>50</number>
+      </property>
+      <property name="tracking">
+       <bool>true</bool>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_7">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>80</y>
+        <width>40</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>-1</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+        <underline>false</underline>
+        <strikeout>false</strikeout>
+        <stylestrategy>PreferDefault</stylestrategy>
+        <kerning>true</kerning>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel
+{
+	color: rgb(255, 255, 255);
+	font-size: 14px;
+}</string>
+      </property>
+      <property name="lineWidth">
+       <number>0</number>
+      </property>
+      <property name="text">
+       <string>-180</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="margin">
+       <number>0</number>
+      </property>
+      <property name="indent">
+       <number>0</number>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::NoTextInteraction</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_8">
+      <property name="geometry">
+       <rect>
+        <x>550</x>
+        <y>80</y>
+        <width>40</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>-1</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+        <underline>false</underline>
+        <strikeout>false</strikeout>
+        <stylestrategy>PreferDefault</stylestrategy>
+        <kerning>true</kerning>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel
+{
+	color: rgb(255, 255, 255);
+	font-size: 14px;
+}</string>
+      </property>
+      <property name="lineWidth">
+       <number>0</number>
+      </property>
+      <property name="text">
+       <string>180</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="margin">
+       <number>0</number>
+      </property>
+      <property name="indent">
+       <number>0</number>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::NoTextInteraction</set>
+      </property>
+     </widget>
+     <widget class="QSlider" name="m_rootAngleSliderY">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>80</y>
+        <width>500</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Y axis angle: 0.0</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QSlider::groove:horizontal 
+{
+	background-color: transparent;
+	height: 4px;
+}
+
+QSlider::sub-page:horizontal 
+{
+	background-color: #0e141b;
+}
+
+QSlider::add-page:horizontal 
+{
+	background-color: #0e141b;
+}
+
+QSlider::handle:horizontal 
+{
+	background-color: #22242c;
+	width: 20px;
+	margin-top: -8px;
+	margin-bottom: -8px;
+	border: 0px;
+	border-radius: 10px;
+}
+
+QSlider::handle:horizontal:hover 
+{
+	background-color: #3d4450;
+}
+
+
+QSlider::sub-page:horizontal:disabled 
+{
+	background-color: #bbb;
+	border-color: #999;
+}
+
+QSlider::add-page:horizontal:disabled 
+{
+	background-color: #eee;
+	border-color: #999;
+}
+
+QSlider::handle:horizontal:disabled 
+{
+	background-color: #eee;
+	border: 1px solid #aaa;
+	border-radius: 3px;
+}
+
+QToolTip
+{
+	background-color: rgb(10, 14, 19);
+	border: 1px solid #23262e;
+	border-radius: 2px;
+	color: white;
+	font: 14px;
+}</string>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="pageStep">
+       <number>10</number>
+      </property>
+      <property name="sliderPosition">
+       <number>50</number>
+      </property>
+      <property name="tracking">
+       <bool>true</bool>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QSlider" name="m_rootAngleSliderZ">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>110</y>
+        <width>500</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Z axis angle: 0.0</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QSlider::groove:horizontal 
+{
+	background-color: transparent;
+	height: 4px;
+}
+
+QSlider::sub-page:horizontal 
+{
+	background-color: #0e141b;
+}
+
+QSlider::add-page:horizontal 
+{
+	background-color: #0e141b;
+}
+
+QSlider::handle:horizontal 
+{
+	background-color: #22242c;
+	width: 20px;
+	margin-top: -8px;
+	margin-bottom: -8px;
+	border: 0px;
+	border-radius: 10px;
+}
+
+QSlider::handle:horizontal:hover 
+{
+	background-color: #3d4450;
+}
+
+
+QSlider::sub-page:horizontal:disabled 
+{
+	background-color: #bbb;
+	border-color: #999;
+}
+
+QSlider::add-page:horizontal:disabled 
+{
+	background-color: #eee;
+	border-color: #999;
+}
+
+QSlider::handle:horizontal:disabled 
+{
+	background-color: #eee;
+	border: 1px solid #aaa;
+	border-radius: 3px;
+}
+
+QToolTip
+{
+	background-color: rgb(10, 14, 19);
+	border: 1px solid #23262e;
+	border-radius: 2px;
+	color: white;
+	font: 14px;
+}</string>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="pageStep">
+       <number>10</number>
+      </property>
+      <property name="sliderPosition">
+       <number>50</number>
+      </property>
+      <property name="tracking">
+       <bool>true</bool>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QFrame" name="frame_7">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>600</width>
+       <height>140</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+       <underline>false</underline>
+       <strikeout>false</strikeout>
+       <kerning>true</kerning>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(10, 14, 19);
+border-radius: 10px;</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <widget class="QLabel" name="label_9">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>600</width>
+        <height>40</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>-1</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Local offset of Leap Motion from HMD transformation</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel
+{
+	color: rgb(255, 255, 255);
+	font-size: 16px;
+}
+QToolTip
+{
+	background-color:  rgb(14, 20, 27);
+	border: 1px solid #23262e;
+	border-radius: 2px;
+	color: white;
+	font: 14px;
+}</string>
+      </property>
+      <property name="lineWidth">
+       <number>0</number>
+      </property>
+      <property name="text">
+       <string>Root offset</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="margin">
+       <number>0</number>
+      </property>
+      <property name="indent">
+       <number>0</number>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::NoTextInteraction</set>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="m_rootOffsetResetButton">
+      <property name="geometry">
+       <rect>
+        <x>505</x>
+        <y>5</y>
+        <width>90</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>-1</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton
+{
+	background-color: #23262e;
+	color: #ffffff;
+	border-radius: 5px;
+	font-size: 16px;
+}
+
+QPushButton::disabled
+{
+	background-color: #23262e;
+	color: #ffffff;
+}
+
+QPushButton::hover
+{
+	background-color: #3d4450;
+}
+
+QPushButton::pressed
+{
+	background-color: #1e2126;
+	color: #ffffff;
+}</string>
+      </property>
+      <property name="text">
+       <string>Reset</string>
+      </property>
+     </widget>
+     <widget class="QFrame" name="frame_8">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>39</y>
+        <width>600</width>
+        <height>2</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(14, 20, 27);
+background-color: rgb(14, 20, 27);</string>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+     </widget>
+     <widget class="QSlider" name="m_rootOffsetSliderX">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>50</y>
+        <width>500</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>X axis offset: 0.0</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QSlider::groove:horizontal 
+{
+	background-color: transparent;
+	height: 4px;
+}
+
+QSlider::sub-page:horizontal 
+{
+	background-color: #0e141b;
+}
+
+QSlider::add-page:horizontal 
+{
+	background-color: #0e141b;
+}
+
+QSlider::handle:horizontal 
+{
+	background-color: #22242c;
+	width: 20px;
+	margin-top: -8px;
+	margin-bottom: -8px;
+	border: 0px;
+	border-radius: 10px;
+}
+
+QSlider::handle:horizontal:hover 
+{
+	background-color: #3d4450;
+}
+
+
+QSlider::sub-page:horizontal:disabled 
+{
+	background-color: #bbb;
+	border-color: #999;
+}
+
+QSlider::add-page:horizontal:disabled 
+{
+	background-color: #eee;
+	border-color: #999;
+}
+
+QSlider::handle:horizontal:disabled 
+{
+	background-color: #eee;
+	border: 1px solid #aaa;
+	border-radius: 3px;
+}
+
+QToolTip
+{
+	background-color: rgb(10, 14, 19);
+	border: 1px solid #23262e;
+	border-radius: 2px;
+	color: white;
+	font: 14px;
+}</string>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="pageStep">
+       <number>10</number>
+      </property>
+      <property name="sliderPosition">
+       <number>50</number>
+      </property>
+      <property name="tracking">
+       <bool>true</bool>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_10">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>80</y>
+        <width>40</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>-1</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+        <underline>false</underline>
+        <strikeout>false</strikeout>
+        <stylestrategy>PreferDefault</stylestrategy>
+        <kerning>true</kerning>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel
+{
+	color: rgb(255, 255, 255);
+	font-size: 14px;
+}</string>
+      </property>
+      <property name="lineWidth">
+       <number>0</number>
+      </property>
+      <property name="text">
+       <string>-1.0</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="margin">
+       <number>0</number>
+      </property>
+      <property name="indent">
+       <number>0</number>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::NoTextInteraction</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_11">
+      <property name="geometry">
+       <rect>
+        <x>550</x>
+        <y>80</y>
+        <width>40</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>-1</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+        <underline>false</underline>
+        <strikeout>false</strikeout>
+        <stylestrategy>PreferDefault</stylestrategy>
+        <kerning>true</kerning>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel
+{
+	color: rgb(255, 255, 255);
+	font-size: 14px;
+}</string>
+      </property>
+      <property name="lineWidth">
+       <number>0</number>
+      </property>
+      <property name="text">
+       <string>1.0</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="margin">
+       <number>0</number>
+      </property>
+      <property name="indent">
+       <number>0</number>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::NoTextInteraction</set>
+      </property>
+     </widget>
+     <widget class="QSlider" name="m_rootOffsetSliderY">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>80</y>
+        <width>500</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Y axis offset: 0.0</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QSlider::groove:horizontal 
+{
+	background-color: transparent;
+	height: 4px;
+}
+
+QSlider::sub-page:horizontal 
+{
+	background-color: #0e141b;
+}
+
+QSlider::add-page:horizontal 
+{
+	background-color: #0e141b;
+}
+
+QSlider::handle:horizontal 
+{
+	background-color: #22242c;
+	width: 20px;
+	margin-top: -8px;
+	margin-bottom: -8px;
+	border: 0px;
+	border-radius: 10px;
+}
+
+QSlider::handle:horizontal:hover 
+{
+	background-color: #3d4450;
+}
+
+
+QSlider::sub-page:horizontal:disabled 
+{
+	background-color: #bbb;
+	border-color: #999;
+}
+
+QSlider::add-page:horizontal:disabled 
+{
+	background-color: #eee;
+	border-color: #999;
+}
+
+QSlider::handle:horizontal:disabled 
+{
+	background-color: #eee;
+	border: 1px solid #aaa;
+	border-radius: 3px;
+}
+
+QToolTip
+{
+	background-color: rgb(10, 14, 19);
+	border: 1px solid #23262e;
+	border-radius: 2px;
+	color: white;
+	font: 14px;
+}</string>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="pageStep">
+       <number>10</number>
+      </property>
+      <property name="sliderPosition">
+       <number>50</number>
+      </property>
+      <property name="tracking">
+       <bool>true</bool>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QSlider" name="m_rootOffsetSliderZ">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>110</y>
+        <width>500</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Z axis offset: 0.0</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QSlider::groove:horizontal 
+{
+	background-color: transparent;
+	height: 4px;
+}
+
+QSlider::sub-page:horizontal 
+{
+	background-color: #0e141b;
+}
+
+QSlider::add-page:horizontal 
+{
+	background-color: #0e141b;
+}
+
+QSlider::handle:horizontal 
+{
+	background-color: #22242c;
+	width: 20px;
+	margin-top: -8px;
+	margin-bottom: -8px;
+	border: 0px;
+	border-radius: 10px;
+}
+
+QSlider::handle:horizontal:hover 
+{
+	background-color: #3d4450;
+}
+
+
+QSlider::sub-page:horizontal:disabled 
+{
+	background-color: #bbb;
+	border-color: #999;
+}
+
+QSlider::add-page:horizontal:disabled 
+{
+	background-color: #eee;
+	border-color: #999;
+}
+
+QSlider::handle:horizontal:disabled 
+{
+	background-color: #eee;
+	border: 1px solid #aaa;
+	border-radius: 3px;
+}
+
+QToolTip
+{
+	background-color: rgb(10, 14, 19);
+	border: 1px solid #23262e;
+	border-radius: 2px;
+	color: white;
+	font: 14px;
+}</string>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="pageStep">
+       <number>10</number>
+      </property>
+      <property name="sliderPosition">
+       <number>50</number>
+      </property>
+      <property name="tracking">
+       <bool>true</bool>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="tab_3">
+    <attribute name="title">
+     <string>Overlays</string>
+    </attribute>
+    <widget class="QFrame" name="frame_4">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>600</width>
+       <height>40</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+       <underline>false</underline>
+       <strikeout>false</strikeout>
+       <kerning>true</kerning>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(10, 14, 19);
+border-radius: 10px;</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <widget class="QLabel" name="label_12">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>300</width>
+        <height>40</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>-1</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>If disabled, only grip and trigger inputs are available</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel
+{
+	color: rgb(255, 255, 255);
+	font-size: 16px;
+}
+QToolTip
+{
+	background-color:  rgb(14, 20, 27);
+	border: 1px solid #23262e;
+	border-radius: 2px;
+	color: white;
+	font: 14px;
+}</string>
+      </property>
+      <property name="lineWidth">
+       <number>0</number>
+      </property>
+      <property name="text">
+       <string>Show overlays</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="margin">
+       <number>0</number>
+      </property>
+      <property name="indent">
+       <number>0</number>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::NoTextInteraction</set>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="m_showOverlaysCheckBox">
+      <property name="geometry">
+       <rect>
+        <x>432</x>
+        <y>4</y>
+        <width>32</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QCheckBox::indicator
+{
+    background-color: #23262e;
+	border-radius: 4px;
+    width: 32px;
+    height: 32px;
+}
+
+QCheckBox::indicator:checked
+{
+    background-color: #ffffff;
+	border: 4px solid #3d4450;
+    width: 24px;
+   	height: 24px;
+}
+
+QCheckBox::indicator:unchecked:hover
+{
+	background-color: #3d4450;
+}</string>
+      </property>
+      <property name="text">
+       <string>CheckBox</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QFrame" name="frame_10">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>150</y>
+       <width>600</width>
+       <height>140</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+       <underline>false</underline>
+       <strikeout>false</strikeout>
+       <kerning>true</kerning>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(10, 14, 19);
+border-radius: 10px;</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <widget class="QLabel" name="label_13">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>600</width>
+        <height>40</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>-1</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Local position offset from controllers transformation</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel
+{
+	color: rgb(255, 255, 255);
+	font-size: 16px;
+}
+QToolTip
+{
+	background-color:  rgb(14, 20, 27);
+	border: 1px solid #23262e;
+	border-radius: 2px;
+	color: white;
+	font: 14px;
+}</string>
+      </property>
+      <property name="lineWidth">
+       <number>0</number>
+      </property>
+      <property name="text">
+       <string>Hand overlay offset</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="margin">
+       <number>0</number>
+      </property>
+      <property name="indent">
+       <number>0</number>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::NoTextInteraction</set>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="m_overlayOffsetResetButton">
+      <property name="geometry">
+       <rect>
+        <x>505</x>
+        <y>5</y>
+        <width>90</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>-1</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton
+{
+	background-color: #23262e;
+	color: #ffffff;
+	border-radius: 5px;
+	font-size: 16px;
+}
+
+QPushButton::disabled
+{
+	background-color: #23262e;
+	color: #ffffff;
+}
+
+QPushButton::hover
+{
+	background-color: #3d4450;
+}
+
+QPushButton::pressed
+{
+	background-color: #1e2126;
+	color: #ffffff;
+}</string>
+      </property>
+      <property name="text">
+       <string>Reset</string>
+      </property>
+     </widget>
+     <widget class="QFrame" name="frame_11">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>39</y>
+        <width>600</width>
+        <height>2</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(14, 20, 27);
+background-color: rgb(14, 20, 27);</string>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+     </widget>
+     <widget class="QSlider" name="m_overlayOffsetSliderX">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>50</y>
+        <width>500</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>X axis offset: 0.0</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QSlider::groove:horizontal 
+{
+	background-color: transparent;
+	height: 4px;
+}
+
+QSlider::sub-page:horizontal 
+{
+	background-color: #0e141b;
+}
+
+QSlider::add-page:horizontal 
+{
+	background-color: #0e141b;
+}
+
+QSlider::handle:horizontal 
+{
+	background-color: #22242c;
+	width: 20px;
+	margin-top: -8px;
+	margin-bottom: -8px;
+	border: 0px;
+	border-radius: 10px;
+}
+
+QSlider::handle:horizontal:hover 
+{
+	background-color: #3d4450;
+}
+
+
+QSlider::sub-page:horizontal:disabled 
+{
+	background-color: #bbb;
+	border-color: #999;
+}
+
+QSlider::add-page:horizontal:disabled 
+{
+	background-color: #eee;
+	border-color: #999;
+}
+
+QSlider::handle:horizontal:disabled 
+{
+	background-color: #eee;
+	border: 1px solid #aaa;
+	border-radius: 3px;
+}
+
+QToolTip
+{
+	background-color: rgb(10, 14, 19);
+	border: 1px solid #23262e;
+	border-radius: 2px;
+	color: white;
+	font: 14px;
+}</string>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="pageStep">
+       <number>10</number>
+      </property>
+      <property name="sliderPosition">
+       <number>50</number>
+      </property>
+      <property name="tracking">
+       <bool>true</bool>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_14">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>80</y>
+        <width>40</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>-1</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+        <underline>false</underline>
+        <strikeout>false</strikeout>
+        <stylestrategy>PreferDefault</stylestrategy>
+        <kerning>true</kerning>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel
+{
+	color: rgb(255, 255, 255);
+	font-size: 14px;
+}</string>
+      </property>
+      <property name="lineWidth">
+       <number>0</number>
+      </property>
+      <property name="text">
+       <string>-0.5</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="margin">
+       <number>0</number>
+      </property>
+      <property name="indent">
+       <number>0</number>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::NoTextInteraction</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_15">
+      <property name="geometry">
+       <rect>
+        <x>550</x>
+        <y>80</y>
+        <width>40</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>-1</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+        <underline>false</underline>
+        <strikeout>false</strikeout>
+        <stylestrategy>PreferDefault</stylestrategy>
+        <kerning>true</kerning>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel
+{
+	color: rgb(255, 255, 255);
+	font-size: 14px;
+}</string>
+      </property>
+      <property name="lineWidth">
+       <number>0</number>
+      </property>
+      <property name="text">
+       <string>0.5</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="margin">
+       <number>0</number>
+      </property>
+      <property name="indent">
+       <number>0</number>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::NoTextInteraction</set>
+      </property>
+     </widget>
+     <widget class="QSlider" name="m_overlayOffsetSliderY">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>80</y>
+        <width>500</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Y axis offset: 0.0</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QSlider::groove:horizontal 
+{
+	background-color: transparent;
+	height: 4px;
+}
+
+QSlider::sub-page:horizontal 
+{
+	background-color: #0e141b;
+}
+
+QSlider::add-page:horizontal 
+{
+	background-color: #0e141b;
+}
+
+QSlider::handle:horizontal 
+{
+	background-color: #22242c;
+	width: 20px;
+	margin-top: -8px;
+	margin-bottom: -8px;
+	border: 0px;
+	border-radius: 10px;
+}
+
+QSlider::handle:horizontal:hover 
+{
+	background-color: #3d4450;
+}
+
+
+QSlider::sub-page:horizontal:disabled 
+{
+	background-color: #bbb;
+	border-color: #999;
+}
+
+QSlider::add-page:horizontal:disabled 
+{
+	background-color: #eee;
+	border-color: #999;
+}
+
+QSlider::handle:horizontal:disabled 
+{
+	background-color: #eee;
+	border: 1px solid #aaa;
+	border-radius: 3px;
+}
+
+QToolTip
+{
+	background-color: rgb(10, 14, 19);
+	border: 1px solid #23262e;
+	border-radius: 2px;
+	color: white;
+	font: 14px;
+}</string>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="pageStep">
+       <number>10</number>
+      </property>
+      <property name="sliderPosition">
+       <number>50</number>
+      </property>
+      <property name="tracking">
+       <bool>true</bool>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QSlider" name="m_overlayOffsetSliderZ">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>110</y>
+        <width>500</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Z axis offset: 0.0</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QSlider::groove:horizontal 
+{
+	background-color: transparent;
+	height: 4px;
+}
+
+QSlider::sub-page:horizontal 
+{
+	background-color: #0e141b;
+}
+
+QSlider::add-page:horizontal 
+{
+	background-color: #0e141b;
+}
+
+QSlider::handle:horizontal 
+{
+	background-color: #22242c;
+	width: 20px;
+	margin-top: -8px;
+	margin-bottom: -8px;
+	border: 0px;
+	border-radius: 10px;
+}
+
+QSlider::handle:horizontal:hover 
+{
+	background-color: #3d4450;
+}
+
+
+QSlider::sub-page:horizontal:disabled 
+{
+	background-color: #bbb;
+	border-color: #999;
+}
+
+QSlider::add-page:horizontal:disabled 
+{
+	background-color: #eee;
+	border-color: #999;
+}
+
+QSlider::handle:horizontal:disabled 
+{
+	background-color: #eee;
+	border: 1px solid #aaa;
+	border-radius: 3px;
+}
+
+QToolTip
+{
+	background-color: rgb(10, 14, 19);
+	border: 1px solid #23262e;
+	border-radius: 2px;
+	color: white;
+	font: 14px;
+}</string>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="pageStep">
+       <number>10</number>
+      </property>
+      <property name="sliderPosition">
+       <number>50</number>
+      </property>
+      <property name="tracking">
+       <bool>true</bool>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QFrame" name="frame_12">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>300</y>
+       <width>600</width>
+       <height>140</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+       <underline>false</underline>
+       <strikeout>false</strikeout>
+       <kerning>true</kerning>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(10, 14, 19);
+border-radius: 10px;</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <widget class="QLabel" name="label_16">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>600</width>
+        <height>40</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>-1</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>Local rotation from controllers transformation</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel
+{
+	color: rgb(255, 255, 255);
+	font-size: 16px;
+}
+QToolTip
+{
+	background-color:  rgb(14, 20, 27);
+	border: 1px solid #23262e;
+	border-radius: 2px;
+	color: white;
+	font: 14px;
+}</string>
+      </property>
+      <property name="lineWidth">
+       <number>0</number>
+      </property>
+      <property name="text">
+       <string>Hand overlay rotation</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="margin">
+       <number>0</number>
+      </property>
+      <property name="indent">
+       <number>0</number>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::NoTextInteraction</set>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="m_overlayAngleResetButton">
+      <property name="geometry">
+       <rect>
+        <x>505</x>
+        <y>5</y>
+        <width>90</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>-1</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton
+{
+	background-color: #23262e;
+	color: #ffffff;
+	border-radius: 5px;
+	font-size: 16px;
+}
+
+QPushButton::disabled
+{
+	background-color: #23262e;
+	color: #ffffff;
+}
+
+QPushButton::hover
+{
+	background-color: #3d4450;
+}
+
+QPushButton::pressed
+{
+	background-color: #1e2126;
+	color: #ffffff;
+}</string>
+      </property>
+      <property name="text">
+       <string>Reset</string>
+      </property>
+     </widget>
+     <widget class="QFrame" name="frame_13">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>39</y>
+        <width>600</width>
+        <height>2</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(14, 20, 27);
+background-color: rgb(14, 20, 27);</string>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+     </widget>
+     <widget class="QSlider" name="m_overlayAngleSliderX">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>50</y>
+        <width>500</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>X axis angle: 0.0</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QSlider::groove:horizontal 
+{
+	background-color: transparent;
+	height: 4px;
+}
+
+QSlider::sub-page:horizontal 
+{
+	background-color: #0e141b;
+}
+
+QSlider::add-page:horizontal 
+{
+	background-color: #0e141b;
+}
+
+QSlider::handle:horizontal 
+{
+	background-color: #22242c;
+	width: 20px;
+	margin-top: -8px;
+	margin-bottom: -8px;
+	border: 0px;
+	border-radius: 10px;
+}
+
+QSlider::handle:horizontal:hover 
+{
+	background-color: #3d4450;
+}
+
+
+QSlider::sub-page:horizontal:disabled 
+{
+	background-color: #bbb;
+	border-color: #999;
+}
+
+QSlider::add-page:horizontal:disabled 
+{
+	background-color: #eee;
+	border-color: #999;
+}
+
+QSlider::handle:horizontal:disabled 
+{
+	background-color: #eee;
+	border: 1px solid #aaa;
+	border-radius: 3px;
+}
+
+QToolTip
+{
+	background-color: rgb(10, 14, 19);
+	border: 1px solid #23262e;
+	border-radius: 2px;
+	color: white;
+	font: 14px;
+}</string>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="pageStep">
+       <number>10</number>
+      </property>
+      <property name="sliderPosition">
+       <number>50</number>
+      </property>
+      <property name="tracking">
+       <bool>true</bool>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_17">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>80</y>
+        <width>40</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>-1</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+        <underline>false</underline>
+        <strikeout>false</strikeout>
+        <stylestrategy>PreferDefault</stylestrategy>
+        <kerning>true</kerning>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel
+{
+	color: rgb(255, 255, 255);
+	font-size: 14px;
+}</string>
+      </property>
+      <property name="lineWidth">
+       <number>0</number>
+      </property>
+      <property name="text">
+       <string>-180</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="margin">
+       <number>0</number>
+      </property>
+      <property name="indent">
+       <number>0</number>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::NoTextInteraction</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_18">
+      <property name="geometry">
+       <rect>
+        <x>550</x>
+        <y>80</y>
+        <width>40</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>-1</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+        <underline>false</underline>
+        <strikeout>false</strikeout>
+        <stylestrategy>PreferDefault</stylestrategy>
+        <kerning>true</kerning>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel
+{
+	color: rgb(255, 255, 255);
+	font-size: 14px;
+}</string>
+      </property>
+      <property name="lineWidth">
+       <number>0</number>
+      </property>
+      <property name="text">
+       <string>180</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="margin">
+       <number>0</number>
+      </property>
+      <property name="indent">
+       <number>0</number>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::NoTextInteraction</set>
+      </property>
+     </widget>
+     <widget class="QSlider" name="m_overlayAngleSliderY">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>80</y>
+        <width>500</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Y axis angle: 0.0</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QSlider::groove:horizontal 
+{
+	background-color: transparent;
+	height: 4px;
+}
+
+QSlider::sub-page:horizontal 
+{
+	background-color: #0e141b;
+}
+
+QSlider::add-page:horizontal 
+{
+	background-color: #0e141b;
+}
+
+QSlider::handle:horizontal 
+{
+	background-color: #22242c;
+	width: 20px;
+	margin-top: -8px;
+	margin-bottom: -8px;
+	border: 0px;
+	border-radius: 10px;
+}
+
+QSlider::handle:horizontal:hover 
+{
+	background-color: #3d4450;
+}
+
+
+QSlider::sub-page:horizontal:disabled 
+{
+	background-color: #bbb;
+	border-color: #999;
+}
+
+QSlider::add-page:horizontal:disabled 
+{
+	background-color: #eee;
+	border-color: #999;
+}
+
+QSlider::handle:horizontal:disabled 
+{
+	background-color: #eee;
+	border: 1px solid #aaa;
+	border-radius: 3px;
+}
+
+QToolTip
+{
+	background-color: rgb(10, 14, 19);
+	border: 1px solid #23262e;
+	border-radius: 2px;
+	color: white;
+	font: 14px;
+}</string>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="pageStep">
+       <number>10</number>
+      </property>
+      <property name="sliderPosition">
+       <number>50</number>
+      </property>
+      <property name="tracking">
+       <bool>true</bool>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QSlider" name="m_overlayAngleSliderZ">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>110</y>
+        <width>500</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Z axis angle: 0.0</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QSlider::groove:horizontal 
+{
+	background-color: transparent;
+	height: 4px;
+}
+
+QSlider::sub-page:horizontal 
+{
+	background-color: #0e141b;
+}
+
+QSlider::add-page:horizontal 
+{
+	background-color: #0e141b;
+}
+
+QSlider::handle:horizontal 
+{
+	background-color: #22242c;
+	width: 20px;
+	margin-top: -8px;
+	margin-bottom: -8px;
+	border: 0px;
+	border-radius: 10px;
+}
+
+QSlider::handle:horizontal:hover 
+{
+	background-color: #3d4450;
+}
+
+
+QSlider::sub-page:horizontal:disabled 
+{
+	background-color: #bbb;
+	border-color: #999;
+}
+
+QSlider::add-page:horizontal:disabled 
+{
+	background-color: #eee;
+	border-color: #999;
+}
+
+QSlider::handle:horizontal:disabled 
+{
+	background-color: #eee;
+	border: 1px solid #aaa;
+	border-radius: 3px;
+}
+
+QToolTip
+{
+	background-color: rgb(10, 14, 19);
+	border: 1px solid #23262e;
+	border-radius: 2px;
+	color: white;
+	font: 14px;
+}</string>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="pageStep">
+       <number>10</number>
+      </property>
+      <property name="sliderPosition">
+       <number>50</number>
+      </property>
+      <property name="tracking">
+       <bool>true</bool>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QFrame" name="frame_14">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>60</y>
+       <width>600</width>
+       <height>80</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+       <underline>false</underline>
+       <strikeout>false</strikeout>
+       <kerning>true</kerning>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(10, 14, 19);
+border-radius: 10px;</string>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <widget class="QLabel" name="label_22">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>600</width>
+        <height>40</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>-1</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel
+{
+	color: rgb(255, 255, 255);
+	font-size: 16px;
+}</string>
+      </property>
+      <property name="lineWidth">
+       <number>0</number>
+      </property>
+      <property name="text">
+       <string>Overlays size</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="margin">
+       <number>0</number>
+      </property>
+      <property name="indent">
+       <number>0</number>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::NoTextInteraction</set>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="m_overlaySizeResetButton">
+      <property name="geometry">
+       <rect>
+        <x>505</x>
+        <y>5</y>
+        <width>90</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>-1</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton
+{
+	background-color: #23262e;
+	color: #ffffff;
+	border-radius: 5px;
+	font-size: 16px;
+}
+
+QPushButton::disabled
+{
+	background-color: #23262e;
+	color: #ffffff;
+}
+
+QPushButton::hover
+{
+	background-color: #3d4450;
+}
+
+QPushButton::pressed
+{
+	background-color: #1e2126;
+	color: #ffffff;
+}</string>
+      </property>
+      <property name="text">
+       <string>Reset</string>
+      </property>
+     </widget>
+     <widget class="QFrame" name="frame_16">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>39</y>
+        <width>600</width>
+        <height>2</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: rgb(14, 20, 27);
+background-color: rgb(14, 20, 27);</string>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+     </widget>
+     <widget class="QSlider" name="m_overlaySizeSlider">
+      <property name="geometry">
+       <rect>
+        <x>50</x>
+        <y>50</y>
+        <width>500</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>X axis offset: 0.0</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QSlider::groove:horizontal 
+{
+	background-color: transparent;
+	height: 4px;
+}
+
+QSlider::sub-page:horizontal 
+{
+	background-color: #0e141b;
+}
+
+QSlider::add-page:horizontal 
+{
+	background-color: #0e141b;
+}
+
+QSlider::handle:horizontal 
+{
+	background-color: #22242c;
+	width: 20px;
+	margin-top: -8px;
+	margin-bottom: -8px;
+	border: 0px;
+	border-radius: 10px;
+}
+
+QSlider::handle:horizontal:hover 
+{
+	background-color: #3d4450;
+}
+
+
+QSlider::sub-page:horizontal:disabled 
+{
+	background-color: #bbb;
+	border-color: #999;
+}
+
+QSlider::add-page:horizontal:disabled 
+{
+	background-color: #eee;
+	border-color: #999;
+}
+
+QSlider::handle:horizontal:disabled 
+{
+	background-color: #eee;
+	border: 1px solid #aaa;
+	border-radius: 3px;
+}
+
+QToolTip
+{
+	background-color: rgb(10, 14, 19);
+	border: 1px solid #23262e;
+	border-radius: 2px;
+	color: white;
+	font: 14px;
+}</string>
+      </property>
+      <property name="maximum">
+       <number>100</number>
+      </property>
+      <property name="pageStep">
+       <number>10</number>
+      </property>
+      <property name="sliderPosition">
+       <number>50</number>
+      </property>
+      <property name="tracking">
+       <bool>true</bool>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_23">
+      <property name="geometry">
+       <rect>
+        <x>5</x>
+        <y>50</y>
+        <width>40</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>-1</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+        <underline>false</underline>
+        <strikeout>false</strikeout>
+        <stylestrategy>PreferDefault</stylestrategy>
+        <kerning>true</kerning>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel
+{
+	color: rgb(255, 255, 255);
+	font-size: 14px;
+}</string>
+      </property>
+      <property name="lineWidth">
+       <number>0</number>
+      </property>
+      <property name="text">
+       <string>0.1</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="margin">
+       <number>0</number>
+      </property>
+      <property name="indent">
+       <number>0</number>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::NoTextInteraction</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_24">
+      <property name="geometry">
+       <rect>
+        <x>550</x>
+        <y>50</y>
+        <width>40</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>-1</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+        <underline>false</underline>
+        <strikeout>false</strikeout>
+        <stylestrategy>PreferDefault</stylestrategy>
+        <kerning>true</kerning>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel
+{
+	color: rgb(255, 255, 255);
+	font-size: 14px;
+}</string>
+      </property>
+      <property name="lineWidth">
+       <number>0</number>
+      </property>
+      <property name="text">
+       <string>0.5</string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="margin">
+       <number>0</number>
+      </property>
+      <property name="indent">
+       <number>0</number>
+      </property>
+      <property name="textInteractionFlags">
+       <set>Qt::NoTextInteraction</set>
+      </property>
+     </widget>
+    </widget>
+   </widget>
+  </widget>
+  <zorder>tabWidget</zorder>
+  <zorder>m_saveButton</zorder>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="../Resources/leap_control.qrc"/>
+ </resources>
+ <connections/>
+</ui>

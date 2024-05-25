@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/leap_control">
+        <file>leap_control.ico</file>
+    </qresource>
+</RCC>
