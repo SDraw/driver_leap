@@ -14,16 +14,18 @@ Self-sustainable fork of SteamVR driver for Leap Motion controller with updated 
 ## Usage
 ### Settings
 Settings are configurated with Leap Control utility application that is launched upon SteamVR start.
-![](./.github/img_02.gif)
+<kbd>![](./.github/img_02.gif)</kbd>
 
 Alternatively, you can edit manually `resources/settings.xml` configuration file.  
-Settings are saved upon SteamVR exit, or manually with `Save` button at top-right corner.
+Settings are saved upon SteamVR exit, or manually with `Save` button at top-right corner.  
 Leap Control can be minimized in tray icon and shown again by double-clicking tray icon.
 
 ### Gestures
 List of hands gestures that correspond to controller original input:
 * **Grip:** bending of middle, ring and pinky fingers
 * **Trigger:** bending of index finger
+
+Other buttons/inputs are available only through hand overlays.
 
 ## Notes
 * If you see only green dots that represent tip of your index fingers, force `leap_control` to launch on dGPU through control panel of your GPU vendor.
