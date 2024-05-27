@@ -174,9 +174,9 @@ void COverlayManager::ProcessButtons(const std::vector<CButton*>& p_buttons, boo
 {
     for(auto l_button : p_buttons)
     {
-        std::string l_message;
         if(l_button->IsUpdated())
         {
+            std::string l_message;
             switch(l_button->GetType())
             {
                 case CButton::BT_Button:

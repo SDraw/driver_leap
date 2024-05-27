@@ -29,8 +29,8 @@ void vr_overlay::Mirror()
 
 void vr_overlay::Update(const glm::vec2 & p_pos, float p_pressure)
 {
-    auto l_size = ui.m_cursor->size();
-    ui.m_cursor->move(p_pos.x - l_size.width() / 2, p_pos.y - l_size.height() / 2);
+    auto l_cursorSize = ui.m_cursor->size();
+    ui.m_cursor->move(p_pos.x - l_cursorSize.width() / 2, p_pos.y - l_cursorSize.height() / 2);
 
     // Check for areas with axes
     m_onThumbstick = false;
@@ -50,7 +50,6 @@ void vr_overlay::Update(const glm::vec2 & p_pos, float p_pressure)
         l_pos.setY(l_pos.y() - l_size.height() / 2);
         ui.m_thumbstickCursor->move(l_pos);
     }
-
 
     l_rect.moveTo(ui.m_touchpadArea->pos());
     l_rect.setSize(ui.m_touchpadArea->size());

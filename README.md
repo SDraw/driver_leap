@@ -18,7 +18,7 @@ Settings are configurated with Leap Control utility application that is launched
 
 Alternatively, you can edit manually `resources/settings.xml` configuration file.  
 Settings are saved upon SteamVR exit, or manually with `Save` button at top-right corner.  
-Leap Control can be minimized in tray icon and shown again by double-clicking tray icon.
+Leap Control can be minimized to tray icon and shown again by double-clicking tray icon.
 
 ### Gestures
 List of hands gestures that correspond to controller original input:
@@ -29,5 +29,5 @@ Other buttons/inputs are available only through hand overlays.
 
 ## Notes
 * If you see only green dots that represent tip of your index fingers, force `leap_control` to launch on dGPU through control panel of your GPU vendor.
-* Coordinate system used for offsets is right handed.  
-![](https://learnopengl.com/img/getting-started/coordinate_systems_right_handed.png)
+* Coordinate system used for offsets and angles is right handed (as in OpenGL).  
+<kbd>![](https://learnopengl.com/img/getting-started/coordinate_systems_right_handed.png)</kbd>
