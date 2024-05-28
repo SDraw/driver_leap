@@ -169,13 +169,13 @@
     <QtUic Include="Ui\vr_overlay.ui" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\leap_control.aps" />
-  </ItemGroup>
-  <ItemGroup>
     <Image Include="Resources\leap_control.ico" />
   </ItemGroup>
   <ItemGroup>
     <QtRcc Include="Resources\leap_control.qrc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resources\leap_control.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

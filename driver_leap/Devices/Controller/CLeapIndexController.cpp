@@ -623,17 +623,17 @@ void CLeapIndexController::ProcessExternalInput(const char * p_message)
                         case StateName::ST_None:
                         {
                             m_buttons[IB_ThumbstickTouch]->SetState(false);
-                            m_buttons[IB_ThumbstickTouch]->SetState(false);
+                            m_buttons[IB_ThumbstickClick]->SetState(false);
                         } break;
                         case StateName::ST_Touched:
                         {
                             m_buttons[IB_ThumbstickTouch]->SetState(true);
-                            m_buttons[IB_ThumbstickTouch]->SetState(false);
+                            m_buttons[IB_ThumbstickClick]->SetState(false);
                         } break;
                         case StateName::ST_Clicked:
                         {
                             m_buttons[IB_ThumbstickTouch]->SetState(true);
-                            m_buttons[IB_ThumbstickTouch]->SetState(true);
+                            m_buttons[IB_ThumbstickClick]->SetState(true);
                         } break;
                     }
                 } break;
@@ -645,17 +645,17 @@ void CLeapIndexController::ProcessExternalInput(const char * p_message)
                         case StateName::ST_None:
                         {
                             m_buttons[IB_TrackpadTouch]->SetState(false);
-                            m_buttons[IB_TrackpadTouch]->SetState(false);
+                            m_buttons[IB_TrackpadForce]->SetValue(0.f);
                         } break;
                         case StateName::ST_Touched:
                         {
                             m_buttons[IB_TrackpadTouch]->SetState(true);
-                            m_buttons[IB_TrackpadTouch]->SetState(false);
+                            m_buttons[IB_TrackpadForce]->SetState(0.f);
                         } break;
                         case StateName::ST_Clicked:
                         {
                             m_buttons[IB_TrackpadTouch]->SetState(true);
-                            m_buttons[IB_TrackpadTouch]->SetState(true);
+                            m_buttons[IB_TrackpadForce]->SetState(1.f);
                         } break;
                     }
                 } break;

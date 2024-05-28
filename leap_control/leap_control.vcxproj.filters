@@ -135,9 +135,9 @@
     </QtUic>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\leap_control.aps">
+    <QtRcc Include="Resources\leap_control.qrc">
       <Filter>Resources</Filter>
-    </None>
+    </QtRcc>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\leap_control.ico">
@@ -145,8 +145,8 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <QtRcc Include="Resources\leap_control.qrc">
+    <ResourceCompile Include="Resources\leap_control.rc">
       <Filter>Resources</Filter>
-    </QtRcc>
+    </ResourceCompile>
   </ItemGroup>
 </Project>
