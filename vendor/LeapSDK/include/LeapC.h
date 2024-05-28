@@ -57,6 +57,18 @@ extern "C" {
  * Enumerations used by the LeapC functions and data structures.
  * \defgroup Structs Data Structures
  * Structs passed to and received from LeapC functions.
+ * \defgroup Hints
+ * Hints a client may pass to the server to influence hand tracking settings and behaviour.
+ *
+ * Some hints will represent an "Axis" (e.g. application type) where values are mutually exclusive.
+ * But other hints may not be explicitly on an axis (e.g. user is typing on a virtual keyboard and
+ * microgestures) but may not be actually compatible.
+ *
+ * Some hints values will only be supported when the hand tracking service has a Hyperion license.
+ * These will be indicated in the hint documentation below. (Requests for unlicensed hints will
+ * be ignored)
+ *
+ * Over time supported hints will be added and removed (unknown values will be ignored).
  */
 
 /** \ingroup Enum
@@ -285,7 +297,7 @@ typedef enum _eLeapConnectionConfig {
    * The client is aware of how to handle multiple devices through the API.
    * @since 4.1.0
    */
-  eLeapConnectionConfig_MultiDeviceAware = 0x00000001,  
+  eLeapConnectionConfig_MultiDeviceAware = 0x00000001,
 } eLeapConnectionConfig;
 LEAP_STATIC_ASSERT(sizeof(eLeapConnectionConfig) == 4, "Incorrect enum size");
 
@@ -302,7 +314,7 @@ typedef enum _eLeapTrackingOrigin {
    * @since 5.12.0
    */
   eLeapTrackingOrigin_DevicePrimaryCamera = 1
-  
+
 } eLeapTrackingOrigin;
 LEAP_STATIC_ASSERT(sizeof(eLeapTrackingOrigin) == 4, "Incorrect enum size");
 
@@ -323,20 +335,20 @@ typedef struct _LEAP_CONNECTION_CONFIG {
   /**
    * Specifies the server namespace to be used. Leave NULL to use the default namespace.
    *
-   * Passing valid json with a `tracking_server_ip` and `tracking_server_port` fields 
+   * Passing valid json with a `tracking_server_ip` and `tracking_server_port` fields
    * will change the server ip and port the connection will attempt to connect to.
-   * 
+   *
    */
   /** For public use. @since 5.12.0 */
   const char* server_namespace;
 
-  /** 
+  /**
    * The client can specify that hand tracking data should be relative to
    * the position and orientation of different locations on a device.
-   * 
+   *
    * The options are described in the eLeapTrackingOrigin enum.
-   * 
-   * @since 5.12.0 
+   *
+   * @since 5.12.0
    */
   eLeapTrackingOrigin tracking_origin;
 } LEAP_CONNECTION_CONFIG;
@@ -431,11 +443,11 @@ LEAP_EXPORT eLeapRS LEAP_CALL LeapCreateConnection(const LEAP_CONNECTION_CONFIG*
  * Optionally sets connection metadata prior to opening the connection to the service.
  *
  * This optional function has no functional effect.
- * 
+ *
  * If used, this must be called before a call to LeapOpenConnection.
- * 
+ *
  * Caller can safely free the memory after the function returns.
- * 
+ *
  * Note: Any null characters will be copied into the string if they are within the length defined.
  *
  * @param hConnection A handle to the connection object, created by LeapCreateConnection().
@@ -688,7 +700,7 @@ LEAP_EXPORT eLeapRS LEAP_CALL LeapSetPolicyFlagsEx(LEAP_CONNECTION hConnection, 
  * policies, reflecting any changes.
  *
  * The eLeapTrackingMode enumeration defines the tracking mode.
- *.
+ *
  * @param hConnection The connection handle created by LeapCreateConnection().
  * @param mode The enum value specifying the requested tracking mode
  * @returns The operation result code, a member of the eLeapRS enumeration.
@@ -772,6 +784,7 @@ LEAP_EXPORT eLeapRS LEAP_CALL LeapSetPause(LEAP_CONNECTION hConnection, bool pau
  * @param hConnection A handle to the connection object, created by LeapCreateConnection().
  * @param allocator A pointer to a structure containing the allocator functions to be called
  * as needed by the library.
+ * @returns The operation result code, a member of the eLeapRS enumeration.
  * @since 4.0.0
  */
 LEAP_EXPORT eLeapRS LEAP_CALL LeapSetAllocator(LEAP_CONNECTION hConnection, const LEAP_ALLOCATOR* allocator);
@@ -1010,7 +1023,7 @@ typedef enum _eLeapDevicePID {
 
   /** The Ultraleap Leap Motion Controller 2 hand tracking camera. @since 5.11.0 */
   eLeapDevicePID_LMC2             = 0x1206,
-  
+
   /** An invalid device type. Not currently in use. @since 3.1.3 */
   eLeapDevicePID_Invalid = 0xFFFFFFFF
 } eLeapDevicePID;
@@ -1206,14 +1219,14 @@ LEAP_EXPORT eLeapRS LEAP_CALL LeapGetDeviceCameraCount(LEAP_DEVICE hDevice, uint
  * LeapPollConnection() produces a message containing this event when a new
  * device is detected. You can use the handle provided by the device filed to
  * open a device so that you can access its properties.
- * 
+ *
  * This can be used when the connection is set to multi device mode to
  * interact with or enable multiple leap devices.
- * 
+ *
  * Note that while this struct will contain a device ID via the field
- * `device.id`, it is not itself a multi-connection event (so the 
+ * `device.id`, it is not itself a multi-connection event (so the
  * value of device_id in LEAP_CONNECTION_MESSAGE will be 0).
- * 
+ *
  * @since 3.0.0
  */
 typedef struct _LEAP_DEVICE_EVENT {
@@ -2032,7 +2045,7 @@ typedef struct _LEAP_IMU_EVENT {
 typedef struct _LEAP_NEW_DEVICE_TRANSFORM {
     /** Reserved for future use. @since 5.13.0 */
   uint32_t reserved;
-} LEAP_NEW_DEVICE_TRANSFORM; 
+} LEAP_NEW_DEVICE_TRANSFORM;
 
 
 /** \ingroup Structs
@@ -2054,6 +2067,54 @@ typedef struct _LEAP_IMAGE_EVENT {
   /** For internal use only. */
   LEAP_CALIBRATION calib;
 } LEAP_IMAGE_EVENT;
+
+/** \ingroup Structs
+ * Pose data for a fiducial marker in the same coordinate system as the hands.
+ * @since 6.0.0
+ */
+typedef struct _LEAP_FIDUCIAL_POSE_EVENT {
+  /**
+   * The ID that was read from the fiducial marker.
+   * @since 6.0.0
+   */
+  int id;
+
+  /**
+   * A pointer to the null-terminated tag family string.
+   * Not implemented.
+   */
+  const char* family;
+
+  /**
+   * The size of the tag measured in metres.
+   * Not implemented.
+   */
+  float size;
+
+  /**
+   * The timestamp for this event, in microseconds, referenced against LeapGetNow().
+   * @since 6.0.0
+   */
+  int64_t timestamp;
+
+  /**
+   * Error when calculating the pose of the fiducial marker.
+   * @since 6.0.0
+   */
+  float estimated_error;
+
+  /**
+   * Position of the fiducial marker in world space.
+   * @since 6.0.0
+   */
+  LEAP_VECTOR translation;
+
+  /**
+   * Rotation in world space.
+   * @since 6.0.0
+   */
+  LEAP_QUATERNION rotation;
+} LEAP_FIDUCIAL_POSE_EVENT;
 
 /** \ingroup Enum
  * The types of event messages resulting from calling LeapPollConnection().
@@ -2232,7 +2293,76 @@ typedef enum _eLeapEventType {
    *
    * @since 5.13.0
    */
-  eLeapEventType_NewDeviceTransform
+  eLeapEventType_NewDeviceTransform,
+
+  /**
+   * Support for Fiducial Marker Tracking
+   *
+   * This experimental feature enables the detection of fiducial markers
+   * (AprilTags) and provides the pose data for markers alongside hands. There
+   * are no limits on the number of markers which can be tracked, however,
+   * the more tags being tracked the system performance will be reduced.
+   *
+   * Guidelines for usage:
+   *
+   * 1. Enable fiducial marker tracking by adding a "fiducial_tracker"
+   *    section to the "hand_tracker_config.json" file:
+   *
+   *    ```
+   *    "fiducial_tracker": {
+   *      "family": "TagStandard41h12", // AprilTag family to track.
+   *      "size": 0.05, // Width of the tag in meters, e.g. 50mm
+   *      "frequency": 1 // Frequency of tracking (1 = every frame)
+   *    }
+   *    ```
+   *
+   * 2. To maximise the tag tracking range, enable the "full_res_fiducials"
+   *    setting outside the "fiducial_tracker" block:
+   *
+   *    "full_res_fiducials": true
+   *
+   *    With a marker width of 50mm (0.05m), we expect markers to perform well at
+   *    a distance of up to 500mm using the Leap2 camera and ‘full_res_fiducials’.
+   *
+   * 3. When a fiducial marker is detected, a notification event is triggered.
+   *    The pose data for the detected marker is stored in the "fiducial_pose_event"
+   *    union member.
+   *
+   * Note:
+   * - Fiducial marker tracking can only be enabled through the configuration file.
+   * - The "family" parameter specifies the AprilTag family to track (e.g.,
+   *   TagStandard41h12).
+   * - The "size" parameter defines the width of the tag in meters.
+   * - The "frequency" parameter determines how often the tracking should occur
+   *   (1 = every frame).
+   *
+   * Use Cases:
+   * - Object placement and interaction in AR/VR environments
+   * - Spatial mapping and navigation in training simulations
+   * - Interactive training scenarios and feedback
+   *
+   * Generating Markers:
+   *
+   * AprilTags can be generated using various online tools or libraries. One
+   * popular option is the AprilTag generation tool
+   * (https://github.com/AprilRobotics/apriltag-generation) which provides a web
+   * interface for creating and customising AprilTag markers.
+   *
+   * The TagStandard41h12 and TagStandard36h11 libraries have been tested extensively,
+   * however, it may work with others. Downloaded or printed markers can then be
+   * placed in the physical environment for tracking.
+   *
+   * Optimising Marker Performance:
+   * 1. Maximise the visible contrast of markers ideally printing onto non-reflective,
+   *    rigid, surfaces.
+   * 2. Position markers within the optimal tracking range specified by the marker
+   *    size. Larger markers will achieve longer range.
+   * 3. Experiment with different marker sizes, tracking frequency, and families
+   *    to find the best balance between range and accuracy.
+   *
+   * @since 6.0.0
+   */
+  eLeapEventType_Fiducial
 
 } eLeapEventType;
 LEAP_STATIC_ASSERT(sizeof(eLeapEventType) == 4, "Incorrect enum size");
@@ -2296,6 +2426,8 @@ typedef struct _LEAP_CONNECTION_MESSAGE {
     const LEAP_IMU_EVENT* imu_event;
     /** A notification message. @since 5.13.0 */
     const LEAP_NEW_DEVICE_TRANSFORM* new_device_transform_event;
+    /** A fiducial pose message. @since 6.0.0 */
+    const LEAP_FIDUCIAL_POSE_EVENT* fiducial_pose_event;
   };
 
   /** A unique ID for the attached device that sent this message. A value of
@@ -2587,7 +2719,7 @@ LEAP_EXPORT LEAP_VECTOR LEAP_CALL LeapPixelToRectilinear(LEAP_CONNECTION hConnec
 /** \ingroup Functions
  * This converts the camera perspective to an index and returns the result of LeapPixelToRectilinearByIndexEx()
  * @sa LeapPixelToRectilinearByIndexEx for additional information
- * 
+ *
  * @param hConnection The connection handle created by LeapCreateConnection().
  * @param hDevice A device handle returned by LeapOpenDevice().
  * @param camera The camera to use, a member of the eLeapPerspectiveType enumeration
@@ -2597,7 +2729,7 @@ LEAP_EXPORT LEAP_VECTOR LEAP_CALL LeapPixelToRectilinear(LEAP_CONNECTION hConnec
  * *) You do not have a valid connection or device handle.
  * *) You passed an invalid camera enum.
  * *) You have never received any images from LeapC as detailed above.
- * 
+ *
  * @since 5.4.0
  */
 LEAP_EXPORT LEAP_VECTOR LEAP_CALL LeapPixelToRectilinearEx(LEAP_CONNECTION hConnection, LEAP_DEVICE hDevice, eLeapPerspectiveType camera, LEAP_VECTOR pixel);
@@ -2605,7 +2737,7 @@ LEAP_EXPORT LEAP_VECTOR LEAP_CALL LeapPixelToRectilinearEx(LEAP_CONNECTION hConn
 /** \ingroup Functions
  * This finds the default device and returns the result of LeapPixelToRectilinearByIndexEx()
  * @sa LeapPixelToRectilinearByIndexEx for additional information
- * 
+ *
  * @param hConnection The connection handle created by LeapCreateConnection().
  * @param cameraIndex The index of the camera to use
  * @param pixel A Vector containing the position of a pixel in the image.
@@ -2614,7 +2746,7 @@ LEAP_EXPORT LEAP_VECTOR LEAP_CALL LeapPixelToRectilinearEx(LEAP_CONNECTION hConn
  * *) You do not have a valid connection or device handle.
  * *) You passed an invalid camera index.
  * *) You have never received any images from LeapC as detailed above.
- * 
+ *
  * @since 5.8.0
  */
 LEAP_EXPORT LEAP_VECTOR LEAP_CALL LeapPixelToRectilinearByIndex(LEAP_CONNECTION hConnection, uint8_t cameraIndex, LEAP_VECTOR pixel);
@@ -2632,11 +2764,11 @@ LEAP_EXPORT LEAP_VECTOR LEAP_CALL LeapPixelToRectilinearByIndex(LEAP_CONNECTION 
  * where the x-axis parallels the longer (typically horizontal) dimension and
  * the y-axis parallels the shorter (vertical) dimension. The camera coordinate
  * system does not correlate to the 3D Ultraleap coordinate system.
- * 
+ *
  * For this function to work, you must have fetched at least 1 image from the LeapC polling event loop,
  * i.e. call LeapSetPolicyFlags(eLeapPolicyFlag_Images, 0), and received one LEAP_IMAGE_EVENT type
  * for your given device handle.
- * 
+ *
  * @param hConnection The connection handle created by LeapCreateConnection().
  * @param hDevice A device handle returned by LeapOpenDevice().
  * @param cameraIndex The index of the camera to use
@@ -2646,7 +2778,7 @@ LEAP_EXPORT LEAP_VECTOR LEAP_CALL LeapPixelToRectilinearByIndex(LEAP_CONNECTION 
  * *) You do not have a valid connection or device handle.
  * *) You passed an invalid camera index.
  * *) You have never received any images from LeapC as detailed above.
- * 
+ *
  * @since 5.8.0
  */
 LEAP_EXPORT LEAP_VECTOR LEAP_CALL LeapPixelToRectilinearByIndexEx(LEAP_CONNECTION hConnection, LEAP_DEVICE hDevice, uint8_t cameraIndex, LEAP_VECTOR pixel);
@@ -2665,7 +2797,7 @@ LEAP_EXPORT LEAP_VECTOR LEAP_CALL LeapPixelToRectilinearByIndexEx(LEAP_CONNECTIO
  * *) You do not have a valid connection or device handle.
  * *) You passed an invalid camera enum.
  * *) You have never received any images from LeapC as detailed above.
- * 
+ *
  * @since 3.1.3
  */
 LEAP_EXPORT LEAP_VECTOR LEAP_CALL LeapRectilinearToPixel(LEAP_CONNECTION hConnection, eLeapPerspectiveType camera, LEAP_VECTOR rectilinear);
@@ -2683,7 +2815,7 @@ LEAP_EXPORT LEAP_VECTOR LEAP_CALL LeapRectilinearToPixel(LEAP_CONNECTION hConnec
  * *) You do not have a valid connection or device handle.
  * *) You passed an invalid camera enum.
  * *) You have never received any images from LeapC as detailed above.
- * 
+ *
  * @since 5.4.0
  */
 LEAP_EXPORT LEAP_VECTOR LEAP_CALL LeapRectilinearToPixelEx(LEAP_CONNECTION hConnection, LEAP_DEVICE hDevice, eLeapPerspectiveType camera, LEAP_VECTOR rectilinear);
@@ -2700,7 +2832,7 @@ LEAP_EXPORT LEAP_VECTOR LEAP_CALL LeapRectilinearToPixelEx(LEAP_CONNECTION hConn
  * *) You do not have a valid connection or device handle.
  * *) You passed an invalid camera index.
  * *) You have never received any images from LeapC as detailed above.
- * 
+ *
  * @since 5.8.0
  */
 LEAP_EXPORT LEAP_VECTOR LEAP_CALL LeapRectilinearToPixelByIndex(LEAP_CONNECTION hConnection, uint8_t cameraIndex, LEAP_VECTOR rectilinear);
@@ -2722,7 +2854,7 @@ LEAP_EXPORT LEAP_VECTOR LEAP_CALL LeapRectilinearToPixelByIndex(LEAP_CONNECTION 
  *
  * ``LeapRectilinearToPixelByIndex()`` is typically not fast enough for realtime distortion correction.
  * For better performance, use a shader program executed on a GPU.
- * 
+ *
  * For this function to work, you must have fetched at least 1 image from the LeapC polling event loop,
  * i.e. call LeapSetPolicyFlags(eLeapPolicyFlag_Images, 0), and received one LEAP_IMAGE_EVENT type
  * for your given device handle.
@@ -2736,7 +2868,7 @@ LEAP_EXPORT LEAP_VECTOR LEAP_CALL LeapRectilinearToPixelByIndex(LEAP_CONNECTION 
  * *) You do not have a valid connection or device handle.
  * *) You passed an invalid camera index.
  * *) You have never received any images from LeapC as detailed above.
- * 
+ *
  * @since 5.8.0
  */
 LEAP_EXPORT LEAP_VECTOR LEAP_CALL LeapRectilinearToPixelByIndexEx(LEAP_CONNECTION hConnection, LEAP_DEVICE hDevice, uint8_t cameraIndex, LEAP_VECTOR rectilinear);
@@ -3189,48 +3321,57 @@ LEAP_EXPORT eLeapRS LEAP_CALL LeapInterpolateHeadPose(LEAP_CONNECTION hConnectio
 LEAP_EXPORT eLeapRS LEAP_CALL LeapInterpolateHeadPoseEx(LEAP_CONNECTION hConnection, LEAP_DEVICE hDevice, int64_t timestamp, LEAP_HEAD_POSE_EVENT* pEvent);
 LEAP_EXPORT eLeapRS LEAP_CALL LeapInterpolateEyePositions(LEAP_CONNECTION hConnection, int64_t timestamp, LEAP_EYE_EVENT* pEvent);
 
-/**
- * Public Hints
+/** \ingroup Hints
+ * Requested using "hand_on_object".
+ * 
+ * Hand tracking is being used while holding objects (Hyperion license required)
  *
- * Hints a client may pass to the server to influence hand tracking settings and behaviour.
+ * Optimises hand tracking where hands are occluded by objects being held.
+ * Achieves higher performance in these situations at the cost of more general
+ * tracking performance e.g. Mixed and Augmented Reality.
  *
- * Some hints will represent an "Axis" (e.g. application type) where values are mutually exclusive.
- * But other hints may not be explicitly on an axis (e.g. user is typing on a virtual keyboard and
- * microgestures) but may not be actually compatible.
- *
- * Some hints values will only be supported when the hand tracking service has a Gemini Pro license.
- * These will be indicated in the hint documentation below. (Requests for unlicensed hints will
- * be ignored)
- *
- * Over time supported hints will be added and removed (unknown values will be ignored).
- */
-
-/**
- * Hint: Hand tracking is being used while holding objects (Gemini Pro license required)
- *
- * To confirm this hint is available the application can check for the presence of the
- * "GeminiPro" feature flag.
+ * To confirm this hint is available the application can check for the presence of the Hyperion
+ * "Hyperion" feature flag.
  */
 #define LEAP_HINT_HAND_ON_OBJECT "hand_on_object"
 
-/**
- * Hint: Tracked hands are expected to be moving quickly.
+/** \ingroup Hints
+ * Requested using "microgestures".
+ * 
+ * Hand tracking is for being used for Microgestures (Hyperion license required)
+ *
+ * Optimises the hand tracking for small, finer movements for user navigation and control.
+ *
+ * To confirm this hint is available the application can check for the presence of the
+ * "Hyperion" feature flag.
+ */
+#define LEAP_HINT_MICROGESTURES "microgestures"
+
+/** \ingroup Hints
+ * Requested using "fast_hand_motion".
+ * 
+ * Tracked hands are expected to be moving quickly.
  *
  * The system will optimise for hands that move quickly at the cost of using more resources (CPU,
  * camera bandwidth, memory and power)
  */
 #define LEAP_HINT_FAST_HAND_MOTION "fast_hand_motion"
 
-/**
- * Hint: Hand position accuracy is very important.
+/** \ingroup Hints
+ * Requested using "high_hand_fidelity".
+ * 
+ * Hand position accuracy is very important.
  *
- * The system will optimise for accurate hand position at the cost of using more resources (CPU,
- * camera bandwidth, memory and power)
+ * Increases the fidelity and responsiveness of hand tracking at the expense of compute
+ * resources (CPU, camera bandwidth, memory and power). Attempts to match available system resources
+ * will be made, however, callers should take steps to maintain sufficient application resources.
  */
 #define LEAP_HINT_HIGH_HAND_FIDELITY "high_hand_fidelity"
 
-/**
- * Hint: Minimising resource usage (CPU, camera bandwidth, memory and power) is very important.
+/** \ingroup Hints
+ * Requested using "low_resource_usage".
+ * 
+ * Minimising resource usage (CPU, camera bandwidth, memory and power) is very important.
  *
  * The system will minimise resource usage at the cost of hand tracking quality. Using this
  * hint to avoid OS throttling on a resource-constrained system might produce the best hand
@@ -3238,8 +3379,10 @@ LEAP_EXPORT eLeapRS LEAP_CALL LeapInterpolateEyePositions(LEAP_CONNECTION hConne
  */
 #define LEAP_HINT_LOW_RESOURCE_USAGE "low_resource_usage"
 
-/**
- * Hint: Hand tracking is running in an environment with a high level of illumination,
+/** \ingroup Hints
+ * Requested using "high_background_illumination".
+ * 
+ * Hand tracking is running in an environment with a high level of illumination,
  * for an IR camera system it's only the IR illumination the is relevant.
  *
  * The system will optimise to track hands more reliably in these challenging conditions
@@ -3247,25 +3390,52 @@ LEAP_EXPORT eLeapRS LEAP_CALL LeapInterpolateEyePositions(LEAP_CONNECTION hConne
  */
 #define LEAP_HINT_HIGH_BACKGROUND_ILLUMINATION "high_background_illumination"
 
-/**
+/** \ingroup Hints
+ * Requested using "balanced".
+ * 
+ * Default tracking where there is no preference set. This mode is enabled on service restart.
+ */
+#define LEAP_HINT_BALANCED "balanced"
+
+/** \ingroup Hints
+ * Requested using "user_input".
+ * 
+ * Optimises hand predictions for user input into menus, keyboards or navigation panels.
+ */
+#define LEAP_HINT_USER_INPUT "user_input"
+
+/** \ingroup Hints
+ * Requested using "app_immersive".
+ * 
  * Application Type Axis: Hand tracking is being used by an immersive application, i.e. VR
  */
 #define LEAP_HINT_APP_IMMERSIVE "app_immersive"
 
-/**
+/** \ingroup Hints
+ * Requested using "app_passthrough".
+ * 
  * Application Type Axis: Hand tracking is being used by an application using passthrough, i.e. AR
  */
 #define LEAP_HINT_APP_PASSTHROUGH "app_passthrough"
 
-/**
+/** \ingroup Hints
+ * Requested using "ultra_performance_mode".
+ * 
+ * Hint: Increases the fidelity and responsiveness of hand tracking at the expense of compute resources.
+ *
+ * Attempts to match available system resources may be made
+ * However, callers should take steps to maintain sufficient application resources"
+ */
+#define LEAP_HINT_ULTRA_PERFORMANCE_MODE "ultra_performance_mode"
+
+/** \ingroup Functions
  * Sets a number of hints describing how the client and device will be using hand tracking. These
  * hints will be used by the server to select an appropiate form of hand tracking for the client.
  * The service will make its best guess at what to do when interpreting all the hints from all
  * connected clients. It makes no guarantee to the client that it will follow any particular
  * behaviour.
  *
- * The trait string may contain either public strings (defined above) or custom hints specific for a
- * given customer.
+ * The trait string may contain either public strings (defined above) or custom hints.
  *
  * The function is called on a per device basis, so different hints can be applied to different
  * cameras. Calling this function will override any and all previous hints from this device for this
@@ -3281,21 +3451,60 @@ LEAP_EXPORT eLeapRS LEAP_CALL LeapInterpolateEyePositions(LEAP_CONNECTION hConne
  *
  * @param hConnection The connection handle created by LeapCreateConnection().
  * @param hDevice A device handle returned by LeapOpenDevice().
- * @param hints An array of null terminated strings, one string for each hints, the array is
+ * @param hints An array of null terminated strings, one string for each hint, the array is
  * terminated with a null pointer.
  */
 LEAP_EXPORT eLeapRS LEAP_CALL
 LeapSetDeviceHints(LEAP_CONNECTION hConnection, LEAP_DEVICE hDevice, const char* hints[]);
 
-/**
+/** \ingroup Functions
  * Check if a specific license feature flag is enabled in the hand tracking service.
  *
  * @param hConnection The connection handle created by LeapCreateConnection().
- * @param flag A feature flag, pointer to a null terminated string. For example: "GeminiPro"
+ * @param flag A feature flag, pointer to a null terminated string. For example: "Hyperion"
  * @param flag_enabled An output parameter indicating if the feature flag is enabled.
+ * @returns The operation result code, a member of the eLeapRS enumeration.
  */
 LEAP_EXPORT eLeapRS LEAP_CALL
 LeapCheckLicenseFlag(LEAP_CONNECTION hConnection, const char* flag, bool* flag_enabled);
+
+/** \ingroup Functions
+ * Set the hand tracking classifier thresholds. This function is only supported
+ * when the hand tracking service has a license with the "SetClassifierThresholds" flag.
+ *
+ * eLeapRS_InvalidArgument will be returned if either the acquireConfidence or releaseConfidence parameters
+ * are not in the range: 0 <= t <= 1.
+ *
+ * eLeapRS_Unsupported will be returned if no license with the "SetClassifierThresholds" flag is found.
+ *
+ * @param hConnection The connection handle created by LeapCreateConnection().
+ * @param acquireConfidence The hand tracking model's acquire threshold value.
+ * @param releaseConfidence The hand tracking model's release threshold value.
+ * @return The operation result code, a member of the eLeapRS enumeration.
+ */
+LEAP_EXPORT eLeapRS LEAP_CALL
+LeapSetClassifierThresholds(LEAP_CONNECTION hConnection, float acquireConfidence, float releaseConfidence);
+
+/** \ingroup Functions
+ * Set the hand tracking classifier thresholds for a device. This function is only supported
+ * when the hand tracking service has a license with the "SetClassifierThresholds" flag.
+ *
+ * eLeapRS_InvalidArgument will be returned if either the acquireConfidence or releaseConfidence parameters
+ * are not in the range: 0 <= t <= 1.
+ *
+ * eLeapRS_Unsupported will be returned if no license with the "SetClassifierThresholds" flag is found.
+ *
+ * @param hConnection The connection handle created by LeapCreateConnection().
+ * @param hDevice A device handle returned by LeapOpenDevice().
+ * @param acquireConfidence The hand tracking model's acquire threshold value.
+ * @param releaseConfidence The hand tracking model's release threshold value.
+ * @return The operation result code, a member of the eLeapRS enumeration.
+ */
+LEAP_EXPORT eLeapRS LEAP_CALL LeapSetClassifierThresholdsEx(
+  LEAP_CONNECTION hConnection,
+  LEAP_DEVICE hDevice,
+  float acquireConfidence,
+  float releaseConfidence);
 
 #ifdef __cplusplus
 }
