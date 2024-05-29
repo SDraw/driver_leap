@@ -18,6 +18,9 @@ enum ButtonName
 const glm::mat4 g_identityMat4(1.f);
 const glm::vec2 g_zeroVec2(0.f);
 
+const float g_touchPressure = 0.5f;
+const float g_clickPressure = 0.75f;
+
 CHandOverlay::CHandOverlay(bool p_left)
 {
     m_renderTarget = nullptr;
@@ -150,6 +153,16 @@ void CHandOverlay::ResetInput()
     }
 }
 
+const std::vector<CButton*>& CHandOverlay::GetButtons() const
+{
+    return m_buttons;
+}
+
+float CHandOverlay::GetPressure() const
+{
+    return m_pressure;
+}
+
 void CHandOverlay::Update(const glm::vec3 &p_cursor)
 {
     if(m_overlayHandle != vr::k_ulOverlayHandleInvalid)
@@ -199,23 +212,23 @@ void CHandOverlay::Update(const glm::vec3 &p_cursor)
 
         // Buttons
         if(m_ui->IsOnButtonA())
-            m_buttons[ButtonName::BN_A]->SetState((m_pressure > 0.75f) ? CButton::BS_Clicked : ((m_pressure > 0.5f) ? CButton::BS_Touched : CButton::BS_None));
+            m_buttons[ButtonName::BN_A]->SetState((m_pressure > g_clickPressure) ? CButton::BS_Clicked : ((m_pressure > g_touchPressure) ? CButton::BS_Touched : CButton::BS_None));
         else
             m_buttons[ButtonName::BN_A]->SetState(CButton::BS_None);
 
         if(m_ui->IsOnButtonB())
-            m_buttons[ButtonName::BN_B]->SetState((m_pressure > 0.75f) ? CButton::BS_Clicked : ((m_pressure > 0.5f) ? CButton::BS_Touched : CButton::BS_None));
+            m_buttons[ButtonName::BN_B]->SetState((m_pressure > g_clickPressure) ? CButton::BS_Clicked : ((m_pressure > g_touchPressure) ? CButton::BS_Touched : CButton::BS_None));
         else
             m_buttons[ButtonName::BN_B]->SetState(CButton::BS_None);
 
         if(m_ui->IsOnButtonSys())
-            m_buttons[ButtonName::BN_System]->SetState((m_pressure > 0.75f) ? CButton::BS_Clicked : ((m_pressure > 0.5f) ? CButton::BS_Touched : CButton::BS_None));
+            m_buttons[ButtonName::BN_System]->SetState((m_pressure > g_clickPressure) ? CButton::BS_Clicked : ((m_pressure > g_touchPressure) ? CButton::BS_Touched : CButton::BS_None));
         else
             m_buttons[ButtonName::BN_System]->SetState(CButton::BS_None);
 
-        if(m_ui->IsOnThumbstick() && (m_pressure > 0.5f))
+        if(m_ui->IsOnThumbstick() && (m_pressure > g_touchPressure))
         {
-            m_buttons[ButtonName::BN_Thumbstick]->SetState((m_pressure > 0.75f) ? CButton::BS_Clicked : CButton::BS_Touched);
+            m_buttons[ButtonName::BN_Thumbstick]->SetState((m_pressure > g_clickPressure) ? CButton::BS_Clicked : CButton::BS_Touched);
             m_buttons[ButtonName::BN_Thumbstick]->SetAxis(m_ui->GetThumbstickAxis());
         }
         else
@@ -224,9 +237,9 @@ void CHandOverlay::Update(const glm::vec3 &p_cursor)
             m_buttons[ButtonName::BN_Thumbstick]->SetAxis(g_zeroVec2);
         }
 
-        if(m_ui->IsOnTouchpad() && (m_pressure > 0.5f))
+        if(m_ui->IsOnTouchpad() && (m_pressure > g_touchPressure))
         {
-            m_buttons[ButtonName::BN_Touchpad]->SetState((m_pressure > 0.75f) ? CButton::BS_Clicked : CButton::BS_Touched);
+            m_buttons[ButtonName::BN_Touchpad]->SetState((m_pressure > g_clickPressure) ? CButton::BS_Clicked : CButton::BS_Touched);
             m_buttons[ButtonName::BN_Touchpad]->SetAxis(m_ui->GetTouchpadAxis());
         }
         else
@@ -235,11 +248,6 @@ void CHandOverlay::Update(const glm::vec3 &p_cursor)
             m_buttons[ButtonName::BN_Touchpad]->SetAxis(g_zeroVec2);
         }
     }
-}
-
-const std::vector<CButton*>& CHandOverlay::GetButtons() const
-{
-    return m_buttons;
 }
 
 void CHandOverlay::ResetInteraction()

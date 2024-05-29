@@ -13,8 +13,6 @@ const glm::vec4 g_pointVec4(0.f, 0.f, 0.f, 1.f);
 
 COverlayManager* COverlayManager::ms_instance = nullptr;
 
-
-
 COverlayManager* COverlayManager::GetInstance()
 {
     if(!ms_instance)
@@ -121,7 +119,7 @@ void COverlayManager::Update()
         m_leftHandOverlay->SetRotation(l_rot);
         m_leftHandOverlay->Update(CLeapManager::GetInstance()->GetRightTipPosition());
 
-        ProcessButtons(m_leftHandOverlay->GetButtons(), true);
+        ProcessButtons(m_leftHandOverlay->GetButtons(), m_leftHandOverlay->GetPressure(), true);
     }
     if(m_rightHandOverlay)
     {
@@ -142,7 +140,7 @@ void COverlayManager::Update()
         m_rightHandOverlay->SetRotation(l_rot);
         m_rightHandOverlay->Update(CLeapManager::GetInstance()->GetLeftTipPosition());
 
-        ProcessButtons(m_rightHandOverlay->GetButtons(), false);
+        ProcessButtons(m_rightHandOverlay->GetButtons(), m_leftHandOverlay->GetPressure(), false);
     }
 }
 
@@ -170,7 +168,7 @@ void COverlayManager::SetOverlaysActive(bool p_state)
     }
 }
 
-void COverlayManager::ProcessButtons(const std::vector<CButton*>& p_buttons, bool p_left) const
+void COverlayManager::ProcessButtons(const std::vector<CButton*>& p_buttons, float p_pressure, bool p_left) const
 {
     for(auto l_button : p_buttons)
     {
@@ -209,6 +207,8 @@ void COverlayManager::ProcessButtons(const std::vector<CButton*>& p_buttons, boo
                 l_message.append(std::to_string(l_axis.x));
                 l_message.push_back(' ');
                 l_message.append(std::to_string(l_axis.y));
+                l_message.push_back(' ');
+                l_message.append(std::to_string(p_pressure));
             }
 
             if(p_left)

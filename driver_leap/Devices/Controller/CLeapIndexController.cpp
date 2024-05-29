@@ -537,7 +537,8 @@ void CLeapIndexController::FixMetacarpalBone(glm::quat & p_rot) const
 void CLeapIndexController::ProcessExternalInput(const char * p_message)
 {
     // Message format for buttons: button {name} {state}
-    // Message format for axes: axis {name} {state} {x} {y}
+    // Message format for axes: axis {name} {state} {x} {y} {pressure}
+    // This method is ugly
     std::vector<std::string> l_chunks;
     SplitString(p_message, ' ', l_chunks);
 
@@ -548,136 +549,148 @@ void CLeapIndexController::ProcessExternalInput(const char * p_message)
         size_t l_state = 0U;
         if(ReadEnumVector(l_chunks[0U], g_typeNames, l_type) && ReadEnumVector(l_chunks[1U], g_inputNames, l_input) && ReadEnumVector(l_chunks[2U], g_stateNames, l_state))
         {
-            switch(l_input)
+            switch(l_type)
             {
-                case InputName::IN_A:
-                {
-                    switch(l_state)
-                    {
-                        case StateName::ST_None:
-                        {
-                            m_buttons[IB_ATouch]->SetState(false);
-                            m_buttons[IB_AClick]->SetState(false);
-                        } break;
-                        case StateName::ST_Touched:
-                        {
-                            m_buttons[IB_ATouch]->SetState(true);
-                            m_buttons[IB_AClick]->SetState(false);
-                        } break;
-                        case StateName::ST_Clicked:
-                        {
-                            m_buttons[IB_ATouch]->SetState(true);
-                            m_buttons[IB_AClick]->SetState(true);
-                        } break;
-                    }
-                } break;
-
-                case InputName::IN_B:
-                {
-                    switch(l_state)
-                    {
-                        case StateName::ST_None:
-                        {
-                            m_buttons[IB_BTouch]->SetState(false);
-                            m_buttons[IB_BClick]->SetState(false);
-                        } break;
-                        case StateName::ST_Touched:
-                        {
-                            m_buttons[IB_BTouch]->SetState(true);
-                            m_buttons[IB_BClick]->SetState(false);
-                        } break;
-                        case StateName::ST_Clicked:
-                        {
-                            m_buttons[IB_BTouch]->SetState(true);
-                            m_buttons[IB_BClick]->SetState(true);
-                        } break;
-                    }
-                } break;
-
-                case InputName::IN_System:
-                {
-                    switch(l_state)
-                    {
-                        case StateName::ST_None:
-                        {
-                            m_buttons[IB_SystemTouch]->SetState(false);
-                            m_buttons[IB_SystemClick]->SetState(false);
-                        } break;
-                        case StateName::ST_Touched:
-                        {
-                            m_buttons[IB_SystemTouch]->SetState(true);
-                            m_buttons[IB_SystemClick]->SetState(false);
-                        } break;
-                        case StateName::ST_Clicked:
-                        {
-                            m_buttons[IB_SystemTouch]->SetState(true);
-                            m_buttons[IB_SystemClick]->SetState(true);
-                        } break;
-                    }
-                } break;
-
-                case InputName::IN_Thumbstick:
-                {
-                    switch(l_state)
-                    {
-                        case StateName::ST_None:
-                        {
-                            m_buttons[IB_ThumbstickTouch]->SetState(false);
-                            m_buttons[IB_ThumbstickClick]->SetState(false);
-                        } break;
-                        case StateName::ST_Touched:
-                        {
-                            m_buttons[IB_ThumbstickTouch]->SetState(true);
-                            m_buttons[IB_ThumbstickClick]->SetState(false);
-                        } break;
-                        case StateName::ST_Clicked:
-                        {
-                            m_buttons[IB_ThumbstickTouch]->SetState(true);
-                            m_buttons[IB_ThumbstickClick]->SetState(true);
-                        } break;
-                    }
-                } break;
-
-                case InputName::IN_Touchpad:
-                {
-                    switch(l_state)
-                    {
-                        case StateName::ST_None:
-                        {
-                            m_buttons[IB_TrackpadTouch]->SetState(false);
-                            m_buttons[IB_TrackpadForce]->SetValue(0.f);
-                        } break;
-                        case StateName::ST_Touched:
-                        {
-                            m_buttons[IB_TrackpadTouch]->SetState(true);
-                            m_buttons[IB_TrackpadForce]->SetState(0.f);
-                        } break;
-                        case StateName::ST_Clicked:
-                        {
-                            m_buttons[IB_TrackpadTouch]->SetState(true);
-                            m_buttons[IB_TrackpadForce]->SetState(1.f);
-                        } break;
-                    }
-                } break;
-            }
-
-            if((l_type == TypeName::TN_Axis) && (l_chunks.size() >= 5U))
-            {
-                glm::vec2 l_vec(0.f);
-                if(TryParse(l_chunks[3U], l_vec.x) && TryParse(l_chunks[4U], l_vec.y))
+                // Buttons
+                case TypeName::TN_Button:
                 {
                     switch(l_input)
                     {
-                        case InputName::IN_Thumbstick:
+                        case InputName::IN_A:
                         {
-                            m_buttons[IB_ThumbstickX]->SetValue(l_vec.x);
-                            m_buttons[IB_ThumbstickY]->SetValue(l_vec.y);
+                            switch(l_state)
+                            {
+                                case StateName::ST_None:
+                                {
+                                    m_buttons[IB_ATouch]->SetState(false);
+                                    m_buttons[IB_AClick]->SetState(false);
+                                } break;
+                                case StateName::ST_Touched:
+                                {
+                                    m_buttons[IB_ATouch]->SetState(true);
+                                    m_buttons[IB_AClick]->SetState(false);
+                                } break;
+                                case StateName::ST_Clicked:
+                                {
+                                    m_buttons[IB_ATouch]->SetState(true);
+                                    m_buttons[IB_AClick]->SetState(true);
+                                } break;
+                            }
                         } break;
-                        case InputName::IN_Touchpad:
+
+                        case InputName::IN_B:
                         {
-                            m_buttons[IB_TrackpadX]->SetValue(l_vec.x);
-                            m_buttons[IB_TrackpadY]->SetValue(l_vec.y);
+                            switch(l_state)
+                            {
+                                case StateName::ST_None:
+                                {
+                                    m_buttons[IB_BTouch]->SetState(false);
+                                    m_buttons[IB_BClick]->SetState(false);
+                                } break;
+                                case StateName::ST_Touched:
+                                {
+                                    m_buttons[IB_BTouch]->SetState(true);
+                                    m_buttons[IB_BClick]->SetState(false);
+                                } break;
+                                case StateName::ST_Clicked:
+                                {
+                                    m_buttons[IB_BTouch]->SetState(true);
+                                    m_buttons[IB_BClick]->SetState(true);
+                                } break;
+                            }
                         } break;
+
+                        case InputName::IN_System:
+                        {
+                            switch(l_state)
+                            {
+                                case StateName::ST_None:
+                                {
+                                    m_buttons[IB_SystemTouch]->SetState(false);
+                                    m_buttons[IB_SystemClick]->SetState(false);
+                                } break;
+                                case StateName::ST_Touched:
+                                {
+                                    m_buttons[IB_SystemTouch]->SetState(true);
+                                    m_buttons[IB_SystemClick]->SetState(false);
+                                } break;
+                                case StateName::ST_Clicked:
+                                {
+                                    m_buttons[IB_SystemTouch]->SetState(true);
+                                    m_buttons[IB_SystemClick]->SetState(true);
+                                } break;
+                            }
+                        } break;
+                    }
+                } break;
+
+                // Axes
+                case TypeName::TN_Axis:
+                {
+                    if(l_chunks.size() >= 6U)
+                    {
+                        glm::vec3 l_values(0.f);
+                        if(TryParse(l_chunks[3U], l_values.x) && TryParse(l_chunks[4U], l_values.y) && TryParse(l_chunks[5U], l_values.z))
+                        {
+                            switch(l_input)
+                            {
+                                case InputName::IN_Thumbstick:
+                                {
+                                    switch(l_state)
+                                    {
+                                        case StateName::ST_None:
+                                        {
+                                            m_buttons[IB_ThumbstickTouch]->SetState(false);
+                                            m_buttons[IB_ThumbstickClick]->SetState(false);
+                                            m_buttons[IB_ThumbstickX]->SetValue(0.f);
+                                            m_buttons[IB_ThumbstickY]->SetValue(0.f);
+                                        } break;
+                                        case StateName::ST_Touched:
+                                        {
+                                            m_buttons[IB_ThumbstickTouch]->SetState(true);
+                                            m_buttons[IB_ThumbstickClick]->SetState(false);
+                                            m_buttons[IB_ThumbstickX]->SetValue(l_values.x);
+                                            m_buttons[IB_ThumbstickY]->SetValue(l_values.y);
+                                        } break;
+                                        case StateName::ST_Clicked:
+                                        {
+                                            m_buttons[IB_ThumbstickTouch]->SetState(true);
+                                            m_buttons[IB_ThumbstickClick]->SetState(true);
+                                            m_buttons[IB_ThumbstickX]->SetValue(l_values.x);
+                                            m_buttons[IB_ThumbstickY]->SetValue(l_values.y);
+                                        } break;
+                                    }
+                                } break;
+
+                                case InputName::IN_Touchpad:
+                                {
+                                    switch(l_state)
+                                    {
+                                        case StateName::ST_None:
+                                        {
+                                            m_buttons[IB_TrackpadTouch]->SetState(false);
+                                            m_buttons[IB_TrackpadForce]->SetValue(0.f);
+                                            m_buttons[IB_TrackpadX]->SetValue(0.f);
+                                            m_buttons[IB_TrackpadY]->SetValue(0.f);
+                                        } break;
+                                        case StateName::ST_Touched:
+                                        {
+                                            m_buttons[IB_TrackpadTouch]->SetState(true);
+                                            m_buttons[IB_TrackpadForce]->SetValue(0.f);
+                                            m_buttons[IB_TrackpadX]->SetValue(l_values.x);
+                                            m_buttons[IB_TrackpadY]->SetValue(l_values.y);
+                                        } break;
+                                        case StateName::ST_Clicked:
+                                        {
+                                            m_buttons[IB_TrackpadTouch]->SetState(true);
+                                            m_buttons[IB_TrackpadForce]->SetValue(NormalizeRange(l_values.z, 0.75f, 1.f));
+                                            m_buttons[IB_TrackpadX]->SetValue(l_values.x);
+                                            m_buttons[IB_TrackpadY]->SetValue(l_values.y);
+                                        } break;
+                                    }
+                                } break;
+                            }
+                        }
                     }
                 }
             }

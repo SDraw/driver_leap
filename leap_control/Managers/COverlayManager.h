@@ -18,7 +18,7 @@ class COverlayManager
     COverlayManager& operator=(const COverlayManager &that) = delete;
     ~COverlayManager() = default;
 
-    void ProcessButtons(const std::vector<CButton*> &p_buttons, bool p_left) const;
+    void ProcessButtons(const std::vector<CButton*> &p_buttons, float p_pressure, bool p_left) const;
 public:
     static COverlayManager* GetInstance();
 

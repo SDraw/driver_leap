@@ -50,8 +50,9 @@ public:
     void SetWidth(float p_width);
     void ResetInput();
 
-    void Update(const glm::vec3 &p_cursor);
-
     const std::vector<CButton*>& GetButtons() const;
+    float GetPressure() const;
+
+    void Update(const glm::vec3 &p_cursor);
 };
 
