@@ -2,9 +2,6 @@
 
 #include "Utils/Utils.h"
 
-extern const glm::mat4 g_identityMatrix(1.f);
-extern const glm::vec4 g_zeroPoint(0.f, 0.f, 0.f, 1.f);
-
 // Left hand open gesture transformation, thanks to https://github.com/spayne and his soft_knuckles repository
 extern const std::array<vr::VRBoneTransform_t, 31U> g_openHandGesture =
 {

@@ -29,5 +29,5 @@ class CServerDriver final : public vr::IServerTrackedDeviceProvider
     void LeaveStandby();
 public:
     CServerDriver();
-    ~CServerDriver();
+    ~CServerDriver() = default;
 };

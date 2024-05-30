@@ -50,8 +50,8 @@ CSettingsManager* CSettingsManager::GetInstance()
 
 void CSettingsManager::Load()
 {
-    std::string l_path(QApplication::applicationDirPath().toStdString());
-    l_path.append("/../../../resources/settings.xml");
+    std::wstring l_path(QApplication::applicationDirPath().toStdWString());
+    l_path.append(L"/../../../resources/settings.xml");
 
     pugi::xml_document l_document;
     if(l_document.load_file(l_path.c_str()))
@@ -147,8 +147,8 @@ void CSettingsManager::Load()
 
 void CSettingsManager::Save()
 {
-    std::string l_path(QApplication::applicationDirPath().toStdString());
-    l_path.append("/../../../resources/settings.xml");
+    std::wstring l_path(QApplication::applicationDirPath().toStdWString());
+    l_path.append(L"/../../../resources/settings.xml");
 
     pugi::xml_document l_document;
     auto l_root = l_document.append_child("settings");

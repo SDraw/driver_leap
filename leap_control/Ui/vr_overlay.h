@@ -9,7 +9,7 @@ class vr_overlay : public QWidget
 
 public:
     vr_overlay(QWidget *parent = nullptr);
-    ~vr_overlay();
+    ~vr_overlay() = default;
 
     void Mirror();
 
@@ -36,5 +36,5 @@ private:
     bool m_onButtonB;
     bool m_onButtonS;
 
-    static void Mirror(QFrame *m_frame, int p_mainWidth);
+    static void Mirror(QWidget *m_frame, int p_mainWidth);
 };

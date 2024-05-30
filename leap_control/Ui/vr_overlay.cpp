@@ -1,8 +1,7 @@
 #include "stdafx.h"
 #include "Ui/vr_overlay.h"
 
-vr_overlay::vr_overlay(QWidget *parent)
-    : QWidget(parent)
+vr_overlay::vr_overlay(QWidget *parent) : QWidget(parent)
 {
     ui.setupUi(this);
 
@@ -12,9 +11,6 @@ vr_overlay::vr_overlay(QWidget *parent)
     m_onButtonB = false;
     m_onButtonS = false;
 }
-
-vr_overlay::~vr_overlay()
-{}
 
 void vr_overlay::Mirror()
 {
@@ -132,7 +128,7 @@ const glm::vec2 & vr_overlay::GetTouchpadAxis() const
     return m_touchpadAxis;
 }
 
-void vr_overlay::Mirror(QFrame *p_frame, int p_mainWidth)
+void vr_overlay::Mirror(QWidget *p_frame, int p_mainWidth)
 {
     QPoint l_pos = p_frame->pos();
     QSize l_size = p_frame->size();

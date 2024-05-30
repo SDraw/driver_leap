@@ -4,7 +4,7 @@
 
 #include "Utils/Utils.h"
 
-extern char g_modulePath[];
+extern std::wstring g_modulePath;
 
 const std::vector<std::string> g_settingNames
 {
@@ -27,9 +27,8 @@ glm::vec3 CDriverConfig::ms_rootAngle = glm::vec3(0.f);
 
 void CDriverConfig::Load()
 {
-    std::string l_path(g_modulePath);
-    l_path.erase(l_path.begin() + l_path.rfind('\\'), l_path.end());
-    l_path.append("\\..\\..\\resources\\settings.xml");
+    std::wstring l_path(g_modulePath);
+    l_path.append(L"\\..\\..\\resources\\settings.xml");
 
     pugi::xml_document l_document;
     if(l_document.load_file(l_path.c_str()))

@@ -168,7 +168,7 @@ void COverlayManager::SetOverlaysActive(bool p_state)
     }
 }
 
-void COverlayManager::ProcessButtons(const std::vector<CButton*>& p_buttons, float p_pressure, bool p_left) const
+void COverlayManager::ProcessButtons(const std::vector<CButton*> &p_buttons, float p_pressure, bool p_left) const
 {
     for(auto l_button : p_buttons)
     {

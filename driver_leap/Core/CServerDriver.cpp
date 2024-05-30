@@ -9,7 +9,7 @@
 #include "Core/CDriverConfig.h"
 #include "Utils/Utils.h"
 
-extern char g_modulePath[];
+extern std::wstring g_modulePath;
 
 const char* const CServerDriver::ms_interfaces[]
 {
@@ -26,10 +26,6 @@ CServerDriver::CServerDriver()
     m_leftController = nullptr;
     m_rightController = nullptr;
     m_leapStation = nullptr;
-}
-
-CServerDriver::~CServerDriver()
-{
 }
 
 // vr::IServerTrackedDeviceProvider
@@ -54,16 +50,13 @@ vr::EVRInitError CServerDriver::Init(vr::IVRDriverContext *pDriverContext)
     m_leapPoller->SetPolicy(eLeapPolicyFlag::eLeapPolicyFlag_OptimizeHMD, eLeapPolicyFlag::eLeapPolicyFlag_OptimizeScreenTop);
 
     // Start leap_control
-    std::string l_path(g_modulePath);
-    l_path.erase(l_path.begin() + l_path.rfind('\\'), l_path.end());
+    std::wstring l_appPath(g_modulePath);
+    l_appPath.append(L"\\leap_control\\leap_control.exe");
 
-    std::string l_appPath(l_path);
-    l_appPath.append("\\leap_control\\leap_control.exe");
-
-    STARTUPINFOA l_infoProcess = { 0 };
+    STARTUPINFOW l_infoProcess = { 0 };
     PROCESS_INFORMATION l_monitorInfo = { 0 };
     l_infoProcess.cb = sizeof(STARTUPINFOA);
-    CreateProcessA(l_appPath.c_str(), NULL, NULL, NULL, FALSE, 0, NULL, l_path.c_str(), &l_infoProcess, &l_monitorInfo);
+    CreateProcessW(l_appPath.c_str(), NULL, NULL, NULL, FALSE, 0, NULL, g_modulePath.c_str(), &l_infoProcess, &l_monitorInfo);
 
     return vr::VRInitError_None;
 }

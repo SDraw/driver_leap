@@ -5,11 +5,8 @@
 #include "Managers/CVRManager.h"
 #include "Utils/Utils.h"
 
-leap_control::leap_control(QWidget *parent)
-    : QWidget(parent)
+leap_control::leap_control(QWidget *parent) : QWidget(parent)
 {
-    m_firstShow = true;
-
     ui.setupUi(this);
     this->setWindowFlag(Qt::WindowMaximizeButtonHint, false);
 
@@ -61,7 +58,7 @@ leap_control::leap_control(QWidget *parent)
     connect(ui.m_overlayOffsetSliderX, &QSlider::valueChanged, this, &leap_control::OnOverlayOffsetXChanged);
 
     ui.m_overlayOffsetSliderY->setValue(InvProgressLerp(CSettingsManager::GetInstance()->GetOverlayOffset().y, -0.5f, 0.5f));
-    ui.m_overlayOffsetSliderY->setToolTip(QString("Y axis offset: %1").arg(CSettingsManager::GetInstance()->GetOverlayOffset().y));
+    ui.m_overlayOffsetSliderY->setToolTip(QString("Y: %1").arg(CSettingsManager::GetInstance()->GetOverlayOffset().y));
     connect(ui.m_overlayOffsetSliderY, &QSlider::valueChanged, this, &leap_control::OnOverlayOffsetYChanged);
 
     ui.m_overlayOffsetSliderZ->setValue(InvProgressLerp(CSettingsManager::GetInstance()->GetOverlayOffset().z, -0.5f, 0.5f));

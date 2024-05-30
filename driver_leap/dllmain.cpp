@@ -2,15 +2,19 @@
 
 #include "Core/CServerDriver.h"
 
-char g_modulePath[2048U];
+std::wstring g_modulePath;
 
-BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID /* lpReserved */)
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD ul_reason_for_call, LPVOID)
 {
     switch(ul_reason_for_call)
     {
         case DLL_PROCESS_ATTACH:
-            GetModuleFileNameA(hModule, g_modulePath, 2048U);
-            break;
+        {
+            g_modulePath.resize(2048U);
+            unsigned long l_length = GetModuleFileNameW(hModule, &g_modulePath[0], 2048U);
+            g_modulePath.resize(l_length);
+            g_modulePath.erase(g_modulePath.begin() + g_modulePath.rfind(L'\\'), g_modulePath.end());
+        } break;
         case DLL_THREAD_ATTACH: case DLL_THREAD_DETACH: case DLL_PROCESS_DETACH:
             break;
     }

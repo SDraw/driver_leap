@@ -9,7 +9,7 @@ const glm::quat g_identityQuat(1.f, 0.f, 0.f, 0.f);
 const float g_pi = glm::pi<float>();
 const float g_piHalf = g_pi * 0.5f;
 const float g_piQuarter = g_pi * 0.25f;
-extern const glm::vec4 g_zeroPoint;
+const glm::vec4 g_pointVec4(0.f, 0.f, 0.f, 1.f);
 
 CLeapHand::CLeapHand(bool p_left)
 {
@@ -68,7 +68,7 @@ void CLeapHand::GetFingerBoneLocalPosition(size_t p_finger, size_t p_bone, glm::
     glm::mat4 l_parentMat = glm::translate(g_identityMat4, l_parentPos) * glm::toMat4(l_parentRot);
     glm::mat4 l_childMat = glm::translate(g_identityMat4, m_bonesPositions[l_index]) * glm::toMat4(m_bonesRotations[l_index]);
     glm::mat4 l_childLocal = glm::inverse(l_parentMat) * l_childMat;
-    l_result = l_childLocal * g_zeroPoint;
+    l_result = l_childLocal * g_pointVec4;
 }
 
 void CLeapHand::GetFingerBoneLocalRotation(size_t p_finger, size_t p_bone, glm::quat & l_result) const

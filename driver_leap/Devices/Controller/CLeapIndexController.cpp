@@ -6,10 +6,10 @@
 #include "Utils/Utils.h"
 
 extern const std::array<vr::VRBoneTransform_t, 31U> g_openHandGesture;
-extern const glm::mat4 g_identityMatrix;
-extern const glm::vec4 g_zeroPoint;
+const glm::mat4 g_identityMatrix(1.f);
 const float g_pi = glm::pi<float>();
 const float g_piHalf = g_pi * 0.5f;
+const glm::vec4 g_pointVec4(0.f, 0.f, 0.f, 1.f);
 
 // This is ... something ...
 const glm::mat4 g_wristOffsetLeft = glm::inverse(glm::translate(g_identityMatrix, glm::vec3(-0.0445230342f, 0.0301547553f, 0.16438961f)) * glm::toMat4(glm::quat(1.50656376e-07f, -1.77612698e-08f, 0.927827835f, -0.373008907f)));
@@ -387,7 +387,7 @@ void CLeapIndexController::UpdatePose(const CLeapHand *p_hand)
         m_pose.qRotation.w = l_poseRotation.w;
 
         // Positon
-        glm::vec4 l_posePosition = l_mat * g_zeroPoint;
+        glm::vec4 l_posePosition = l_mat * g_pointVec4;
         m_pose.vecPosition[0] = l_posePosition.x;
         m_pose.vecPosition[1] = l_posePosition.y;
         m_pose.vecPosition[2] = l_posePosition.z;
@@ -485,7 +485,7 @@ void CLeapIndexController::UpdateSkeletalInput(const CLeapHand *p_hand)
             ConvertQuaternion(m_boneTransform[l_chainIndex + j].orientation, l_rotation);
             l_chainMat = l_chainMat * (glm::translate(g_identityMatrix, l_position)*glm::mat4_cast(l_rotation));
         }
-        l_position = l_chainMat * g_zeroPoint;
+        l_position = l_chainMat * g_pointVec4;
         l_rotation = glm::quat_cast(l_chainMat);
         if(m_isLeft)
             ChangeAuxTransformation(l_position, l_rotation);

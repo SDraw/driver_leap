@@ -13,7 +13,6 @@ public:
 private:
     Ui::leap_controlClass ui;
     QSystemTrayIcon m_trayIcon;
-    bool m_firstShow;
 
     void OnTrackingLevelChange(int p_item);
     void OnHandsResetChange(int p_state);
