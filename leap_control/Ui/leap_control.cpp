@@ -19,6 +19,9 @@ leap_control::leap_control(QWidget *parent) : QWidget(parent)
     ui.m_useVelocityCheckBox->setChecked(CSettingsManager::GetInstance()->GetUseVelocity());
     connect(ui.m_useVelocityCheckBox, &QCheckBox::stateChanged, this, &leap_control::OnUseVelocityChange);
 
+    ui.m_useControllerInputCheckBox->setChecked(CSettingsManager::GetInstance()->GetUseControllerInput());
+    connect(ui.m_useControllerInputCheckBox, &QCheckBox::stateChanged, this, &leap_control::OnUseControllerInputChange);
+
     ui.m_startMinimizedCheckBox->setChecked(CSettingsManager::GetInstance()->GetStartMinimized());
     connect(ui.m_startMinimizedCheckBox, &QCheckBox::stateChanged, this, &leap_control::OnStartMinimizedChanged);
 
@@ -112,6 +115,17 @@ void leap_control::OnUseVelocityChange(int p_state)
         CSettingsManager::GetInstance()->SetSetting(CSettingsManager::ST_UseVelocity, (p_state == Qt::Checked));
 
         std::string l_message("useVelocity ");
+        l_message.append(std::to_string((p_state == Qt::Checked) ? 1 : 0));
+        CVRManager::GetInstance()->SendStationMessage(l_message);
+    }
+}
+void leap_control::OnUseControllerInputChange(int p_state)
+{
+    if (p_state != Qt::PartiallyChecked)
+    {
+        CSettingsManager::GetInstance()->SetSetting(CSettingsManager::ST_UseControllerInput, (p_state == Qt::Checked));
+
+        std::string l_message("useControllerInput ");
         l_message.append(std::to_string((p_state == Qt::Checked) ? 1 : 0));
         CVRManager::GetInstance()->SendStationMessage(l_message);
     }

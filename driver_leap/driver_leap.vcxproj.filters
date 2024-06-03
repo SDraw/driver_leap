@@ -33,6 +33,9 @@
     <ClCompile Include="Devices\Controller\CLeapIndexController.cpp">
       <Filter>Devices\Controller</Filter>
     </ClCompile>
+    <ClCompile Include="Devices\Controller\CControllerInput.cpp">
+      <Filter>Devices\Controller</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -61,6 +64,9 @@
       <Filter>Devices\Controller</Filter>
     </ClInclude>
     <ClInclude Include="Devices\Controller\CLeapIndexController.h">
+      <Filter>Devices\Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="Devices\Controller\CControllerInput.h">
       <Filter>Devices\Controller</Filter>
     </ClInclude>
   </ItemGroup>

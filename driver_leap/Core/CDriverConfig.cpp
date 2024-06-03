@@ -16,7 +16,8 @@ const std::vector<std::string> g_settingNames
     "rootOffsetZ",
     "rootAngleX",
     "rootAngleY",
-    "rootAngleZ"
+    "rootAngleZ",
+    "useControllerInput"
 };
 
 int CDriverConfig::ms_trackingLevel = CDriverConfig::TL_Partial;
@@ -24,6 +25,7 @@ bool CDriverConfig::ms_handsReset = false;
 bool CDriverConfig::ms_useVelocity = false;
 glm::vec3 CDriverConfig::ms_rootOffset = glm::vec3(0.f);
 glm::vec3 CDriverConfig::ms_rootAngle = glm::vec3(0.f);
+bool CDriverConfig::ms_useControllerInput = false;
 
 void CDriverConfig::Load()
 {
@@ -79,6 +81,10 @@ void CDriverConfig::Load()
                         case CS_RootAngleZ:
                             ms_rootAngle.z = glm::clamp(l_attribValue.as_float(0.f), -180.f, 180.f);
                             break;
+
+                        case CS_UseControllerInput:
+                            ms_useControllerInput = l_attribValue.as_bool(false);
+                            break;
                     }
                 }
             }
@@ -109,6 +115,11 @@ const glm::vec3& CDriverConfig::GetRootOffset()
 const glm::vec3& CDriverConfig::GetRootAngle()
 {
     return ms_rootAngle;
+}
+
+bool CDriverConfig::IsControllerInputUsed()
+{
+    return ms_useControllerInput;
 }
 
 void CDriverConfig::ProcessExternalSetting(const char *p_message)
@@ -178,6 +189,13 @@ void CDriverConfig::ProcessExternalSetting(const char *p_message)
                     float l_value = 0.f;
                     if(TryParse(l_chunks[1U], l_value))
                         ms_rootOffset.z = l_value;
+                } break;
+
+                case CS_UseControllerInput:
+                {
+                    int l_value = -1;
+                    if (TryParse(l_chunks[1U], l_value))
+                        ms_useControllerInput = (l_value == 1);
                 } break;
             }
         }

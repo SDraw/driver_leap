@@ -7,6 +7,7 @@ class CDriverConfig final
     static bool ms_useVelocity;
     static glm::vec3 ms_rootOffset;
     static glm::vec3 ms_rootAngle;
+    static bool ms_useControllerInput;
 
     CDriverConfig() = delete;
     ~CDriverConfig() = delete;
@@ -23,7 +24,8 @@ public:
         CS_RootOffsetZ,
         CS_RootAngleX,
         CS_RootAngleY,
-        CS_RootAngleZ
+        CS_RootAngleZ,
+        CS_UseControllerInput
     };
 
     enum TrackingLevel : int
@@ -39,6 +41,7 @@ public:
     static bool IsVelocityUsed();
     static const glm::vec3& GetRootOffset();
     static const glm::vec3& GetRootAngle();
+    static bool IsControllerInputUsed();
 
     static void ProcessExternalSetting(const char *p_message);
 };

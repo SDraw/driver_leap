@@ -88,15 +88,15 @@
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
-      <AdditionalIncludeDirectories>./;../vendor/LeapSDK/include;../vendor/openvr/headers;../vendor/pugixml/src;../vendor/glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./;../vendor/LeapSDK/include;../vendor/openvr/headers;../vendor/pugixml/src;../vendor/glm;../vendor/JSL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
-      <AdditionalLibraryDirectories>../vendor/LeapSDK/lib/x64;../vendor/openvr/lib/win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>openvr_api.lib;LeapC.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../vendor/LeapSDK/lib/x64;../vendor/openvr/lib/win64;../vendor/JSL/x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>openvr_api.lib;LeapC.lib;JoyShockLibrary.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <CustomBuildStep>
@@ -111,7 +111,7 @@
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <CompileAsWinRT>false</CompileAsWinRT>
-      <AdditionalIncludeDirectories>./;../vendor/LeapSDK/include;../vendor/openvr/headers;../vendor/pugixml/src;../vendor/glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./;../vendor/LeapSDK/include;../vendor/openvr/headers;../vendor/pugixml/src;../vendor/glm;../vendor/JSL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <SDLCheck>true</SDLCheck>
     </ClCompile>
@@ -119,8 +119,8 @@
       <SubSystem>Windows</SubSystem>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <GenerateWindowsMetadata>false</GenerateWindowsMetadata>
-      <AdditionalLibraryDirectories>../vendor/LeapSDK/lib/x64;../vendor/openvr/lib/win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>openvr_api.lib;LeapC.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../vendor/LeapSDK/lib/x64;../vendor/openvr/lib/win64;../vendor/JSL/x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>openvr_api.lib;LeapC.lib;JoyShockLibrary.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>false</GenerateDebugInformation>
     </Link>
     <CustomBuildStep>
@@ -136,6 +136,7 @@
     <ClInclude Include="Core\CServerDriver.h" />
     <ClInclude Include="Devices\CLeapStation.h" />
     <ClInclude Include="Devices\Controller\CControllerButton.h" />
+    <ClInclude Include="Devices\Controller\CControllerInput.h" />
     <ClInclude Include="Devices\Controller\CLeapIndexController.h" />
     <ClInclude Include="Leap\CLeapFrame.h" />
     <ClInclude Include="Leap\CLeapHand.h" />
@@ -152,6 +153,7 @@
     <ClCompile Include="Core\CServerDriver.cpp" />
     <ClCompile Include="Devices\CLeapStation.cpp" />
     <ClCompile Include="Devices\Controller\CControllerButton.cpp" />
+    <ClCompile Include="Devices\Controller\CControllerInput.cpp" />
     <ClCompile Include="Devices\Controller\CLeapIndexController.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Leap\CLeapFrame.cpp" />
