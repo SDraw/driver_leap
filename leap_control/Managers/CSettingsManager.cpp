@@ -21,7 +21,8 @@ const std::vector<std::string> g_settingNames
     "overlayAngleY",
     "overlayAngleZ",
     "startMinimized",
-    "overlaySize"
+    "overlaySize",
+    "useControllerInput"
 };
 
 CSettingsManager* CSettingsManager::ms_instance = nullptr;
@@ -38,6 +39,7 @@ CSettingsManager::CSettingsManager()
     m_overlayAngle = glm::vec3(0.f);
     m_startMinimized = false;
     m_overlaySize = 0.128f;
+    m_useControllerInput = false;
 }
 
 CSettingsManager* CSettingsManager::GetInstance()
@@ -138,6 +140,10 @@ void CSettingsManager::Load()
                         case ST_OverlaySize:
                             m_overlaySize = glm::clamp(l_attribValue.as_float(0.128f), 0.1f, 0.5f);
                             break;
+
+                        case ST_UseControllerInput:
+                            m_useControllerInput = l_attribValue.as_bool(false);
+                            break;
                     }
                 }
             }
@@ -232,6 +238,10 @@ void CSettingsManager::Save()
             case ST_OverlaySize:
                 l_valueAttrib.set_value(m_overlaySize);
                 break;
+
+            case ST_UseControllerInput:
+                l_valueAttrib.set_value(m_useControllerInput);
+                break;
         }
     }
 
@@ -288,6 +298,11 @@ float CSettingsManager::GetOverlaySize() const
     return m_overlaySize;
 }
 
+bool CSettingsManager::GetUseControllerInput() const
+{
+    return m_useControllerInput;
+}
+
 void CSettingsManager::SetSetting(SettingType p_setting, int p_value)
 {
     switch(p_setting)
@@ -315,6 +330,10 @@ void CSettingsManager::SetSetting(SettingType p_setting, bool p_value)
 
         case ST_StartMinimized:
             m_startMinimized = p_value;
+            break;
+
+        case ST_UseControllerInput:
+            m_useControllerInput = p_value;
             break;
     }
 }

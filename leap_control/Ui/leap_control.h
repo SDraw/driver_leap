@@ -17,6 +17,7 @@ private:
     void OnTrackingLevelChange(int p_item);
     void OnHandsResetChange(int p_state);
     void OnUseVelocityChange(int p_state);
+    void OnUseControllerInputChange(int p_state);
 
     void OnStartMinimizedChanged(int p_state);
 

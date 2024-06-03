@@ -14,6 +14,7 @@ class CSettingsManager
     glm::vec3 m_overlayAngle;
     bool m_startMinimized;
     float m_overlaySize;
+    bool m_useControllerInput;
 
     CSettingsManager();
     CSettingsManager(const CSettingsManager &that) = delete;
@@ -40,6 +41,7 @@ public:
         ST_OverlayAngleZ,
         ST_StartMinimized,
         ST_OverlaySize,
+        ST_UseControllerInput,
 
         Count
     };
@@ -59,6 +61,7 @@ public:
     const glm::vec3& GetOverlayOffset() const;
     const glm::vec3& GetOverlayAngle() const;
     float GetOverlaySize() const;
+    bool GetUseControllerInput() const;
 
     void SetSetting(SettingType p_setting, int p_value);
     void SetSetting(SettingType p_setting, bool p_value);
