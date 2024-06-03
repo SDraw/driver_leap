@@ -412,17 +412,20 @@ void CLeapIndexController::UpdatePose(const CLeapHand *p_hand)
 
 void CLeapIndexController::UpdateInput(const CLeapHand *p_hand)
 {
-    float l_trigger = p_hand->GetFingerBend(CLeapHand::Finger::Index);
-    m_buttons[IB_TriggerValue]->SetValue(l_trigger);
-    m_buttons[IB_TriggerTouch]->SetState(l_trigger >= 0.5f);
-    m_buttons[IB_TriggerClick]->SetState(l_trigger >= 0.75f);
+    if (!CDriverConfig::IsControllerInputUsed())
+    {
+        float l_trigger = p_hand->GetFingerBend(CLeapHand::Finger::Index);
+        m_buttons[IB_TriggerValue]->SetValue(l_trigger);
+        m_buttons[IB_TriggerTouch]->SetState(l_trigger >= 0.5f);
+        m_buttons[IB_TriggerClick]->SetState(l_trigger >= 0.75f);
 
-    float l_grabValue = p_hand->GetGrabValue();
-    m_buttons[IB_GripValue]->SetValue(l_grabValue);
-    m_buttons[IB_GripTouch]->SetState(l_grabValue >= 0.75f);
-    m_buttons[IB_GripForce]->SetValue((l_grabValue >= 0.9f) ? (l_grabValue - 0.9f) * 10.f : 0.f);
+        float l_grabValue = p_hand->GetGrabValue();
+        m_buttons[IB_GripValue]->SetValue(l_grabValue);
+        m_buttons[IB_GripTouch]->SetState(l_grabValue >= 0.75f);
+        m_buttons[IB_GripForce]->SetValue((l_grabValue >= 0.9f) ? (l_grabValue - 0.9f) * 10.f : 0.f);
+    }
 
-    m_buttons[IB_FingerIndex]->SetValue(l_trigger);
+    m_buttons[IB_FingerIndex]->SetValue(p_hand->GetFingerBend(CLeapHand::Finger::Index));
     m_buttons[IB_FingerMiddle]->SetValue(p_hand->GetFingerBend(CLeapHand::Finger::Middle));
     m_buttons[IB_FingerRing]->SetValue(p_hand->GetFingerBend(CLeapHand::Finger::Ring));
     m_buttons[IB_FingerPinky]->SetValue(p_hand->GetFingerBend(CLeapHand::Finger::Pinky));

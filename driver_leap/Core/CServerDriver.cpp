@@ -4,6 +4,7 @@
 #include "Leap/CLeapPoller.h"
 #include "Leap/CLeapFrame.h"
 #include "Devices/Controller/CLeapIndexController.h"
+#include "Devices/Controller/CControllerInput.h"
 #include "Devices/CLeapStation.h"
 
 #include "Core/CDriverConfig.h"
@@ -26,6 +27,7 @@ CServerDriver::CServerDriver()
     m_leftController = nullptr;
     m_rightController = nullptr;
     m_leapStation = nullptr;
+    m_controllerInput = nullptr;
 }
 
 // vr::IServerTrackedDeviceProvider
@@ -39,6 +41,7 @@ vr::EVRInitError CServerDriver::Init(vr::IVRDriverContext *pDriverContext)
 
     m_leftController = new CLeapIndexController(true);
     m_rightController = new CLeapIndexController(false);
+    m_controllerInput = new CControllerInput();
 
     vr::VRServerDriverHost()->TrackedDeviceAdded(m_leftController->GetSerialNumber().c_str(), vr::TrackedDeviceClass_Controller, m_leftController);
     vr::VRServerDriverHost()->TrackedDeviceAdded(m_rightController->GetSerialNumber().c_str(), vr::TrackedDeviceClass_Controller, m_rightController);
@@ -79,6 +82,9 @@ void CServerDriver::Cleanup()
     delete m_leapFrame;
     m_leapFrame = nullptr;
 
+    delete m_controllerInput;
+    m_controllerInput = nullptr;
+
     m_connectionState = false;
 
     VR_CLEANUP_SERVER_DRIVER_CONTEXT();
@@ -106,6 +112,14 @@ void CServerDriver::RunFrame()
 
     if(m_connectionState && m_leapPoller->GetFrame(m_leapFrame->GetEvent()))
         m_leapFrame->Update();
+
+    if (CDriverConfig::IsControllerInputUsed())
+    {
+        if (m_controllerInput->IsConnected())
+        {
+            m_controllerInput->Update(m_leftController, m_rightController);
+        }
+    }
 
     // Update devices
     m_leftController->RunFrame(m_leapFrame->GetLeftHand());
