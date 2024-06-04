@@ -110,8 +110,8 @@ void CControllerInput::Update(CLeapIndexController *p_left, CLeapIndexController
         p_right->SetButtonValue(CLeapIndexController::IndexButton::IB_GripForce, (l_state.buttons & JSMASK_R) ? 1.0f : 0.0f);
 
         // Trackpad/touchpad
-        p_left->SetButtonState(CLeapIndexController::IndexButton::IB_TrackpadTouch, l_state.buttons & JSMASK_SR);
-        p_left->SetButtonValue(CLeapIndexController::IndexButton::IB_TrackpadForce, ((l_state.buttons & JSMASK_SR) && (l_state.buttons & JSMASK_SL)) ? 1.f : 0.f);
+        p_right->SetButtonState(CLeapIndexController::IndexButton::IB_TrackpadTouch, l_state.buttons & JSMASK_SR);
+        p_right->SetButtonValue(CLeapIndexController::IndexButton::IB_TrackpadForce, ((l_state.buttons & JSMASK_SR) && (l_state.buttons & JSMASK_SL)) ? 1.f : 0.f);
     }
 
     if(m_devices[JS_TYPE_DS4].connected)

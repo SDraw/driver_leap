@@ -25,7 +25,12 @@ List of hands gestures that correspond to controller original input:
 * **Grip:** bending of middle, ring and pinky fingers
 * **Trigger:** bending of index finger
 
-Other buttons/inputs are available only through hand overlays.
+By default other buttons/inputs are available through hand overlays or connected controllers (by enabling option in `General` tab of utility app).
+Currenty supported controllers:
+* Nintendo Joy-Cons controllers
+  * <kbd>![](./.github/img_03.gif)</kbd>
+* Sony Playstation DualShock4
+ * (TBA)
 
 ## Notes
 * If you see only green dots that represent tip of your index fingers, force `leap_control` to launch on dGPU through control panel of your GPU vendor.
