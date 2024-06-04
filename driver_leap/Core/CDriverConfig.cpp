@@ -1,7 +1,5 @@
 #include "stdafx.h"
-
 #include "Core/CDriverConfig.h"
-
 #include "Utils/Utils.h"
 
 extern std::wstring g_modulePath;
@@ -194,7 +192,7 @@ void CDriverConfig::ProcessExternalSetting(const char *p_message)
                 case CS_UseControllerInput:
                 {
                     int l_value = -1;
-                    if (TryParse(l_chunks[1U], l_value))
+                    if(TryParse(l_chunks[1U], l_value))
                         ms_useControllerInput = (l_value == 1);
                 } break;
             }

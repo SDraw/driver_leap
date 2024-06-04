@@ -1,5 +1,4 @@
 #include "stdafx.h"
-
 #include "Devices/CLeapStation.h"
 #include "Core/CDriverConfig.h"
 #include "Utils/Utils.h"

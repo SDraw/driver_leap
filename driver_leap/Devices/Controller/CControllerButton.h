@@ -19,7 +19,7 @@ public:
     };
 
     CControllerButton();
-    ~CControllerButton();
+    ~CControllerButton() = default;
 
     vr::VRInputComponentHandle_t GetHandle() const;
     vr::VRInputComponentHandle_t& GetHandleRef();

@@ -9,7 +9,6 @@
 #include <sstream>
 #include <vector>
 #include <map>
-#include <unordered_map>
 #include <chrono>
 #include <numeric>
 #include <atomic>
@@ -28,3 +27,4 @@
 #include "glm/gtx/intersect.hpp"
 
 #include "pugixml.hpp"
+#include "JoyShockLibrary.h"

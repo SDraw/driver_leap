@@ -1,12 +1,10 @@
 #include "stdafx.h"
-
 #include "Core/CServerDriver.h"
 #include "Leap/CLeapPoller.h"
 #include "Leap/CLeapFrame.h"
 #include "Devices/Controller/CLeapIndexController.h"
 #include "Devices/Controller/CControllerInput.h"
 #include "Devices/CLeapStation.h"
-
 #include "Core/CDriverConfig.h"
 #include "Utils/Utils.h"
 
@@ -113,13 +111,8 @@ void CServerDriver::RunFrame()
     if(m_connectionState && m_leapPoller->GetFrame(m_leapFrame->GetEvent()))
         m_leapFrame->Update();
 
-    if (CDriverConfig::IsControllerInputUsed())
-    {
-        if (m_controllerInput->IsConnected())
-        {
-            m_controllerInput->Update(m_leftController, m_rightController);
-        }
-    }
+    if(CDriverConfig::IsControllerInputUsed() && m_controllerInput->IsConnected())
+        m_controllerInput->Update(m_leftController, m_rightController);
 
     // Update devices
     m_leftController->RunFrame(m_leapFrame->GetLeftHand());

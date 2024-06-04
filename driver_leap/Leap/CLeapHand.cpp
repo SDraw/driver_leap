@@ -115,10 +115,10 @@ void CLeapHand::Update(const LEAP_HAND & p_hand)
             l_prevDirection = l_direction;
         }
 
-        m_fingersBends[i] = NormalizeRange(m_fingersBends[i], (i == 0U) ? 0.f : g_piQuarter, (i == 0U) ? g_piQuarter : g_pi);
+        m_fingersBends[i] = InverseLerp(m_fingersBends[i], (i == 0U) ? 0.f : g_piQuarter, (i == 0U) ? g_piQuarter : g_pi);
     }
 
-    m_grabValue = (NormalizeRange(m_fingersBends[2U], 0.5f, 1.f) + NormalizeRange(m_fingersBends[3U], 0.5f, 1.f) + NormalizeRange(m_fingersBends[3U], 0.5f, 1.f)) / 3.f;
+    m_grabValue = (InverseLerp(m_fingersBends[2U], 0.5f, 1.f) + InverseLerp(m_fingersBends[3U], 0.5f, 1.f) + InverseLerp(m_fingersBends[3U], 0.5f, 1.f)) / 3.f;
 
     // Convert fingers to HMD space
     for(size_t i = 0; i < 5U; i++)

@@ -1,10 +1,10 @@
 #include "stdafx.h"
-#include "CControllerInput.h"
-#include "JoyShockLibrary.h"
+#include "Devices/Controller/CControllerInput.h"
+#include "Devices/Controller/CLeapIndexController.h"
 
 CControllerInput::CControllerInput()
 {
-    m_deviceCount = -1;
+    m_deviceCount = 0;
 }
 
 CControllerInput::~CControllerInput()
@@ -15,160 +15,166 @@ CControllerInput::~CControllerInput()
 bool CControllerInput::IsConnected()
 {
     // NOTE: Joycons work as a pair, so we check if both are still alive, otherwise this check will fail.
-    if ((m_devices[ControllerType::CONTROLLER_JOYCON_LEFT].connected &&
-        m_devices[ControllerType::CONTROLLER_JOYCON_RIGHT].connected) ||
-        m_devices[ControllerType::CONTROLLER_JOYCON_DS4].connected)
-    {
+    if((m_devices[JS_TYPE_JOYCON_LEFT].connected && m_devices[JS_TYPE_JOYCON_RIGHT].connected) || m_devices[JS_TYPE_DS4].connected)
         return true;
-    }
 
     m_deviceCount = JslConnectDevices();
 
-    std::vector<int> handles(m_deviceCount);
-    JslGetConnectedDeviceHandles(handles.data(), m_deviceCount);
+    std::vector<int> l_handles(m_deviceCount);
+    JslGetConnectedDeviceHandles(l_handles.data(), m_deviceCount);
 
-    for (auto handle : handles)
+    for(auto l_handle : l_handles)
     {
-        int type = JslGetControllerType(handle);
-        m_devices[type].connected = true;
-        m_devices[type].handle = handle;
+        int l_type = JslGetControllerType(l_handle);
+        m_devices[l_type].connected = true;
+        m_devices[l_type].handle = l_handle;
     }
 
     // For other controllers, just one of them is enough
-    if (m_devices[ControllerType::CONTROLLER_JOYCON_DS4].connected)
+    if(m_devices[JS_TYPE_DS4].connected)
         return true;
 
     // For joycons, we need both of them connected
-    return m_devices[ControllerType::CONTROLLER_JOYCON_LEFT].connected && m_devices[ControllerType::CONTROLLER_JOYCON_RIGHT].connected;
+    return (m_devices[JS_TYPE_JOYCON_LEFT].connected && m_devices[JS_TYPE_JOYCON_RIGHT].connected);
 }
 
-void CControllerInput::Update(CLeapIndexController* left, CLeapIndexController* right)
+void CControllerInput::Update(CLeapIndexController *p_left, CLeapIndexController *p_right)
 {
-    if (m_devices[ControllerType::CONTROLLER_JOYCON_LEFT].connected)
+    if(m_devices[JS_TYPE_JOYCON_LEFT].connected)
     {
-        JOY_SHOCK_STATE state = JslGetSimpleState(m_devices[ControllerType::CONTROLLER_JOYCON_LEFT].handle);
+        JOY_SHOCK_STATE l_state = JslGetSimpleState(m_devices[JS_TYPE_JOYCON_LEFT].handle);
 
         // Home
-        left->SetButtonState(CLeapIndexController::IndexButton::IB_SystemTouch, state.buttons & 0x20000);
-        left->SetButtonState(CLeapIndexController::IndexButton::IB_SystemClick, state.buttons & 0x20000);
+        p_left->SetButtonState(CLeapIndexController::IndexButton::IB_SystemTouch, l_state.buttons & JSMASK_CAPTURE);
+        p_left->SetButtonState(CLeapIndexController::IndexButton::IB_SystemClick, l_state.buttons & JSMASK_CAPTURE);
 
         // A
-        left->SetButtonState(CLeapIndexController::IndexButton::IB_AClick, state.buttons & 0x00002);
-        left->SetButtonState(CLeapIndexController::IndexButton::IB_ATouch, state.buttons & 0x00002);
+        p_left->SetButtonState(CLeapIndexController::IndexButton::IB_AClick, l_state.buttons & JSMASK_DOWN);
+        p_left->SetButtonState(CLeapIndexController::IndexButton::IB_ATouch, l_state.buttons & JSMASK_DOWN);
 
         // B
-        left->SetButtonState(CLeapIndexController::IndexButton::IB_BClick, state.buttons & 0x00001);
-        left->SetButtonState(CLeapIndexController::IndexButton::IB_BClick, state.buttons & 0x00001);
+        p_left->SetButtonState(CLeapIndexController::IndexButton::IB_BClick, l_state.buttons & JSMASK_UP);
+        p_left->SetButtonState(CLeapIndexController::IndexButton::IB_BTouch, l_state.buttons & JSMASK_UP);
 
         // Joystick XY
-        left->SetButtonState(CLeapIndexController::IndexButton::IB_ThumbstickClick, state.buttons & 0x00040);
-        left->SetButtonState(CLeapIndexController::IndexButton::IB_ThumbstickTouch, state.stickLX > 0 && state.stickLY > 0);
-        left->SetButtonValue(CLeapIndexController::IndexButton::IB_ThumbstickX, state.stickLX);
-        left->SetButtonValue(CLeapIndexController::IndexButton::IB_ThumbstickY, state.stickLY);
+        p_left->SetButtonState(CLeapIndexController::IndexButton::IB_ThumbstickClick, l_state.buttons & JSMASK_LCLICK);
+        p_left->SetButtonState(CLeapIndexController::IndexButton::IB_ThumbstickTouch, (l_state.stickLX > 0.f) && (l_state.stickLY > 0.f));
+        p_left->SetButtonValue(CLeapIndexController::IndexButton::IB_ThumbstickX, l_state.stickLX);
+        p_left->SetButtonValue(CLeapIndexController::IndexButton::IB_ThumbstickY, l_state.stickLY);
 
         // Trigger
-        left->SetButtonState(CLeapIndexController::IndexButton::IB_TriggerClick, state.buttons & 0x00400);
-        left->SetButtonValue(CLeapIndexController::IndexButton::IB_TriggerValue, state.lTrigger);
+        p_left->SetButtonState(CLeapIndexController::IndexButton::IB_TriggerClick, l_state.buttons & JSMASK_ZL);
+        p_left->SetButtonState(CLeapIndexController::IndexButton::IB_TriggerTouch, l_state.lTrigger > 0.f);
+        p_left->SetButtonValue(CLeapIndexController::IndexButton::IB_TriggerValue, l_state.lTrigger);
 
         // Grip
-        left->SetButtonState(CLeapIndexController::IndexButton::IB_GripTouch, state.buttons & 0x00100);
-        left->SetButtonValue(CLeapIndexController::IndexButton::IB_GripValue, state.buttons & 0x00100 ? 1.0f : 0.0f);
-        left->SetButtonValue(CLeapIndexController::IndexButton::IB_GripForce, state.buttons & 0x00100 ? 1.0f : 0.0f);
+        p_left->SetButtonState(CLeapIndexController::IndexButton::IB_GripTouch, l_state.buttons & JSMASK_L);
+        p_left->SetButtonValue(CLeapIndexController::IndexButton::IB_GripValue, (l_state.buttons & JSMASK_L) ? 1.f : 0.f);
+        p_left->SetButtonValue(CLeapIndexController::IndexButton::IB_GripForce, (l_state.buttons & JSMASK_L) ? 1.f : 0.f);
+
+        // Trackpad/touchpad
+        p_left->SetButtonState(CLeapIndexController::IndexButton::IB_TrackpadTouch, l_state.buttons & JSMASK_SL);
+        p_left->SetButtonValue(CLeapIndexController::IndexButton::IB_TrackpadForce, ((l_state.buttons & JSMASK_SL) && (l_state.buttons & JSMASK_SR)) ? 1.f : 0.f);
     }
 
-    if (m_devices[ControllerType::CONTROLLER_JOYCON_RIGHT].connected)
+    if(m_devices[JS_TYPE_JOYCON_RIGHT].connected)
     {
-        JOY_SHOCK_STATE state = JslGetSimpleState(m_devices[ControllerType::CONTROLLER_JOYCON_RIGHT].handle);
+        JOY_SHOCK_STATE l_state = JslGetSimpleState(m_devices[JS_TYPE_JOYCON_RIGHT].handle);
 
         // Home
-        right->SetButtonState(CLeapIndexController::IndexButton::IB_SystemTouch, state.buttons & 0x10000);
-        right->SetButtonState(CLeapIndexController::IndexButton::IB_SystemClick, state.buttons & 0x10000);
+        p_right->SetButtonState(CLeapIndexController::IndexButton::IB_SystemTouch, l_state.buttons & JSMASK_HOME);
+        p_right->SetButtonState(CLeapIndexController::IndexButton::IB_SystemClick, l_state.buttons & JSMASK_HOME);
 
         // A
-        right->SetButtonState(CLeapIndexController::IndexButton::IB_AClick, state.buttons & 0x01000);
-        right->SetButtonState(CLeapIndexController::IndexButton::IB_AClick, state.buttons & 0x01000);
+        p_right->SetButtonState(CLeapIndexController::IndexButton::IB_AClick, l_state.buttons & JSMASK_S);
+        p_right->SetButtonState(CLeapIndexController::IndexButton::IB_ATouch, l_state.buttons & JSMASK_S);
 
         // B
-        right->SetButtonState(CLeapIndexController::IndexButton::IB_BClick, state.buttons & 0x08000);
-        right->SetButtonState(CLeapIndexController::IndexButton::IB_BClick, state.buttons & 0x08000);
+        p_right->SetButtonState(CLeapIndexController::IndexButton::IB_BClick, l_state.buttons & JSMASK_N);
+        p_right->SetButtonState(CLeapIndexController::IndexButton::IB_BTouch, l_state.buttons & JSMASK_N);
 
         // Joystick XY
-        right->SetButtonState(CLeapIndexController::IndexButton::IB_ThumbstickClick, state.buttons & 0x00080);
-        right->SetButtonState(CLeapIndexController::IndexButton::IB_ThumbstickTouch, state.stickRX > 0 && state.stickRY > 0);
-        right->SetButtonValue(CLeapIndexController::IndexButton::IB_ThumbstickX, state.stickRX);
-        right->SetButtonValue(CLeapIndexController::IndexButton::IB_ThumbstickY, state.stickRY);
+        p_right->SetButtonState(CLeapIndexController::IndexButton::IB_ThumbstickClick, l_state.buttons & JSMASK_RCLICK);
+        p_right->SetButtonState(CLeapIndexController::IndexButton::IB_ThumbstickTouch, (l_state.stickRX > 0.f) && (l_state.stickRY > 0.f));
+        p_right->SetButtonValue(CLeapIndexController::IndexButton::IB_ThumbstickX, l_state.stickRX);
+        p_right->SetButtonValue(CLeapIndexController::IndexButton::IB_ThumbstickY, l_state.stickRY);
 
         // Trigger
-        right->SetButtonState(CLeapIndexController::IndexButton::IB_TriggerClick, state.buttons & 0x00800);
-        right->SetButtonValue(CLeapIndexController::IndexButton::IB_TriggerValue, state.rTrigger);
+        p_right->SetButtonState(CLeapIndexController::IndexButton::IB_TriggerClick, l_state.buttons & JSMASK_ZR);
+        p_right->SetButtonState(CLeapIndexController::IndexButton::IB_TriggerTouch, l_state.rTrigger > 0.f);
+        p_right->SetButtonValue(CLeapIndexController::IndexButton::IB_TriggerValue, l_state.rTrigger);
 
         // Grip
-        right->SetButtonState(CLeapIndexController::IndexButton::IB_GripTouch, state.buttons & 0x00200);
-        right->SetButtonValue(CLeapIndexController::IndexButton::IB_GripValue, state.buttons & 0x00200 ? 1.0f : 0.0f);
-        right->SetButtonValue(CLeapIndexController::IndexButton::IB_GripForce, state.buttons & 0x00200 ? 1.0f : 0.0f);
+        p_right->SetButtonState(CLeapIndexController::IndexButton::IB_GripTouch, l_state.buttons & JSMASK_R);
+        p_right->SetButtonValue(CLeapIndexController::IndexButton::IB_GripValue, (l_state.buttons & JSMASK_R) ? 1.0f : 0.0f);
+        p_right->SetButtonValue(CLeapIndexController::IndexButton::IB_GripForce, (l_state.buttons & JSMASK_R) ? 1.0f : 0.0f);
+
+        // Trackpad/touchpad
+        p_left->SetButtonState(CLeapIndexController::IndexButton::IB_TrackpadTouch, l_state.buttons & JSMASK_SR);
+        p_left->SetButtonValue(CLeapIndexController::IndexButton::IB_TrackpadForce, ((l_state.buttons & JSMASK_SR) && (l_state.buttons & JSMASK_SL)) ? 1.f : 0.f);
     }
 
-    if (m_devices[ControllerType::CONTROLLER_JOYCON_DS4].connected)
+    if(m_devices[JS_TYPE_DS4].connected)
     {
-        JOY_SHOCK_STATE state = JslGetSimpleState(m_devices[ControllerType::CONTROLLER_JOYCON_DS4].handle);
+        JOY_SHOCK_STATE l_state = JslGetSimpleState(m_devices[JS_TYPE_DS4].handle);
 
         // Home
-        left->SetButtonState(CLeapIndexController::IndexButton::IB_SystemTouch, state.buttons & 0x10000);
-        left->SetButtonState(CLeapIndexController::IndexButton::IB_SystemClick, state.buttons & 0x10000);
+        p_left->SetButtonState(CLeapIndexController::IndexButton::IB_SystemTouch, l_state.buttons & JSMASK_HOME);
+        p_left->SetButtonState(CLeapIndexController::IndexButton::IB_SystemClick, l_state.buttons & JSMASK_HOME);
 
         // A
-        left->SetButtonState(CLeapIndexController::IndexButton::IB_AClick, state.buttons & 0x00002);
-        left->SetButtonState(CLeapIndexController::IndexButton::IB_ATouch, state.buttons & 0x00002);
+        p_left->SetButtonState(CLeapIndexController::IndexButton::IB_AClick, l_state.buttons & JSMASK_DOWN);
+        p_left->SetButtonState(CLeapIndexController::IndexButton::IB_ATouch, l_state.buttons & JSMASK_DOWN);
 
         // B
-        left->SetButtonState(CLeapIndexController::IndexButton::IB_BClick, state.buttons & 0x00001);
-        left->SetButtonState(CLeapIndexController::IndexButton::IB_BClick, state.buttons & 0x00001);
+        p_left->SetButtonState(CLeapIndexController::IndexButton::IB_BClick, l_state.buttons & JSMASK_UP);
+        p_left->SetButtonState(CLeapIndexController::IndexButton::IB_BTouch, l_state.buttons & JSMASK_UP);
 
         // Joystick XY
-        left->SetButtonState(CLeapIndexController::IndexButton::IB_ThumbstickClick, state.buttons & 0x00040);
-        left->SetButtonState(CLeapIndexController::IndexButton::IB_ThumbstickTouch, state.stickLX > 0 && state.stickLY > 0);
-        left->SetButtonValue(CLeapIndexController::IndexButton::IB_ThumbstickX, state.stickLX);
-        left->SetButtonValue(CLeapIndexController::IndexButton::IB_ThumbstickY, state.stickLY);
+        p_left->SetButtonState(CLeapIndexController::IndexButton::IB_ThumbstickClick, l_state.buttons & JSMASK_LCLICK);
+        p_left->SetButtonState(CLeapIndexController::IndexButton::IB_ThumbstickTouch, (l_state.stickLX > 0.f) && (l_state.stickLY > 0.f));
+        p_left->SetButtonValue(CLeapIndexController::IndexButton::IB_ThumbstickX, l_state.stickLX);
+        p_left->SetButtonValue(CLeapIndexController::IndexButton::IB_ThumbstickY, l_state.stickLY);
 
         // Trigger
-        left->SetButtonState(CLeapIndexController::IndexButton::IB_TriggerClick, state.buttons & 0x00400);
-        left->SetButtonValue(CLeapIndexController::IndexButton::IB_TriggerValue, state.lTrigger);
+        p_left->SetButtonState(CLeapIndexController::IndexButton::IB_TriggerClick, l_state.buttons & JSMASK_ZL);
+        p_left->SetButtonState(CLeapIndexController::IndexButton::IB_TriggerTouch, l_state.lTrigger > 0.f);
+        p_left->SetButtonValue(CLeapIndexController::IndexButton::IB_TriggerValue, l_state.lTrigger);
 
         // Grip
-        left->SetButtonState(CLeapIndexController::IndexButton::IB_GripTouch, state.buttons & 0x00100);
-        left->SetButtonValue(CLeapIndexController::IndexButton::IB_GripValue, state.buttons & 0x00100 ? 1.0f : 0.0f);
-        left->SetButtonValue(CLeapIndexController::IndexButton::IB_GripForce, state.buttons & 0x00100 ? 1.0f : 0.0f);
+        p_left->SetButtonState(CLeapIndexController::IndexButton::IB_GripTouch, l_state.buttons & JSMASK_L);
+        p_left->SetButtonValue(CLeapIndexController::IndexButton::IB_GripValue, (l_state.buttons & JSMASK_L) ? 1.f : 0.f);
+        p_left->SetButtonValue(CLeapIndexController::IndexButton::IB_GripForce, (l_state.buttons & JSMASK_L) ? 1.f : 0.f);
 
         // Home
-        right->SetButtonState(CLeapIndexController::IndexButton::IB_SystemTouch, state.buttons & 0x10000);
-        right->SetButtonState(CLeapIndexController::IndexButton::IB_SystemClick, state.buttons & 0x10000);
+        p_right->SetButtonState(CLeapIndexController::IndexButton::IB_SystemTouch, l_state.buttons & JSMASK_HOME);
+        p_right->SetButtonState(CLeapIndexController::IndexButton::IB_SystemClick, l_state.buttons & JSMASK_HOME);
 
         // A
-        right->SetButtonState(CLeapIndexController::IndexButton::IB_AClick, state.buttons & 0x01000);
-        right->SetButtonState(CLeapIndexController::IndexButton::IB_AClick, state.buttons & 0x01000);
+        p_right->SetButtonState(CLeapIndexController::IndexButton::IB_AClick, l_state.buttons & JSMASK_S);
+        p_right->SetButtonState(CLeapIndexController::IndexButton::IB_ATouch, l_state.buttons & JSMASK_S);
 
         // B
-        right->SetButtonState(CLeapIndexController::IndexButton::IB_BClick, state.buttons & 0x08000);
-        right->SetButtonState(CLeapIndexController::IndexButton::IB_BClick, state.buttons & 0x08000);
+        p_right->SetButtonState(CLeapIndexController::IndexButton::IB_BClick, l_state.buttons & JSMASK_N);
+        p_right->SetButtonState(CLeapIndexController::IndexButton::IB_BTouch, l_state.buttons & JSMASK_N);
 
         // Joystick XY
-        right->SetButtonState(CLeapIndexController::IndexButton::IB_ThumbstickClick, state.buttons & 0x00080);
-        right->SetButtonState(CLeapIndexController::IndexButton::IB_ThumbstickTouch, state.stickRX > 0 && state.stickRY > 0);
-        right->SetButtonValue(CLeapIndexController::IndexButton::IB_ThumbstickX, state.stickRX);
-        right->SetButtonValue(CLeapIndexController::IndexButton::IB_ThumbstickY, state.stickRY);
+        p_right->SetButtonState(CLeapIndexController::IndexButton::IB_ThumbstickClick, l_state.buttons & JSMASK_RCLICK);
+        p_right->SetButtonState(CLeapIndexController::IndexButton::IB_ThumbstickTouch, (l_state.stickRX > 0.f) && (l_state.stickRY > 0.f));
+        p_right->SetButtonValue(CLeapIndexController::IndexButton::IB_ThumbstickX, l_state.stickRX);
+        p_right->SetButtonValue(CLeapIndexController::IndexButton::IB_ThumbstickY, l_state.stickRY);
 
         // Trigger
-        right->SetButtonState(CLeapIndexController::IndexButton::IB_TriggerClick, state.buttons & 0x00800);
-        right->SetButtonValue(CLeapIndexController::IndexButton::IB_TriggerValue, state.rTrigger);
+        p_right->SetButtonState(CLeapIndexController::IndexButton::IB_TriggerClick, l_state.buttons & JSMASK_ZR);
+        p_right->SetButtonState(CLeapIndexController::IndexButton::IB_TriggerTouch, l_state.rTrigger > 0.f);
+        p_right->SetButtonValue(CLeapIndexController::IndexButton::IB_TriggerValue, l_state.rTrigger);
 
         // Grip
-        right->SetButtonState(CLeapIndexController::IndexButton::IB_GripTouch, state.buttons & 0x00200);
-        right->SetButtonValue(CLeapIndexController::IndexButton::IB_GripValue, state.buttons & 0x00200 ? 1.0f : 0.0f);
-        right->SetButtonValue(CLeapIndexController::IndexButton::IB_GripForce, state.buttons & 0x00200 ? 1.0f : 0.0f);
+        p_right->SetButtonState(CLeapIndexController::IndexButton::IB_GripTouch, l_state.buttons & JSMASK_R);
+        p_right->SetButtonValue(CLeapIndexController::IndexButton::IB_GripValue, (l_state.buttons & JSMASK_R) ? 1.f : 0.f);
+        p_right->SetButtonValue(CLeapIndexController::IndexButton::IB_GripForce, (l_state.buttons & JSMASK_R) ? 1.f : 0.f);
     }
 
-    for (size_t i = 0U; i < m_devices.size(); i++)
-    {
+    for(int i = 0, j = static_cast<int>(m_devices.size()); i < j; i++)
         m_devices[i].connected = JslStillConnected(m_devices[i].handle);
-    }
 }

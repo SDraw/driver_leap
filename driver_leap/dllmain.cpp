@@ -1,5 +1,4 @@
 ﻿#include "stdafx.h"
-
 #include "Core/CServerDriver.h"
 
 std::wstring g_modulePath;

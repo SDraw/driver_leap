@@ -412,7 +412,7 @@ void CLeapIndexController::UpdatePose(const CLeapHand *p_hand)
 
 void CLeapIndexController::UpdateInput(const CLeapHand *p_hand)
 {
-    if (!CDriverConfig::IsControllerInputUsed())
+    if(!CDriverConfig::IsControllerInputUsed())
     {
         float l_trigger = p_hand->GetFingerBend(CLeapHand::Finger::Index);
         m_buttons[IB_TriggerValue]->SetValue(l_trigger);
@@ -422,7 +422,7 @@ void CLeapIndexController::UpdateInput(const CLeapHand *p_hand)
         float l_grabValue = p_hand->GetGrabValue();
         m_buttons[IB_GripValue]->SetValue(l_grabValue);
         m_buttons[IB_GripTouch]->SetState(l_grabValue >= 0.75f);
-        m_buttons[IB_GripForce]->SetValue((l_grabValue >= 0.9f) ? (l_grabValue - 0.9f) * 10.f : 0.f);
+        m_buttons[IB_GripForce]->SetValue(InverseLerp(l_grabValue, 0.9f, 1.f));
     }
 
     m_buttons[IB_FingerIndex]->SetValue(p_hand->GetFingerBend(CLeapHand::Finger::Index));
@@ -460,13 +460,8 @@ void CLeapIndexController::UpdateSkeletalInput(const CLeapHand *p_hand)
             p_hand->GetFingerBoneLocalRotation(i, (i == 0U) ? (j + 1U) : j, l_rot);
             ChangeBoneOrientation(l_rot);
 
-            if(j == 0U) // Metacarpal
-            {
-                if(i == 0U)
-                    FixThumbBone(l_rot);
-                else
-                    FixMetacarpalBone(l_rot);
-            }
+            if(j == 0U)
+                FixMetacarpalBone(l_rot, i == 0);
 
             ConvertQuaternion(l_rot, m_boneTransform[l_indexFinger + j].orientation);
         }
@@ -523,16 +518,12 @@ void CLeapIndexController::ChangeBoneOrientation(glm::quat &p_rot) const
     }
 }
 
-void CLeapIndexController::FixThumbBone(glm::quat & p_rot) const
+void CLeapIndexController::FixMetacarpalBone(glm::quat & p_rot, bool p_thumb) const
 {
-    p_rot = g_thumbOffset * p_rot;
-    if(m_isLeft)
-        p_rot = g_mirroringOffset * p_rot;
-}
-
-void CLeapIndexController::FixMetacarpalBone(glm::quat & p_rot) const
-{
-    p_rot = g_metacarpalOffset * p_rot;
+    if(p_thumb)
+        p_rot = g_thumbOffset * p_rot;
+    else
+        p_rot = g_metacarpalOffset * p_rot;
     if(m_isLeft)
         p_rot = g_mirroringOffset * p_rot;
 }
@@ -686,7 +677,7 @@ void CLeapIndexController::ProcessExternalInput(const char * p_message)
                                         case StateName::ST_Clicked:
                                         {
                                             m_buttons[IB_TrackpadTouch]->SetState(true);
-                                            m_buttons[IB_TrackpadForce]->SetValue(NormalizeRange(l_values.z, 0.75f, 1.f));
+                                            m_buttons[IB_TrackpadForce]->SetValue(InverseLerp(l_values.z, 0.75f, 1.f));
                                             m_buttons[IB_TrackpadX]->SetValue(l_values.x);
                                             m_buttons[IB_TrackpadY]->SetValue(l_values.y);
                                         } break;
@@ -695,7 +686,7 @@ void CLeapIndexController::ProcessExternalInput(const char * p_message)
                             }
                         }
                     }
-                }
+                } break;
             }
         }
     }

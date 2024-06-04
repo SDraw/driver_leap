@@ -14,4 +14,3 @@
 #include "glm/gtx/intersect.hpp"
 
 #include "pugixml.hpp"
-

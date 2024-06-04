@@ -19,7 +19,7 @@ bool ReadEnumVector(const char *p_val, const std::vector<std::string> &p_vec, si
 
 void SplitString(const std::string& p_text, const char p_separator, std::vector<std::string>& p_result);
 void SplitString(const char *p_text, const char p_separator, std::vector<std::string>& p_result);
-float NormalizeRange(float p_val, float p_min, float p_max);
+float InverseLerp(float p_val, float p_min, float p_max);
 
 bool TryParse(const std::string &p_string, int &p_value);
 bool TryParse(const std::string &p_string, float &p_value);

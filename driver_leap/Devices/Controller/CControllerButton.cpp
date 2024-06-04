@@ -1,5 +1,4 @@
 #include "stdafx.h"
-
 #include "Devices/Controller/CControllerButton.h"
 
 CControllerButton::CControllerButton()
@@ -9,10 +8,6 @@ CControllerButton::CControllerButton()
     m_state = false;
     m_value = 0.f;
     m_updated = false;
-}
-
-CControllerButton::~CControllerButton()
-{
 }
 
 vr::VRInputComponentHandle_t CControllerButton::GetHandle() const
@@ -37,13 +32,10 @@ unsigned char CControllerButton::GetInputType() const
 
 void CControllerButton::SetState(bool p_state)
 {
-    if(m_inputType == IT_Boolean)
+    if((m_inputType == IT_Boolean) && (m_state != p_state))
     {
-        if(m_state != p_state)
-        {
-            m_state = p_state;
-            m_updated = true;
-        }
+        m_state = p_state;
+        m_updated = true;
     }
 }
 
@@ -54,13 +46,10 @@ bool CControllerButton::GetState() const
 
 void CControllerButton::SetValue(float p_value)
 {
-    if(m_inputType == IT_Float)
+    if((m_inputType == IT_Float) && (m_value != p_value))
     {
-        if(m_value != p_value)
-        {
-            m_value = p_value;
-            m_updated = true;
-        }
+        m_value = p_value;
+        m_updated = true;
     }
 }
 

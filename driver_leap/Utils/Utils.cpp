@@ -1,5 +1,4 @@
 #include "stdafx.h"
-
 #include "Utils/Utils.h"
 
 // Left hand open gesture transformation, thanks to https://github.com/spayne and his soft_knuckles repository
@@ -135,7 +134,7 @@ void SplitString(const char* p_text, const char p_separator, std::vector<std::st
     }
 }
 
-float NormalizeRange(float p_val, float p_min, float p_max)
+float InverseLerp(float p_val, float p_min, float p_max)
 {
     const float l_mapped = (p_val - p_min) / (p_max - p_min);
     return glm::clamp(l_mapped, 0.f, 1.f);
