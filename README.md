@@ -25,11 +25,11 @@ List of hands gestures that correspond to controller original input:
 * **Grip:** bending of middle, ring and pinky fingers
 * **Trigger:** bending of index finger
 
-By default other buttons/inputs are available through hand overlays or connected controllers (by enabling option in `General` tab of utility app).
+By default other buttons/inputs are available through hand overlays or connected controllers (by enabling corresponding option in `General` tab of utility app).
 Currenty supported controllers:
-* Nintendo Joy-Cons controllers
+* Nintendo Joy-Cons controllers:
   * <kbd>![](./.github/img_03.png)</kbd>
-* Sony Playstation DualShock4
+* Sony Playstation DualShock 4:
   * (TBA)
 
 ## Notes
