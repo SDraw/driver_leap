@@ -71,7 +71,16 @@ void CLeapHand::GetFingerBoneLocalPosition(size_t p_finger, size_t p_bone, glm::
     l_result = l_childLocal * g_pointVec4;
 }
 
-void CLeapHand::GetFingerBoneLocalRotation(size_t p_finger, size_t p_bone, glm::quat & l_result) const
+void CLeapHand::GetThumbBoneLocalRotation(size_t p_finger, size_t p_bone, glm::quat &l_result) const
+{
+	if ((p_finger != 0u) || (p_bone >= 4U))
+		return;
+
+	size_t l_index = p_finger * 4U + p_bone;
+	l_result = glm::inverse((p_bone == 1U) ? m_rotation : m_bonesRotations[l_index - 1U]) * m_bonesRotations[l_index];
+}
+
+void CLeapHand::GetFingerBoneLocalRotation(size_t p_finger, size_t p_bone, glm::quat &l_result) const
 {
     if((p_finger >= 5U) || (p_bone >= 4U))
         return;

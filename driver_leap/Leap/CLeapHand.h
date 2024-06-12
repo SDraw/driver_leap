@@ -42,6 +42,7 @@ public:
 
     void GetFingerBoneLocalPosition(size_t p_finger, size_t p_bone, glm::vec3 &l_result) const;
     void GetFingerBoneLocalRotation(size_t p_finger, size_t p_bone, glm::quat &l_result) const;
+	void GetThumbBoneLocalRotation(size_t p_finger, size_t p_bone, glm::quat &l_result) const;
 
     float GetFingerBend(size_t p_finger) const;
     float GetGrabValue() const;
