@@ -7,39 +7,43 @@ const std::vector<std::string> g_settingNames
     "trackingLevel",
     "handsReset",
     "useVelocity",
-    "showOverlays",
+    "startMinimized",
+    "useTriggerGrip",
+    "triggerMode",
+    "useControllerInput",
     "rootOffsetX",
     "rootOffsetY",
     "rootOffsetZ",
     "rootAngleX",
     "rootAngleY",
     "rootAngleZ",
+    "showOverlays",
+    "overlaySize",
     "overlayOffsetX",
     "overlayOffsetY",
     "overlayOffsetZ",
     "overlayAngleX",
     "overlayAngleY",
-    "overlayAngleZ",
-    "startMinimized",
-    "overlaySize",
-    "useControllerInput"
+    "overlayAngleZ"
 };
 
 CSettingsManager* CSettingsManager::ms_instance = nullptr;
 
 CSettingsManager::CSettingsManager()
 {
-    m_trackingLevel = 0;
+    m_trackingLevel = TL_Full;
     m_handsReset = false;
     m_useVelocity = false;
-    m_showOverlays = true;
+    m_startMinimized = false;
+    m_useTriggerGrip = true;
+    m_triggerMode = TM_FingerBend;
+    m_useControllerInput = false;
     m_rootOffset = glm::vec3(0.f);
     m_rootAngle = glm::vec3(0.f);
+    m_showOverlays = true;
+    m_overlaySize = 0.128f;
     m_overlayOffset = glm::vec3(0.f);
     m_overlayAngle = glm::vec3(0.f);
-    m_startMinimized = false;
-    m_overlaySize = 0.128f;
-    m_useControllerInput = false;
 }
 
 CSettingsManager* CSettingsManager::GetInstance()
@@ -70,7 +74,7 @@ void CSettingsManager::Load()
                     switch(ReadEnumVector(l_attribName.as_string(), g_settingNames))
                     {
                         case ST_TrackingLevel:
-                            m_trackingLevel = std::abs(l_attribValue.as_int(0)) % 2;
+                            m_trackingLevel = glm::clamp<int>(l_attribValue.as_int(TL_Full), TL_Partial, TL_Full);
                             break;
 
                         case ST_HandsReset:
@@ -81,8 +85,20 @@ void CSettingsManager::Load()
                             m_useVelocity = l_attribValue.as_bool(false);
                             break;
 
-                        case ST_ShowOverlays:
-                            m_showOverlays = l_attribValue.as_bool(true);
+                        case ST_StartMinimized:
+                            m_startMinimized = l_attribValue.as_bool(false);
+                            break;
+
+                        case ST_UseTriggerGrip:
+                            m_useTriggerGrip = l_attribValue.as_bool(true);
+                            break;
+
+                        case ST_TriggerMode:
+                            m_triggerMode = glm::clamp<int>(l_attribValue.as_int(TM_FingerBend), TM_FingerBend, TM_Pinch);
+                            break;
+
+                        case ST_UseControllerInput:
+                            m_useControllerInput = l_attribValue.as_bool(false);
                             break;
 
                         case ST_RootOffsetX:
@@ -109,6 +125,14 @@ void CSettingsManager::Load()
                             m_rootAngle.z = glm::clamp(l_attribValue.as_float(0.f), -180.f, 180.f);
                             break;
 
+                        case ST_ShowOverlays:
+                            m_showOverlays = l_attribValue.as_bool(true);
+                            break;
+
+                        case ST_OverlaySize:
+                            m_overlaySize = glm::clamp(l_attribValue.as_float(0.128f), 0.1f, 0.5f);
+                            break;
+
                         case ST_OverlayOffsetX:
                             m_overlayOffset.x = glm::clamp(l_attribValue.as_float(0.f), -0.5f, 0.5f);
                             break;
@@ -131,18 +155,6 @@ void CSettingsManager::Load()
 
                         case ST_OverlayAngleZ:
                             m_overlayAngle.z = glm::clamp(l_attribValue.as_float(0.f), -180.f, 180.f);
-                            break;
-
-                        case ST_StartMinimized:
-                            m_startMinimized = l_attribValue.as_bool(false);
-                            break;
-
-                        case ST_OverlaySize:
-                            m_overlaySize = glm::clamp(l_attribValue.as_float(0.128f), 0.1f, 0.5f);
-                            break;
-
-                        case ST_UseControllerInput:
-                            m_useControllerInput = l_attribValue.as_bool(false);
                             break;
                     }
                 }
@@ -179,8 +191,20 @@ void CSettingsManager::Save()
                 l_valueAttrib.set_value(m_useVelocity);
                 break;
 
-            case ST_ShowOverlays:
-                l_valueAttrib.set_value(m_showOverlays);
+            case ST_StartMinimized:
+                l_valueAttrib.set_value(m_startMinimized);
+                break;
+
+            case ST_UseTriggerGrip:
+                l_valueAttrib.set_value(m_useTriggerGrip);
+                break;
+
+            case ST_TriggerMode:
+                l_valueAttrib.set_value(m_triggerMode);
+                break;
+
+            case ST_UseControllerInput:
+                l_valueAttrib.set_value(m_useControllerInput);
                 break;
 
             case ST_RootOffsetX:
@@ -207,6 +231,14 @@ void CSettingsManager::Save()
                 l_valueAttrib.set_value(m_rootAngle.z);
                 break;
 
+            case ST_ShowOverlays:
+                l_valueAttrib.set_value(m_showOverlays);
+                break;
+
+            case ST_OverlaySize:
+                l_valueAttrib.set_value(m_overlaySize);
+                break;
+
             case ST_OverlayOffsetX:
                 l_valueAttrib.set_value(m_overlayOffset.x);
                 break;
@@ -230,18 +262,6 @@ void CSettingsManager::Save()
             case ST_OverlayAngleZ:
                 l_valueAttrib.set_value(m_overlayAngle.z);
                 break;
-
-            case ST_StartMinimized:
-                l_valueAttrib.set_value(m_startMinimized);
-                break;
-
-            case ST_OverlaySize:
-                l_valueAttrib.set_value(m_overlaySize);
-                break;
-
-            case ST_UseControllerInput:
-                l_valueAttrib.set_value(m_useControllerInput);
-                break;
         }
     }
 
@@ -263,14 +283,24 @@ bool CSettingsManager::GetUseVelocity() const
     return m_useVelocity;
 }
 
-bool CSettingsManager::GetShowOverlays() const
-{
-    return m_showOverlays;
-}
-
 bool CSettingsManager::GetStartMinimized() const
 {
     return m_startMinimized;
+}
+
+bool CSettingsManager::GetUseTriggerGrip() const
+{
+    return m_useTriggerGrip;
+}
+
+int CSettingsManager::GetTriggerMode() const
+{
+    return m_triggerMode;
+}
+
+bool CSettingsManager::GetUseControllerInput() const
+{
+    return m_useControllerInput;
 }
 
 const glm::vec3 & CSettingsManager::GetRootOffset() const
@@ -283,6 +313,16 @@ const glm::vec3& CSettingsManager::GetRootAngle() const
     return m_rootAngle;
 }
 
+bool CSettingsManager::GetShowOverlays() const
+{
+    return m_showOverlays;
+}
+
+float CSettingsManager::GetOverlaySize() const
+{
+    return m_overlaySize;
+}
+
 const glm::vec3 & CSettingsManager::GetOverlayOffset() const
 {
     return m_overlayOffset;
@@ -293,22 +333,16 @@ const glm::vec3 & CSettingsManager::GetOverlayAngle() const
     return m_overlayAngle;
 }
 
-float CSettingsManager::GetOverlaySize() const
-{
-    return m_overlaySize;
-}
-
-bool CSettingsManager::GetUseControllerInput() const
-{
-    return m_useControllerInput;
-}
-
 void CSettingsManager::SetSetting(SettingType p_setting, int p_value)
 {
     switch(p_setting)
     {
         case ST_TrackingLevel:
-            m_trackingLevel = std::abs(p_value) % 2;
+            m_trackingLevel = glm::clamp<int>(p_value, TL_Partial, TL_Full);
+            break;
+
+        case ST_TriggerMode:
+            m_triggerMode = glm::clamp<int>(p_value, TM_FingerBend, TM_Pinch);
             break;
     }
 }
@@ -324,16 +358,20 @@ void CSettingsManager::SetSetting(SettingType p_setting, bool p_value)
             m_useVelocity = p_value;
             break;
 
-        case ST_ShowOverlays:
-            m_showOverlays = p_value;
-            break;
-
         case ST_StartMinimized:
             m_startMinimized = p_value;
             break;
 
+        case ST_UseTriggerGrip:
+            m_useTriggerGrip = p_value;
+            break;
+
         case ST_UseControllerInput:
             m_useControllerInput = p_value;
+            break;
+
+        case ST_ShowOverlays:
+            m_showOverlays = p_value;
             break;
     }
 }

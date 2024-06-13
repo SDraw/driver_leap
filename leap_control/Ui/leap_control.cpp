@@ -10,6 +10,7 @@ leap_control::leap_control(QWidget *parent) : QWidget(parent)
     ui.setupUi(this);
     this->setWindowFlag(Qt::WindowMaximizeButtonHint, false);
 
+    // General
     ui.m_trackingLevelComboBox->setCurrentIndex(CSettingsManager::GetInstance()->GetTrackingLevel());
     connect(ui.m_trackingLevelComboBox, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &leap_control::OnTrackingLevelChange);
 
@@ -19,12 +20,20 @@ leap_control::leap_control(QWidget *parent) : QWidget(parent)
     ui.m_useVelocityCheckBox->setChecked(CSettingsManager::GetInstance()->GetUseVelocity());
     connect(ui.m_useVelocityCheckBox, &QCheckBox::stateChanged, this, &leap_control::OnUseVelocityChange);
 
-    ui.m_useControllerInputCheckBox->setChecked(CSettingsManager::GetInstance()->GetUseControllerInput());
-    connect(ui.m_useControllerInputCheckBox, &QCheckBox::stateChanged, this, &leap_control::OnUseControllerInputChange);
-
     ui.m_startMinimizedCheckBox->setChecked(CSettingsManager::GetInstance()->GetStartMinimized());
     connect(ui.m_startMinimizedCheckBox, &QCheckBox::stateChanged, this, &leap_control::OnStartMinimizedChanged);
 
+    // Input
+    ui.m_useTriggerGripCheckBox->setChecked(CSettingsManager::GetInstance()->GetUseTriggerGrip());
+    connect(ui.m_useTriggerGripCheckBox, &QCheckBox::stateChanged, this, &leap_control::OnUseTriggerGripChange);
+
+    ui.m_triggerModeComboBox->setCurrentIndex(CSettingsManager::GetInstance()->GetTriggerMode());
+    connect(ui.m_triggerModeComboBox, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &leap_control::OnTriggerModeChange);
+
+    ui.m_useControllerInputCheckBox->setChecked(CSettingsManager::GetInstance()->GetUseControllerInput());
+    connect(ui.m_useControllerInputCheckBox, &QCheckBox::stateChanged, this, &leap_control::OnUseControllerInputChange);
+
+    // Root
     ui.m_rootOffsetSliderX->setValue(InvProgressLerp(CSettingsManager::GetInstance()->GetRootOffset().x, -1.f, 1.f));
     ui.m_rootOffsetSliderX->setToolTip(QString("X: %1").arg(CSettingsManager::GetInstance()->GetRootOffset().x));
     connect(ui.m_rootOffsetSliderX, &QSlider::valueChanged, this, &leap_control::OnRootOffsetXChanged);
@@ -49,6 +58,7 @@ leap_control::leap_control(QWidget *parent) : QWidget(parent)
     ui.m_rootAngleSliderZ->setToolTip(QString("Z: %1").arg(CSettingsManager::GetInstance()->GetRootAngle().z));
     connect(ui.m_rootAngleSliderZ, &QSlider::valueChanged, this, &leap_control::OnRootAngleZChanged);
 
+    // Overlays
     ui.m_showOverlaysCheckBox->setChecked(CSettingsManager::GetInstance()->GetShowOverlays());
     connect(ui.m_showOverlaysCheckBox, &QCheckBox::stateChanged, this, &leap_control::OnShowOverlaysChange);
 
@@ -119,9 +129,34 @@ void leap_control::OnUseVelocityChange(int p_state)
         CVRManager::GetInstance()->SendStationMessage(l_message);
     }
 }
+void leap_control::OnStartMinimizedChanged(int p_state)
+{
+    if(p_state != Qt::PartiallyChecked)
+        CSettingsManager::GetInstance()->SetSetting(CSettingsManager::ST_StartMinimized, (p_state == Qt::Checked));
+}
+
+void leap_control::OnUseTriggerGripChange(int p_state)
+{
+    if(p_state != Qt::PartiallyChecked)
+    {
+        CSettingsManager::GetInstance()->SetSetting(CSettingsManager::ST_UseTriggerGrip, (p_state == Qt::Checked));
+
+        std::string l_message("useTriggerGrip ");
+        l_message.append(std::to_string((p_state == Qt::Checked) ? 1 : 0));
+        CVRManager::GetInstance()->SendStationMessage(l_message);
+    }
+}
+void leap_control::OnTriggerModeChange(int p_item)
+{
+    CSettingsManager::GetInstance()->SetSetting(CSettingsManager::ST_TriggerMode, p_item);
+
+    std::string l_message("triggerMode ");
+    l_message.append(std::to_string(p_item));
+    CVRManager::GetInstance()->SendStationMessage(l_message);
+}
 void leap_control::OnUseControllerInputChange(int p_state)
 {
-    if (p_state != Qt::PartiallyChecked)
+    if(p_state != Qt::PartiallyChecked)
     {
         CSettingsManager::GetInstance()->SetSetting(CSettingsManager::ST_UseControllerInput, (p_state == Qt::Checked));
 
@@ -129,11 +164,6 @@ void leap_control::OnUseControllerInputChange(int p_state)
         l_message.append(std::to_string((p_state == Qt::Checked) ? 1 : 0));
         CVRManager::GetInstance()->SendStationMessage(l_message);
     }
-}
-void leap_control::OnStartMinimizedChanged(int p_state)
-{
-    if(p_state != Qt::PartiallyChecked)
-        CSettingsManager::GetInstance()->SetSetting(CSettingsManager::ST_StartMinimized, (p_state == Qt::Checked));
 }
 
 void leap_control::OnRootOffsetXChanged(int p_value)

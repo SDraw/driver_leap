@@ -17,9 +17,11 @@ private:
     void OnTrackingLevelChange(int p_item);
     void OnHandsResetChange(int p_state);
     void OnUseVelocityChange(int p_state);
-    void OnUseControllerInputChange(int p_state);
-
     void OnStartMinimizedChanged(int p_state);
+
+    void OnUseTriggerGripChange(int p_state);
+    void OnTriggerModeChange(int p_item);
+    void OnUseControllerInputChange(int p_state);
 
     void OnRootOffsetXChanged(int p_value);
     void OnRootOffsetYChanged(int p_value);

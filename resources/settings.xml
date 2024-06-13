@@ -3,19 +3,22 @@
 	<setting name="trackingLevel" value="1" />
 	<setting name="handsReset" value="false" />
 	<setting name="useVelocity" value="false" />
-	<setting name="showOverlays" value="true" />
+	<setting name="startMinimized" value="false" />
+	<setting name="useTriggerGrip" value="true" />
+	<setting name="triggerMode" value="0" />
+	<setting name="useControllerInput" value="false" />
 	<setting name="rootOffsetX" value="0" />
 	<setting name="rootOffsetY" value="0" />
 	<setting name="rootOffsetZ" value="0" />
 	<setting name="rootAngleX" value="0" />
 	<setting name="rootAngleY" value="0" />
 	<setting name="rootAngleZ" value="0" />
+	<setting name="showOverlays" value="true" />
+	<setting name="overlaySize" value="0.128000006" />
 	<setting name="overlayOffsetX" value="0.00999999046" />
 	<setting name="overlayOffsetY" value="0.0299999714" />
 	<setting name="overlayOffsetZ" value="0.0299999714" />
 	<setting name="overlayAngleX" value="-118.799995" />
 	<setting name="overlayAngleY" value="0" />
 	<setting name="overlayAngleZ" value="-10.7999954" />
-	<setting name="startMinimized" value="false" />
-	<setting name="overlaySize" value="0.128000006" />
 </settings>

@@ -11,6 +11,7 @@ class CLeapHand final
     std::array<glm::quat, 20U> m_bonesRotations;
     std::array<float, 5U> m_fingersBends;
     float m_grabValue;
+    float m_pinchValue;
 public:
     enum Finger : size_t
     {
@@ -33,6 +34,7 @@ public:
 
     bool IsLeft() const;
     bool IsVisible() const;
+
     const glm::vec3& GetPosition() const;
     const glm::quat& GetRotation() const;
     const glm::vec3& GetVelocity() const;
@@ -40,12 +42,12 @@ public:
     const glm::vec3& GetFingerBonePosition(size_t p_finger, size_t p_bone) const;
     const glm::quat& GetFingerBoneRotation(size_t p_finger, size_t p_bone) const;
 
-    void GetFingerBoneLocalPosition(size_t p_finger, size_t p_bone, glm::vec3 &l_result) const;
-    void GetFingerBoneLocalRotation(size_t p_finger, size_t p_bone, glm::quat &l_result) const;
-	void GetThumbBoneLocalRotation(size_t p_finger, size_t p_bone, glm::quat &l_result) const;
+    void GetFingerBoneLocalPosition(size_t p_finger, size_t p_bone, glm::vec3 &l_result, bool p_ignoreMeta = false) const;
+    void GetFingerBoneLocalRotation(size_t p_finger, size_t p_bone, glm::quat &l_result, bool p_ignoreMeta = false) const;
 
     float GetFingerBend(size_t p_finger) const;
     float GetGrabValue() const;
+    float GetPinchValue() const;
 
     void Update(const LEAP_HAND &p_hand);
     void Update();

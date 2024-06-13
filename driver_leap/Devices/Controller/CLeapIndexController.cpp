@@ -16,7 +16,6 @@ const glm::mat4 g_wristOffsetLeft = glm::inverse(glm::translate(g_identityMatrix
 const glm::mat4 g_wristOffsetRight = glm::inverse(glm::translate(g_identityMatrix, glm::vec3(0.0445230342f, 0.0301547553f, 0.16438961f)) * glm::toMat4(glm::quat(1.50656376e-07f, -1.77612698e-08f, -0.927827835f, 0.373008907f)));
 const glm::quat g_skeletonOffsetLeft = glm::quat(glm::vec3(g_pi, 0.f, g_piHalf));
 const glm::quat g_skeletonOffsetRight = glm::quat(glm::vec3(g_pi, 0.f, -g_piHalf));
-const glm::quat g_thumbOffset = glm::quat(glm::vec3(-g_piHalf * 0.5, 0.f, 0.f)) * glm::quat(glm::vec3(-g_piHalf, g_piHalf, -g_piHalf)); // glm::quat(1, 0, 0, 0);
 const glm::quat g_metacarpalOffset = glm::quat(glm::vec3(-g_piHalf, g_piHalf, 0.f));
 const glm::quat g_mirroringOffset = glm::quat(glm::vec3(g_pi, 0.f, 0.f));
 
@@ -412,9 +411,19 @@ void CLeapIndexController::UpdatePose(const CLeapHand *p_hand)
 
 void CLeapIndexController::UpdateInput(const CLeapHand *p_hand)
 {
-    if(!CDriverConfig::IsControllerInputUsed())
+    if(!CDriverConfig::IsControllerInputUsed() && CDriverConfig::IsTriggerGripUsed())
     {
-        float l_trigger = p_hand->GetFingerBend(CLeapHand::Finger::Index);
+        float l_trigger = 0.f;
+        switch(CDriverConfig::GetTriggerMode())
+        {
+            case CDriverConfig::TM_FingerBend:
+                l_trigger = p_hand->GetFingerBend(CLeapHand::Finger::Index);
+                break;
+
+            case CDriverConfig::TM_Pinch:
+                l_trigger = InverseLerp(p_hand->GetPinchValue(), 0.f, 0.75f);
+                break;
+        }
         m_buttons[IB_TriggerValue]->SetValue(l_trigger);
         m_buttons[IB_TriggerTouch]->SetState(l_trigger >= 0.5f);
         m_buttons[IB_TriggerClick]->SetState(l_trigger >= 0.75f);
@@ -451,49 +460,29 @@ void CLeapIndexController::UpdateInput(const CLeapHand *p_hand)
 void CLeapIndexController::UpdateSkeletalInput(const CLeapHand *p_hand)
 {
     // Skeletal structure update
+    bool l_updatePos = (CDriverConfig::GetTrackingLevel() == CDriverConfig::TL_Full);
     for(size_t i = 0U; i < 5U; i++)
     {
         size_t l_indexFinger = GetFingerBoneIndex(i);
+        bool l_thumb = (i == 0U);
 
-		if (i == 0U)
-		{
-			for (size_t j = 0U; j < 3U; j++)
-			{
-				glm::quat l_rot;
-				glm::vec3 l_pos;
+        for(size_t j = 0U, k = (l_thumb ? 3U : 4U); j < k; j++)
+        {
+            glm::quat l_rot;
+            p_hand->GetFingerBoneLocalRotation(i, (l_thumb ? (j + 1U) : j), l_rot, l_thumb);
+            ChangeBoneOrientation(l_rot);
+            if(j == 0U)
+                FixMetacarpalBone(l_rot);
+            ConvertQuaternion(l_rot, m_boneTransform[l_indexFinger + j].orientation);
 
-				p_hand->GetThumbBoneLocalRotation(i, j + 1U, l_rot);
-				p_hand->GetFingerBoneLocalPosition(i, j + 1U, l_pos);
-
-				ChangeBoneOrientation(l_rot);
-				if (j == 0U) FixMetacarpalBone(l_rot, false);
-				ChangeBonePosition(l_pos);
-
-				ConvertQuaternion(l_rot, m_boneTransform[l_indexFinger + j].orientation);
-				if(j > 0U) ConvertVector3(l_pos, m_boneTransform[l_indexFinger + j].position);
-			}
-		}
-		else
-		{
-			for (size_t j = 0U; j < 4U; j++)
-			{
-				glm::quat l_rot;
-				glm::vec3 l_pos;
-
-				p_hand->GetFingerBoneLocalRotation(i, j, l_rot);
-				p_hand->GetFingerBoneLocalPosition(i, j, l_pos);
-
-				ChangeBoneOrientation(l_rot);
-				if (j == 0U)
-				{
-					FixMetacarpalBone(l_rot, i == 0);
-				}
-				ChangeBonePosition(l_pos);
-
-				ConvertQuaternion(l_rot, m_boneTransform[l_indexFinger + j].orientation);
-				if(j > 0U) ConvertVector3(l_pos, m_boneTransform[l_indexFinger + j].position);
-			}
-		}
+            if(l_updatePos && (j > 0U))
+            {
+                glm::vec3 l_pos;
+                p_hand->GetFingerBoneLocalPosition(i, (l_thumb ? (j + 1U) : j), l_pos, l_thumb);
+                ChangeBonePosition(l_pos);
+                ConvertVector3(l_pos, m_boneTransform[l_indexFinger + j].position);
+            }
+        }
     }
 
     // Update aux bones
@@ -549,22 +538,16 @@ void CLeapIndexController::ChangeBoneOrientation(glm::quat &p_rot) const
 
 void CLeapIndexController::ChangeBonePosition(glm::vec3 &p_pos) const
 {
-	std::swap(p_pos.x, p_pos.z);
-	p_pos.z *= -1.f;
+    std::swap(p_pos.x, p_pos.z);
+    p_pos.z *= -1.f;
 
-	if (m_isLeft)
-	{
-		p_pos.x *= -1.f;
-		p_pos.y *= 1.f;
-	}
+    if(m_isLeft)
+        p_pos.x *= -1.f;
 }
 
-void CLeapIndexController::FixMetacarpalBone(glm::quat & p_rot, bool p_thumb) const
+void CLeapIndexController::FixMetacarpalBone(glm::quat &p_rot) const
 {
-    if(p_thumb)
-        p_rot = g_thumbOffset * p_rot;
-    else
-        p_rot = g_metacarpalOffset * p_rot;
+    p_rot = g_metacarpalOffset * p_rot;
     if(m_isLeft)
         p_rot = g_mirroringOffset * p_rot;
 }

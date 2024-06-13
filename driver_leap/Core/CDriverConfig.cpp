@@ -9,21 +9,25 @@ const std::vector<std::string> g_settingNames
     "trackingLevel",
     "handsReset",
     "useVelocity",
+    "useTriggerGrip",
+    "triggerMode",
+    "useControllerInput",
     "rootOffsetX",
     "rootOffsetY",
     "rootOffsetZ",
     "rootAngleX",
     "rootAngleY",
-    "rootAngleZ",
-    "useControllerInput"
+    "rootAngleZ"
 };
 
-int CDriverConfig::ms_trackingLevel = CDriverConfig::TL_Partial;
+int CDriverConfig::ms_trackingLevel = CDriverConfig::TL_Full;
 bool CDriverConfig::ms_handsReset = false;
 bool CDriverConfig::ms_useVelocity = false;
+bool CDriverConfig::ms_useTriggerGrip = true;
+int CDriverConfig::ms_triggerMode = CDriverConfig::TM_FingerBend;
+bool CDriverConfig::ms_useControllerInput = false;
 glm::vec3 CDriverConfig::ms_rootOffset = glm::vec3(0.f);
 glm::vec3 CDriverConfig::ms_rootAngle = glm::vec3(0.f);
-bool CDriverConfig::ms_useControllerInput = false;
 
 void CDriverConfig::Load()
 {
@@ -45,7 +49,7 @@ void CDriverConfig::Load()
                     switch(ReadEnumVector(l_attribName.as_string(), g_settingNames))
                     {
                         case CS_TrackingLevel:
-                            ms_trackingLevel = glm::clamp(l_attribValue.as_int(0), static_cast<int>(TL_Partial), static_cast<int>(TL_Full));
+                            ms_trackingLevel = glm::clamp<int>(l_attribValue.as_int(TL_Full), TL_Partial, TL_Full);
                             break;
 
                         case CS_HandsReset:
@@ -54,6 +58,18 @@ void CDriverConfig::Load()
 
                         case CS_UseVelocity:
                             ms_useVelocity = l_attribValue.as_bool(false);
+                            break;
+
+                        case CS_UseTriggerGrip:
+                            ms_useTriggerGrip = l_attribValue.as_bool(true);
+                            break;
+
+                        case CS_TriggerMode:
+                            ms_triggerMode = glm::clamp<int>(l_attribValue.as_int(TM_FingerBend), TM_FingerBend, TM_Pinch);
+                            break;
+
+                        case CS_UseControllerInput:
+                            ms_useControllerInput = l_attribValue.as_bool(false);
                             break;
 
                         case CS_RootOffsetX:
@@ -79,10 +95,6 @@ void CDriverConfig::Load()
                         case CS_RootAngleZ:
                             ms_rootAngle.z = glm::clamp(l_attribValue.as_float(0.f), -180.f, 180.f);
                             break;
-
-                        case CS_UseControllerInput:
-                            ms_useControllerInput = l_attribValue.as_bool(false);
-                            break;
                     }
                 }
             }
@@ -105,6 +117,21 @@ bool CDriverConfig::IsVelocityUsed()
     return ms_useVelocity;
 }
 
+bool CDriverConfig::IsTriggerGripUsed()
+{
+    return ms_useTriggerGrip;
+}
+
+int CDriverConfig::GetTriggerMode()
+{
+    return ms_triggerMode;
+}
+
+bool CDriverConfig::IsControllerInputUsed()
+{
+    return ms_useControllerInput;
+}
+
 const glm::vec3& CDriverConfig::GetRootOffset()
 {
     return ms_rootOffset;
@@ -113,11 +140,6 @@ const glm::vec3& CDriverConfig::GetRootOffset()
 const glm::vec3& CDriverConfig::GetRootAngle()
 {
     return ms_rootAngle;
-}
-
-bool CDriverConfig::IsControllerInputUsed()
-{
-    return ms_useControllerInput;
 }
 
 void CDriverConfig::ProcessExternalSetting(const char *p_message)
@@ -194,6 +216,20 @@ void CDriverConfig::ProcessExternalSetting(const char *p_message)
                     int l_value = -1;
                     if(TryParse(l_chunks[1U], l_value))
                         ms_useControllerInput = (l_value == 1);
+                } break;
+
+                case CS_UseTriggerGrip:
+                {
+                    int l_value = -1;
+                    if(TryParse(l_chunks[1U], l_value))
+                        ms_useTriggerGrip = (l_value == 1);
+                } break;
+
+                case CS_TriggerMode:
+                {
+                    int l_value = -1;
+                    if(TryParse(l_chunks[1U], l_value))
+                        ms_triggerMode = glm::clamp<int>(l_value, TL_Partial, TL_Full);
                 } break;
             }
         }

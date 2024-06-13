@@ -41,20 +41,24 @@ void ConvertMatrix(const vr::HmdMatrix34_t& p_matVR, glm::mat4& p_mat)
 {
     for(int i = 0; i < 4; i++)
     {
-        for(int j = 0; j < 3; j++) p_mat[i][j] = p_matVR.m[j][i];
+        for(int j = 0; j < 3; j++)
+            p_mat[i][j] = p_matVR.m[j][i];
     }
-    for(int i = 0; i < 3; i++) p_mat[i][3] = 0.f;
+    for(int i = 0; i < 3; i++)
+        p_mat[i][3] = 0.f;
     p_mat[3][3] = 1.f;
 }
 
 void ConvertVector3(const vr::HmdVector4_t& p_vrVec, glm::vec3& p_glmVec)
 {
-    for(size_t i = 0U; i < 3U; i++) p_glmVec[i] = p_vrVec.v[i];
+    for(size_t i = 0U; i < 3U; i++)
+        p_glmVec[i] = p_vrVec.v[i];
 }
 
 void ConvertVector3(const glm::vec3& p_glmVec, vr::HmdVector4_t& p_vrVec)
 {
-    for(size_t i = 0U; i < 3U; i++) p_vrVec.v[i] = p_glmVec[i];
+    for(size_t i = 0U; i < 3U; i++)
+        p_vrVec.v[i] = p_glmVec[i];
 }
 
 size_t ReadEnumVector(const std::string& p_val, const std::vector<std::string>& p_vec)
@@ -140,7 +144,7 @@ float InverseLerp(float p_val, float p_min, float p_max)
     return glm::clamp(l_mapped, 0.f, 1.f);
 }
 
-bool TryParse(const std::string & p_string, int & p_value)
+bool TryParse(const std::string &p_string, int &p_value)
 {
     bool l_result = false;
     try
@@ -151,7 +155,7 @@ bool TryParse(const std::string & p_string, int & p_value)
     catch(std::exception) {}
     return l_result;
 }
-bool TryParse(const std::string & p_string, float & p_value)
+bool TryParse(const std::string &p_string, float &p_value)
 {
     bool l_result = false;
     try

@@ -93,13 +93,13 @@ void COverlayManager::Update()
 
     if(m_leftCursorOverlay)
     {
-        m_leftCursorOverlay->SetPosition(CLeapManager::GetInstance()->GetLeftTipPosition());
+        m_leftCursorOverlay->SetPosition(CLeapManager::GetInstance()->GetLeftIndexTipPosition());
         m_leftCursorOverlay->SetRotation(l_hmdRot);
         m_leftCursorOverlay->Update();
     }
     if(m_rightCursorOverlay)
     {
-        m_rightCursorOverlay->SetPosition(CLeapManager::GetInstance()->GetRightTipPosition());
+        m_rightCursorOverlay->SetPosition(CLeapManager::GetInstance()->GetRightIndexTipPosition());
         m_rightCursorOverlay->SetRotation(l_hmdRot);
         m_rightCursorOverlay->Update();
     }
@@ -117,7 +117,7 @@ void COverlayManager::Update()
         glm::quat l_rot = glm::toQuat(l_overlayMat);
         m_leftHandOverlay->SetPosition(l_pos);
         m_leftHandOverlay->SetRotation(l_rot);
-        m_leftHandOverlay->Update(CLeapManager::GetInstance()->GetRightTipPosition());
+        m_leftHandOverlay->Update(CLeapManager::GetInstance()->GetRightIndexTipPosition());
 
         ProcessButtons(m_leftHandOverlay->GetButtons(), m_leftHandOverlay->GetPressure(), true);
     }
@@ -138,7 +138,7 @@ void COverlayManager::Update()
         glm::quat l_rot = glm::toQuat(l_overlayMat);
         m_rightHandOverlay->SetPosition(l_pos);
         m_rightHandOverlay->SetRotation(l_rot);
-        m_rightHandOverlay->Update(CLeapManager::GetInstance()->GetLeftTipPosition());
+        m_rightHandOverlay->Update(CLeapManager::GetInstance()->GetLeftIndexTipPosition());
 
         ProcessButtons(m_rightHandOverlay->GetButtons(), m_leftHandOverlay->GetPressure(), false);
     }

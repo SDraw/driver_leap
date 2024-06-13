@@ -21,8 +21,10 @@ CLeapManager::CLeapManager()
 {
     m_leapPoller = nullptr;
     m_trackingEvent = new LEAP_TRACKING_EVENT();
-    m_leftTipPosition = glm::vec3(0.f);
-    m_rightTipPosition = glm::vec3(0.f);
+    m_leftIndexTipPosition = glm::vec3(0.f);
+    m_leftThumbTipPosition = glm::vec3(0.f);
+    m_rightIndexTipPosition = glm::vec3(0.f);
+    m_rightThumbTipPosition = glm::vec3(0.f);
     m_leftHandVisible = false;
     m_rightHandVisible = false;
 }
@@ -66,7 +68,8 @@ void CLeapManager::Update()
                 {
                     if(!m_leftHandVisible)
                     {
-                        ConvertPosition(m_trackingEvent->pHands[i].index.distal.next_joint, m_leftTipPosition);
+                        ConvertPosition(m_trackingEvent->pHands[i].index.distal.next_joint, m_leftIndexTipPosition);
+                        ConvertPosition(m_trackingEvent->pHands[i].thumb.distal.next_joint, m_leftThumbTipPosition);
                         m_leftHandVisible = true;
                     }
                 } break;
@@ -74,7 +77,8 @@ void CLeapManager::Update()
                 {
                     if(!m_rightHandVisible)
                     {
-                        ConvertPosition(m_trackingEvent->pHands[i].index.distal.next_joint, m_rightTipPosition);
+                        ConvertPosition(m_trackingEvent->pHands[i].index.distal.next_joint, m_rightIndexTipPosition);
+                        ConvertPosition(m_trackingEvent->pHands[i].thumb.distal.next_joint, m_rightThumbTipPosition);
                         m_rightHandVisible = true;
                     }
                 } break;
@@ -89,25 +93,34 @@ void CLeapManager::Update()
 
             if(m_leftHandVisible)
             {
-                glm::mat4 l_tipMat = l_rootMat * glm::translate(g_identityMat4, m_leftTipPosition);
-                m_leftTipPosition = l_tipMat * g_pointVec4;
+                glm::mat4 l_tipMat = l_rootMat * glm::translate(g_identityMat4, m_leftIndexTipPosition);
+                m_leftIndexTipPosition = l_tipMat * g_pointVec4;
             }
             if(m_rightHandVisible)
             {
-                glm::mat4 l_tipMat = l_rootMat * glm::translate(g_identityMat4, m_rightTipPosition);
-                m_rightTipPosition = l_tipMat * g_pointVec4;
+                glm::mat4 l_tipMat = l_rootMat * glm::translate(g_identityMat4, m_rightIndexTipPosition);
+                m_rightIndexTipPosition = l_tipMat * g_pointVec4;
             }
         }
     }
 }
 
-const glm::vec3 & CLeapManager::GetLeftTipPosition() const
+const glm::vec3 & CLeapManager::GetLeftIndexTipPosition() const
 {
-    return m_leftTipPosition;
+    return m_leftIndexTipPosition;
 }
-const glm::vec3 & CLeapManager::GetRightTipPosition() const
+const glm::vec3& CLeapManager::GetLeftThumbTipPosition() const
 {
-    return m_rightTipPosition;
+    return m_leftThumbTipPosition;
+}
+const glm::vec3 & CLeapManager::GetRightIndexTipPosition() const
+{
+    return m_rightIndexTipPosition;
+}
+
+const glm::vec3& CLeapManager::GetRightThumbTipPosition() const
+{
+    return m_rightThumbTipPosition;
 }
 
 bool CLeapManager::IsLeftHandVisible() const

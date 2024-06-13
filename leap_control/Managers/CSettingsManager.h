@@ -7,14 +7,16 @@ class CSettingsManager
     int m_trackingLevel;
     bool m_handsReset;
     bool m_useVelocity;
-    bool m_showOverlays;
+    bool m_startMinimized;
+    bool m_useTriggerGrip;
+    int m_triggerMode;
+    bool m_useControllerInput;
     glm::vec3 m_rootOffset;
     glm::vec3 m_rootAngle;
+    bool m_showOverlays;
     glm::vec3 m_overlayOffset;
     glm::vec3 m_overlayAngle;
-    bool m_startMinimized;
     float m_overlaySize;
-    bool m_useControllerInput;
 
     CSettingsManager();
     CSettingsManager(const CSettingsManager &that) = delete;
@@ -26,24 +28,38 @@ public:
         ST_TrackingLevel = 0U,
         ST_HandsReset,
         ST_UseVelocity,
-        ST_ShowOverlays,
+        ST_StartMinimized,
+        ST_UseTriggerGrip,
+        ST_TriggerMode,
+        ST_UseControllerInput,
         ST_RootOffsetX,
         ST_RootOffsetY,
         ST_RootOffsetZ,
         ST_RootAngleX,
         ST_RootAngleY,
         ST_RootAngleZ,
+        ST_ShowOverlays,
+        ST_OverlaySize,
         ST_OverlayOffsetX,
         ST_OverlayOffsetY,
         ST_OverlayOffsetZ,
         ST_OverlayAngleX,
         ST_OverlayAngleY,
         ST_OverlayAngleZ,
-        ST_StartMinimized,
-        ST_OverlaySize,
-        ST_UseControllerInput,
-
+        
         Count
+    };
+
+    enum TrackingLevel : int
+    {
+        TL_Partial = 0,
+        TL_Full
+    };
+
+    enum TriggerMode : int
+    {
+        TM_FingerBend = 0,
+        TM_Pinch
     };
 
     static CSettingsManager* GetInstance();
@@ -54,14 +70,16 @@ public:
     int GetTrackingLevel() const;
     bool GetHandsReset() const;
     bool GetUseVelocity() const;
-    bool GetShowOverlays() const;
+    bool GetUseTriggerGrip() const;
+    int GetTriggerMode() const;
+    bool GetUseControllerInput() const;
     bool GetStartMinimized() const;
     const glm::vec3& GetRootOffset() const;
     const glm::vec3& GetRootAngle() const;
+    bool GetShowOverlays() const;
+    float GetOverlaySize() const;
     const glm::vec3& GetOverlayOffset() const;
     const glm::vec3& GetOverlayAngle() const;
-    float GetOverlaySize() const;
-    bool GetUseControllerInput() const;
 
     void SetSetting(SettingType p_setting, int p_value);
     void SetSetting(SettingType p_setting, bool p_value);
