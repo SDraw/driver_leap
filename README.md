@@ -23,7 +23,7 @@ Leap Control can be minimized to tray icon and shown again by double-clicking tr
 ### Gestures
 List of hands gestures that correspond to controller original input:
 * **Grip:** bending of middle, ring and pinky fingers
-* **Trigger:** bending of index finger
+* **Trigger:** bending of index finger or pinch gesture (configurable as `Input - Trigger mode` setting in utility app)
 
 By default other buttons/inputs are available through hand overlays or connected controllers (by enabling corresponding option in `General` tab of utility app).
 Currenty supported controllers:
