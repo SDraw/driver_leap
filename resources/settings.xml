@@ -2,10 +2,15 @@
 <settings>
 	<setting name="trackingLevel" value="1" />
 	<setting name="handsReset" value="false" />
-	<setting name="useVelocity" value="false" />
+	<setting name="useVelocity" value="true" />
+	<setting name="dashboardSmooth" value="1" />
 	<setting name="startMinimized" value="false" />
 	<setting name="useTriggerGrip" value="true" />
 	<setting name="triggerMode" value="0" />
+	<setting name="triggerThreshold" value="0.747999966" />
+	<setting name="gripThreshold" value="0.75" />
+	<setting name="pinchLimitMin" value="0.0208000001" />
+	<setting name="pinchLimitMax" value="0.0234999992" />
 	<setting name="useControllerInput" value="false" />
 	<setting name="rootOffsetX" value="0" />
 	<setting name="rootOffsetY" value="0" />

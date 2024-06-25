@@ -140,6 +140,8 @@ void SplitString(const char* p_text, const char p_separator, std::vector<std::st
 
 float InverseLerp(float p_val, float p_min, float p_max)
 {
+    if(p_min == p_max)
+        return 1.f;
     const float l_mapped = (p_val - p_min) / (p_max - p_min);
     return glm::clamp(l_mapped, 0.f, 1.f);
 }

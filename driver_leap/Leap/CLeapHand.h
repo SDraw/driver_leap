@@ -11,7 +11,7 @@ class CLeapHand final
     std::array<glm::quat, 20U> m_bonesRotations;
     std::array<float, 5U> m_fingersBends;
     float m_grabValue;
-    float m_pinchValue;
+    float m_pinchDistance;
 public:
     enum Finger : size_t
     {
@@ -47,7 +47,7 @@ public:
 
     float GetFingerBend(size_t p_finger) const;
     float GetGrabValue() const;
-    float GetPinchValue() const;
+    float GetPinchDistance() const;
 
     void Update(const LEAP_HAND &p_hand);
     void Update();

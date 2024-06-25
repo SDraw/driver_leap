@@ -7,9 +7,13 @@ class CSettingsManager
     int m_trackingLevel;
     bool m_handsReset;
     bool m_useVelocity;
+    float m_dashboardSmooth;
     bool m_startMinimized;
     bool m_useTriggerGrip;
     int m_triggerMode;
+    float m_triggerThreshold;
+    float m_gripThreshold;
+    glm::vec2 m_pinchLimits;
     bool m_useControllerInput;
     glm::vec3 m_rootOffset;
     glm::vec3 m_rootAngle;
@@ -28,9 +32,14 @@ public:
         ST_TrackingLevel = 0U,
         ST_HandsReset,
         ST_UseVelocity,
+        ST_DashboardSmooth,
         ST_StartMinimized,
         ST_UseTriggerGrip,
         ST_TriggerMode,
+        ST_TriggerThreshold,
+        ST_GripThreshold,
+        ST_PinchLimitMin,
+        ST_PinchLimitMax,
         ST_UseControllerInput,
         ST_RootOffsetX,
         ST_RootOffsetY,
@@ -70,8 +79,12 @@ public:
     int GetTrackingLevel() const;
     bool GetHandsReset() const;
     bool GetUseVelocity() const;
+    float GetDashboardSmooth() const;
     bool GetUseTriggerGrip() const;
     int GetTriggerMode() const;
+    float GetTriggerThreshold() const;
+    float GetGripThreshold() const;
+    const glm::vec2& GetPinchLimits() const;
     bool GetUseControllerInput() const;
     bool GetStartMinimized() const;
     const glm::vec3& GetRootOffset() const;

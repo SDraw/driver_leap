@@ -6,6 +6,7 @@
 #include "Devices/Controller/CControllerInput.h"
 #include "Devices/CLeapStation.h"
 #include "Core/CDriverConfig.h"
+#include "Core/CVREventsPoller.h"
 #include "Utils/Utils.h"
 
 extern std::wstring g_modulePath;
@@ -96,6 +97,7 @@ const char* const* CServerDriver::GetInterfaceVersions()
 void CServerDriver::RunFrame()
 {
     CLeapIndexController::UpdateHMDCoordinates();
+    CVREventsPoller::PollEvents();
 
     if(m_connectionState != m_leapPoller->IsConnected())
     {

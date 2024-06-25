@@ -9,8 +9,13 @@ const std::vector<std::string> g_settingNames
     "trackingLevel",
     "handsReset",
     "useVelocity",
+    "dashboardSmooth",
     "useTriggerGrip",
     "triggerMode",
+    "triggerThreshold",
+    "gripThreshold",
+    "pinchLimitMin",
+    "pinchLimitMax",
     "useControllerInput",
     "rootOffsetX",
     "rootOffsetY",
@@ -23,11 +28,15 @@ const std::vector<std::string> g_settingNames
 int CDriverConfig::ms_trackingLevel = CDriverConfig::TL_Full;
 bool CDriverConfig::ms_handsReset = false;
 bool CDriverConfig::ms_useVelocity = false;
+float CDriverConfig::ms_dashboardSmooth = 1.f;
 bool CDriverConfig::ms_useTriggerGrip = true;
 int CDriverConfig::ms_triggerMode = CDriverConfig::TM_FingerBend;
+float CDriverConfig::ms_triggerThreshold = 0.75f;
+float CDriverConfig::ms_gripThreshold = 0.75f;
+glm::vec2 CDriverConfig::ms_pinchLimits(0.02f, 0.05f);
 bool CDriverConfig::ms_useControllerInput = false;
-glm::vec3 CDriverConfig::ms_rootOffset = glm::vec3(0.f);
-glm::vec3 CDriverConfig::ms_rootAngle = glm::vec3(0.f);
+glm::vec3 CDriverConfig::ms_rootOffset(0.f);
+glm::vec3 CDriverConfig::ms_rootAngle(0.f);
 
 void CDriverConfig::Load()
 {
@@ -60,12 +69,32 @@ void CDriverConfig::Load()
                             ms_useVelocity = l_attribValue.as_bool(false);
                             break;
 
+                        case CS_DashboardSmooth:
+                            ms_dashboardSmooth = glm::clamp(l_attribValue.as_float(1.f), 0.01f, 1.f);
+                            break;
+
                         case CS_UseTriggerGrip:
                             ms_useTriggerGrip = l_attribValue.as_bool(true);
                             break;
 
                         case CS_TriggerMode:
                             ms_triggerMode = glm::clamp<int>(l_attribValue.as_int(TM_FingerBend), TM_FingerBend, TM_Pinch);
+                            break;
+
+                        case CS_TriggerThreshold:
+                            ms_triggerThreshold = glm::clamp(l_attribValue.as_float(0.75f), 0.1f, 1.f);
+                            break;
+
+                        case CS_GripThreshold:
+                            ms_gripThreshold = glm::clamp(l_attribValue.as_float(0.75f), 0.1f, 1.f);
+                            break;
+
+                        case CS_PinchLimitMin:
+                            ms_pinchLimits.x = glm::clamp(l_attribValue.as_float(0.02f), 0.01f, 0.1f);
+                            break;
+
+                        case CS_PinchLimitMax:
+                            ms_pinchLimits.y = glm::clamp(l_attribValue.as_float(0.05f), 0.01f, 0.1f);
                             break;
 
                         case CS_UseControllerInput:
@@ -117,6 +146,11 @@ bool CDriverConfig::IsVelocityUsed()
     return ms_useVelocity;
 }
 
+float CDriverConfig::GetDashboardSmooth()
+{
+    return ms_dashboardSmooth;
+}
+
 bool CDriverConfig::IsTriggerGripUsed()
 {
     return ms_useTriggerGrip;
@@ -125,6 +159,21 @@ bool CDriverConfig::IsTriggerGripUsed()
 int CDriverConfig::GetTriggerMode()
 {
     return ms_triggerMode;
+}
+
+float CDriverConfig::GetTriggerThreshold()
+{
+    return ms_triggerThreshold;
+}
+
+float CDriverConfig::GetGripThreshold()
+{
+    return ms_gripThreshold;
+}
+
+const glm::vec2& CDriverConfig::GetPinchLimits()
+{
+    return ms_pinchLimits;
 }
 
 bool CDriverConfig::IsControllerInputUsed()
@@ -153,83 +202,103 @@ void CDriverConfig::ProcessExternalSetting(const char *p_message)
         size_t l_index = 0U;
         if(ReadEnumVector(l_chunks[0U], g_settingNames, l_index))
         {
+            ParsedValue l_value;
             switch(l_index)
             {
                 case CS_HandsReset:
                 {
-                    int l_value = -1;
-                    if(TryParse(l_chunks[1U], l_value))
-                        ms_handsReset = (l_value == 1);
+                    if(TryParse(l_chunks[1U], l_value.m_int))
+                        ms_handsReset = (l_value.m_int == 1);
                 } break;
 
                 case CS_UseVelocity:
                 {
-                    int l_value = -1;
-                    if(TryParse(l_chunks[1U], l_value))
-                        ms_useVelocity = (l_value == 1);
+                    if(TryParse(l_chunks[1U], l_value.m_int))
+                        ms_useVelocity = (l_value.m_int == 1);
                 } break;
 
                 case CS_RootAngleX:
                 {
-                    float l_value = 0.f;
-                    if(TryParse(l_chunks[1U], l_value))
-                        ms_rootAngle.x = l_value;
+                    if(TryParse(l_chunks[1U], l_value.m_float))
+                        ms_rootAngle.x = glm::clamp(l_value.m_float, -180.f, 180.f);
                 } break;
 
                 case CS_RootAngleY:
                 {
-                    float l_value = 0.f;
-                    if(TryParse(l_chunks[1U], l_value))
-                        ms_rootAngle.y = l_value;
+                    if(TryParse(l_chunks[1U], l_value.m_float))
+                        ms_rootAngle.y = glm::clamp(l_value.m_float, -180.f, 180.f);
                 } break;
 
                 case CS_RootAngleZ:
                 {
-                    float l_value = 0.f;
-                    if(TryParse(l_chunks[1U], l_value))
-                        ms_rootAngle.z = l_value;
+                    if(TryParse(l_chunks[1U], l_value.m_float))
+                        ms_rootAngle.z = glm::clamp(l_value.m_float, -180.f, 180.f);
                 } break;
 
                 case CS_RootOffsetX:
                 {
-                    float l_value = 0.f;
-                    if(TryParse(l_chunks[1U], l_value))
-                        ms_rootOffset.x = l_value;
+                    if(TryParse(l_chunks[1U], l_value.m_float))
+                        ms_rootOffset.x = glm::clamp(l_value.m_float, -1.f, 1.f);
                 } break;
 
                 case CS_RootOffsetY:
                 {
-                    float l_value = 0.f;
-                    if(TryParse(l_chunks[1U], l_value))
-                        ms_rootOffset.y = l_value;
+                    if(TryParse(l_chunks[1U], l_value.m_float))
+                        ms_rootOffset.y = glm::clamp(l_value.m_float, -1.f, 1.f);
                 } break;
 
                 case CS_RootOffsetZ:
                 {
-                    float l_value = 0.f;
-                    if(TryParse(l_chunks[1U], l_value))
-                        ms_rootOffset.z = l_value;
+                    if(TryParse(l_chunks[1U], l_value.m_float))
+                        ms_rootOffset.z = glm::clamp(l_value.m_float, -1.f, 1.f);
                 } break;
 
                 case CS_UseControllerInput:
                 {
-                    int l_value = -1;
-                    if(TryParse(l_chunks[1U], l_value))
-                        ms_useControllerInput = (l_value == 1);
+                    if(TryParse(l_chunks[1U], l_value.m_int))
+                        ms_useControllerInput = (l_value.m_int == 1);
                 } break;
 
                 case CS_UseTriggerGrip:
                 {
-                    int l_value = -1;
-                    if(TryParse(l_chunks[1U], l_value))
-                        ms_useTriggerGrip = (l_value == 1);
+                    if(TryParse(l_chunks[1U], l_value.m_int))
+                        ms_useTriggerGrip = (l_value.m_int == 1);
                 } break;
 
                 case CS_TriggerMode:
                 {
-                    int l_value = -1;
-                    if(TryParse(l_chunks[1U], l_value))
-                        ms_triggerMode = glm::clamp<int>(l_value, TL_Partial, TL_Full);
+                    if(TryParse(l_chunks[1U], l_value.m_int))
+                        ms_triggerMode = glm::clamp<int>(l_value.m_int, TL_Partial, TL_Full);
+                } break;
+
+                case CS_TriggerThreshold:
+                {
+                    if(TryParse(l_chunks[1U], l_value.m_float))
+                        ms_triggerThreshold = glm::clamp(l_value.m_float, 0.1f, 1.f);
+                } break;
+
+                case CS_GripThreshold:
+                {
+                    if(TryParse(l_chunks[1U], l_value.m_float))
+                        ms_triggerThreshold = glm::clamp(l_value.m_float, 0.1f, 1.f);
+                } break;
+
+                case CS_PinchLimitMin:
+                {
+                    if(TryParse(l_chunks[1U], l_value.m_float))
+                        ms_pinchLimits.x = glm::clamp(l_value.m_float, 0.01f, 0.1f);
+                } break;
+
+                case CS_PinchLimitMax:
+                {
+                    if(TryParse(l_chunks[1U], l_value.m_float))
+                        ms_pinchLimits.y = glm::clamp(l_value.m_float, 0.01f, 0.1f);
+                } break;
+
+                case CS_DashboardSmooth:
+                {
+                    if(TryParse(l_chunks[1U], l_value.m_float))
+                        ms_dashboardSmooth = glm::clamp(l_value.m_float, 0.01f, 1.f);
                 } break;
             }
         }

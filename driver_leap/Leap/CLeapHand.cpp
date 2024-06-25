@@ -90,9 +90,9 @@ float CLeapHand::GetGrabValue() const
     return m_grabValue;
 }
 
-float CLeapHand::GetPinchValue() const
+float CLeapHand::GetPinchDistance() const
 {
-    return m_pinchValue;
+    return m_pinchDistance;
 }
 
 void CLeapHand::Update(const LEAP_HAND &p_hand)
@@ -124,7 +124,7 @@ void CLeapHand::Update(const LEAP_HAND &p_hand)
     }
 
     m_grabValue = (InverseLerp(m_fingersBends[2U], 0.5f, 1.f) + InverseLerp(m_fingersBends[3U], 0.5f, 1.f) + InverseLerp(m_fingersBends[3U], 0.5f, 1.f)) / 3.f;
-    m_pinchValue = p_hand.pinch_strength;
+    m_pinchDistance = p_hand.pinch_distance * 0.001f;
 
     // Convert fingers to HMD space
     for(size_t i = 0; i < 5U; i++)

@@ -20,6 +20,10 @@ leap_control::leap_control(QWidget *parent) : QWidget(parent)
     ui.m_useVelocityCheckBox->setChecked(CSettingsManager::GetInstance()->GetUseVelocity());
     connect(ui.m_useVelocityCheckBox, &QCheckBox::stateChanged, this, &leap_control::OnUseVelocityChange);
 
+    ui.m_dashboardSmoothSlider->setValue(InvProgressLerp(CSettingsManager::GetInstance()->GetDashboardSmooth(), 0.01f, 1.f));
+    ui.m_dashboardSmoothSlider->setToolTip(QString("%1").arg(CSettingsManager::GetInstance()->GetDashboardSmooth()));
+    connect(ui.m_dashboardSmoothSlider, &QSlider::valueChanged, this, &leap_control::OnDashboardSmoothChanged);
+
     ui.m_startMinimizedCheckBox->setChecked(CSettingsManager::GetInstance()->GetStartMinimized());
     connect(ui.m_startMinimizedCheckBox, &QCheckBox::stateChanged, this, &leap_control::OnStartMinimizedChanged);
 
@@ -29,6 +33,22 @@ leap_control::leap_control(QWidget *parent) : QWidget(parent)
 
     ui.m_triggerModeComboBox->setCurrentIndex(CSettingsManager::GetInstance()->GetTriggerMode());
     connect(ui.m_triggerModeComboBox, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &leap_control::OnTriggerModeChange);
+
+    ui.m_triggerThresholdSlider->setValue(InvProgressLerp(CSettingsManager::GetInstance()->GetTriggerThreshold(), 0.1f, 1.f));
+    ui.m_triggerThresholdSlider->setToolTip(QString("%1").arg(CSettingsManager::GetInstance()->GetTriggerThreshold()));
+    connect(ui.m_triggerThresholdSlider, &QSlider::valueChanged, this, &leap_control::OnTriggerThresholdChange);
+
+    ui.m_gripThresholdSlider->setValue(InvProgressLerp(CSettingsManager::GetInstance()->GetGripThreshold(), 0.1f, 1.f));
+    ui.m_gripThresholdSlider->setToolTip(QString("%1").arg(CSettingsManager::GetInstance()->GetGripThreshold()));
+    connect(ui.m_gripThresholdSlider, &QSlider::valueChanged, this, &leap_control::OnGripThresholdChange);
+
+    ui.m_pinchRangeMinSlider->setValue(InvProgressLerp(CSettingsManager::GetInstance()->GetPinchLimits().x, 0.01f, 0.1f));
+    ui.m_pinchRangeMinSlider->setToolTip(QString("Min: %1").arg(CSettingsManager::GetInstance()->GetPinchLimits().x));
+    connect(ui.m_pinchRangeMinSlider, &QSlider::valueChanged, this, &leap_control::OnPinchRangeMinChange);
+
+    ui.m_pinchRangeMaxSlider->setValue(InvProgressLerp(CSettingsManager::GetInstance()->GetPinchLimits().y, 0.01f, 0.1f));
+    ui.m_pinchRangeMaxSlider->setToolTip(QString("Max: %1").arg(CSettingsManager::GetInstance()->GetPinchLimits().y));
+    connect(ui.m_pinchRangeMaxSlider, &QSlider::valueChanged, this, &leap_control::OnPinchRangeMaxChange);
 
     ui.m_useControllerInputCheckBox->setChecked(CSettingsManager::GetInstance()->GetUseControllerInput());
     connect(ui.m_useControllerInputCheckBox, &QCheckBox::stateChanged, this, &leap_control::OnUseControllerInputChange);
@@ -90,6 +110,10 @@ leap_control::leap_control(QWidget *parent) : QWidget(parent)
     ui.m_overlayAngleSliderZ->setToolTip(QString("Z: %1").arg(CSettingsManager::GetInstance()->GetOverlayAngle().z));
     connect(ui.m_overlayAngleSliderZ, &QSlider::valueChanged, this, &leap_control::OnOverlayAngleZChanged);
 
+    connect(ui.m_dashboardSmoothResetButton, &QPushButton::clicked, this, &leap_control::OnDashboardSmoothReset);
+    connect(ui.m_triggerThresholdResetButton, &QPushButton::clicked, this, &leap_control::OnTriggerThresholdReset);
+    connect(ui.m_gripThresholdResetButton, &QPushButton::clicked, this, &leap_control::OnGripThresholdReset);
+    connect(ui.m_pinchRangeResetButton, &QPushButton::clicked, this, &leap_control::OnPinchRangeReset);
     connect(ui.m_rootOffsetResetButton, &QPushButton::clicked, this, &leap_control::OnRootOffsetReset);
     connect(ui.m_rootAngleResetButton, &QPushButton::clicked, this, &leap_control::OnRootAngleReset);
     connect(ui.m_overlaySizeResetButton, &QPushButton::clicked, this, &leap_control::OnOverlaySizeReset);
@@ -107,6 +131,7 @@ void leap_control::OnTrackingLevelChange(int p_item)
 {
     CSettingsManager::GetInstance()->SetSetting(CSettingsManager::ST_TrackingLevel, p_item);
 }
+
 void leap_control::OnHandsResetChange(int p_state)
 {
     if(p_state != Qt::PartiallyChecked)
@@ -118,6 +143,7 @@ void leap_control::OnHandsResetChange(int p_state)
         CVRManager::GetInstance()->SendStationMessage(l_message);
     }
 }
+
 void leap_control::OnUseVelocityChange(int p_state)
 {
     if(p_state != Qt::PartiallyChecked)
@@ -129,6 +155,24 @@ void leap_control::OnUseVelocityChange(int p_state)
         CVRManager::GetInstance()->SendStationMessage(l_message);
     }
 }
+
+void leap_control::OnDashboardSmoothChanged(int p_value)
+{
+    float l_value = ProgressLerp(p_value, 0.01f, 1.f);
+    ui.m_dashboardSmoothSlider->setToolTip(QString("%1").arg(l_value));
+    CSettingsManager::GetInstance()->SetSetting(CSettingsManager::ST_DashboardSmooth, l_value);
+
+    std::string l_message("dashboardSmooth ");
+    l_message.append(std::to_string(l_value));
+    CVRManager::GetInstance()->SendStationMessage(l_message);
+}
+void leap_control::OnDashboardSmoothReset(bool p_checked)
+{
+    int l_progress = InvProgressLerp(1.f, 0.01, 1.f);
+    ui.m_dashboardSmoothSlider->setValue(l_progress);
+    OnDashboardSmoothChanged(l_progress);
+}
+
 void leap_control::OnStartMinimizedChanged(int p_state)
 {
     if(p_state != Qt::PartiallyChecked)
@@ -146,6 +190,7 @@ void leap_control::OnUseTriggerGripChange(int p_state)
         CVRManager::GetInstance()->SendStationMessage(l_message);
     }
 }
+
 void leap_control::OnTriggerModeChange(int p_item)
 {
     CSettingsManager::GetInstance()->SetSetting(CSettingsManager::ST_TriggerMode, p_item);
@@ -154,6 +199,72 @@ void leap_control::OnTriggerModeChange(int p_item)
     l_message.append(std::to_string(p_item));
     CVRManager::GetInstance()->SendStationMessage(l_message);
 }
+
+void leap_control::OnTriggerThresholdChange(int p_value)
+{
+    float l_value = ProgressLerp(p_value, 0.1f, 1.f);
+    ui.m_triggerThresholdSlider->setToolTip(QString("%1").arg(l_value));
+    CSettingsManager::GetInstance()->SetSetting(CSettingsManager::ST_TriggerThreshold, l_value);
+
+    std::string l_message("triggerThreshold ");
+    l_message.append(std::to_string(l_value));
+    CVRManager::GetInstance()->SendStationMessage(l_message);
+}
+void leap_control::OnTriggerThresholdReset(bool p_checked)
+{
+    int l_progress = InvProgressLerp(0.75f, 0.1f, 1.f);
+    ui.m_triggerThresholdSlider->setValue(l_progress);
+    OnTriggerThresholdChange(l_progress);
+}
+
+void leap_control::OnGripThresholdChange(int p_value)
+{
+    float l_value = ProgressLerp(p_value, 0.1f, 1.f);
+    ui.m_gripThresholdSlider->setToolTip(QString("%1").arg(l_value));
+    CSettingsManager::GetInstance()->SetSetting(CSettingsManager::ST_GripThreshold, l_value);
+
+    std::string l_message("gripThreshold ");
+    l_message.append(std::to_string(l_value));
+    CVRManager::GetInstance()->SendStationMessage(l_message);
+}
+void leap_control::OnGripThresholdReset(bool p_checked)
+{
+    int l_progress = InvProgressLerp(0.75f, 0.1f, 1.f);
+    ui.m_gripThresholdSlider->setValue(l_progress);
+    OnGripThresholdChange(l_progress);
+}
+
+void leap_control::OnPinchRangeMinChange(int p_value)
+{
+    float l_value = ProgressLerp(p_value, 0.01f, 0.1f);
+    ui.m_pinchRangeMinSlider->setToolTip(QString("Min: %1").arg(l_value));
+    CSettingsManager::GetInstance()->SetSetting(CSettingsManager::ST_PinchLimitMin, l_value);
+
+    std::string l_message("pinchLimitMin ");
+    l_message.append(std::to_string(l_value));
+    CVRManager::GetInstance()->SendStationMessage(l_message);
+}
+void leap_control::OnPinchRangeMaxChange(int p_value)
+{
+    float l_value = ProgressLerp(p_value, 0.01f, 0.1f);
+    ui.m_pinchRangeMaxSlider->setToolTip(QString("Max: %1").arg(l_value));
+    CSettingsManager::GetInstance()->SetSetting(CSettingsManager::ST_PinchLimitMax, l_value);
+
+    std::string l_message("pinchLimitMax ");
+    l_message.append(std::to_string(l_value));
+    CVRManager::GetInstance()->SendStationMessage(l_message);
+}
+void leap_control::OnPinchRangeReset(bool p_checked)
+{
+    glm::ivec2 l_progress;
+    l_progress.x = InvProgressLerp(0.02f, 0.01f, 0.1f);
+    l_progress.y = InvProgressLerp(0.05f, 0.01f, 0.1f);
+    ui.m_pinchRangeMinSlider->setValue(l_progress.x);
+    ui.m_pinchRangeMaxSlider->setValue(l_progress.y);
+    OnPinchRangeMinChange(l_progress.x);
+    OnPinchRangeMaxChange(l_progress.y);
+}
+
 void leap_control::OnUseControllerInputChange(int p_state)
 {
     if(p_state != Qt::PartiallyChecked)

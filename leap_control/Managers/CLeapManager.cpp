@@ -22,9 +22,7 @@ CLeapManager::CLeapManager()
     m_leapPoller = nullptr;
     m_trackingEvent = new LEAP_TRACKING_EVENT();
     m_leftIndexTipPosition = glm::vec3(0.f);
-    m_leftThumbTipPosition = glm::vec3(0.f);
     m_rightIndexTipPosition = glm::vec3(0.f);
-    m_rightThumbTipPosition = glm::vec3(0.f);
     m_leftHandVisible = false;
     m_rightHandVisible = false;
 }
@@ -69,7 +67,6 @@ void CLeapManager::Update()
                     if(!m_leftHandVisible)
                     {
                         ConvertPosition(m_trackingEvent->pHands[i].index.distal.next_joint, m_leftIndexTipPosition);
-                        ConvertPosition(m_trackingEvent->pHands[i].thumb.distal.next_joint, m_leftThumbTipPosition);
                         m_leftHandVisible = true;
                     }
                 } break;
@@ -78,7 +75,6 @@ void CLeapManager::Update()
                     if(!m_rightHandVisible)
                     {
                         ConvertPosition(m_trackingEvent->pHands[i].index.distal.next_joint, m_rightIndexTipPosition);
-                        ConvertPosition(m_trackingEvent->pHands[i].thumb.distal.next_joint, m_rightThumbTipPosition);
                         m_rightHandVisible = true;
                     }
                 } break;
@@ -109,18 +105,9 @@ const glm::vec3 & CLeapManager::GetLeftIndexTipPosition() const
 {
     return m_leftIndexTipPosition;
 }
-const glm::vec3& CLeapManager::GetLeftThumbTipPosition() const
-{
-    return m_leftThumbTipPosition;
-}
 const glm::vec3 & CLeapManager::GetRightIndexTipPosition() const
 {
     return m_rightIndexTipPosition;
-}
-
-const glm::vec3& CLeapManager::GetRightThumbTipPosition() const
-{
-    return m_rightThumbTipPosition;
 }
 
 bool CLeapManager::IsLeftHandVisible() const

@@ -9,9 +9,7 @@ class CLeapManager
     LEAP_TRACKING_EVENT *m_trackingEvent;
 
     glm::vec3 m_leftIndexTipPosition;
-    glm::vec3 m_leftThumbTipPosition;
     glm::vec3 m_rightIndexTipPosition;
-    glm::vec3 m_rightThumbTipPosition;
 
     bool m_leftHandVisible;
     bool m_rightHandVisible;
@@ -29,9 +27,7 @@ public:
     void Update();
 
     const glm::vec3& GetLeftIndexTipPosition() const;
-    const glm::vec3& GetLeftThumbTipPosition() const;
     const glm::vec3& GetRightIndexTipPosition() const;
-    const glm::vec3& GetRightThumbTipPosition() const;
 
     bool IsLeftHandVisible() const;
     bool IsRightHandVisible() const;

@@ -7,9 +7,14 @@ const std::vector<std::string> g_settingNames
     "trackingLevel",
     "handsReset",
     "useVelocity",
+    "dashboardSmooth",
     "startMinimized",
     "useTriggerGrip",
     "triggerMode",
+    "triggerThreshold",
+    "gripThreshold",
+    "pinchLimitMin",
+    "pinchLimitMax",
     "useControllerInput",
     "rootOffsetX",
     "rootOffsetY",
@@ -34,9 +39,13 @@ CSettingsManager::CSettingsManager()
     m_trackingLevel = TL_Full;
     m_handsReset = false;
     m_useVelocity = false;
+    m_dashboardSmooth = 1.f;
     m_startMinimized = false;
     m_useTriggerGrip = true;
     m_triggerMode = TM_FingerBend;
+    m_triggerThreshold = 0.75f;
+    m_gripThreshold = 0.75f;
+    m_pinchLimits = glm::vec2(0.02f, 0.05f);
     m_useControllerInput = false;
     m_rootOffset = glm::vec3(0.f);
     m_rootAngle = glm::vec3(0.f);
@@ -85,6 +94,10 @@ void CSettingsManager::Load()
                             m_useVelocity = l_attribValue.as_bool(false);
                             break;
 
+                        case ST_DashboardSmooth:
+                            m_dashboardSmooth = l_attribValue.as_float(1.f);
+                            break;
+
                         case ST_StartMinimized:
                             m_startMinimized = l_attribValue.as_bool(false);
                             break;
@@ -95,6 +108,22 @@ void CSettingsManager::Load()
 
                         case ST_TriggerMode:
                             m_triggerMode = glm::clamp<int>(l_attribValue.as_int(TM_FingerBend), TM_FingerBend, TM_Pinch);
+                            break;
+
+                        case ST_TriggerThreshold:
+                            m_triggerThreshold = glm::clamp(l_attribValue.as_float(0.75f), 0.1f, 1.f);
+                            break;
+
+                        case ST_GripThreshold:
+                            m_gripThreshold = glm::clamp(l_attribValue.as_float(0.75f), 0.1f, 1.f);
+                            break;
+
+                        case ST_PinchLimitMin:
+                            m_pinchLimits.x = glm::clamp(l_attribValue.as_float(0.02f), 0.01f, 0.1f);
+                            break;
+
+                        case ST_PinchLimitMax:
+                            m_pinchLimits.y = glm::clamp(l_attribValue.as_float(0.02f), 0.01f, 0.1f);
                             break;
 
                         case ST_UseControllerInput:
@@ -191,6 +220,10 @@ void CSettingsManager::Save()
                 l_valueAttrib.set_value(m_useVelocity);
                 break;
 
+            case ST_DashboardSmooth:
+                l_valueAttrib.set_value(m_dashboardSmooth);
+                break;
+
             case ST_StartMinimized:
                 l_valueAttrib.set_value(m_startMinimized);
                 break;
@@ -201,6 +234,22 @@ void CSettingsManager::Save()
 
             case ST_TriggerMode:
                 l_valueAttrib.set_value(m_triggerMode);
+                break;
+
+            case ST_TriggerThreshold:
+                l_valueAttrib.set_value(m_triggerThreshold);
+                break;
+
+            case ST_GripThreshold:
+                l_valueAttrib.set_value(m_gripThreshold);
+                break;
+
+            case ST_PinchLimitMin:
+                l_valueAttrib.set_value(m_pinchLimits.x);
+                break;
+
+            case ST_PinchLimitMax:
+                l_valueAttrib.set_value(m_pinchLimits.y);
                 break;
 
             case ST_UseControllerInput:
@@ -283,6 +332,11 @@ bool CSettingsManager::GetUseVelocity() const
     return m_useVelocity;
 }
 
+float CSettingsManager::GetDashboardSmooth() const
+{
+    return m_dashboardSmooth;
+}
+
 bool CSettingsManager::GetStartMinimized() const
 {
     return m_startMinimized;
@@ -296,6 +350,21 @@ bool CSettingsManager::GetUseTriggerGrip() const
 int CSettingsManager::GetTriggerMode() const
 {
     return m_triggerMode;
+}
+
+float CSettingsManager::GetTriggerThreshold() const
+{
+    return m_triggerThreshold;
+}
+
+float CSettingsManager::GetGripThreshold() const
+{
+    return m_gripThreshold;
+}
+
+const glm::vec2& CSettingsManager::GetPinchLimits() const
+{
+    return m_pinchLimits;
 }
 
 bool CSettingsManager::GetUseControllerInput() const
@@ -379,6 +448,26 @@ void CSettingsManager::SetSetting(SettingType p_setting, float p_value)
 {
     switch(p_setting)
     {
+        case ST_DashboardSmooth:
+            m_dashboardSmooth = glm::clamp(p_value, 0.01f, 1.f);
+            break;
+
+        case ST_TriggerThreshold:
+            m_triggerThreshold = glm::clamp(p_value, 0.1f, 1.f);
+            break;
+
+        case ST_GripThreshold:
+            m_gripThreshold = glm::clamp(p_value, 0.1f, 1.f);
+            break;
+
+        case ST_PinchLimitMin:
+            m_pinchLimits.x = glm::clamp(p_value, 0.01f, 0.1f);
+            break;
+
+        case ST_PinchLimitMax:
+            m_pinchLimits.y = glm::clamp(p_value, 0.01f, 0.1f);
+            break;
+
         case ST_RootOffsetX:
             m_rootOffset.x = glm::clamp(p_value, -1.f, 1.f);
             break;

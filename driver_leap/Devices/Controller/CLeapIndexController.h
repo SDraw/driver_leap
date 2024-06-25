@@ -65,6 +65,8 @@ class CLeapIndexController : public vr::ITrackedDeviceServerDriver
     bool m_isLeft;
     std::string m_serialNumber;
     std::vector<CControllerButton*> m_buttons;
+    glm::vec3 m_position;
+    glm::quat m_rotation;
 
     CLeapIndexController(const CLeapIndexController &that) = delete;
     CLeapIndexController& operator=(const CLeapIndexController &that) = delete;

@@ -134,6 +134,7 @@
   <ItemGroup>
     <ClInclude Include="Core\CDriverConfig.h" />
     <ClInclude Include="Core\CServerDriver.h" />
+    <ClInclude Include="Core\CVREventsPoller.h" />
     <ClInclude Include="Devices\CLeapStation.h" />
     <ClInclude Include="Devices\Controller\CControllerButton.h" />
     <ClInclude Include="Devices\Controller\CControllerInput.h" />
@@ -151,6 +152,7 @@
     </ClCompile>
     <ClCompile Include="Core\CDriverConfig.cpp" />
     <ClCompile Include="Core\CServerDriver.cpp" />
+    <ClCompile Include="Core\CVREventsPoller.cpp" />
     <ClCompile Include="Devices\CLeapStation.cpp" />
     <ClCompile Include="Devices\Controller\CControllerButton.cpp" />
     <ClCompile Include="Devices\Controller\CControllerInput.cpp" />

@@ -2,6 +2,7 @@
 #include "Devices/Controller/CLeapIndexController.h"
 #include "Devices/Controller/CControllerButton.h"
 #include "Core/CDriverConfig.h"
+#include "Core/CVREventsPoller.h"
 #include "Leap/CLeapHand.h"
 #include "Utils/Utils.h"
 
@@ -114,6 +115,9 @@ CLeapIndexController::CLeapIndexController(bool p_left)
             }
         }
     }
+
+    m_position = glm::vec3(0.f);
+    m_rotation = glm::quat(1.f, 0.f, 0.f, 0.f);
 }
 
 CLeapIndexController::~CLeapIndexController()
@@ -380,16 +384,27 @@ void CLeapIndexController::UpdatePose(const CLeapHand *p_hand)
         glm::mat4 l_mat = glm::translate(g_identityMatrix, p_hand->GetPosition()) * glm::toMat4(l_poseRotation);
         l_mat *= (m_isLeft ? g_wristOffsetLeft : g_wristOffsetRight);
         l_poseRotation = glm::toQuat(l_mat);
-        m_pose.qRotation.x = l_poseRotation.x;
-        m_pose.qRotation.y = l_poseRotation.y;
-        m_pose.qRotation.z = l_poseRotation.z;
-        m_pose.qRotation.w = l_poseRotation.w;
+
+        if(CVREventsPoller::IsDashboardOpened())
+            m_rotation = glm::slerp(m_rotation, l_poseRotation, CDriverConfig::GetDashboardSmooth());
+        else
+            m_rotation = l_poseRotation;
+
+        m_pose.qRotation.x = m_rotation.x;
+        m_pose.qRotation.y = m_rotation.y;
+        m_pose.qRotation.z = m_rotation.z;
+        m_pose.qRotation.w = m_rotation.w;
 
         // Positon
-        glm::vec4 l_posePosition = l_mat * g_pointVec4;
-        m_pose.vecPosition[0] = l_posePosition.x;
-        m_pose.vecPosition[1] = l_posePosition.y;
-        m_pose.vecPosition[2] = l_posePosition.z;
+        glm::vec3 l_posePosition = l_mat * g_pointVec4;
+        if(CVREventsPoller::IsDashboardOpened())
+            m_position = glm::mix(m_position, l_posePosition, CDriverConfig::GetDashboardSmooth());
+        else
+            m_position = l_posePosition;
+
+        m_pose.vecPosition[0] = m_position.x;
+        m_pose.vecPosition[1] = m_position.y;
+        m_pose.vecPosition[2] = m_position.z;
 
         m_pose.result = vr::TrackingResult_Running_OK;
     }
@@ -411,7 +426,7 @@ void CLeapIndexController::UpdatePose(const CLeapHand *p_hand)
 
 void CLeapIndexController::UpdateInput(const CLeapHand *p_hand)
 {
-    if(!CDriverConfig::IsControllerInputUsed() && CDriverConfig::IsTriggerGripUsed())
+    if(CDriverConfig::IsTriggerGripUsed() && !CDriverConfig::IsControllerInputUsed())
     {
         float l_trigger = 0.f;
         switch(CDriverConfig::GetTriggerMode())
@@ -421,17 +436,21 @@ void CLeapIndexController::UpdateInput(const CLeapHand *p_hand)
                 break;
 
             case CDriverConfig::TM_Pinch:
-                l_trigger = InverseLerp(p_hand->GetPinchValue(), 0.f, 0.75f);
-                break;
+            {
+                const glm::vec2& l_limits = CDriverConfig::GetPinchLimits();
+                l_trigger = 1.f - InverseLerp(p_hand->GetPinchDistance(), glm::min(l_limits.x, l_limits.y), glm::max(l_limits.x, l_limits.y));
+            } break;
         }
-        m_buttons[IB_TriggerValue]->SetValue(l_trigger);
-        m_buttons[IB_TriggerTouch]->SetState(l_trigger >= 0.5f);
-        m_buttons[IB_TriggerClick]->SetState(l_trigger >= 0.75f);
+        l_trigger = InverseLerp(l_trigger, 0.f, CDriverConfig::GetTriggerThreshold());
 
-        float l_grabValue = p_hand->GetGrabValue();
+        m_buttons[IB_TriggerValue]->SetValue(l_trigger);
+        m_buttons[IB_TriggerTouch]->SetState(l_trigger > 0.f);
+        m_buttons[IB_TriggerClick]->SetState(l_trigger >= 1.f);
+
+        float l_grabValue = InverseLerp(p_hand->GetGrabValue(), 0.f, CDriverConfig::GetGripThreshold());
         m_buttons[IB_GripValue]->SetValue(l_grabValue);
-        m_buttons[IB_GripTouch]->SetState(l_grabValue >= 0.75f);
-        m_buttons[IB_GripForce]->SetValue(InverseLerp(l_grabValue, 0.9f, 1.f));
+        m_buttons[IB_GripTouch]->SetState(l_grabValue >= 1.f);
+        m_buttons[IB_GripForce]->SetValue(InverseLerp(p_hand->GetGrabValue(), CDriverConfig::GetGripThreshold(), 1.f));
     }
 
     m_buttons[IB_FingerIndex]->SetValue(p_hand->GetFingerBend(CLeapHand::Finger::Index));

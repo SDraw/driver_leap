@@ -2,11 +2,23 @@
 
 class CDriverConfig final
 {
+    union ParsedValue
+    {
+        bool m_bool;
+        int m_int;
+        float m_float;
+        double m_double;
+    };
+
     static int ms_trackingLevel;
     static bool ms_handsReset;
     static bool ms_useVelocity;
+    static float ms_dashboardSmooth;
     static bool ms_useTriggerGrip;
     static int ms_triggerMode;
+    static float ms_triggerThreshold;
+    static float ms_gripThreshold;
+    static glm::vec2 ms_pinchLimits;
     static bool ms_useControllerInput;
     static glm::vec3 ms_rootOffset;
     static glm::vec3 ms_rootAngle;
@@ -21,8 +33,13 @@ public:
         CS_TrackingLevel = 0U,
         CS_HandsReset,
         CS_UseVelocity,
+        CS_DashboardSmooth,
         CS_UseTriggerGrip,
         CS_TriggerMode,
+        CS_TriggerThreshold,
+        CS_GripThreshold,
+        CS_PinchLimitMin,
+        CS_PinchLimitMax,
         CS_UseControllerInput,
         CS_RootOffsetX,
         CS_RootOffsetY,
@@ -49,8 +66,12 @@ public:
     static int GetTrackingLevel();
     static bool IsHandsResetEnabled();
     static bool IsVelocityUsed();
+    static float GetDashboardSmooth();
     static bool IsTriggerGripUsed();
     static int GetTriggerMode();
+    static float GetTriggerThreshold();
+    static float GetGripThreshold();
+    static const glm::vec2& GetPinchLimits();
     static bool IsControllerInputUsed();
     static const glm::vec3& GetRootOffset();
     static const glm::vec3& GetRootAngle();
