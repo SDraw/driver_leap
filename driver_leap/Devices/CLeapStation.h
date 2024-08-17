@@ -1,5 +1,6 @@
 #pragma once
 
+class CLeapIndexController;
 class CLeapStation final : public vr::ITrackedDeviceServerDriver
 {
     vr::DriverPose_t m_pose;
@@ -8,8 +9,12 @@ class CLeapStation final : public vr::ITrackedDeviceServerDriver
 
     std::string m_serialNumber;
 
+    CLeapIndexController *m_leftController;
+    CLeapIndexController *m_rightController;
+
     CLeapStation(const CLeapStation &that) = delete;
     CLeapStation& operator=(const CLeapStation &that) = delete;
+    void ProcessExternalMessage(const char *p_message);
 
     // vr::ITrackedDeviceServerDriver
     vr::EVRInitError Activate(uint32_t unObjectId);
@@ -29,6 +34,8 @@ public:
     ~CLeapStation() = default;
 
     const std::string& GetSerialNumber() const;
+
+    void SetControllers(CLeapIndexController *p_left, CLeapIndexController *p_right);
 
     void SetTrackingState(TrackingState p_state);
 

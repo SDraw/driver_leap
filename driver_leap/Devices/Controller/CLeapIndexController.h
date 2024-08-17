@@ -80,7 +80,7 @@ class CLeapIndexController : public vr::ITrackedDeviceServerDriver
     void ChangeBonePosition(glm::vec3 &p_pos) const;
     void FixMetacarpalBone(glm::quat &p_rot) const;
 
-    void ProcessExternalInput(const char *p_message);
+    void ProcessExternalMessage(const char *p_message);
 
     static void ChangeAuxTransformation(glm::vec3 &p_pos, glm::quat &p_rot);
     static size_t GetFingerBoneIndex(size_t p_id);
@@ -131,6 +131,7 @@ public:
     const std::string& GetSerialNumber() const;
 
     void SetEnabled(bool p_state);
+    void ToggleEnabled();
     void SetButtonState(size_t p_button, bool p_state);
     void SetButtonValue(size_t p_button, float p_value);
 

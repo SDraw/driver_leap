@@ -17,6 +17,8 @@ private:
     void OnTrackingLevelChange(int p_item);
     void OnHandsResetChange(int p_state);
     void OnUseVelocityChange(int p_state);
+    void OnLeftControllerToggle(bool p_checked);
+    void OnRightControllerToggle(bool p_checked);
     void OnDashboardSmoothChanged(int p_value);
     void OnDashboardSmoothReset(bool p_checked);
     void OnStartMinimizedChanged(int p_state);

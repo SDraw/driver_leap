@@ -73,6 +73,7 @@
     </Link>
     <ClCompile>
       <AdditionalIncludeDirectories>./;../vendor/openvr/headers;../vendor/LeapSDK/include;../vendor/glm;../vendor/pugixml/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <PostBuildEvent>
       <Command>copy /y "$(TargetPath)" "C:\Program Files (x86)\Steam\steamapps\common\SteamVR\drivers\leap\bin\win64\leap_control\$(TargetFileName)"</Command>
@@ -85,6 +86,7 @@
     </Link>
     <ClCompile>
       <AdditionalIncludeDirectories>./;../vendor/openvr/headers;../vendor/LeapSDK/include;../vendor/glm;../vendor/pugixml/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <PostBuildEvent>
       <Command>copy /y "$(TargetPath)" "C:\Program Files (x86)\Steam\steamapps\common\SteamVR\drivers\leap\bin\win64\leap_control\$(TargetFileName)"</Command>

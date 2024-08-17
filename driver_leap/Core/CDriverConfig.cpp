@@ -304,3 +304,8 @@ void CDriverConfig::ProcessExternalSetting(const char *p_message)
         }
     }
 }
+
+void CDriverConfig::ProcessExternalSetting(const std::string & p_message)
+{
+    ProcessExternalSetting(p_message.c_str());
+}

@@ -6,13 +6,13 @@
 #include "Utils/CButton.h"
 #include "Utils/Utils.h"
 
-enum ButtonName
+enum ButtonType
 {
-    BN_A,
-    BN_B,
-    BN_System,
-    BN_Thumbstick,
-    BN_Touchpad
+    BT_A,
+    BT_B,
+    BT_System,
+    BT_Thumbstick,
+    BT_Touchpad
 };
 
 const glm::mat4 g_identityMat4(1.f);
@@ -143,13 +143,13 @@ void CHandOverlay::ResetInput()
 {
     if(!m_buttons.empty())
     {
-        m_buttons[ButtonName::BN_A]->SetState(CButton::BS_None);
-        m_buttons[ButtonName::BN_B]->SetState(CButton::BS_None);
-        m_buttons[ButtonName::BN_System]->SetState(CButton::BS_None);
-        m_buttons[ButtonName::BN_Thumbstick]->SetState(CButton::BS_None);
-        m_buttons[ButtonName::BN_Thumbstick]->SetAxis(g_zeroVec2);
-        m_buttons[ButtonName::BN_Touchpad]->SetState(CButton::BS_None);
-        m_buttons[ButtonName::BN_Touchpad]->SetAxis(g_zeroVec2);
+        m_buttons[ButtonType::BT_A]->SetState(CButton::BS_None);
+        m_buttons[ButtonType::BT_B]->SetState(CButton::BS_None);
+        m_buttons[ButtonType::BT_System]->SetState(CButton::BS_None);
+        m_buttons[ButtonType::BT_Thumbstick]->SetState(CButton::BS_None);
+        m_buttons[ButtonType::BT_Thumbstick]->SetAxis(g_zeroVec2);
+        m_buttons[ButtonType::BT_Touchpad]->SetState(CButton::BS_None);
+        m_buttons[ButtonType::BT_Touchpad]->SetAxis(g_zeroVec2);
     }
 }
 
@@ -212,40 +212,40 @@ void CHandOverlay::Update(const glm::vec3 &p_cursor)
 
         // Buttons
         if(m_ui->IsOnButtonA())
-            m_buttons[ButtonName::BN_A]->SetState((m_pressure > g_clickPressure) ? CButton::BS_Clicked : ((m_pressure > g_touchPressure) ? CButton::BS_Touched : CButton::BS_None));
+            m_buttons[ButtonType::BT_A]->SetState((m_pressure > g_clickPressure) ? CButton::BS_Clicked : ((m_pressure > g_touchPressure) ? CButton::BS_Touched : CButton::BS_None));
         else
-            m_buttons[ButtonName::BN_A]->SetState(CButton::BS_None);
+            m_buttons[ButtonType::BT_A]->SetState(CButton::BS_None);
 
         if(m_ui->IsOnButtonB())
-            m_buttons[ButtonName::BN_B]->SetState((m_pressure > g_clickPressure) ? CButton::BS_Clicked : ((m_pressure > g_touchPressure) ? CButton::BS_Touched : CButton::BS_None));
+            m_buttons[ButtonType::BT_B]->SetState((m_pressure > g_clickPressure) ? CButton::BS_Clicked : ((m_pressure > g_touchPressure) ? CButton::BS_Touched : CButton::BS_None));
         else
-            m_buttons[ButtonName::BN_B]->SetState(CButton::BS_None);
+            m_buttons[ButtonType::BT_B]->SetState(CButton::BS_None);
 
         if(m_ui->IsOnButtonSys())
-            m_buttons[ButtonName::BN_System]->SetState((m_pressure > g_clickPressure) ? CButton::BS_Clicked : ((m_pressure > g_touchPressure) ? CButton::BS_Touched : CButton::BS_None));
+            m_buttons[ButtonType::BT_System]->SetState((m_pressure > g_clickPressure) ? CButton::BS_Clicked : ((m_pressure > g_touchPressure) ? CButton::BS_Touched : CButton::BS_None));
         else
-            m_buttons[ButtonName::BN_System]->SetState(CButton::BS_None);
+            m_buttons[ButtonType::BT_System]->SetState(CButton::BS_None);
 
         if(m_ui->IsOnThumbstick() && (m_pressure > g_touchPressure))
         {
-            m_buttons[ButtonName::BN_Thumbstick]->SetState((m_pressure > g_clickPressure) ? CButton::BS_Clicked : CButton::BS_Touched);
-            m_buttons[ButtonName::BN_Thumbstick]->SetAxis(m_ui->GetThumbstickAxis());
+            m_buttons[ButtonType::BT_Thumbstick]->SetState((m_pressure > g_clickPressure) ? CButton::BS_Clicked : CButton::BS_Touched);
+            m_buttons[ButtonType::BT_Thumbstick]->SetAxis(m_ui->GetThumbstickAxis());
         }
         else
         {
-            m_buttons[ButtonName::BN_Thumbstick]->SetState(CButton::BS_None);
-            m_buttons[ButtonName::BN_Thumbstick]->SetAxis(g_zeroVec2);
+            m_buttons[ButtonType::BT_Thumbstick]->SetState(CButton::BS_None);
+            m_buttons[ButtonType::BT_Thumbstick]->SetAxis(g_zeroVec2);
         }
 
         if(m_ui->IsOnTouchpad() && (m_pressure > g_touchPressure))
         {
-            m_buttons[ButtonName::BN_Touchpad]->SetState((m_pressure > g_clickPressure) ? CButton::BS_Clicked : CButton::BS_Touched);
-            m_buttons[ButtonName::BN_Touchpad]->SetAxis(m_ui->GetTouchpadAxis());
+            m_buttons[ButtonType::BT_Touchpad]->SetState((m_pressure > g_clickPressure) ? CButton::BS_Clicked : CButton::BS_Touched);
+            m_buttons[ButtonType::BT_Touchpad]->SetAxis(m_ui->GetTouchpadAxis());
         }
         else
         {
-            m_buttons[ButtonName::BN_Touchpad]->SetState(CButton::BS_None);
-            m_buttons[ButtonName::BN_Touchpad]->SetAxis(g_zeroVec2);
+            m_buttons[ButtonType::BT_Touchpad]->SetState(CButton::BS_None);
+            m_buttons[ButtonType::BT_Touchpad]->SetAxis(g_zeroVec2);
         }
     }
 }

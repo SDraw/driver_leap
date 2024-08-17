@@ -77,4 +77,5 @@ public:
     static const glm::vec3& GetRootAngle();
 
     static void ProcessExternalSetting(const char *p_message);
+    static void ProcessExternalSetting(const std::string &p_message);
 };

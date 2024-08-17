@@ -63,11 +63,13 @@ bool CLeapPoller::GetFrame(LEAP_TRACKING_EVENT *p_target)
     return true;
 }
 
+#ifndef LEAP_ORION
 void CLeapPoller::SetTrackingMode(eLeapTrackingMode p_mode)
 {
     if(m_isRunning)
         LeapSetTrackingMode(m_connection, p_mode);
 }
+#endif
 
 void CLeapPoller::SetPolicy(uint64_t p_set, uint64_t p_clear)
 {

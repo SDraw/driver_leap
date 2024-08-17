@@ -45,11 +45,17 @@ vr::EVRInitError CServerDriver::Init(vr::IVRDriverContext *pDriverContext)
     vr::VRServerDriverHost()->TrackedDeviceAdded(m_leftController->GetSerialNumber().c_str(), vr::TrackedDeviceClass_Controller, m_leftController);
     vr::VRServerDriverHost()->TrackedDeviceAdded(m_rightController->GetSerialNumber().c_str(), vr::TrackedDeviceClass_Controller, m_rightController);
 
+    m_leapStation->SetControllers(m_leftController, m_rightController);
+
     m_leapFrame = new CLeapFrame();
     m_leapPoller = new CLeapPoller();
     m_leapPoller->Start();
+#ifndef LEAP_ORION
     m_leapPoller->SetTrackingMode(_eLeapTrackingMode::eLeapTrackingMode_HMD);
     m_leapPoller->SetPolicy(eLeapPolicyFlag::eLeapPolicyFlag_OptimizeHMD, eLeapPolicyFlag::eLeapPolicyFlag_OptimizeScreenTop);
+#else
+    m_leapPoller->SetPolicy(eLeapPolicyFlag::eLeapPolicyFlag_OptimizeHMD);
+#endif
 
     // Start leap_control
     std::wstring l_appPath(g_modulePath);
@@ -106,8 +112,12 @@ void CServerDriver::RunFrame()
         m_leftController->SetEnabled(m_connectionState);
         m_rightController->SetEnabled(m_connectionState);
 
+#ifndef LEAP_ORION
         m_leapPoller->SetTrackingMode(_eLeapTrackingMode::eLeapTrackingMode_HMD);
         m_leapPoller->SetPolicy(eLeapPolicyFlag::eLeapPolicyFlag_OptimizeHMD, eLeapPolicyFlag::eLeapPolicyFlag_OptimizeScreenTop);
+#else
+        m_leapPoller->SetPolicy(eLeapPolicyFlag::eLeapPolicyFlag_OptimizeHMD);
+#endif
     }
 
     if(m_connectionState && m_leapPoller->GetFrame(m_leapFrame->GetEvent()))

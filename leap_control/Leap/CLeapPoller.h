@@ -28,7 +28,9 @@ public:
     bool GetFrame(LEAP_TRACKING_EVENT *p_target);
 
     void SetPolicy(uint64_t p_set, uint64_t p_clear = 0U);
+#ifndef LEAP_ORION
     void SetTrackingMode(eLeapTrackingMode p_mode);
+#endif
 };
 
 

@@ -1,7 +1,29 @@
 #include "stdafx.h"
 #include "Devices/CLeapStation.h"
+#include "Devices/Controller/CLeapIndexController.h"
 #include "Core/CDriverConfig.h"
 #include "Utils/Utils.h"
+
+enum MessageType : size_t
+{
+    MT_Power = 0U,
+    MT_Setting
+};
+const std::vector<std::string> g_messageTypes =
+{
+    "power",
+    "setting"
+};
+
+enum ControllerHand : size_t
+{
+    CH_Left = 0U,
+    CH_Right
+};
+const std::vector<std::string> g_controllerHands =
+{
+    "left", "right"
+};
 
 CLeapStation::CLeapStation()
 {
@@ -29,6 +51,8 @@ CLeapStation::CLeapStation()
     m_trackedDevice = vr::k_unTrackedDeviceIndexInvalid;
 
     m_serialNumber.assign("leap_motion_station");
+    m_leftController = nullptr;
+    m_rightController = nullptr;
 }
 
 // vr::ITrackedDeviceServerDriver
@@ -101,7 +125,7 @@ void* CLeapStation::GetComponent(const char* pchComponentNameAndVersion)
 void CLeapStation::DebugRequest(const char* pchRequest, char* pchResponseBuffer, uint32_t unResponseBufferSize)
 {
     if(m_trackedDevice != vr::k_unTrackedDeviceIndexInvalid)
-        CDriverConfig::ProcessExternalSetting(pchRequest);
+        ProcessExternalMessage(pchRequest);
 }
 
 vr::DriverPose_t CLeapStation::GetPose()
@@ -113,6 +137,12 @@ vr::DriverPose_t CLeapStation::GetPose()
 const std::string& CLeapStation::GetSerialNumber() const
 {
     return m_serialNumber;
+}
+
+void CLeapStation::SetControllers(CLeapIndexController * p_left, CLeapIndexController * p_right)
+{
+    m_leftController = p_left;
+    m_rightController = p_right;
 }
 
 void CLeapStation::SetTrackingState(TrackingState p_state)
@@ -136,4 +166,52 @@ void CLeapStation::RunFrame()
 {
     if(m_trackedDevice != vr::k_unTrackedDeviceIndexInvalid)
         vr::VRServerDriverHost()->TrackedDevicePoseUpdated(m_trackedDevice, m_pose, sizeof(vr::DriverPose_t));
+}
+
+void CLeapStation::ProcessExternalMessage(const char *p_message)
+{
+    std::vector<std::string> l_chunks;
+    SplitString(p_message, ' ', l_chunks);
+
+    if(l_chunks.size() > 1U)
+    {
+        size_t l_messageType = 0U;
+        if(ReadEnumVector(l_chunks[0U], g_messageTypes, l_messageType))
+        {
+            switch(l_messageType)
+            {
+                case MT_Power:
+                {
+                    size_t l_hand = 0U;
+                    if(ReadEnumVector(l_chunks[1U], g_controllerHands, l_hand))
+                    {
+                        switch(l_hand)
+                        {
+                            case CH_Left:
+                            {
+                                if(m_leftController)
+                                    m_leftController->ToggleEnabled();
+                            } break;
+                            case CH_Right:
+                            {
+                                if(m_rightController)
+                                    m_rightController->ToggleEnabled();
+                            } break;
+                        }
+                    }
+                } break;
+
+                case MT_Setting:
+                {
+                    std::string l_message;
+                    for(size_t i = 1U, j = l_chunks.size(); i < j; i++)
+                    {
+                        l_message.append(l_chunks[i]);
+                        l_message.push_back(' ');
+                    }
+                    CDriverConfig::ProcessExternalSetting(l_message);
+                } break;
+            }
+        }
+    }
 }

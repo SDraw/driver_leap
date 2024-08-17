@@ -110,6 +110,8 @@ leap_control::leap_control(QWidget *parent) : QWidget(parent)
     ui.m_overlayAngleSliderZ->setToolTip(QString("Z: %1").arg(CSettingsManager::GetInstance()->GetOverlayAngle().z));
     connect(ui.m_overlayAngleSliderZ, &QSlider::valueChanged, this, &leap_control::OnOverlayAngleZChanged);
 
+    connect(ui.m_leftHandToggleButton, &QPushButton::clicked, this, &leap_control::OnLeftControllerToggle);
+    connect(ui.m_rightHandToggleButton, &QPushButton::clicked, this, &leap_control::OnRightControllerToggle);
     connect(ui.m_dashboardSmoothResetButton, &QPushButton::clicked, this, &leap_control::OnDashboardSmoothReset);
     connect(ui.m_triggerThresholdResetButton, &QPushButton::clicked, this, &leap_control::OnTriggerThresholdReset);
     connect(ui.m_gripThresholdResetButton, &QPushButton::clicked, this, &leap_control::OnGripThresholdReset);
@@ -138,7 +140,7 @@ void leap_control::OnHandsResetChange(int p_state)
     {
         CSettingsManager::GetInstance()->SetSetting(CSettingsManager::ST_HandsReset, (p_state == Qt::Checked));
 
-        std::string l_message("handsReset ");
+        std::string l_message("setting handsReset ");
         l_message.append(std::to_string((p_state == Qt::Checked) ? 1 : 0));
         CVRManager::GetInstance()->SendStationMessage(l_message);
     }
@@ -150,10 +152,20 @@ void leap_control::OnUseVelocityChange(int p_state)
     {
         CSettingsManager::GetInstance()->SetSetting(CSettingsManager::ST_UseVelocity, (p_state == Qt::Checked));
 
-        std::string l_message("useVelocity ");
+        std::string l_message("setting useVelocity ");
         l_message.append(std::to_string((p_state == Qt::Checked) ? 1 : 0));
         CVRManager::GetInstance()->SendStationMessage(l_message);
     }
+}
+
+void leap_control::OnLeftControllerToggle(bool p_checked)
+{
+    CVRManager::GetInstance()->SendStationMessage("power left");
+}
+
+void leap_control::OnRightControllerToggle(bool p_checked)
+{
+    CVRManager::GetInstance()->SendStationMessage("power right");
 }
 
 void leap_control::OnDashboardSmoothChanged(int p_value)
@@ -162,7 +174,7 @@ void leap_control::OnDashboardSmoothChanged(int p_value)
     ui.m_dashboardSmoothSlider->setToolTip(QString("%1").arg(l_value));
     CSettingsManager::GetInstance()->SetSetting(CSettingsManager::ST_DashboardSmooth, l_value);
 
-    std::string l_message("dashboardSmooth ");
+    std::string l_message("setting dashboardSmooth ");
     l_message.append(std::to_string(l_value));
     CVRManager::GetInstance()->SendStationMessage(l_message);
 }
@@ -185,7 +197,7 @@ void leap_control::OnUseTriggerGripChange(int p_state)
     {
         CSettingsManager::GetInstance()->SetSetting(CSettingsManager::ST_UseTriggerGrip, (p_state == Qt::Checked));
 
-        std::string l_message("useTriggerGrip ");
+        std::string l_message("setting useTriggerGrip ");
         l_message.append(std::to_string((p_state == Qt::Checked) ? 1 : 0));
         CVRManager::GetInstance()->SendStationMessage(l_message);
     }
@@ -195,7 +207,7 @@ void leap_control::OnTriggerModeChange(int p_item)
 {
     CSettingsManager::GetInstance()->SetSetting(CSettingsManager::ST_TriggerMode, p_item);
 
-    std::string l_message("triggerMode ");
+    std::string l_message("setting triggerMode ");
     l_message.append(std::to_string(p_item));
     CVRManager::GetInstance()->SendStationMessage(l_message);
 }
@@ -206,7 +218,7 @@ void leap_control::OnTriggerThresholdChange(int p_value)
     ui.m_triggerThresholdSlider->setToolTip(QString("%1").arg(l_value));
     CSettingsManager::GetInstance()->SetSetting(CSettingsManager::ST_TriggerThreshold, l_value);
 
-    std::string l_message("triggerThreshold ");
+    std::string l_message("setting triggerThreshold ");
     l_message.append(std::to_string(l_value));
     CVRManager::GetInstance()->SendStationMessage(l_message);
 }
@@ -223,7 +235,7 @@ void leap_control::OnGripThresholdChange(int p_value)
     ui.m_gripThresholdSlider->setToolTip(QString("%1").arg(l_value));
     CSettingsManager::GetInstance()->SetSetting(CSettingsManager::ST_GripThreshold, l_value);
 
-    std::string l_message("gripThreshold ");
+    std::string l_message("setting gripThreshold ");
     l_message.append(std::to_string(l_value));
     CVRManager::GetInstance()->SendStationMessage(l_message);
 }
@@ -240,7 +252,7 @@ void leap_control::OnPinchRangeMinChange(int p_value)
     ui.m_pinchRangeMinSlider->setToolTip(QString("Min: %1").arg(l_value));
     CSettingsManager::GetInstance()->SetSetting(CSettingsManager::ST_PinchLimitMin, l_value);
 
-    std::string l_message("pinchLimitMin ");
+    std::string l_message("setting pinchLimitMin ");
     l_message.append(std::to_string(l_value));
     CVRManager::GetInstance()->SendStationMessage(l_message);
 }
@@ -250,7 +262,7 @@ void leap_control::OnPinchRangeMaxChange(int p_value)
     ui.m_pinchRangeMaxSlider->setToolTip(QString("Max: %1").arg(l_value));
     CSettingsManager::GetInstance()->SetSetting(CSettingsManager::ST_PinchLimitMax, l_value);
 
-    std::string l_message("pinchLimitMax ");
+    std::string l_message("setting pinchLimitMax ");
     l_message.append(std::to_string(l_value));
     CVRManager::GetInstance()->SendStationMessage(l_message);
 }
@@ -271,7 +283,7 @@ void leap_control::OnUseControllerInputChange(int p_state)
     {
         CSettingsManager::GetInstance()->SetSetting(CSettingsManager::ST_UseControllerInput, (p_state == Qt::Checked));
 
-        std::string l_message("useControllerInput ");
+        std::string l_message("setting useControllerInput ");
         l_message.append(std::to_string((p_state == Qt::Checked) ? 1 : 0));
         CVRManager::GetInstance()->SendStationMessage(l_message);
     }
@@ -283,7 +295,7 @@ void leap_control::OnRootOffsetXChanged(int p_value)
     ui.m_rootOffsetSliderX->setToolTip(QString("X: %1").arg(l_value));
     CSettingsManager::GetInstance()->SetSetting(CSettingsManager::ST_RootOffsetX, l_value);
 
-    std::string l_message("rootOffsetX ");
+    std::string l_message("setting rootOffsetX ");
     l_message.append(std::to_string(l_value));
     CVRManager::GetInstance()->SendStationMessage(l_message);
 }
@@ -293,7 +305,7 @@ void leap_control::OnRootOffsetYChanged(int p_value)
     ui.m_rootOffsetSliderY->setToolTip(QString("Y: %1").arg(l_value));
     CSettingsManager::GetInstance()->SetSetting(CSettingsManager::ST_RootOffsetY, l_value);
 
-    std::string l_message("rootOffsetY ");
+    std::string l_message("setting rootOffsetY ");
     l_message.append(std::to_string(l_value));
     CVRManager::GetInstance()->SendStationMessage(l_message);
 }
@@ -303,7 +315,7 @@ void leap_control::OnRootOffsetZChanged(int p_value)
     ui.m_rootOffsetSliderZ->setToolTip(QString("Z: %1").arg(l_value));
     CSettingsManager::GetInstance()->SetSetting(CSettingsManager::ST_RootOffsetZ, l_value);
 
-    std::string l_message("rootOffsetZ ");
+    std::string l_message("setting rootOffsetZ ");
     l_message.append(std::to_string(l_value));
     CVRManager::GetInstance()->SendStationMessage(l_message);
 }
@@ -324,7 +336,7 @@ void leap_control::OnRootAngleXChanged(int p_value)
     ui.m_rootAngleSliderX->setToolTip(QString("X: %1").arg(l_value));
     CSettingsManager::GetInstance()->SetSetting(CSettingsManager::ST_RootAngleX, l_value);
 
-    std::string l_message("rootAngleX ");
+    std::string l_message("setting rootAngleX ");
     l_message.append(std::to_string(l_value));
     CVRManager::GetInstance()->SendStationMessage(l_message);
 }
@@ -334,7 +346,7 @@ void leap_control::OnRootAngleYChanged(int p_value)
     ui.m_rootAngleSliderY->setToolTip(QString("Y: %1").arg(l_value));
     CSettingsManager::GetInstance()->SetSetting(CSettingsManager::ST_RootAngleY, l_value);
 
-    std::string l_message("rootAngleY ");
+    std::string l_message("setting rootAngleY ");
     l_message.append(std::to_string(l_value));
     CVRManager::GetInstance()->SendStationMessage(l_message);
 }
@@ -344,7 +356,7 @@ void leap_control::OnRootAngleZChanged(int p_value)
     ui.m_rootAngleSliderZ->setToolTip(QString("Z: %1").arg(l_value));
     CSettingsManager::GetInstance()->SetSetting(CSettingsManager::ST_RootAngleZ, l_value);
 
-    std::string l_message("rootAngleZ ");
+    std::string l_message("setting rootAngleZ ");
     l_message.append(std::to_string(l_value));
     CVRManager::GetInstance()->SendStationMessage(l_message);
 }
